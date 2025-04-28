@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Home() {
     const [offset, setOffset] = useState(0); // Décalage de 9 mois
@@ -62,18 +63,19 @@ export default function Home() {
                     const isPast = year < currentYear || (year === currentYear && monthNum < currentMonth);
 
                     return (
-                        <div
-                            key={month.value}
-                            className={`rounded-lg p-6 w-full h-24 flex items-center justify-center text-center cursor-pointer transition
-            ${
-                isCurrentMonth
-                    ? 'bg-blue-100 text-blue-800 hover:bg-blue-200'
-                    : isPast
-                    ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                    : 'bg-white text-gray-900 hover:bg-gray-200'
-            }`}>
-                            {month.label}
-                        </div>
+                        <Link key={month.value} to={`/month/${month.value}`} className="w-full">
+                            <div
+                                className={`rounded-lg p-6 w-full h-24 flex items-center justify-center text-center cursor-pointer transition
+                                    ${
+                                        isCurrentMonth
+                                            ? 'bg-blue-100 text-blue-800 hover:bg-blue-200'
+                                            : isPast
+                                            ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                            : 'bg-white text-gray-900 hover:bg-gray-200'
+                                    }`}>
+                                {month.label}
+                            </div>
+                        </Link>
                     );
                 })}
             </div>
