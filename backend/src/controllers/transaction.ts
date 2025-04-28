@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import TransactionModel from '../models/Transaction';
-import { Error } from 'mongoose';
+import { Error as MongooseError } from 'mongoose';
 
 const create = async (req: Request, res: Response) => {
     const { month, income, fixed, name, value } = req.body;
@@ -23,7 +23,7 @@ const create = async (req: Request, res: Response) => {
             errors: null,
         });
     } catch (error: unknown) {
-        if (error instanceof Error.ValidationError) {
+        if (error instanceof MongooseError.ValidationError) {
             res.status(400).json({
                 message: 'Validation error',
                 data: null,
