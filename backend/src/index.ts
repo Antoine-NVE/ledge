@@ -9,7 +9,7 @@ const app = express();
 
 (async () => {
     try {
-        const mongoUri = process.env.MONGO_URI || 'mongodb://ledge-database:27017/ledge';
+        const mongoUri = 'mongodb://ledge-database:27017/ledge';
         await mongoose.connect(mongoUri);
         console.log('Connected to MongoDB');
     } catch (err) {
@@ -36,7 +36,7 @@ app.get('/', async (req: Request, res: Response) => {
     res.send('Hello World from Backend!');
 });
 
-const port = process.env.EXPRESS_PORT || 3000;
+const port = 3000;
 app.listen(port, () => {
     console.log(`Backend listening at http://localhost:${port}`);
 });
