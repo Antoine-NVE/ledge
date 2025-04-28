@@ -1,11 +1,12 @@
 import express, { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import TransactionModel from './models/Transaction';
+import transactionRoutes from './routes/transaction';
 
 dotenv.config();
 
 const app = express();
+app.use(express.json());
 
 (async () => {
     try {
@@ -17,24 +18,7 @@ const app = express();
     }
 })();
 
-app.get('/', async (req: Request, res: Response) => {
-    const transaction = new TransactionModel({
-        month: '2025-04',
-        income: true,
-        fixed: true,
-        name: 'Salary',
-        value: 5000,
-    });
-
-    try {
-        await transaction.save();
-        console.log('Transaction saved:', transaction);
-    } catch (err) {
-        console.error('Error saving transaction:', err);
-    }
-
-    res.send('Hello World from Backend!');
-});
+app.use('/transactions', transactionRoutes);
 
 const port = 3000;
 app.listen(port, () => {
