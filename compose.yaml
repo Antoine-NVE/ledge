@@ -1,0 +1,23 @@
+services:
+  ledge-frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+
+  ledge-backend:
+    build:
+      context: ./backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+
+  ledge-database:
+    image: mongo:8.0.8
+    ports:
+      - "${MONGO_PORT}:27017"
+    volumes:
+      - ./data/database:/data/db
