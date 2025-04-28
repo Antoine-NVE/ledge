@@ -24,10 +24,16 @@ const create = async (req: Request, res: Response) => {
         });
     } catch (error: unknown) {
         if (error instanceof MongooseError.ValidationError) {
+            const errors: Record<string, string> = {};
+
+            for (const [key, err] of Object.entries(error.errors)) {
+                errors[key] = err.message;
+            }
+
             res.status(400).json({
                 message: 'Validation error',
                 data: null,
-                errors: error.errors,
+                errors,
             });
         } else {
             res.status(500).json({
