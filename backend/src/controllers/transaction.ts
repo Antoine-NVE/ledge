@@ -2,7 +2,15 @@ import { Request, Response } from 'express';
 import TransactionModel from '../models/Transaction';
 import { Error as MongooseError } from 'mongoose';
 
-const create = async (req: Request, res: Response) => {
+interface TransactionBody {
+    month: string;
+    income: boolean;
+    fixed: boolean;
+    name: string;
+    value: number;
+}
+
+const create = async (req: Request<{}, {}, TransactionBody>, res: Response) => {
     const { month, income, fixed, name, value } = req.body;
 
     try {
