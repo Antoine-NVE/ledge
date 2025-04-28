@@ -3,11 +3,13 @@ import HomePage from './pages/Home';
 
 function App() {
     return (
-        <BrowserRouter>
-            <Routes>
-                <Route path="/" element={<HomePage />} />
-            </Routes>
-        </BrowserRouter>
+        <div className="min-h-screen flex flex-col bg-gray-100">
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={<HomePage />} />
+                </Routes>
+            </BrowserRouter>
+        </div>
     );
 }
 
