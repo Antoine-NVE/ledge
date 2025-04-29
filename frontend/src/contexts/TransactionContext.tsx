@@ -7,6 +7,8 @@ interface Transaction {
     fixed: boolean;
     name: string;
     value: number;
+    createdAt: string;
+    updatedAt: string;
 }
 
 interface TransactionContextType {
