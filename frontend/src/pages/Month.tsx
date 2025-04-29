@@ -15,6 +15,9 @@ const Month = () => {
         return <Navigate to="/" replace />;
     }
 
+    const [year, monthNumber] = month.split('-');
+    const label = `${monthNumber}/${year}`;
+
     const [sort, setSort] = useState<SortOption>('value-desc');
 
     // Filtrage par mois (source stable)
@@ -49,7 +52,7 @@ const Month = () => {
     return (
         <div className="flex flex-col flex-1 items-center p-4">
             <h1 className="text-3xl font-bold mb-6 text-gray-800">Ledge</h1>
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">{month}</h2>
+            <h2 className="text-2xl font-bold mb-4 text-gray-800">{label}</h2>
 
             {/* Filtres / Tris */}
             <div className="flex flex-wrap justify-center gap-4 mb-6">
