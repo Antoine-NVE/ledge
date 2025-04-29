@@ -6,6 +6,9 @@ services:
       - "${VITE_PORT}:5173"
     volumes:
       - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - ledge-backend
 
   ledge-backend:
     build:
@@ -14,6 +17,9 @@ services:
       - "${NODE_PORT}:3000"
     volumes:
       - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - ledge-database
 
   ledge-database:
     image: mongo:8.0.8
