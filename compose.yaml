@@ -1,5 +1,6 @@
 services:
   ledge-frontend:
+    container_name: ledge-frontend
     build:
       context: ./frontend
     ports:
@@ -11,6 +12,7 @@ services:
       - ledge-backend
 
   ledge-backend:
+    container_name: ledge-backend
     build:
       context: ./backend
     ports:
@@ -22,6 +24,7 @@ services:
       - ledge-database
 
   ledge-database:
+    container_name: ledge-database
     image: mongo:8.0.8
     ports:
       - "${MONGO_PORT}:27017"
