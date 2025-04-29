@@ -57,10 +57,10 @@ const Month = () => {
             {/* Filtres / Tris */}
             <div className="flex flex-wrap justify-center gap-4 mb-6">
                 {[
-                    { label: 'Valeur ↓', value: 'value-desc' },
-                    { label: 'Valeur ↑', value: 'value-asc' },
-                    { label: 'Plus récent', value: 'date-newest' },
-                    { label: 'Plus ancien', value: 'date-oldest' },
+                    { label: 'Value ↓', value: 'value-desc' },
+                    { label: 'Value ↑', value: 'value-asc' },
+                    { label: 'Newest', value: 'date-newest' },
+                    { label: 'Oldest', value: 'date-oldest' },
                 ].map((option) => (
                     <button
                         key={option.value}
@@ -77,7 +77,7 @@ const Month = () => {
 
             {/* Total global */}
             <div className="w-full max-w-5xl bg-white shadow-md rounded-lg p-4 mb-6 text-center">
-                <h3 className="text-xl font-semibold text-gray-800">Solde total</h3>
+                <h3 className="text-xl font-semibold text-gray-800">Total balance</h3>
                 <p
                     className={`text-2xl font-bold ${
                         total > 0 ? 'text-green-900' : total < 0 ? 'text-red-900' : 'text-black'
@@ -100,11 +100,11 @@ const Month = () => {
                                 <p className="text-gray-500 text-sm">
                                     {new Date(transaction.createdAt).toLocaleDateString('fr-FR')}
                                 </p>
-                                {transaction.fixed && <p className="text-blue-700 text-sm font-medium">Fixe</p>}
+                                {transaction.fixed && <p className="text-blue-700 text-sm font-medium">Fixed</p>}
                             </div>
                         ))
                     ) : (
-                        <p className="text-gray-500">Aucun revenu</p>
+                        <p className="text-gray-500">No income</p>
                     )}
                 </div>
 
@@ -120,11 +120,11 @@ const Month = () => {
                                 <p className="text-gray-500 text-sm">
                                     {new Date(transaction.createdAt).toLocaleDateString('fr-FR')}
                                 </p>
-                                {transaction.fixed && <p className="text-blue-700 text-sm font-medium">Fixe</p>}
+                                {transaction.fixed && <p className="text-blue-700 text-sm font-medium">Fixed</p>}
                             </div>
                         ))
                     ) : (
-                        <p className="text-gray-500">Aucune dépense</p>
+                        <p className="text-gray-500">No expense</p>
                     )}
                 </div>
             </div>
