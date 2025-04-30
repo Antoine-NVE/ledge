@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { useTransactions } from '../contexts/TransactionContext';
 import TransactionListSection from '../components/TransactionListSection';
+import { Transaction } from '../types/transaction';
 
 type SortOption = 'value-desc' | 'value-asc' | 'date-newest' | 'date-oldest';
 
@@ -102,13 +103,19 @@ const Month = () => {
             {/* 2 colonnes : Revenus / Dépenses */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
                 {/* Incomes */}
-                <TransactionListSection transactions={incomes} total={totalIncomes} isIncome={true} />
+                <TransactionListSection
+                    transactions={incomes}
+                    total={totalIncomes}
+                    isIncome={true}
+                    onEdit={(transaction: Transaction) => console.log(transaction)}
+                />
 
                 {/* Expenses */}
                 <TransactionListSection
                     transactions={expenses}
                     total={totalExpenses}
                     isIncome={false}
+                    onEdit={(transaction: Transaction) => console.log(transaction)}
                 />
             </div>
         </div>
