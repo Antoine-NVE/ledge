@@ -1,15 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-
-interface Transaction {
-    _id: string;
-    month: string;
-    income: boolean;
-    fixed: boolean;
-    name: string;
-    value: number;
-    createdAt: string;
-    updatedAt: string;
-}
+import { Transaction } from '../types/transaction';
 
 interface TransactionContextType {
     transactions: Transaction[];
