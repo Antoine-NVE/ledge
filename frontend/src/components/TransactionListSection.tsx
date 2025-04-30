@@ -29,7 +29,7 @@ const TransactionListSection = ({ title, transactions, total, isIncome }: Props)
                         <p className="text-gray-500 text-sm">
                             {new Date(transaction.createdAt).toLocaleDateString('fr-FR')}
                         </p>
-                        {transaction.fixed && <p className="text-blue-700 text-sm font-medium">Fixed</p>}
+                        {transaction.isFixed && <p className="text-blue-700 text-sm font-medium">Fixed</p>}
                     </div>
                 ))
             ) : (

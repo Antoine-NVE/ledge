@@ -44,8 +44,8 @@ const Month = () => {
     }, [filteredTransactions, sort]);
 
     // Séparation et totaux dynamiques
-    const incomes = displayedTransactions.filter((t) => t.income);
-    const expenses = displayedTransactions.filter((t) => !t.income);
+    const incomes = displayedTransactions.filter((t) => t.isIncome);
+    const expenses = displayedTransactions.filter((t) => !t.isFixed);
     const totalIncomes = incomes.reduce((acc, t) => acc + t.value / 100, 0);
     const totalExpenses = expenses.reduce((acc, t) => acc + t.value / 100, 0);
     const total = totalIncomes - totalExpenses;

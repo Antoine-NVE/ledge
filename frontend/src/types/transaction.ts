@@ -1,8 +1,8 @@
 export interface Transaction {
     _id: string;
     month: string;
-    income: boolean;
-    fixed: boolean;
+    isIncome: boolean;
+    isFixed: boolean;
     name: string;
     value: number;
     createdAt: string;
