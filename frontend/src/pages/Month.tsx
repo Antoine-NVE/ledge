@@ -49,30 +49,42 @@ const Month = () => {
     const totalExpenses = expenses.reduce((acc, t) => acc + t.value / 100, 0);
     const total = totalIncomes - totalExpenses;
 
+    const handleAddTransaction = () => {
+        console.log('Add transaction clicked');
+    };
+
     return (
         <div className="flex flex-col flex-1 items-center p-4">
             <h1 className="text-3xl font-bold mb-6 text-gray-800">Ledge</h1>
             <h2 className="text-2xl font-bold mb-4 text-gray-800">{label}</h2>
 
             {/* Filtres / Tris */}
-            <div className="flex flex-wrap justify-center gap-4 mb-6">
-                {[
-                    { label: 'Value ↓', value: 'value-desc' },
-                    { label: 'Value ↑', value: 'value-asc' },
-                    { label: 'Newest', value: 'date-newest' },
-                    { label: 'Oldest', value: 'date-oldest' },
-                ].map((option) => (
-                    <button
-                        key={option.value}
-                        onClick={() => setSort(option.value as SortOption)}
-                        className={`px-3 py-1 rounded-md text-sm shadow transition cursor-pointer ${
-                            sort === option.value
-                                ? 'bg-blue-600 text-white'
-                                : 'bg-white hover:bg-gray-200 text-gray-800'
-                        }`}>
-                        {option.label}
-                    </button>
-                ))}
+            <div className="flex flex-wrap justify-between items-center gap-4 mb-6 w-full max-w-5xl">
+                <div className="flex flex-wrap gap-2">
+                    {[
+                        { label: 'Value ↓', value: 'value-desc' },
+                        { label: 'Value ↑', value: 'value-asc' },
+                        { label: 'Newest', value: 'date-newest' },
+                        { label: 'Oldest', value: 'date-oldest' },
+                    ].map((option) => (
+                        <button
+                            key={option.value}
+                            onClick={() => setSort(option.value as SortOption)}
+                            className={`px-3 py-1 rounded-md text-sm shadow transition cursor-pointer ${
+                                sort === option.value
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-white hover:bg-gray-200 text-gray-800'
+                            }`}>
+                            {option.label}
+                        </button>
+                    ))}
+                </div>
+
+                <button
+                    onClick={handleAddTransaction} // à définir toi-même
+                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm shadow cursor-pointer transition">
+                    + Add transaction
+                </button>
             </div>
 
             {/* Total global */}
