@@ -102,11 +102,10 @@ const Month = () => {
             {/* 2 colonnes : Revenus / Dépenses */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
                 {/* Incomes */}
-                <TransactionListSection title="Incomes" transactions={incomes} total={totalIncomes} isIncome={true} />
+                <TransactionListSection transactions={incomes} total={totalIncomes} isIncome={true} />
 
                 {/* Expenses */}
                 <TransactionListSection
-                    title="Expenses"
                     transactions={expenses}
                     total={totalExpenses}
                     isIncome={false}

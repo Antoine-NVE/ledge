@@ -1,13 +1,12 @@
 import { Transaction } from '../types/transaction';
 
 interface Props {
-    title: string;
     transactions: Transaction[];
     total: number;
     isIncome: boolean;
 }
 
-const TransactionListSection = ({ title, transactions, total, isIncome }: Props) => {
+const TransactionListSection = ({ transactions, total, isIncome }: Props) => {
     const bgColor = isIncome ? 'bg-green-50' : 'bg-red-50';
     const titleColor = isIncome ? 'text-green-700' : 'text-red-700';
     const totalColor = isIncome ? 'text-green-800' : 'text-red-800';
@@ -15,7 +14,7 @@ const TransactionListSection = ({ title, transactions, total, isIncome }: Props)
 
     return (
         <div className={`${bgColor} rounded-lg p-4 shadow-md flex flex-col`}>
-            <h3 className={`text-lg font-bold mb-2 ${titleColor}`}>{title}</h3>
+            <h3 className={`text-lg font-bold mb-2 ${titleColor}`}>{isIncome ? 'Incomes' : 'Expenses'}</h3>
             <p className={`font-semibold mb-4 ${totalColor}`}>{total.toFixed(2)} €</p>
 
             {transactions.length > 0 ? (

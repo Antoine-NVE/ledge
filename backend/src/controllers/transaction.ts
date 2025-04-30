@@ -4,20 +4,20 @@ import { Error as MongooseError } from 'mongoose';
 
 interface TransactionBody {
     month: string;
-    income: boolean;
-    fixed: boolean;
+    isIncome: boolean;
+    isFixed: boolean;
     name: string;
     value: number;
 }
 
 const create = async (req: Request<{}, {}, TransactionBody>, res: Response) => {
-    const { month, income, fixed, name, value } = req.body;
+    const { month, isIncome, isFixed, name, value } = req.body;
 
     try {
         const transaction = new TransactionModel({
             month,
-            income,
-            fixed,
+            isIncome,
+            isFixed,
             name,
             value,
         });
@@ -113,15 +113,15 @@ const getById = async (req: Request<{ id: string }>, res: Response) => {
 
 const update = async (req: Request<{ id: string }, {}, TransactionBody>, res: Response) => {
     const { id } = req.params;
-    const { month, income, fixed, name, value } = req.body;
+    const { month, isIncome, isFixed, name, value } = req.body;
 
     try {
         const transaction = await TransactionModel.findByIdAndUpdate(
             id,
             {
                 month,
-                income,
-                fixed,
+                isIncome,
+                isFixed,
                 name,
                 value,
             },
