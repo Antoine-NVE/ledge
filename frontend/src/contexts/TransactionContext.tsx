@@ -7,7 +7,7 @@ interface TransactionContextType {
     error: string | null;
     addTransaction: (transaction: Transaction) => void;
     deleteTransaction: (id: string) => void;
-    updateTransaction: (id: string, updatedFields: Partial<Transaction>) => void;
+    updateTransaction: (transaction: Transaction) => void;
 }
 
 const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
@@ -46,8 +46,8 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         setTransactions((prev) => prev.filter((t) => t._id !== id));
     };
 
-    const updateTransaction = (id: string, updatedFields: Partial<Transaction>) => {
-        setTransactions((prev) => prev.map((t) => (t._id === id ? { ...t, ...updatedFields } : t)));
+    const updateTransaction = (transaction: Transaction) => {
+        setTransactions((prev) => prev.map((t) => (t._id === transaction._id ? transaction : t)));
     };
 
     return (

@@ -3,6 +3,7 @@ import { Navigate, useParams } from 'react-router-dom';
 import { useTransactions } from '../contexts/TransactionContext';
 import TransactionListSection from '../components/TransactionListSection';
 import { Transaction } from '../types/transaction';
+import TransactionModal from '../components/TransactionModal';
 
 type SortOption = 'value-desc' | 'value-asc' | 'date-newest' | 'date-oldest';
 
@@ -10,7 +11,7 @@ const Month = () => {
     const params = useParams<{ month: string }>();
     const month = params.month;
 
-    const { transactions } = useTransactions();
+    const { transactions, addTransaction, updateTransaction } = useTransactions();
 
     const regex = /^\d{4}-(0[1-9]|1[0-2])$/;
     if (!month || !regex.test(month)) {
@@ -51,74 +52,107 @@ const Month = () => {
     const totalExpenses = expenses.reduce((acc, t) => acc + t.value / 100, 0);
     const total = totalIncomes - totalExpenses;
 
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [initialTransaction, setInitialTransaction] = useState<Transaction | null>(null);
+
     const handleAddTransaction = () => {
-        console.log('Add transaction clicked');
+        setInitialTransaction(null);
+        setIsModalOpen(true);
+    };
+
+    const handleEditTransaction = (transaction: Transaction) => {
+        setInitialTransaction(transaction);
+        setIsModalOpen(true);
     };
 
     return (
-        <div className="flex flex-col flex-1 items-center p-4">
-            <h1 className="text-3xl font-bold mb-6 text-gray-800">Ledge</h1>
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">{label}</h2>
+        <>
+            <TransactionModal
+                isOpen={isModalOpen}
+                onClose={() => {
+                    setInitialTransaction(null);
+                    setIsModalOpen(false);
+                }}
+                initialTransaction={initialTransaction}
+                month={month}
+                onSave={(transaction: Transaction) => {
+                    if (initialTransaction) {
+                        // Update transaction
+                        updateTransaction(transaction);
 
-            {/* Filtres / Tris */}
-            <div className="flex flex-wrap justify-between items-center gap-4 mb-6 w-full max-w-5xl">
-                <div className="flex flex-wrap gap-2">
-                    {[
-                        { label: 'Value ↓', value: 'value-desc' },
-                        { label: 'Value ↑', value: 'value-asc' },
-                        { label: 'Newest', value: 'date-newest' },
-                        { label: 'Oldest', value: 'date-oldest' },
-                    ].map((option) => (
-                        <button
-                            key={option.value}
-                            onClick={() => setSort(option.value as SortOption)}
-                            className={`px-3 py-1 rounded-md text-sm shadow transition cursor-pointer ${
-                                sort === option.value
-                                    ? 'bg-blue-600 text-white'
-                                    : 'bg-white hover:bg-gray-200 text-gray-800'
-                            }`}>
-                            {option.label}
-                        </button>
-                    ))}
+                        setInitialTransaction(null);
+                    } else {
+                        // Create transaction
+                        addTransaction(transaction);
+                    }
+                    setIsModalOpen(false);
+                }}
+            />
+
+            <div className="flex flex-col flex-1 items-center p-4">
+                <h1 className="text-3xl font-bold mb-6 text-gray-800">Ledge</h1>
+                <h2 className="text-2xl font-bold mb-4 text-gray-800">{label}</h2>
+
+                {/* Filtres / Tris */}
+                <div className="flex flex-wrap justify-between items-center gap-4 mb-6 w-full max-w-5xl">
+                    <div className="flex flex-wrap gap-2">
+                        {[
+                            { label: 'Value ↓', value: 'value-desc' },
+                            { label: 'Value ↑', value: 'value-asc' },
+                            { label: 'Newest', value: 'date-newest' },
+                            { label: 'Oldest', value: 'date-oldest' },
+                        ].map((option) => (
+                            <button
+                                key={option.value}
+                                onClick={() => setSort(option.value as SortOption)}
+                                className={`px-3 py-1 rounded-md text-sm shadow transition cursor-pointer ${
+                                    sort === option.value
+                                        ? 'bg-blue-600 text-white'
+                                        : 'bg-white hover:bg-gray-200 text-gray-800'
+                                }`}>
+                                {option.label}
+                            </button>
+                        ))}
+                    </div>
+
+                    <button
+                        onClick={handleAddTransaction} // à définir toi-même
+                        className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm shadow cursor-pointer transition">
+                        + Add transaction
+                    </button>
                 </div>
 
-                <button
-                    onClick={handleAddTransaction} // à définir toi-même
-                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm shadow cursor-pointer transition">
-                    + Add transaction
-                </button>
-            </div>
+                {/* Total global */}
+                <div className="w-full max-w-5xl bg-white shadow-md rounded-lg p-4 mb-6 text-center">
+                    <h3 className="text-xl font-semibold text-gray-800">Total balance</h3>
+                    <p
+                        className={`text-2xl font-bold ${
+                            total > 0 ? 'text-green-900' : total < 0 ? 'text-red-900' : 'text-black'
+                        }`}>
+                        {total.toFixed(2)} €
+                    </p>
+                </div>
 
-            {/* Total global */}
-            <div className="w-full max-w-5xl bg-white shadow-md rounded-lg p-4 mb-6 text-center">
-                <h3 className="text-xl font-semibold text-gray-800">Total balance</h3>
-                <p
-                    className={`text-2xl font-bold ${
-                        total > 0 ? 'text-green-900' : total < 0 ? 'text-red-900' : 'text-black'
-                    }`}>
-                    {total.toFixed(2)} €
-                </p>
-            </div>
+                {/* 2 colonnes : Revenus / Dépenses */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
+                    {/* Incomes */}
+                    <TransactionListSection
+                        transactions={incomes}
+                        total={totalIncomes}
+                        isIncome={true}
+                        onEdit={(transaction: Transaction) => handleEditTransaction(transaction)}
+                    />
 
-            {/* 2 colonnes : Revenus / Dépenses */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 w-full max-w-5xl">
-                {/* Incomes */}
-                <TransactionListSection
-                    transactions={incomes}
-                    total={totalIncomes}
-                    isIncome={true}
-                    onEdit={(transaction: Transaction) => console.log(transaction)}
-                />
-
-                {/* Expenses */}
-                <TransactionListSection
-                    transactions={expenses}
-                    total={totalExpenses}
-                    isIncome={false}
-                    onEdit={(transaction: Transaction) => console.log(transaction)}
-                />
+                    {/* Expenses */}
+                    <TransactionListSection
+                        transactions={expenses}
+                        total={totalExpenses}
+                        isIncome={false}
+                        onEdit={(transaction: Transaction) => handleEditTransaction(transaction)}
+                    />
+                </div>
             </div>
-        </div>
+        </>
     );
 };
 
