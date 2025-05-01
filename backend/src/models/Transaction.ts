@@ -18,7 +18,12 @@ const TransactionSchema = new Schema<ITransaction>(
         isIncome: { type: Boolean, required: true },
         isFixed: { type: Boolean, required: true },
         name: { type: String, required: true, trim: true, minlength: 1, maxlength: 100 },
-        value: { type: Number, required: true, min: 1, max: 1000000 },
+        value: {
+            type: Number,
+            required: true,
+            min: [1, 'Path `value` is less than minimum allowed value (0.01).'],
+            max: [100000000, 'Path `value` is more than maximum allowed value (1000000.00).'],
+        },
     },
     {
         timestamps: true, // Automatically create createdAt and updatedAt fields
