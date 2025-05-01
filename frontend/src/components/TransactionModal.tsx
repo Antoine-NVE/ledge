@@ -15,7 +15,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
     const [form, setForm] = useState({
         name: initialTransaction?.name ?? '',
         value: initialTransaction ? initialTransaction.value / 100 : '',
-        isIncome: initialTransaction?.isIncome ?? true,
+        isIncome: initialTransaction?.isIncome ?? false,
         isFixed: initialTransaction?.isFixed ?? false,
     });
     const [isLoading, setIsLoading] = useState(false);
