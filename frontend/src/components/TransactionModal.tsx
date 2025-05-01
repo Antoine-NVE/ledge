@@ -14,7 +14,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
 
     const [form, setForm] = useState({
         name: initialTransaction?.name ?? '',
-        value: initialTransaction ? initialTransaction.value / 100 : '',
+        value: initialTransaction ? (initialTransaction.value / 100).toFixed(2) : '', // Convert to string for input
         isIncome: initialTransaction?.isIncome ?? false,
         isFixed: initialTransaction?.isFixed ?? false,
     });
@@ -79,7 +79,9 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const amount = form.value === '' ? 0 : Math.round(Number(form.value) * 100);
+
+        // Convert to number and round to cents
+        const amount = form.value === '' || isNaN(Number(form.value)) ? 0 : Math.round(Number(form.value) * 100);
 
         if (initialTransaction) {
             const transaction: Transaction = {
@@ -130,15 +132,23 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                     <div>
                         <label className="block text-sm font-medium mb-1">Value (€)</label>
                         <input
-                            type="number"
+                            type="text"
                             value={form.value}
                             onChange={(e) => {
-                                const val = e.target.value;
-                                setForm({ ...form, value: val === '' ? '' : parseFloat(val) });
+                                const val = e.target.value.replace(',', '.');
+
+                                if (val === '' || /^(?:\d+(?:\.\d{0,2})?)?$/.test(val)) {
+                                    setForm({ ...form, value: val });
+                                }
+                            }}
+                            onBlur={() => {
+                                if (form.value !== '') {
+                                    const cleaned = form.value.replace(/\.$/, '');
+
+                                    setForm({ ...form, value: cleaned });
+                                }
                             }}
                             className="w-full border rounded px-3 py-2 text-sm"
-                            min={0}
-                            step="any"
                         />
                         {formErrors.value && <p className="text-red-500 text-sm mt-1">{formErrors.value}</p>}
                     </div>
