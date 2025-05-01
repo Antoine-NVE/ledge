@@ -138,7 +138,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                             }}
                             className="w-full border rounded px-3 py-2 text-sm"
                             min={0}
-                            step={0.01}
+                            step="any"
                         />
                         {formErrors.value && <p className="text-red-500 text-sm mt-1">{formErrors.value}</p>}
                     </div>
