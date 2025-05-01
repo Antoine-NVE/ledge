@@ -122,7 +122,6 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                             value={form.name}
                             onChange={(e) => setForm({ ...form, name: e.target.value })}
                             className="w-full border rounded px-3 py-2 text-sm"
-                            required
                         />
                         {formErrors.name && <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>}
                     </div>
@@ -138,9 +137,8 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                                 setForm({ ...form, value: val === '' ? '' : parseFloat(val) });
                             }}
                             className="w-full border rounded px-3 py-2 text-sm"
-                            min={0.01}
+                            min={0}
                             step={0.01}
-                            required
                         />
                         {formErrors.value && <p className="text-red-500 text-sm mt-1">{formErrors.value}</p>}
                     </div>
