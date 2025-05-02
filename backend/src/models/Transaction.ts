@@ -23,6 +23,10 @@ const TransactionSchema = new Schema<ITransaction>(
             required: true,
             min: [1, 'Path `value` is less than minimum allowed value (0.01).'],
             max: [100000000, 'Path `value` is more than maximum allowed value (1000000.00).'],
+            validate: {
+                validator: Number.isInteger,
+                message: 'Path `value` must be an integer.',
+            },
         },
     },
     {
