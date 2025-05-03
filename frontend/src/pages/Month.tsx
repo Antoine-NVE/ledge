@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { useTransactions } from '../contexts/TransactionContext';
 import TransactionListSection from '../components/TransactionListSection';
@@ -61,25 +61,29 @@ const Month = () => {
         setSelectedTransaction(null);
         setIsTransactionModalOpen(true);
     };
-
     const handleEditTransaction = (transaction: Transaction) => {
         setSelectedTransaction(transaction);
         setIsTransactionModalOpen(true);
     };
+    const handleCloseTransactionModal = useCallback(() => {
+        setSelectedTransaction(null);
+        setIsTransactionModalOpen(false);
+    }, []);
 
     const handleDeleteTransaction = (transaction: Transaction) => {
         setSelectedTransaction(transaction);
         setIsDeleteTransactionModalOpen(true);
     };
+    const handleCloseDeleteTransactionModal = useCallback(() => {
+        setSelectedTransaction(null);
+        setIsDeleteTransactionModalOpen(false);
+    }, []);
 
     return (
         <>
             <TransactionModal
                 isOpen={isTransactionModalOpen}
-                onClose={() => {
-                    setSelectedTransaction(null);
-                    setIsTransactionModalOpen(false);
-                }}
+                onClose={handleCloseTransactionModal}
                 initialTransaction={selectedTransaction}
                 month={month}
                 onSave={(transaction: Transaction) => {
@@ -98,10 +102,7 @@ const Month = () => {
 
             <DeleteTransactionModal
                 isOpen={isDeleteTransactionModalOpen}
-                onClose={() => {
-                    setSelectedTransaction(null);
-                    setIsDeleteTransactionModalOpen(false);
-                }}
+                onClose={handleCloseDeleteTransactionModal}
                 transaction={selectedTransaction!}
                 onDelete={(transaction: Transaction) => {
                     // Delete transaction
