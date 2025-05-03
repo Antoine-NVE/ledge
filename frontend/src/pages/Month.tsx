@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Navigate, useParams } from 'react-router-dom';
 import { useTransactions } from '../contexts/TransactionContext';
 import TransactionListSection from '../components/TransactionListSection';
@@ -71,6 +71,10 @@ const Month = () => {
         setSelectedTransaction(transaction);
         setIsDeleteTransactionModalOpen(true);
     };
+    const handleCloseDeleteTransactionModal = useCallback(() => {
+        setSelectedTransaction(null);
+        setIsDeleteTransactionModalOpen(false);
+    }, []);
 
     return (
         <>
@@ -98,10 +102,7 @@ const Month = () => {
 
             <DeleteTransactionModal
                 isOpen={isDeleteTransactionModalOpen}
-                onClose={() => {
-                    setSelectedTransaction(null);
-                    setIsDeleteTransactionModalOpen(false);
-                }}
+                onClose={handleCloseDeleteTransactionModal}
                 transaction={selectedTransaction!}
                 onDelete={(transaction: Transaction) => {
                     // Delete transaction
