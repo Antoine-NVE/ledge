@@ -1,3 +1,7 @@
 data/database/
+
 compose.override.yaml
+compose.dev.yaml
+compose.prod.yaml
+
 .env

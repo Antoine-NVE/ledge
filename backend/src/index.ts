@@ -13,7 +13,7 @@ app.use(cors());
 
 (async () => {
     try {
-        const mongoUri = 'mongodb://ledge-database:27017/ledge';
+        const mongoUri = 'mongodb://database:27017/ledge';
         await mongoose.connect(mongoUri);
         console.log('Connected to MongoDB');
     } catch (err) {
