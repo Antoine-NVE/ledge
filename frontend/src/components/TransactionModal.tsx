@@ -12,7 +12,12 @@ interface Props {
 const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }: Props) => {
     if (!isOpen) return null;
 
-    const [form, setForm] = useState({
+    const [form, setForm] = useState<{
+        name: string;
+        value: string; // Keep as string for input
+        isIncome: boolean;
+        isFixed: boolean;
+    }>({
         name: initialTransaction?.name ?? '',
         value: initialTransaction ? (initialTransaction.value / 100).toFixed(2) : '', // Convert to string for input
         isIncome: initialTransaction?.isIncome ?? false,
@@ -153,27 +158,43 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                         {formErrors.value && <p className="text-red-500 text-sm mt-1">{formErrors.value}</p>}
                     </div>
 
-                    {/* isIncome / isFixed */}
-                    <div className="flex items-center gap-6">
-                        <label className="flex items-center gap-2 cursor-pointer select-none">
-                            <input
-                                className="cursor-pointer"
-                                type="checkbox"
-                                checked={form.isIncome}
-                                onChange={(e) => setForm({ ...form, isIncome: e.target.checked })}
-                            />
-                            <span>Income</span>
-                        </label>
-                        <label className="flex items-center gap-2 cursor-pointer select-none">
-                            <input
-                                className="cursor-pointer"
-                                type="checkbox"
-                                checked={form.isFixed}
-                                onChange={(e) => setForm({ ...form, isFixed: e.target.checked })}
-                            />
-                            <span>Fixed</span>
-                        </label>
+                    {/* Type */}
+                    <div>
+                        <label className="block text-sm font-medium mb-1">Type</label>
+                        <div className="flex items-center gap-4">
+                            <label className="flex items-center gap-2 cursor-pointer select-none">
+                                <input
+                                    className="cursor-pointer"
+                                    type="radio"
+                                    name="transactionType"
+                                    checked={form.isIncome === true}
+                                    onChange={() => setForm({ ...form, isIncome: true })}
+                                />
+                                <span>Income</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer select-none">
+                                <input
+                                    className="cursor-pointer"
+                                    type="radio"
+                                    name="transactionType"
+                                    checked={form.isIncome === false}
+                                    onChange={() => setForm({ ...form, isIncome: false })}
+                                />
+                                <span>Expense</span>
+                            </label>
+                        </div>
                     </div>
+
+                    {/* Fixed */}
+                    <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <input
+                            className="cursor-pointer"
+                            type="checkbox"
+                            checked={form.isFixed}
+                            onChange={(e) => setForm({ ...form, isFixed: e.target.checked })}
+                        />
+                        <span>Fixed</span>
+                    </label>
 
                     {/* General error */}
                     {formErrors.general && <p className="text-red-600 text-sm">{formErrors.general}</p>}
