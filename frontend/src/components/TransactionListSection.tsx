@@ -1,14 +1,15 @@
 import { Transaction } from '../types/transaction';
-import { Pencil } from 'lucide-react';
+import { Pencil, Trash2 } from 'lucide-react';
 
 interface Props {
     transactions: Transaction[];
     total: number;
     isIncome: boolean;
     onEdit: (transaction: Transaction) => void;
+    onDelete: (transaction: Transaction) => void;
 }
 
-const TransactionListSection = ({ transactions, total, isIncome, onEdit }: Props) => {
+const TransactionListSection = ({ transactions, total, isIncome, onEdit, onDelete }: Props) => {
     const bgColor = isIncome ? 'bg-green-50' : 'bg-red-50';
     const titleColor = isIncome ? 'text-green-700' : 'text-red-700';
     const totalColor = isIncome ? 'text-green-800' : 'text-red-800';
@@ -24,11 +25,18 @@ const TransactionListSection = ({ transactions, total, isIncome, onEdit }: Props
                     <div key={transaction._id} className="bg-white p-3 rounded-md mb-2 shadow-sm">
                         <div className="flex justify-between items-center">
                             <h4 className="text-gray-800 font-medium">{transaction.name}</h4>
-                            <button
-                                onClick={() => onEdit(transaction)}
-                                className="text-gray-500 hover:text-gray-700 cursor-pointer">
-                                <Pencil size={18} />
-                            </button>
+                            <div>
+                                <button
+                                    onClick={() => onEdit(transaction)}
+                                    className="text-gray-500 hover:text-gray-700 cursor-pointer">
+                                    <Pencil size={18} />
+                                </button>
+                                <button
+                                    onClick={() => onDelete(transaction)}
+                                    className="text-red-500 hover:text-red-700 cursor-pointer ml-2">
+                                    <Trash2 size={18} />
+                                </button>
+                            </div>
                         </div>
                         <p className={`font-bold ${valueColor}`}>
                             {isIncome ? '' : '- '}

@@ -6,7 +6,7 @@ interface TransactionContextType {
     loading: boolean;
     error: string | null;
     addTransaction: (transaction: Transaction) => void;
-    deleteTransaction: (id: string) => void;
+    deleteTransaction: (transaction: Transaction) => void;
     updateTransaction: (transaction: Transaction) => void;
 }
 
@@ -42,8 +42,8 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         setTransactions((prev) => [...prev, transaction]);
     };
 
-    const deleteTransaction = (id: string) => {
-        setTransactions((prev) => prev.filter((t) => t._id !== id));
+    const deleteTransaction = (transaction: Transaction) => {
+        setTransactions((prev) => prev.filter((t) => t._id !== transaction._id));
     };
 
     const updateTransaction = (transaction: Transaction) => {

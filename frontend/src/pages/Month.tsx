@@ -4,6 +4,7 @@ import { useTransactions } from '../contexts/TransactionContext';
 import TransactionListSection from '../components/TransactionListSection';
 import { Transaction } from '../types/transaction';
 import TransactionModal from '../components/TransactionModal';
+import DeleteTransactionModal from '../components/DeleteTransactionModal';
 
 type SortOption = 'value-desc' | 'value-asc' | 'date-newest' | 'date-oldest';
 
@@ -11,7 +12,7 @@ const Month = () => {
     const params = useParams<{ month: string }>();
     const month = params.month;
 
-    const { transactions, addTransaction, updateTransaction } = useTransactions();
+    const { transactions, addTransaction, updateTransaction, deleteTransaction } = useTransactions();
 
     const regex = /^\d{4}-(0[1-9]|1[0-2])$/;
     if (!month || !regex.test(month)) {
@@ -52,40 +53,62 @@ const Month = () => {
     const totalExpenses = expenses.reduce((acc, t) => acc + t.value / 100, 0);
     const total = totalIncomes - totalExpenses;
 
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [initialTransaction, setInitialTransaction] = useState<Transaction | null>(null);
+    const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+    const [isDeleteTransactionModalOpen, setIsDeleteTransactionModalOpen] = useState(false);
+    const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
 
     const handleAddTransaction = () => {
-        setInitialTransaction(null);
-        setIsModalOpen(true);
+        setSelectedTransaction(null);
+        setIsTransactionModalOpen(true);
     };
 
     const handleEditTransaction = (transaction: Transaction) => {
-        setInitialTransaction(transaction);
-        setIsModalOpen(true);
+        setSelectedTransaction(transaction);
+        setIsTransactionModalOpen(true);
+    };
+
+    const handleDeleteTransaction = (transaction: Transaction) => {
+        setSelectedTransaction(transaction);
+        setIsDeleteTransactionModalOpen(true);
     };
 
     return (
         <>
             <TransactionModal
-                isOpen={isModalOpen}
+                isOpen={isTransactionModalOpen}
                 onClose={() => {
-                    setInitialTransaction(null);
-                    setIsModalOpen(false);
+                    setSelectedTransaction(null);
+                    setIsTransactionModalOpen(false);
                 }}
-                initialTransaction={initialTransaction}
+                initialTransaction={selectedTransaction}
                 month={month}
                 onSave={(transaction: Transaction) => {
-                    if (initialTransaction) {
+                    if (selectedTransaction) {
                         // Update transaction
                         updateTransaction(transaction);
 
-                        setInitialTransaction(null);
+                        setSelectedTransaction(null);
                     } else {
                         // Create transaction
                         addTransaction(transaction);
                     }
-                    setIsModalOpen(false);
+                    setIsTransactionModalOpen(false);
+                }}
+            />
+
+            <DeleteTransactionModal
+                isOpen={isDeleteTransactionModalOpen}
+                onClose={() => {
+                    setSelectedTransaction(null);
+                    setIsDeleteTransactionModalOpen(false);
+                }}
+                transaction={selectedTransaction!}
+                onDelete={(transaction: Transaction) => {
+                    // Delete transaction
+                    deleteTransaction(transaction);
+
+                    setSelectedTransaction(null);
+                    setIsDeleteTransactionModalOpen(false);
                 }}
             />
 
@@ -141,6 +164,7 @@ const Month = () => {
                         total={totalIncomes}
                         isIncome={true}
                         onEdit={(transaction: Transaction) => handleEditTransaction(transaction)}
+                        onDelete={(transaction: Transaction) => handleDeleteTransaction(transaction)}
                     />
 
                     {/* Expenses */}
@@ -149,6 +173,7 @@ const Month = () => {
                         total={totalExpenses}
                         isIncome={false}
                         onEdit={(transaction: Transaction) => handleEditTransaction(transaction)}
+                        onDelete={(transaction: Transaction) => handleDeleteTransaction(transaction)}
                     />
                 </div>
             </div>
