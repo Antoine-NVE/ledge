@@ -61,11 +61,14 @@ const Month = () => {
         setSelectedTransaction(null);
         setIsTransactionModalOpen(true);
     };
-
     const handleEditTransaction = (transaction: Transaction) => {
         setSelectedTransaction(transaction);
         setIsTransactionModalOpen(true);
     };
+    const handleCloseTransactionModal = useCallback(() => {
+        setSelectedTransaction(null);
+        setIsTransactionModalOpen(false);
+    }, []);
 
     const handleDeleteTransaction = (transaction: Transaction) => {
         setSelectedTransaction(transaction);
@@ -80,10 +83,7 @@ const Month = () => {
         <>
             <TransactionModal
                 isOpen={isTransactionModalOpen}
-                onClose={() => {
-                    setSelectedTransaction(null);
-                    setIsTransactionModalOpen(false);
-                }}
+                onClose={handleCloseTransactionModal}
                 initialTransaction={selectedTransaction}
                 month={month}
                 onSave={(transaction: Transaction) => {
