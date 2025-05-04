@@ -1,9 +1,12 @@
 import mongoose from 'mongoose';
+import dotenv from 'dotenv';
 import TransactionModel, { ITransaction } from '../src/models/Transaction';
+
+dotenv.config();
 
 (async () => {
     try {
-        const mongoUri = 'mongodb://ledge-database:27017/ledge';
+        const mongoUri = `mongodb://${process.env.DATABASE_SERVICE}:27017/ledge`;
         await mongoose.connect(mongoUri);
         console.log('Connected to MongoDB');
 
