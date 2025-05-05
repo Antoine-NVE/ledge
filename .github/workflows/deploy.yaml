@@ -1,0 +1,34 @@
+name: Deploy develop on Raspberry
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    types:
+      - closed
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    if: github.event.pull_request.merged == true || github.event_name == 'push'
+    runs-on: [self-hosted, ledge]
+
+    steps:
+      - name: Set deployment path
+        run: |
+          echo "TARGET_PATH=/home/antoine/ledge/dev" >> $GITHUB_ENV
+
+      - name: Pull latest changes
+        run: |
+          cd $TARGET_PATH
+
+          git fetch origin
+          git checkout develop
+          git pull origin develop
+
+      - name: Restart Docker Compose
+        run: |
+          cd $TARGET_PATH
+          docker compose up -d
