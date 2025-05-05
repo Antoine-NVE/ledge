@@ -18,7 +18,7 @@ jobs:
     steps:
       - name: Set deployment path
         run: |
-          echo "TARGET_PATH=/home/antoine/ledge/dev" >> $GITHUB_ENV
+          echo "TARGET_PATH=/home/antoine/docker/ledge/dev/" >> $GITHUB_ENV
 
       - name: Pull latest changes
         run: |
