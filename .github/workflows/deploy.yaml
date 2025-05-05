@@ -20,6 +20,10 @@ jobs:
         run: |
           echo "TARGET_PATH=/home/antoine/docker/ledge/dev/" >> $GITHUB_ENV
 
+      - name: Mark directory as safe
+        run: |
+          git config --global --add safe.directory /home/antoine/docker/ledge/dev
+
       - name: Pull latest changes
         run: |
           cd $TARGET_PATH
