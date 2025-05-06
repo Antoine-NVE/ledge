@@ -10,6 +10,7 @@ interface Props {
 }
 
 const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }: Props) => {
+    // Close modal on Escape key press
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
@@ -27,6 +28,19 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
         };
     }, [isOpen, onClose]);
 
+    // Disable body scroll when modal is open
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isOpen]);
+
     const [form, setForm] = useState<{
         name: string;
         value: string; // Keep as string for input
@@ -40,6 +54,8 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
     });
 
     const [isFormReady, setIsFormReady] = useState(false);
+
+    // Set initial form values when the modal opens or when initialTransaction changes
     useEffect(() => {
         if (isOpen) {
             if (initialTransaction) {
@@ -70,18 +86,6 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
             setIsFormReady(false);
         }
     }, [isOpen, initialTransaction]);
-
-    useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
-        }
-
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, [isOpen]);
 
     const [IsFetching, setIsFetching] = useState(false);
     const [formErrors, setFormErrors] = useState<{ [field: string]: string }>({});
@@ -171,7 +175,9 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
         isOpen &&
         isFormReady && (
             <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
-                <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative" onClick={(e) => e.stopPropagation()}>
+                <div
+                    className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative"
+                    onClick={(e) => e.stopPropagation()}>
                     <button
                         onClick={onClose}
                         className="absolute top-3 right-3 text-gray-400 hover:text-gray-800 cursor-pointer">

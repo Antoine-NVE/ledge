@@ -9,6 +9,7 @@ interface Props {
 }
 
 const DeleteTransactionModal = ({ isOpen, onClose, transaction, onDelete }: Props) => {
+    // Close modal on Escape key press
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
@@ -25,6 +26,7 @@ const DeleteTransactionModal = ({ isOpen, onClose, transaction, onDelete }: Prop
         };
     }, [isOpen, onClose]);
 
+    // Disable body scroll when modal is open
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
