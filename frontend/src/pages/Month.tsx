@@ -118,8 +118,8 @@ const Month = () => {
                 <h2 className="text-2xl font-bold mb-4 text-gray-800">{label}</h2>
 
                 {/* Filtres / Tris */}
-                <div className="flex flex-wrap justify-between items-center gap-4 mb-6 w-full max-w-5xl">
-                    <div className="flex flex-wrap gap-2">
+                <div className="flex flex-col gap-4 mb-6 w-full max-w-5xl">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                         {[
                             { label: 'Value ↓', value: 'value-desc' },
                             { label: 'Value ↑', value: 'value-asc' },
@@ -129,7 +129,7 @@ const Month = () => {
                             <button
                                 key={option.value}
                                 onClick={() => setSort(option.value as SortOption)}
-                                className={`px-3 py-1 rounded-md text-sm shadow transition cursor-pointer ${
+                                className={`px-3 py-2 rounded-md text-sm shadow transition cursor-pointer w-full ${
                                     sort === option.value
                                         ? 'bg-blue-600 text-white'
                                         : 'bg-white hover:bg-gray-200 text-gray-800'
@@ -139,9 +139,10 @@ const Month = () => {
                         ))}
                     </div>
 
+                    {/* Ajouter transaction */}
                     <button
-                        onClick={handleAddTransaction} // à définir toi-même
-                        className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-2 text-sm shadow cursor-pointer transition">
+                        onClick={handleAddTransaction}
+                        className="bg-blue-600 hover:bg-blue-700 text-white rounded-md px-4 py-3 text-sm shadow cursor-pointer transition w-full">
                         + Add transaction
                     </button>
                 </div>
