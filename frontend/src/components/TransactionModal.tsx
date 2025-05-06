@@ -71,6 +71,18 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
         }
     }, [isOpen, initialTransaction]);
 
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isOpen]);
+
     const [IsFetching, setIsFetching] = useState(false);
     const [formErrors, setFormErrors] = useState<{ [field: string]: string }>({});
 

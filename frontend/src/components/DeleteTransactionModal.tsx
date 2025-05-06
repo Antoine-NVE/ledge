@@ -25,6 +25,18 @@ const DeleteTransactionModal = ({ isOpen, onClose, transaction, onDelete }: Prop
         };
     }, [isOpen, onClose]);
 
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = '';
+        }
+
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isOpen]);
+
     const [isFetching, setIsFetching] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
