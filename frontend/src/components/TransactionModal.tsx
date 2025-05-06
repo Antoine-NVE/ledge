@@ -254,15 +254,31 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                         </div>
 
                         {/* Fixed */}
-                        <label className="flex items-center gap-2 cursor-pointer select-none">
-                            <input
-                                className="cursor-pointer"
-                                type="checkbox"
-                                checked={form.isFixed}
-                                onChange={(e) => setForm({ ...form, isFixed: e.target.checked })}
-                            />
-                            <span>Fixed</span>
-                        </label>
+                        <div>
+                            <label className="block text-sm font-medium mb-1">Fixed</label>
+                            <div className="flex items-center gap-4">
+                                <label className="flex items-center gap-2 cursor-pointer select-none">
+                                    <input
+                                        className="cursor-pointer"
+                                        type="radio"
+                                        name="isFixed"
+                                        checked={form.isFixed === true}
+                                        onChange={() => setForm({ ...form, isFixed: true })}
+                                    />
+                                    <span>Yes</span>
+                                </label>
+                                <label className="flex items-center gap-2 cursor-pointer select-none">
+                                    <input
+                                        className="cursor-pointer"
+                                        type="radio"
+                                        name="isFixed"
+                                        checked={form.isFixed === false}
+                                        onChange={() => setForm({ ...form, isFixed: false })}
+                                    />
+                                    <span>No</span>
+                                </label>
+                            </div>
+                        </div>
 
                         {/* General error */}
                         {formErrors.general && <p className="text-red-600 text-sm">{formErrors.general}</p>}
