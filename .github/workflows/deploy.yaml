@@ -35,4 +35,4 @@ jobs:
       - name: Restart Docker Compose
         run: |
           cd $TARGET_PATH
-          docker compose up -d
+          docker compose up -d --build --remove-orphans
