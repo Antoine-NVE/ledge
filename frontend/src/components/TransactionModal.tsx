@@ -170,7 +170,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
     return (
         isOpen &&
         isFormReady && (
-            <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4">
+            <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
                 <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
                     <button
                         onClick={onClose}
