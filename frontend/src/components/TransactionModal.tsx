@@ -83,6 +83,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                 isFixed: false,
             });
 
+            setFormErrors({});
             setIsFormReady(false);
         }
     }, [isOpen, initialTransaction]);
