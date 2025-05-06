@@ -171,7 +171,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
         isOpen &&
         isFormReady && (
             <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
-                <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
+                <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative" onClick={(e) => e.stopPropagation()}>
                     <button
                         onClick={onClose}
                         className="absolute top-3 right-3 text-gray-400 hover:text-gray-800 cursor-pointer">
