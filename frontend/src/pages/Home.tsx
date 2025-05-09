@@ -32,7 +32,12 @@ const Home = () => {
             <div className="mb-4">
                 <button
                     onClick={() => setYearOffset(0)}
-                    className="bg-white hover:bg-gray-200 text-gray-800 rounded-md px-3 py-1 text-sm shadow cursor-pointer">
+                    disabled={yearOffset === 0}
+                    className={`rounded-md px-3 py-1 text-sm shadow cursor-pointer transition ${
+                        yearOffset === 0
+                            ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                            : 'bg-white hover:bg-gray-200 text-gray-800'
+                    }`}>
                     Today
                 </button>
             </div>
