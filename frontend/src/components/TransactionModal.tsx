@@ -10,102 +10,52 @@ interface Props {
 }
 
 const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }: Props) => {
-    // Close modal on Escape key press
-    useEffect(() => {
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') {
-                onClose();
-            }
-        };
-
-        if (isOpen) {
-            window.addEventListener('keydown', handleKeyDown);
-        }
-
-        // Cleanup the event listener when the component unmounts or isOpen changes
-        return () => {
-            window.removeEventListener('keydown', handleKeyDown);
-        };
-    }, [isOpen, onClose]);
-
-    // Disable body scroll when modal is open
-    useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = '';
-        }
-
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, [isOpen]);
-
-    const [form, setForm] = useState<{
-        name: string;
-        value: string; // Keep as string for input
-        isIncome: boolean;
-        isFixed: boolean;
-    }>({
+    // === State ===
+    const [form, setForm] = useState({
         name: '',
         value: '',
         isIncome: false,
         isFixed: false,
     });
-
-    const [isFormReady, setIsFormReady] = useState(false);
-
-    // Set initial form values when the modal opens or when initialTransaction changes
-    useEffect(() => {
-        if (isOpen) {
-            if (initialTransaction) {
-                setForm({
-                    name: initialTransaction.name,
-                    value: (initialTransaction.value / 100).toFixed(2),
-                    isIncome: initialTransaction.isIncome,
-                    isFixed: initialTransaction.isFixed,
-                });
-            } else {
-                setForm({
-                    name: '',
-                    value: '',
-                    isIncome: false,
-                    isFixed: false,
-                });
-            }
-
-            setIsFormReady(true);
-        } else {
-            setForm({
-                name: '',
-                value: '',
-                isIncome: false,
-                isFixed: false,
-            });
-
-            setFormErrors({});
-            setIsFormReady(false);
-        }
-    }, [isOpen, initialTransaction]);
-
-    const [IsFetching, setIsFetching] = useState(false);
     const [formErrors, setFormErrors] = useState<{ [field: string]: string }>({});
+    const [isFormReady, setIsFormReady] = useState(false);
+    const [isFetching, setIsFetching] = useState(false);
 
+    // === Handlers ===
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        const amount = form.value === '' || isNaN(Number(form.value)) ? 0 : Math.round(Number(form.value) * 100);
+
+        if (initialTransaction) {
+            const transaction: Transaction = {
+                ...initialTransaction,
+                ...form,
+                value: amount,
+            };
+            updateTransaction(transaction);
+        } else {
+            const transaction: NewTransaction = {
+                ...form,
+                value: amount,
+                month,
+            };
+            createTransaction(transaction);
+        }
+    };
+
+    // === Async functions ===
     const createTransaction = async (transaction: NewTransaction) => {
         setIsFetching(true);
         try {
             const response = await fetch(import.meta.env.VITE_API_URL + '/transactions', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(transaction),
             });
             const data = await response.json();
 
-            if (!response.ok) {
-                throw data;
-            }
+            if (!response.ok) throw data;
 
             onSave(data.data.transaction);
         } catch (error: any) {
@@ -124,16 +74,12 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
         try {
             const response = await fetch(import.meta.env.VITE_API_URL + '/transactions/' + transaction._id, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
+                headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(transaction),
             });
             const data = await response.json();
 
-            if (!response.ok) {
-                throw data;
-            }
+            if (!response.ok) throw data;
 
             onSave(data.data.transaction);
         } catch (error: any) {
@@ -147,30 +93,60 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
+    // === Effects ===
 
-        // Convert to number and round to cents
-        const amount = form.value === '' || isNaN(Number(form.value)) ? 0 : Math.round(Number(form.value) * 100);
+    // Handle Escape key to close modal
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') onClose();
+        };
 
-        if (initialTransaction) {
-            const transaction: Transaction = {
-                ...initialTransaction,
-                ...form,
-                value: amount,
-            };
+        if (isOpen) window.addEventListener('keydown', handleKeyDown);
+        return () => window.removeEventListener('keydown', handleKeyDown);
+    }, [isOpen, onClose]);
 
-            updateTransaction(transaction);
+    // Lock body scroll when modal is open
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
         } else {
-            const transaction: NewTransaction = {
-                ...form,
-                value: amount,
-                month,
-            };
-
-            createTransaction(transaction);
+            document.body.style.overflow = '';
         }
-    };
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, [isOpen]);
+
+    // Initialize form values
+    useEffect(() => {
+        if (isOpen) {
+            if (initialTransaction) {
+                setForm({
+                    name: initialTransaction.name,
+                    value: (initialTransaction.value / 100).toFixed(2),
+                    isIncome: initialTransaction.isIncome,
+                    isFixed: initialTransaction.isFixed,
+                });
+            } else {
+                setForm({
+                    name: '',
+                    value: '',
+                    isIncome: false,
+                    isFixed: false,
+                });
+            }
+            setIsFormReady(true);
+        } else {
+            setForm({
+                name: '',
+                value: '',
+                isIncome: false,
+                isFixed: false,
+            });
+            setFormErrors({});
+            setIsFormReady(false);
+        }
+    }, [isOpen, initialTransaction]);
 
     return (
         isOpen &&
@@ -288,9 +264,9 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                         {/* Submit */}
                         <button
                             type="submit"
-                            disabled={IsFetching}
+                            disabled={isFetching}
                             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm disabled:opacity-50 cursor-pointer transition">
-                            {IsFetching
+                            {isFetching
                                 ? initialTransaction
                                     ? 'Updating...'
                                     : 'Adding...'
