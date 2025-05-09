@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NewTransaction, Transaction } from '../types/transaction';
 
 interface Props {
@@ -194,6 +194,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                         <div>
                             <label className="block text-sm font-medium mb-1">Name</label>
                             <input
+                                autoFocus
                                 type="text"
                                 value={form.name}
                                 onChange={(e) => setForm({ ...form, name: e.target.value })}
