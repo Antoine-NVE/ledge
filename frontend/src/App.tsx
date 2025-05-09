@@ -1,14 +1,19 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import HomePage from './pages/Home';
 import MonthPage from './pages/Month';
+import WithNavbar from './layouts/WithNavbar';
+import NoNavbar from './layouts/NoNavbar';
 
 function App() {
     return (
-        <div className="min-h-screen flex flex-col bg-gray-100">
+        <div className="min-h-screen bg-gray-100">
             <BrowserRouter>
                 <Routes>
-                    <Route path="/" element={<HomePage />} />
-                    <Route path="/month/:month" element={<MonthPage />} />
+                    <Route element={<WithNavbar />}>
+                        <Route path="/" element={<HomePage />} />
+                        <Route path="/month/:month" element={<MonthPage />} />
+                    </Route>
+                    <Route element={<NoNavbar />}>{/* Add any routes that don't need a navbar here */}</Route>
                 </Routes>
             </BrowserRouter>
         </div>
