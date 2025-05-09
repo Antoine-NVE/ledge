@@ -128,7 +128,7 @@ const Month = () => {
                                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                                 : 'bg-white hover:bg-gray-200 text-gray-800'
                         }`}>
-                        Aujourd'hui
+                        Today
                     </button>
 
                     {/* Flèches + mois affiché */}
