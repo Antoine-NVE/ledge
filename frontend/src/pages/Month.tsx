@@ -1,5 +1,5 @@
 import { useCallback, useMemo, useState } from 'react';
-import { Navigate, useParams } from 'react-router-dom';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import { useTransactions } from '../contexts/TransactionContext';
 import TransactionListSection from '../components/TransactionListSection';
 import { Transaction } from '../types/transaction';
@@ -11,6 +11,8 @@ type SortOption = 'value-desc' | 'value-asc' | 'alphabetical' | 'reverse-alphabe
 const Month = () => {
     const params = useParams<{ month: string }>();
     const month = params.month;
+
+    const navigate = useNavigate();
 
     const { transactions, addTransaction, updateTransaction, deleteTransaction } = useTransactions();
 
@@ -115,7 +117,45 @@ const Month = () => {
 
             <div className="flex flex-col flex-1 items-center p-4">
                 <h1 className="text-3xl font-bold mb-6 text-gray-800">Ledge</h1>
-                <h2 className="text-2xl font-bold mb-4 text-gray-800">{label}</h2>
+
+                <div className="flex flex-col items-center gap-4 mb-6 w-full max-w-5xl">
+                    {/* Bouton "Aujourd'hui" */}
+                    <button
+                        onClick={() => navigate(`/month/${new Date().toISOString().slice(0, 7)}`)}
+                        disabled={month === new Date().toISOString().slice(0, 7)}
+                        className={`rounded-md px-3 py-1 text-sm shadow cursor-pointer transition ${
+                            month === new Date().toISOString().slice(0, 7)
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : 'bg-white hover:bg-gray-200 text-gray-800'
+                        }`}>
+                        Aujourd'hui
+                    </button>
+
+                    {/* Flèches + mois affiché */}
+                    <div className="flex items-center gap-6">
+                        <button
+                            onClick={() => {
+                                const [y, m] = month.split('-').map(Number);
+                                const date = new Date(y, m - 1); // mois précédent
+                                navigate(`/month/${date.toISOString().slice(0, 7)}`);
+                            }}
+                            className="text-2xl px-2 hover:text-gray-600 cursor-pointer">
+                            ←
+                        </button>
+
+                        <div className="text-lg font-semibold text-center">{label}</div>
+
+                        <button
+                            onClick={() => {
+                                const [y, m] = month.split('-').map(Number);
+                                const date = new Date(y, m + 1); // mois suivant
+                                navigate(`/month/${date.toISOString().slice(0, 7)}`);
+                            }}
+                            className="text-2xl px-2 hover:text-gray-600 cursor-pointer">
+                            →
+                        </button>
+                    </div>
+                </div>
 
                 {/* Filtres / Tris */}
                 <div className="flex flex-col gap-4 mb-6 w-full max-w-5xl">
