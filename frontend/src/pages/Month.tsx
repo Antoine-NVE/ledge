@@ -6,7 +6,7 @@ import { Transaction } from '../types/transaction';
 import TransactionModal from '../components/TransactionModal';
 import DeleteTransactionModal from '../components/DeleteTransactionModal';
 
-type SortOption = 'value-desc' | 'value-asc' | 'date-newest' | 'date-oldest';
+type SortOption = 'value-desc' | 'value-asc' | 'alphabetical' | 'reverse-alphabetical';
 
 const Month = () => {
     const params = useParams<{ month: string }>();
@@ -37,10 +37,10 @@ const Month = () => {
                 return sorted.sort((a, b) => b.value - a.value);
             case 'value-asc':
                 return sorted.sort((a, b) => a.value - b.value);
-            case 'date-newest':
-                return sorted.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-            case 'date-oldest':
-                return sorted.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+            case 'alphabetical':
+                return sorted.sort((a, b) => a.name.localeCompare(b.name));
+            case 'reverse-alphabetical':
+                return sorted.sort((a, b) => b.name.localeCompare(a.name));
             default:
                 return sorted;
         }
@@ -123,8 +123,8 @@ const Month = () => {
                         {[
                             { label: 'Value ↓', value: 'value-desc' },
                             { label: 'Value ↑', value: 'value-asc' },
-                            { label: 'Newest', value: 'date-newest' },
-                            { label: 'Oldest', value: 'date-oldest' },
+                            { label: 'A-Z', value: 'alphabetical' },
+                            { label: 'Z-A', value: 'reverse-alphabetical' },
                         ].map((option) => (
                             <button
                                 key={option.value}
