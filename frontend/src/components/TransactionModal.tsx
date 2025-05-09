@@ -184,6 +184,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                             <label className="block text-sm font-medium mb-1">Value (€)</label>
                             <input
                                 type="text"
+                                inputMode="decimal"
                                 value={form.value}
                                 onChange={(e) => {
                                     const val = e.target.value.replace(',', '.');
