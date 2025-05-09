@@ -9,15 +9,41 @@ interface Props {
     onSave: (transaction: Transaction) => void;
 }
 
+interface FormTransaction {
+    name: string;
+    value: string;
+    isIncome: boolean | null;
+    isFixed: boolean | null;
+}
+
+interface FormErrors {
+    general: string;
+    name: string;
+    value: string;
+    isIncome: string;
+    isFixed: string;
+}
+
+const EMPTY_FORM: FormTransaction = {
+    name: '',
+    value: '',
+    isIncome: null,
+    isFixed: null,
+};
+
+const EMPTY_ERRORS: FormErrors = {
+    general: '',
+    name: '',
+    value: '',
+    isIncome: '',
+    isFixed: '',
+};
+
 const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }: Props) => {
     // === State ===
-    const [form, setForm] = useState({
-        name: '',
-        value: '',
-        isIncome: false,
-        isFixed: false,
-    });
-    const [formErrors, setFormErrors] = useState<{ [field: string]: string }>({});
+    const [form, setForm] = useState<FormTransaction>(EMPTY_FORM);
+    const [formErrors, setFormErrors] = useState<FormErrors>(EMPTY_ERRORS);
+
     const [isFormReady, setIsFormReady] = useState(false);
     const [isFetching, setIsFetching] = useState(false);
 
@@ -25,23 +51,60 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        const amount = form.value === '' || isNaN(Number(form.value)) ? 0 : Math.round(Number(form.value) * 100);
+        const errors: FormErrors = {
+            ...EMPTY_ERRORS,
+        };
+        if (form.name.trim() === '') {
+            errors.name = 'Name is required';
+        }
+        if (form.value.trim() === '') {
+            errors.value = 'Value is required';
+        } else if (isNaN(Number(form.value))) {
+            errors.value = 'Value must be a number';
+        } else if (Number(form.value) <= 0) {
+            errors.value = 'Value must be greater than 0';
+        }
+        if (form.isIncome === null) {
+            errors.isIncome = 'Type is required';
+        }
+        if (form.isFixed === null) {
+            errors.isFixed = 'Fixed is required';
+        }
+        setFormErrors(errors);
+        if (Object.values(errors).some((error) => error !== '')) {
+            return;
+        }
+
+        const value = Math.round(Number(form.value) * 100);
 
         if (initialTransaction) {
             const transaction: Transaction = {
                 ...initialTransaction,
                 ...form,
-                value: amount,
+                value,
+                isFixed: form.isFixed!,
+                isIncome: form.isIncome!,
             };
             updateTransaction(transaction);
         } else {
             const transaction: NewTransaction = {
                 ...form,
-                value: amount,
+                value,
+                isFixed: form.isFixed!,
+                isIncome: form.isIncome!,
                 month,
             };
             createTransaction(transaction);
         }
+    };
+
+    // Clean form and errors
+    const cleanForm = () => {
+        setForm(EMPTY_FORM);
+    };
+
+    const cleanFormErrors = () => {
+        setFormErrors(EMPTY_ERRORS);
     };
 
     // === Async functions ===
@@ -62,7 +125,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
             if (error?.errors) {
                 setFormErrors({ ...error.errors, general: error.message });
             } else {
-                setFormErrors({ general: 'An error occurred while creating the transaction.' });
+                setFormErrors((prev) => ({ ...prev, general: 'An error occurred while creating the transaction.' }));
             }
         } finally {
             setIsFetching(false);
@@ -86,7 +149,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
             if (error?.errors) {
                 setFormErrors({ ...error.errors, general: error.message });
             } else {
-                setFormErrors({ general: 'An error occurred while updating the transaction.' });
+                setFormErrors((prev) => ({ ...prev, general: 'An error occurred while updating the transaction.' }));
             }
         } finally {
             setIsFetching(false);
@@ -119,33 +182,26 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
 
     // Initialize form values
     useEffect(() => {
-        if (isOpen) {
-            if (initialTransaction) {
-                setForm({
-                    name: initialTransaction.name,
-                    value: (initialTransaction.value / 100).toFixed(2),
-                    isIncome: initialTransaction.isIncome,
-                    isFixed: initialTransaction.isFixed,
-                });
-            } else {
-                setForm({
-                    name: '',
-                    value: '',
-                    isIncome: false,
-                    isFixed: false,
-                });
-            }
-            setIsFormReady(true);
-        } else {
-            setForm({
-                name: '',
-                value: '',
-                isIncome: false,
-                isFixed: false,
-            });
-            setFormErrors({});
+        if (!isOpen) {
+            cleanForm();
+            cleanFormErrors();
             setIsFormReady(false);
+            return;
         }
+
+        setForm(
+            initialTransaction
+                ? {
+                      name: initialTransaction.name,
+                      value: (initialTransaction.value / 100).toFixed(2),
+                      isIncome: initialTransaction.isIncome,
+                      isFixed: initialTransaction.isFixed,
+                  }
+                : EMPTY_FORM
+        );
+
+        cleanFormErrors();
+        setIsFormReady(true);
     }, [isOpen, initialTransaction]);
 
     return (
@@ -213,7 +269,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                                     <input
                                         className="cursor-pointer"
                                         type="radio"
-                                        name="transactionType"
+                                        name="transactionTypeModal"
                                         checked={form.isIncome === true}
                                         onChange={() => setForm({ ...form, isIncome: true })}
                                     />
@@ -223,13 +279,14 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                                     <input
                                         className="cursor-pointer"
                                         type="radio"
-                                        name="transactionType"
+                                        name="transactionTypeModal"
                                         checked={form.isIncome === false}
                                         onChange={() => setForm({ ...form, isIncome: false })}
                                     />
                                     <span>Expense</span>
                                 </label>
                             </div>
+                            {formErrors.isIncome && <p className="text-red-500 text-sm mt-1">{formErrors.isIncome}</p>}
                         </div>
 
                         {/* Fixed */}
@@ -240,7 +297,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                                     <input
                                         className="cursor-pointer"
                                         type="radio"
-                                        name="isFixed"
+                                        name="isFixedModal"
                                         checked={form.isFixed === true}
                                         onChange={() => setForm({ ...form, isFixed: true })}
                                     />
@@ -250,13 +307,14 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                                     <input
                                         className="cursor-pointer"
                                         type="radio"
-                                        name="isFixed"
+                                        name="isFixedModal"
                                         checked={form.isFixed === false}
                                         onChange={() => setForm({ ...form, isFixed: false })}
                                     />
                                     <span>No</span>
                                 </label>
                             </div>
+                            {formErrors.isFixed && <p className="text-red-500 text-sm mt-1">{formErrors.isFixed}</p>}
                         </div>
 
                         {/* General error */}
