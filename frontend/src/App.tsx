@@ -3,11 +3,13 @@ import HomePage from './pages/Home';
 import MonthPage from './pages/Month';
 import WithNavbar from './layouts/WithNavbar';
 import NoNavbar from './layouts/NoNavbar';
+import ScrollToTop from './components/ScrollToTop';
 
 function App() {
     return (
         <div className="min-h-screen bg-gray-100">
             <BrowserRouter>
+                <ScrollToTop />
                 <Routes>
                     <Route element={<WithNavbar />}>
                         <Route path="/" element={<HomePage />} />
