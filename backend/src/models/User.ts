@@ -13,39 +13,37 @@ export type UserDocument = User & {
 };
 
 const validatePassword = (password: string): boolean => {
+    const isValidLength = password.length >= 8 && password.length <= 100;
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
     const hasNumber = /\d/.test(password);
     const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    return hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
+    return isValidLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
 };
 
 const UserSchema = new Schema<UserDocument>(
     {
         email: {
             type: String,
-            required: true,
-            unique: true,
             trim: true,
             lowercase: true,
-            match: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+            required: [true, 'Email is required'],
+            unique: [true, 'Email already exists'],
+            match: [/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'Please fill a valid email address'],
         },
         password: {
             type: String,
-            required: true,
             trim: true,
-            minlength: 8,
-            maxlength: 100,
+            required: [true, 'Password is required'],
             validate: {
                 validator: validatePassword,
                 message:
-                    'Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+                    'Password must be between 8 and 100 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
             },
         },
         transactions: {
             type: [{ type: Types.ObjectId, ref: 'Transaction' }],
             default: [],
-            required: true,
         },
     },
     {
