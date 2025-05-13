@@ -1,3 +1,8 @@
+export const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email);
+};
+
 export const validatePassword = (password: string): boolean => {
     const isValidLength = password.length >= 8 && password.length <= 100;
     const hasUpperCase = /[A-Z]/.test(password);
