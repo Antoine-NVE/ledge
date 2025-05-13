@@ -1,4 +1,5 @@
 import { Model, model, Schema, Types } from 'mongoose';
+import { validatePassword } from '../validators/user';
 
 export interface User {
     email: string;
@@ -9,15 +10,6 @@ export type UserDocument = User & {
     _id: Types.ObjectId;
     createdAt: Date;
     updatedAt: Date;
-};
-
-const validatePassword = (password: string): boolean => {
-    const isValidLength = password.length >= 8 && password.length <= 100;
-    const hasUpperCase = /[A-Z]/.test(password);
-    const hasLowerCase = /[a-z]/.test(password);
-    const hasNumber = /\d/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    return isValidLength && hasUpperCase && hasLowerCase && hasNumber && hasSpecialChar;
 };
 
 const UserSchema = new Schema<UserDocument>(
