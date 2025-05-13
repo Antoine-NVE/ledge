@@ -3,7 +3,6 @@ import { Model, model, Schema, Types } from 'mongoose';
 export interface User {
     email: string;
     password: string;
-    transactions: Types.ObjectId[];
 }
 
 export type UserDocument = User & {
@@ -40,10 +39,6 @@ const UserSchema = new Schema<UserDocument>(
                 message:
                     'Password must be between 8 and 100 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
             },
-        },
-        transactions: {
-            type: [{ type: Types.ObjectId, ref: 'Transaction' }],
-            default: [],
         },
     },
     {
