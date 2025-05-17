@@ -3,7 +3,7 @@ import { Error as MongooseError } from 'mongoose';
 import bcrypt from 'bcrypt';
 
 import UserModel from '../models/User';
-import { connect } from '../services/auth';
+import { connect, disconnect } from '../services/auth';
 
 interface AuthBody {
     email: string;
@@ -103,4 +103,14 @@ export const login = async (req: Request<{}, {}, AuthBody>, res: Response) => {
             errors: null,
         });
     }
+};
+
+export const logout = (req: Request, res: Response) => {
+    disconnect(res);
+
+    res.status(200).json({
+        message: 'User logged out successfully',
+        data: null,
+        errors: null,
+    });
 };
