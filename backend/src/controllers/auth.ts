@@ -16,13 +16,16 @@ export const register = async (req: Request<{}, {}, AuthBody>, res: Response) =>
             email,
             password,
         });
-
         user = await user.save();
+
+        // Remove password from the response
+        const userObj = user.toObject() as any;
+        delete userObj.password;
 
         res.status(201).json({
             message: 'User registered successfully',
             data: {
-                user,
+                user: userObj,
             },
             errors: null,
         });
