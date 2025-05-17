@@ -35,6 +35,7 @@ const UserSchema = new Schema<UserDocument>(
         },
         password: {
             type: String,
+            select: false, // Do not include password in queries by default
             trim: true,
             required: [true, 'Password is required'],
             validate: {
