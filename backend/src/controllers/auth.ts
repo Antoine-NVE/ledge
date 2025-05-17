@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { Error as MongooseError } from 'mongoose';
 
 import UserModel from '../models/User';
+import { connect } from '../services/auth';
 
 interface AuthBody {
     email: string;
@@ -17,6 +18,9 @@ export const register = async (req: Request<{}, {}, AuthBody>, res: Response) =>
             password,
         });
         user = await user.save();
+
+        // Automatically connect the user after registration
+        connect(res, user);
 
         // Remove password from the response
         const userObj = user.toObject() as any;
