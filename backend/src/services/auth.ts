@@ -17,3 +17,11 @@ export const connect = (res: Response, user: UserDocument) => {
         maxAge: 3600000, // 1 hour
     });
 };
+
+export const disconnect = (res: Response) => {
+    res.clearCookie('access_token', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+    });
+};
