@@ -1,6 +1,13 @@
+import UserModel from '../models/User';
+
 export const validateEmail = (email: string): boolean => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(email);
+};
+
+export const isEmailUnique = async (email: string): Promise<boolean> => {
+    const user = await UserModel.find({ email });
+    return user.length === 0;
 };
 
 export const validatePassword = (password: string): boolean => {

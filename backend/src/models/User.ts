@@ -1,5 +1,5 @@
 import { Model, model, Schema, Types } from 'mongoose';
-import { validateEmail, validatePassword } from '../validators/user';
+import { isEmailUnique, validateEmail, validatePassword } from '../validators/user';
 
 export interface User {
     email: string;
@@ -18,12 +18,18 @@ const UserSchema = new Schema<UserDocument>(
             type: String,
             trim: true,
             lowercase: true,
-            required: [true, 'Email is required'],
+            required: true,
             unique: [true, 'Email already exists'],
-            validate: {
-                validator: validateEmail,
-                message: 'Invalid email format',
-            },
+            validate: [
+                {
+                    validator: validateEmail,
+                    message: 'Invalid email format',
+                },
+                {
+                    validator: isEmailUnique,
+                    message: 'Email already exists',
+                },
+            ],
         },
         password: {
             type: String,
