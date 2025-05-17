@@ -1,5 +1,5 @@
 import { Model, model, Schema, Types } from 'mongoose';
-import { isEmailUnique, validateEmail, validatePassword } from '../validators/user';
+import { isEmailValid, isEmailUnique, isPasswordValid } from '../validators/user';
 
 export interface User {
     email: string;
@@ -22,7 +22,7 @@ const UserSchema = new Schema<UserDocument>(
             unique: [true, 'Email already exists'],
             validate: [
                 {
-                    validator: validateEmail,
+                    validator: isEmailValid,
                     message: 'Invalid email format',
                 },
                 {
@@ -36,7 +36,7 @@ const UserSchema = new Schema<UserDocument>(
             trim: true,
             required: [true, 'Password is required'],
             validate: {
-                validator: validatePassword,
+                validator: isPasswordValid,
                 message:
                     'Password must be between 8 and 100 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
             },
