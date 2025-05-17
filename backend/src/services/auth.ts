@@ -6,7 +6,7 @@ import { UserDocument } from '../models/User';
 export const connect = (res: Response, user: UserDocument) => {
     const { _id } = user;
 
-    const token = jwt.sign({ _id }, 'azerty', {
+    const token = jwt.sign({ _id }, process.env.JWT_SECRET!, {
         expiresIn: '1h',
     });
 
