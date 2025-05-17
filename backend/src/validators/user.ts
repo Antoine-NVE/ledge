@@ -6,8 +6,8 @@ export const isEmailValid = (email: string): boolean => {
 };
 
 export const isEmailUnique = async (email: string): Promise<boolean> => {
-    const user = await UserModel.find({ email });
-    return user.length === 0;
+    const user = await UserModel.findOne({ email });
+    return user === null;
 };
 
 export const isPasswordValid = (password: string): boolean => {
