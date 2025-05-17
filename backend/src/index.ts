@@ -2,6 +2,8 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
+
+import authRoutes from './routes/auth';
 import transactionRoutes from './routes/transaction';
 
 dotenv.config();
@@ -21,6 +23,7 @@ app.use(cors());
     }
 })();
 
+app.use('/auth', authRoutes);
 app.use('/transactions', transactionRoutes);
 
 const port = 3000;
