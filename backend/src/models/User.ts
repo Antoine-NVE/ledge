@@ -1,4 +1,6 @@
-import { Model, model, Schema, Types } from 'mongoose';
+import { HydratedDocument, Model, model, Schema, Types } from 'mongoose';
+import bcrypt from 'bcrypt';
+
 import { isEmailValid, isEmailUnique, isPasswordValid } from '../validators/user';
 
 export interface User {
@@ -47,6 +49,19 @@ const UserSchema = new Schema<UserDocument>(
         versionKey: false, // Disable the __v field
     }
 );
+
+UserSchema.pre<HydratedDocument<User>>('save', async function (next) {
+    if (!this.isModified('password')) {
+        return next();
+    }
+
+    try {
+        this.password = await bcrypt.hash(this.password, 10);
+        next();
+    } catch (error: any) {
+        next(error);
+    }
+});
 
 const UserModel: Model<UserDocument> = model<UserDocument>('User', UserSchema);
 
