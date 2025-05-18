@@ -59,8 +59,10 @@ const create = async (req: Request<object, object, TransactionBody>, res: Respon
 };
 
 const getAll = async (req: Request, res: Response) => {
+    const userId = req.userId;
+
     try {
-        const transactions = await TransactionModel.find();
+        const transactions = await TransactionModel.find({ user: userId }).populate('user');
 
         res.status(200).json({
             message: 'Transactions retrieved successfully',

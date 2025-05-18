@@ -5,9 +5,9 @@ import authenticate from '../middlewares/authenticate';
 const router = express.Router();
 
 router.post('/', authenticate, TransactionController.create);
-router.get('/', TransactionController.getAll);
-router.get('/:id', TransactionController.getById);
-router.put('/:id', TransactionController.update);
-router.delete('/:id', TransactionController.remove);
+router.get('/', authenticate, TransactionController.getAll);
+router.get('/:id', authenticate, TransactionController.getById);
+router.put('/:id', authenticate, TransactionController.update);
+router.delete('/:id', authenticate, TransactionController.remove);
 
 export default router;
