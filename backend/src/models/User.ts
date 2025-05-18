@@ -1,4 +1,4 @@
-import { HydratedDocument, Model, model, Schema, Types } from 'mongoose';
+import { HydratedDocument, Model, model, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 
 import { isEmailValid, isEmailUnique, isPasswordValid } from '../validators/user';
