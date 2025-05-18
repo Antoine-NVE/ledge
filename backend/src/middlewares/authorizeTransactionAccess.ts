@@ -55,3 +55,5 @@ const authorizeTransactionAccess = async (req: Request, res: Response, next: Nex
         });
     }
 };
+
+export default authorizeTransactionAccess;

@@ -7,13 +7,14 @@ import {
     removeTransaction,
     updateTransaction,
 } from '../controllers/transaction';
+import authorizeTransactionAccess from '../middlewares/authorizeTransactionAccess';
 
 const router = express.Router();
 
 router.post('/', authenticate, createTransaction);
 router.get('/', authenticate, getAllTransactions);
-router.get('/:id', authenticate, getTransactionById);
-router.put('/:id', authenticate, updateTransaction);
-router.delete('/:id', authenticate, removeTransaction);
+router.get('/:id', authenticate, authorizeTransactionAccess, getTransactionById);
+router.put('/:id', authenticate, authorizeTransactionAccess, updateTransaction);
+router.delete('/:id', authenticate, authorizeTransactionAccess, removeTransaction);
 
 export default router;
