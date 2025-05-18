@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 
 import UserModel, { UserDocument } from '../models/User';
 import { createAccessToken, removeAccessToken } from '../services/auth';
+import { sanitizeUser } from '../utils/sanitize';
 
 interface AuthBody {
     email: string;
@@ -24,8 +25,7 @@ export const register = async (req: Request<object, object, AuthBody>, res: Resp
         createAccessToken(res, user);
 
         // Remove password from the response
-        const userObj = user.toObject() as Partial<UserDocument>;
-        delete userObj.password;
+        const userObj = sanitizeUser(user);
 
         res.status(201).json({
             message: 'User registered successfully',
@@ -86,8 +86,7 @@ export const login = async (req: Request<object, object, AuthBody>, res: Respons
         createAccessToken(res, user);
 
         // Remove password from the response
-        const userObj = user.toObject() as Partial<UserDocument>;
-        delete userObj.password;
+        const userObj = sanitizeUser(user);
 
         res.status(200).json({
             message: 'User logged in successfully',
