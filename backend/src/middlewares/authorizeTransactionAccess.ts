@@ -23,7 +23,7 @@ const authorizeTransactionAccess = async (req: Request, res: Response, next: Nex
     }
 
     try {
-        const transaction = await TransactionModel.findById(transactionId);
+        const transaction = await (await TransactionModel.findById(transactionId))?.populate('user');
 
         if (!transaction) {
             res.status(404).json({
@@ -34,7 +34,7 @@ const authorizeTransactionAccess = async (req: Request, res: Response, next: Nex
             return;
         }
 
-        if (transaction.user.toString() !== userId) {
+        if (transaction.user._id.toString() !== userId) {
             res.status(403).json({
                 message: 'Forbidden',
                 data: null,
