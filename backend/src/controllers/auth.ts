@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Error as MongooseError } from 'mongoose';
 import bcrypt from 'bcrypt';
 
-import UserModel, { UserDocument } from '../models/User';
+import UserModel from '../models/User';
 import { createAccessToken, removeAccessToken } from '../services/auth';
 import { sanitizeUser } from '../utils/sanitize';
 
