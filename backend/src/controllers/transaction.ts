@@ -82,20 +82,10 @@ export const getAllTransactions = async (req: Request, res: Response) => {
     }
 };
 
-export const getTransactionById = async (req: Request<{ id: string }>, res: Response) => {
-    const { id } = req.params;
+export const getTransactionById = async (req: Request, res: Response) => {
+    const transaction = req.transaction;
 
     try {
-        const transaction = await TransactionModel.findById(id);
-
-        if (!transaction) {
-            res.status(404).json({
-                message: 'Transaction not found',
-                data: null,
-                errors: null,
-            });
-        }
-
         res.status(200).json({
             message: 'Transaction retrieved successfully',
             data: {
