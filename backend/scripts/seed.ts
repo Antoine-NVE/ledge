@@ -43,7 +43,7 @@ dotenv.config();
                         isFixed: true,
                         name: income.name,
                         value: income.value,
-                    })
+                    }),
                 );
             });
 
@@ -58,7 +58,7 @@ dotenv.config();
                         isFixed: false,
                         name: income,
                         value: random(10000, 100000),
-                    })
+                    }),
                 );
             });
 
@@ -78,7 +78,7 @@ dotenv.config();
                         isFixed: true,
                         name: expense.name,
                         value: expense.value,
-                    })
+                    }),
                 );
             });
 
@@ -103,7 +103,7 @@ dotenv.config();
                         isFixed: false,
                         name: variableExpenses[random(0, variableExpenses.length - 1)],
                         value: random(500, 15000),
-                    })
+                    }),
                 );
             }
         }

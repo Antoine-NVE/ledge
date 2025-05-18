@@ -17,7 +17,13 @@ const TransactionSchema = new Schema<ITransaction>(
         },
         isIncome: { type: Boolean, required: true },
         isFixed: { type: Boolean, required: true },
-        name: { type: String, required: true, trim: true, minlength: 1, maxlength: 100 },
+        name: {
+            type: String,
+            required: true,
+            trim: true,
+            minlength: 1,
+            maxlength: 100,
+        },
         value: {
             type: Number,
             required: true,
@@ -32,7 +38,7 @@ const TransactionSchema = new Schema<ITransaction>(
     {
         timestamps: true, // Automatically create createdAt and updatedAt fields
         versionKey: false, // Disable the __v field
-    }
+    },
 );
 
 const TransactionModel = model<ITransaction>('Transaction', TransactionSchema);

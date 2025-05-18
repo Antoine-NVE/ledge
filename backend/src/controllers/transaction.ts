@@ -125,7 +125,7 @@ const update = async (req: Request<{ id: string }, {}, TransactionBody>, res: Re
                 name,
                 value,
             },
-            { new: true, runValidators: true }
+            { new: true, runValidators: true },
         );
 
         if (!transaction) {
