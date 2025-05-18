@@ -18,6 +18,14 @@ export const createAccessToken = (res: Response, user: UserDocument) => {
     });
 };
 
+export const verifyAccessToken = (token: string) => {
+    try {
+        return jwt.verify(token, process.env.JWT_SECRET!);
+    } catch (error) {
+        return null;
+    }
+};
+
 export const removeAccessToken = (res: Response) => {
     res.clearCookie('access_token', {
         httpOnly: true,
