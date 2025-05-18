@@ -21,7 +21,7 @@ const UserSchema = new Schema<UserDocument>(
             trim: true,
             lowercase: true,
             required: true,
-            unique: [true, 'Email already exists'],
+            unique: true,
             validate: [
                 {
                     validator: isEmailValid,
