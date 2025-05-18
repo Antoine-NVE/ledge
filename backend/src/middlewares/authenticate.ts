@@ -17,6 +17,7 @@ const authenticate = (req: Request, res: Response, next: NextFunction) => {
             data: null,
             errors: null,
         });
+        return;
     }
 
     const decoded = verifyAccessToken(access_token);
