@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 
 export interface Transaction {
     month: string;
@@ -6,6 +6,7 @@ export interface Transaction {
     isFixed: boolean;
     name: string;
     value: number;
+    user: Types.ObjectId;
 }
 
 export type TransactionDocument = Transaction & {
@@ -39,6 +40,11 @@ const TransactionSchema = new Schema<TransactionDocument>(
                 validator: Number.isInteger,
                 message: 'Path `value` must be an integer.',
             },
+        },
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: true,
         },
     },
     {

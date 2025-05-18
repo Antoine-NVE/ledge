@@ -12,6 +12,7 @@ interface TransactionBody {
 
 const create = async (req: Request<object, object, TransactionBody>, res: Response) => {
     const { month, isIncome, isFixed, name, value } = req.body;
+    const userId = req.userId;
 
     try {
         const transaction = new TransactionModel({
@@ -20,9 +21,12 @@ const create = async (req: Request<object, object, TransactionBody>, res: Respon
             isFixed,
             name,
             value,
+            user: userId,
         });
 
-        await transaction.save();
+        // Save the transaction and populate the user field
+        await (await transaction.save()).populate('user');
+
         res.status(201).json({
             message: 'Transaction created successfully',
             data: {
