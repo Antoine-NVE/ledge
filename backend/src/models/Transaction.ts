@@ -1,6 +1,6 @@
-import { Schema, model, Document } from 'mongoose';
+import { Schema, model } from 'mongoose';
 
-export interface ITransaction extends Document {
+export interface Transaction {
     month: string;
     isIncome: boolean;
     isFixed: boolean;
@@ -8,7 +8,13 @@ export interface ITransaction extends Document {
     value: number;
 }
 
-const TransactionSchema = new Schema<ITransaction>(
+export type TransactionDocument = Transaction & {
+    _id: string;
+    createdAt: Date;
+    updatedAt: Date;
+};
+
+const TransactionSchema = new Schema<TransactionDocument>(
     {
         month: {
             type: String,
@@ -41,6 +47,6 @@ const TransactionSchema = new Schema<ITransaction>(
     },
 );
 
-const TransactionModel = model<ITransaction>('Transaction', TransactionSchema);
+const TransactionModel = model<TransactionDocument>('Transaction', TransactionSchema);
 
 export default TransactionModel;
