@@ -59,8 +59,8 @@ UserSchema.pre<HydratedDocument<User>>('save', async function (next) {
     try {
         this.password = await bcrypt.hash(this.password, 10);
         next();
-    } catch (error: any) {
-        next(error);
+    } catch (error: unknown) {
+        next(error instanceof Error ? error : new Error('Unknown error during hashing'));
     }
 });
 

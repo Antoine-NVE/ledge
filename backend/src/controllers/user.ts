@@ -15,6 +15,8 @@ export const me = async (req: Request, res: Response) => {
             errors: null,
         });
     } catch (error) {
+        console.error(error);
+
         res.status(500).json({
             message: 'Internal server error',
             data: null,

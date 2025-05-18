@@ -22,6 +22,8 @@ export const verifyAccessToken = (token: string) => {
     try {
         return jwt.verify(token, process.env.JWT_SECRET!);
     } catch (error) {
+        console.error(error);
+
         return null;
     }
 };

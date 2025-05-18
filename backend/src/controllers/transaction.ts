@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response } from 'express';
+import { Request, Response } from 'express';
 import TransactionModel from '../models/Transaction';
 import { Error as MongooseError } from 'mongoose';
 
@@ -10,7 +10,7 @@ interface TransactionBody {
     value: number;
 }
 
-const create = async (req: Request<{}, {}, TransactionBody>, res: Response) => {
+const create = async (req: Request<object, object, TransactionBody>, res: Response) => {
     const { month, isIncome, isFixed, name, value } = req.body;
 
     try {
@@ -64,7 +64,9 @@ const getAll = async (req: Request, res: Response) => {
             },
             errors: null,
         });
-    } catch (error: unknown) {
+    } catch (error) {
+        console.error(error);
+
         res.status(500).json({
             message: 'Internal server error',
             data: null,
@@ -111,7 +113,7 @@ const getById = async (req: Request<{ id: string }>, res: Response) => {
     }
 };
 
-const update = async (req: Request<{ id: string }, {}, TransactionBody>, res: Response) => {
+const update = async (req: Request<{ id: string }, object, TransactionBody>, res: Response) => {
     const { id } = req.params;
     const { month, isIncome, isFixed, name, value } = req.body;
 

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Error as MongooseError } from 'mongoose';
 import bcrypt from 'bcrypt';
 
-import UserModel from '../models/User';
+import UserModel, { UserDocument } from '../models/User';
 import { createAccessToken, removeAccessToken } from '../services/auth';
 
 interface AuthBody {
@@ -10,7 +10,7 @@ interface AuthBody {
     password: string;
 }
 
-export const register = async (req: Request<{}, {}, AuthBody>, res: Response) => {
+export const register = async (req: Request<object, object, AuthBody>, res: Response) => {
     try {
         const { email, password } = req.body;
 
@@ -24,7 +24,7 @@ export const register = async (req: Request<{}, {}, AuthBody>, res: Response) =>
         createAccessToken(res, user);
 
         // Remove password from the response
-        const userObj = user.toObject() as any;
+        const userObj = user.toObject() as Partial<UserDocument>;
         delete userObj.password;
 
         res.status(201).json({
@@ -57,7 +57,7 @@ export const register = async (req: Request<{}, {}, AuthBody>, res: Response) =>
     }
 };
 
-export const login = async (req: Request<{}, {}, AuthBody>, res: Response) => {
+export const login = async (req: Request<object, object, AuthBody>, res: Response) => {
     try {
         const { email, password } = req.body;
 
@@ -86,7 +86,7 @@ export const login = async (req: Request<{}, {}, AuthBody>, res: Response) => {
         createAccessToken(res, user);
 
         // Remove password from the response
-        const userObj = user.toObject() as any;
+        const userObj = user.toObject() as Partial<UserDocument>;
         delete userObj.password;
 
         res.status(200).json({
@@ -97,6 +97,8 @@ export const login = async (req: Request<{}, {}, AuthBody>, res: Response) => {
             errors: null,
         });
     } catch (error) {
+        console.error(error);
+
         res.status(500).json({
             message: 'Internal server error',
             data: null,
