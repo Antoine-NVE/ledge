@@ -4,7 +4,7 @@ import { verifyAccessToken } from '../services/auth';
 // Extend Express Request interface to include userId
 declare module 'express-serve-static-core' {
     interface Request {
-        userId: string;
+        userId?: string;
     }
 }
 
