@@ -43,6 +43,7 @@ const create = async (req: Request<object, object, TransactionBody>, res: Respon
                 data: null,
                 errors,
             });
+            return;
         }
 
         res.status(500).json({
