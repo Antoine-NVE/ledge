@@ -11,9 +11,9 @@ interface AuthBody {
 }
 
 export const register = async (req: Request<object, object, AuthBody>, res: Response) => {
-    try {
-        const { email, password } = req.body;
+    const { email, password } = req.body;
 
+    try {
         let user = new UserModel({
             email,
             password,
@@ -58,9 +58,9 @@ export const register = async (req: Request<object, object, AuthBody>, res: Resp
 };
 
 export const login = async (req: Request<object, object, AuthBody>, res: Response) => {
-    try {
-        const { email, password } = req.body;
+    const { email, password } = req.body;
 
+    try {
         const user = await UserModel.findOne({ email }).select('+password');
 
         if (!user) {
