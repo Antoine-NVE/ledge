@@ -6,13 +6,11 @@ import { isEmailValid, isEmailUnique, isPasswordValid } from '../validators/user
 export interface User {
     email: string;
     password: string;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
-export type UserDocument = User & {
-    _id: Types.ObjectId;
-    createdAt: Date;
-    updatedAt: Date;
-};
+export type UserDocument = HydratedDocument<User>;
 
 const UserSchema = new Schema<UserDocument>(
     {
@@ -51,7 +49,7 @@ const UserSchema = new Schema<UserDocument>(
     },
 );
 
-UserSchema.pre<HydratedDocument<User>>('save', async function (next) {
+UserSchema.pre<UserDocument>('save', async function (next) {
     if (!this.isModified('password')) {
         return next();
     }

@@ -1,4 +1,4 @@
-import { Schema, Types, model } from 'mongoose';
+import { HydratedDocument, Schema, Types, model } from 'mongoose';
 
 export interface Transaction {
     month: string;
@@ -7,13 +7,11 @@ export interface Transaction {
     name: string;
     value: number;
     user: Types.ObjectId;
+    createdAt?: Date;
+    updatedAt?: Date;
 }
 
-export type TransactionDocument = Transaction & {
-    _id: string;
-    createdAt: Date;
-    updatedAt: Date;
-};
+export type TransactionDocument = HydratedDocument<Transaction>;
 
 const TransactionSchema = new Schema<TransactionDocument>(
     {
