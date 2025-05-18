@@ -1,10 +1,18 @@
+import { NextFunction, Request, Response } from 'express';
 import { verifyAccessToken } from '../services/auth';
 
-export const authenticate = (req: any, res: any, next: any) => {
+// Extend Express Request interface to include userId
+declare module 'express-serve-static-core' {
+    interface Request {
+        userId: string;
+    }
+}
+
+const authenticate = (req: Request, res: Response, next: NextFunction) => {
     const access_token = req.cookies?.access_token;
 
     if (!access_token) {
-        return res.status(401).json({
+        res.status(401).json({
             message: 'Unauthorized',
             data: null,
             errors: null,
@@ -12,14 +20,18 @@ export const authenticate = (req: any, res: any, next: any) => {
     }
 
     const decoded = verifyAccessToken(access_token);
-    if (!decoded) {
-        return res.status(401).json({
-            message: 'Unauthorized',
-            data: null,
-            errors: null,
-        });
+
+    if (typeof decoded === 'object' && decoded !== null && '_id' in decoded) {
+        req.userId = (decoded as { _id: string })._id;
+        next();
+        return;
     }
 
-    req.user = decoded;
-    next();
+    res.status(401).json({
+        message: 'Unauthorized',
+        data: null,
+        errors: null,
+    });
 };
+
+export default authenticate;
