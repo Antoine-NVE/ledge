@@ -110,30 +110,18 @@ export const getTransactionById = async (req: Request, res: Response) => {
     }
 };
 
-export const updateTransaction = async (req: Request<{ id: string }, object, TransactionBody>, res: Response) => {
-    const { id } = req.params;
+export const updateTransaction = async (req: Request<object, object, TransactionBody>, res: Response) => {
+    const transaction = req.transaction!;
     const { month, isIncome, isFixed, name, value } = req.body;
 
     try {
-        const transaction = await TransactionModel.findByIdAndUpdate(
-            id,
-            {
-                month,
-                isIncome,
-                isFixed,
-                name,
-                value,
-            },
-            { new: true, runValidators: true },
-        );
+        if (month !== undefined) transaction.month = month;
+        if (isIncome !== undefined) transaction.isIncome = isIncome;
+        if (isFixed !== undefined) transaction.isFixed = isFixed;
+        if (name !== undefined) transaction.name = name;
+        if (value !== undefined) transaction.value = value;
 
-        if (!transaction) {
-            res.status(404).json({
-                message: 'Transaction not found',
-                data: null,
-                errors: null,
-            });
-        }
+        await transaction.save();
 
         res.status(200).json({
             message: 'Transaction updated successfully',
