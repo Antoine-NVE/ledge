@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import TransactionModel from '../models/Transaction';
 import { Error as MongooseError } from 'mongoose';
+import { formatMongooseValidationErrors } from '../utils/errors';
 
 interface TransactionBody {
     month: string;
@@ -36,16 +37,10 @@ export const createTransaction = async (req: Request<object, object, Transaction
         });
     } catch (error: unknown) {
         if (error instanceof MongooseError.ValidationError) {
-            const errors: Record<string, string> = {};
-
-            for (const [key, err] of Object.entries(error.errors)) {
-                errors[key] = err.message;
-            }
-
             res.status(400).json({
                 message: 'Validation error',
                 data: null,
-                errors,
+                errors: formatMongooseValidationErrors(error),
             });
             return;
         }
@@ -132,16 +127,10 @@ export const updateTransaction = async (req: Request<object, object, Transaction
         });
     } catch (error: unknown) {
         if (error instanceof MongooseError.ValidationError) {
-            const errors: Record<string, string> = {};
-
-            for (const [key, err] of Object.entries(error.errors)) {
-                errors[key] = err.message;
-            }
-
             res.status(400).json({
                 message: 'Validation error',
                 data: null,
-                errors,
+                errors: formatMongooseValidationErrors(error),
             });
         }
 
