@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 
 import { UserDocument } from '../models/User';
 
-export const connect = (res: Response, user: UserDocument) => {
+export const createAccessToken = (res: Response, user: UserDocument) => {
     const { _id } = user;
 
     const token = jwt.sign({ _id }, process.env.JWT_SECRET!, {
@@ -18,7 +18,7 @@ export const connect = (res: Response, user: UserDocument) => {
     });
 };
 
-export const disconnect = (res: Response) => {
+export const removeAccessToken = (res: Response) => {
     res.clearCookie('access_token', {
         httpOnly: true,
         secure: true,

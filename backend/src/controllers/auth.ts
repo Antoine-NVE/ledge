@@ -3,7 +3,7 @@ import { Error as MongooseError } from 'mongoose';
 import bcrypt from 'bcrypt';
 
 import UserModel from '../models/User';
-import { connect, disconnect } from '../services/auth';
+import { createAccessToken, removeAccessToken } from '../services/auth';
 
 interface AuthBody {
     email: string;
@@ -21,7 +21,7 @@ export const register = async (req: Request<{}, {}, AuthBody>, res: Response) =>
         user = await user.save();
 
         // Automatically connect the user after registration
-        connect(res, user);
+        createAccessToken(res, user);
 
         // Remove password from the response
         const userObj = user.toObject() as any;
@@ -83,7 +83,7 @@ export const login = async (req: Request<{}, {}, AuthBody>, res: Response) => {
         }
 
         // Automatically connect the user after login
-        connect(res, user);
+        createAccessToken(res, user);
 
         // Remove password from the response
         const userObj = user.toObject() as any;
@@ -106,7 +106,7 @@ export const login = async (req: Request<{}, {}, AuthBody>, res: Response) => {
 };
 
 export const logout = (req: Request, res: Response) => {
-    disconnect(res);
+    removeAccessToken(res);
 
     res.status(200).json({
         message: 'User logged out successfully',
