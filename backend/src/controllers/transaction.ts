@@ -10,7 +10,7 @@ interface TransactionBody {
     value: number;
 }
 
-const create = async (req: Request<object, object, TransactionBody>, res: Response) => {
+export const createTransaction = async (req: Request<object, object, TransactionBody>, res: Response) => {
     const { month, isIncome, isFixed, name, value } = req.body;
     const userId = req.userId;
 
@@ -58,7 +58,7 @@ const create = async (req: Request<object, object, TransactionBody>, res: Respon
     }
 };
 
-const getAll = async (req: Request, res: Response) => {
+export const getAllTransactions = async (req: Request, res: Response) => {
     const userId = req.userId;
 
     try {
@@ -82,7 +82,7 @@ const getAll = async (req: Request, res: Response) => {
     }
 };
 
-const getById = async (req: Request<{ id: string }>, res: Response) => {
+export const getTransactionById = async (req: Request<{ id: string }>, res: Response) => {
     const { id } = req.params;
 
     try {
@@ -120,7 +120,7 @@ const getById = async (req: Request<{ id: string }>, res: Response) => {
     }
 };
 
-const update = async (req: Request<{ id: string }, object, TransactionBody>, res: Response) => {
+export const updateTransaction = async (req: Request<{ id: string }, object, TransactionBody>, res: Response) => {
     const { id } = req.params;
     const { month, isIncome, isFixed, name, value } = req.body;
 
@@ -183,7 +183,7 @@ const update = async (req: Request<{ id: string }, object, TransactionBody>, res
     }
 };
 
-const remove = async (req: Request<{ id: string }>, res: Response) => {
+export const removeTransaction = async (req: Request<{ id: string }>, res: Response) => {
     const { id } = req.params;
 
     try {
@@ -219,12 +219,4 @@ const remove = async (req: Request<{ id: string }>, res: Response) => {
             errors: null,
         });
     }
-};
-
-export default {
-    create,
-    getAll,
-    getById,
-    update,
-    remove,
 };

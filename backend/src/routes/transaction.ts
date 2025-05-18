@@ -1,13 +1,19 @@
 import express from 'express';
-import TransactionController from '../controllers/transaction';
 import authenticate from '../middlewares/authenticate';
+import {
+    createTransaction,
+    getAllTransactions,
+    getTransactionById,
+    removeTransaction,
+    updateTransaction,
+} from '../controllers/transaction';
 
 const router = express.Router();
 
-router.post('/', authenticate, TransactionController.create);
-router.get('/', authenticate, TransactionController.getAll);
-router.get('/:id', authenticate, TransactionController.getById);
-router.put('/:id', authenticate, TransactionController.update);
-router.delete('/:id', authenticate, TransactionController.remove);
+router.post('/', authenticate, createTransaction);
+router.get('/', authenticate, getAllTransactions);
+router.get('/:id', authenticate, getTransactionById);
+router.put('/:id', authenticate, updateTransaction);
+router.delete('/:id', authenticate, removeTransaction);
 
 export default router;
