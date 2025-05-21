@@ -7,11 +7,12 @@ export interface Transaction {
     name: string;
     value: number;
     user: Types.ObjectId;
-    createdAt?: Date;
-    updatedAt?: Date;
 }
 
-export type TransactionDocument = HydratedDocument<Transaction>;
+export type TransactionDocument = HydratedDocument<Transaction> & {
+    createdAt: Date;
+    updatedAt: Date;
+};
 
 const TransactionSchema = new Schema<TransactionDocument>(
     {

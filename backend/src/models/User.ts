@@ -6,11 +6,12 @@ import { isEmailValid, isEmailUnique, isPasswordValid } from '../validators/user
 export interface User {
     email: string;
     password: string;
-    createdAt?: Date;
-    updatedAt?: Date;
 }
 
-export type UserDocument = HydratedDocument<User>;
+export type UserDocument = HydratedDocument<User> & {
+    createdAt: Date;
+    updatedAt: Date;
+};
 
 const UserSchema = new Schema<UserDocument>(
     {
