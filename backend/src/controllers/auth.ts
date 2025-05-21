@@ -5,6 +5,7 @@ import bcrypt from 'bcrypt';
 import UserModel from '../models/User';
 import { sanitizeUser } from '../utils/sanitize';
 import { clearAccessToken, createAccessToken } from '../utils/accessToken';
+import { formatMongooseValidationErrors } from '../utils/errors';
 
 interface AuthBody {
     email: string;
@@ -36,16 +37,10 @@ export const register = async (req: Request<object, object, AuthBody>, res: Resp
         });
     } catch (error: unknown) {
         if (error instanceof MongooseError.ValidationError) {
-            // Handle validation errors
-            const errors: Record<string, string> = {};
-            for (const [key, err] of Object.entries(error.errors)) {
-                errors[key] = err.message;
-            }
-
             res.status(400).json({
                 message: 'Validation error',
                 data: null,
-                errors,
+                errors: formatMongooseValidationErrors(error),
             });
         } else {
             res.status(500).json({
