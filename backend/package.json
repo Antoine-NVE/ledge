@@ -10,9 +10,7 @@
         "build": "rimraf dist && tsc",
         "seed": "tsx scripts/seed.ts",
         "lint": "eslint . --ext .ts",
-        "lint:fix": "eslint . --ext .ts --fix",
-        "format": "prettier --write .",
-        "format:check": "prettier --check ."
+        "format": "prettier --write ."
     },
     "author": "",
     "license": "ISC",
