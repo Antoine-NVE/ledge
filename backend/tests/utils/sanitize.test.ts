@@ -1,3 +1,4 @@
+import { describe, it, jest, expect } from '@jest/globals';
 import { sanitizeUser } from '../../src/utils/sanitize';
 import { UserDocument } from '../../src/models/User';
 
@@ -11,7 +12,7 @@ describe('sanitizeUser', () => {
                 password: 'supersecret',
                 createdAt: new Date('2025-01-01'),
                 updatedAt: new Date('2025-01-02'),
-            }),
+            }) as UserDocument['toObject'],
         };
 
         const userDoc = fakeUser as UserDocument;

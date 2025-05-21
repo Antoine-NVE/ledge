@@ -1,3 +1,5 @@
+import { jest, describe, it, expect, beforeEach } from '@jest/globals';
+
 jest.mock('../../src/models/User', () => ({
     __esModule: true,
     default: {
@@ -49,13 +51,13 @@ describe('User Validators', () => {
         });
 
         it('should return true if no user exists', async () => {
-            findOneMock.mockResolvedValueOnce(null);
+            findOneMock.mockReturnValueOnce(null);
             await expect(isEmailUnique('new@example.com')).resolves.toBe(true);
             expect(findOneMock).toHaveBeenCalledWith({ email: 'new@example.com' });
         });
 
         it('should return false if the email already exists', async () => {
-            findOneMock.mockResolvedValueOnce({ _id: '123', email: 'exists@example.com' });
+            findOneMock.mockReturnValueOnce({ _id: '123', email: 'exists@example.com' });
             await expect(isEmailUnique('exists@example.com')).resolves.toBe(false);
         });
     });
