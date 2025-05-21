@@ -28,7 +28,7 @@ export const verifyAccessToken = (token: string) => {
     }
 };
 
-export const removeAccessToken = (res: Response) => {
+export const clearAccessToken = (res: Response) => {
     res.clearCookie('access_token', {
         httpOnly: true,
         secure: true,

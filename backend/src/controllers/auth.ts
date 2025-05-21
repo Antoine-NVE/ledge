@@ -3,8 +3,8 @@ import { Error as MongooseError } from 'mongoose';
 import bcrypt from 'bcrypt';
 
 import UserModel from '../models/User';
-import { createAccessToken, removeAccessToken } from '../services/auth';
 import { sanitizeUser } from '../utils/sanitize';
+import { clearAccessToken, createAccessToken } from '../utils/accessToken';
 
 interface AuthBody {
     email: string;
@@ -107,7 +107,7 @@ export const login = async (req: Request<object, object, AuthBody>, res: Respons
 };
 
 export const logout = (req: Request, res: Response) => {
-    removeAccessToken(res);
+    clearAccessToken(res);
 
     res.status(200).json({
         message: 'User logged out successfully',

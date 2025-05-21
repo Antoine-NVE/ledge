@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { verifyAccessToken } from '../services/auth';
+import { verifyAccessToken } from '../utils/accessToken';
 
 // Extend Express Request interface to include userId
 declare module 'express-serve-static-core' {
