@@ -19,7 +19,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/user/me`, {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/users/me`, {
                 credentials: 'include',
             });
             const { data } = await response.json();
