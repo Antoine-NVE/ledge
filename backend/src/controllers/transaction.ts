@@ -13,7 +13,7 @@ interface TransactionBody {
 
 export const createTransaction = async (req: Request<object, object, TransactionBody>, res: Response) => {
     const { month, isIncome, isFixed, name, value } = req.body;
-    const userId = req.userId;
+    const user = req.user;
 
     try {
         const transaction = new TransactionModel({
@@ -22,7 +22,7 @@ export const createTransaction = async (req: Request<object, object, Transaction
             isFixed,
             name,
             value,
-            user: userId,
+            user,
         });
 
         // Save the transaction and populate the user field
@@ -54,10 +54,10 @@ export const createTransaction = async (req: Request<object, object, Transaction
 };
 
 export const getAllTransactions = async (req: Request, res: Response) => {
-    const userId = req.userId;
+    const user = req.user;
 
     try {
-        const transactions = await TransactionModel.find({ user: userId }).populate('user');
+        const transactions = await TransactionModel.find({ user }).populate('user');
 
         res.status(200).json({
             message: 'Transactions retrieved successfully',

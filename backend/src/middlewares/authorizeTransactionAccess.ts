@@ -10,7 +10,7 @@ declare module 'express-serve-static-core' {
 }
 
 const authorizeTransactionAccess = async (req: Request, res: Response, next: NextFunction) => {
-    const userId = req.userId;
+    const user = req.user!;
     const transactionId = req.params.id;
 
     if (!Types.ObjectId.isValid(transactionId)) {
@@ -34,7 +34,7 @@ const authorizeTransactionAccess = async (req: Request, res: Response, next: Nex
             return;
         }
 
-        if (transaction.user._id.toString() !== userId) {
+        if (transaction.user._id.toString() !== user._id.toString()) {
             res.status(403).json({
                 message: 'Forbidden',
                 data: null,
