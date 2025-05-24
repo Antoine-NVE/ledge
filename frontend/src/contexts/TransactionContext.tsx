@@ -5,6 +5,7 @@ interface TransactionContextType {
     transactions: Transaction[];
     loading: boolean;
     error: string | null;
+    refreshTransactions: () => Promise<void>;
     addTransaction: (transaction: Transaction) => void;
     deleteTransaction: (transaction: Transaction) => void;
     updateTransaction: (transaction: Transaction) => void;
@@ -18,25 +19,25 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchTransactions = async () => {
-            try {
-                const response = await fetch(import.meta.env.VITE_API_URL + '/transactions');
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.message || 'Failed to fetch transactions');
-                }
-
-                setTransactions(data.data.transactions || []);
-            } catch (err) {
-                setError(err instanceof Error ? err.message : 'An unknown error occurred');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchTransactions();
+        refreshTransactions();
     }, []);
+
+    const refreshTransactions = async () => {
+        setLoading(true);
+        setError(null);
+        try {
+            const response = await fetch(import.meta.env.VITE_API_URL + '/transactions', {credentials: 'include'});
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to refresh transactions');
+            }
+            setTransactions(data.data.transactions || []);
+        } catch (err) {
+            setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const addTransaction = (transaction: Transaction) => {
         setTransactions((prev) => [...prev, transaction]);
@@ -52,7 +53,15 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
 
     return (
         <TransactionContext.Provider
-            value={{ transactions, loading, error, addTransaction, deleteTransaction, updateTransaction }}>
+            value={{
+                transactions,
+                loading,
+                error,
+                refreshTransactions,
+                addTransaction,
+                deleteTransaction,
+                updateTransaction,
+            }}>
             {children}
         </TransactionContext.Provider>
     );

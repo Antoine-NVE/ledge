@@ -4,6 +4,7 @@ import MonthPage from './pages/Month';
 import WithNavbar from './layouts/WithNavbar';
 import NoNavbar from './layouts/NoNavbar';
 import ScrollToTop from './components/ScrollToTop';
+import Login from './pages/Login';
 
 function App() {
     return (
@@ -15,7 +16,10 @@ function App() {
                         <Route path="/" element={<HomePage />} />
                         <Route path="/month/:month" element={<MonthPage />} />
                     </Route>
-                    <Route element={<NoNavbar />}>{/* Add any routes that don't need a navbar here */}</Route>
+                    <Route element={<NoNavbar />}>
+                        {/* Add any routes that don't need a navbar here */}
+                        <Route path="/login" element={<Login />} />
+                    </Route>
                 </Routes>
             </BrowserRouter>
         </div>
