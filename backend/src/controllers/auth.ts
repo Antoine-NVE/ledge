@@ -1,11 +1,10 @@
 import { Request, Response } from 'express';
 import { Error as MongooseError } from 'mongoose';
 import bcrypt from 'bcrypt';
-
 import UserModel from '../models/User';
 import { sanitizeUser } from '../utils/sanitize';
-import { clearAccessToken, createAccessToken } from '../utils/accessToken';
 import { formatMongooseValidationErrors } from '../utils/errors';
+import { clearAccessToken, setAccessTokenCookie } from '../services/authCookie';
 
 interface AuthBody {
     email: string;
@@ -23,7 +22,7 @@ export const register = async (req: Request<object, object, AuthBody>, res: Resp
         user = await user.save();
 
         // Automatically connect the user after registration
-        createAccessToken(res, user);
+        setAccessTokenCookie(res, user);
 
         // Remove password from the response
         const userObj = sanitizeUser(user);
@@ -78,7 +77,7 @@ export const login = async (req: Request<object, object, AuthBody>, res: Respons
         }
 
         // Automatically connect the user after login
-        createAccessToken(res, user);
+        setAccessTokenCookie(res, user);
 
         // Remove password from the response
         const userObj = sanitizeUser(user);

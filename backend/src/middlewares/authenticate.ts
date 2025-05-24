@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
-import { verifyAccessToken } from '../utils/accessToken';
+import { verifyJwt } from '../utils/jwt';
 import UserModel, { UserDocument } from '../models/User';
 
 // Extend Express Request interface to include userId
@@ -21,7 +21,7 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
         return;
     }
 
-    const decoded = verifyAccessToken(access_token);
+    const decoded = verifyJwt(access_token);
 
     if (typeof decoded === 'object' && decoded !== null && '_id' in decoded) {
         const user = await UserModel.findById(decoded._id);
