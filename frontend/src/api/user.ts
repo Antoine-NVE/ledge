@@ -1,18 +1,14 @@
 import { ApiResponse } from '../types/apiResponse';
 import { User } from '../types/user';
 
-export const login = async (
-    email: string,
-    password: string
-): Promise<[ApiResponse<{ user: User } | null, null>, Response | null]> => {
+export const getCurrentUser = async (): Promise<[ApiResponse<{ user: User } | null, null>, Response | null]> => {
     try {
-        const response = await fetch(import.meta.env.VITE_API_URL + '/auth/login', {
-            method: 'POST',
+        const response = await fetch(import.meta.env.VITE_API_URL + '/users/me', {
+            method: 'GET',
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, password }),
         });
 
         // Can be any status code, including 200, 401, or 500
@@ -24,7 +20,7 @@ export const login = async (
 
         return [
             {
-                message: 'An error occurred while logging in',
+                message: 'An error occurred while fetching user data',
                 data: null,
                 errors: null,
             },

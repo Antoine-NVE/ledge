@@ -1,11 +1,13 @@
-import { createContext, ReactNode, useContext, useEffect, useState, useMemo, useCallback } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import { User } from '../types/user';
+import { getCurrentUser } from '../api/user';
 
 interface UserContextType {
     user: User | null;
     loading: boolean;
     error: string | null;
-    refreshUser: () => Promise<void>;
+    syncUser: () => Promise<void>;
+    setUser: (user: User | null) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -15,35 +17,28 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    const fetchUser = useCallback(async () => {
+    const syncUser = async () => {
         setLoading(true);
         setError(null);
-        try {
-            const response = await fetch(`${import.meta.env.VITE_API_URL}/users/me`, {
-                credentials: 'include',
-            });
-            const { data } = await response.json();
 
-            if (!response.ok) {
-                throw new Error(data.message || 'Error during user fetch');
-            }
+        const [result, response] = await getCurrentUser();
 
-            setUser(data.user || null);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'An unknown error occurred');
+        if (!response || !response.ok) {
+            setError(result.message);
             setUser(null);
-        } finally {
             setLoading(false);
+            return;
         }
-    }, []);
+
+        setUser(result.data!.user);
+        setLoading(false);
+    };
 
     useEffect(() => {
-        fetchUser();
-    }, [fetchUser]);
+        syncUser();
+    }, []);
 
-    const value = useMemo(() => ({ user, loading, error, refreshUser: fetchUser }), [user, loading, error, fetchUser]);
-
-    return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+    return <UserContext.Provider value={{ user, loading, error, syncUser, setUser }}>{children}</UserContext.Provider>;
 };
 
 export const useUser = () => {

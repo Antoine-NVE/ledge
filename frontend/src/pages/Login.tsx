@@ -10,7 +10,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
-    const { refreshUser } = useUser();
+    const { setUser } = useUser();
     const { refreshTransactions } = useTransactions();
     const navigate = useNavigate();
 
@@ -28,7 +28,7 @@ const Login = () => {
 
         setSuccess(result.message);
         setTimeout(() => {
-            refreshUser();
+            setUser(result.data!.user);
             refreshTransactions();
             navigate('/');
             setLoading(false);
