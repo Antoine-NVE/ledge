@@ -1,31 +1,26 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { Transaction } from '../types/transaction';
 import TransactionsContext from '../contexts/TransactionsContext';
+import { getAllTransactions } from '../api/transactions';
 
 const TransactionsProvider = ({ children }: { children: ReactNode }) => {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    useEffect(() => {
-        syncTransactions();
-    }, []);
-
     const syncTransactions = async () => {
         setLoading(true);
         setError(null);
-        try {
-            const response = await fetch(import.meta.env.VITE_API_URL + '/transactions', { credentials: 'include' });
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.message || 'Failed to refresh transactions');
-            }
-            setTransactions(data.data.transactions || []);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'An unknown error occurred');
-        } finally {
+
+        const [result, response] = await getAllTransactions();
+        if (!response || !response.ok) {
+            setError(result.message);
             setLoading(false);
+            return;
         }
+
+        setTransactions(result.data!.transactions);
+        setLoading(false);
     };
 
     const addTransaction = (transaction: Transaction) => {
@@ -39,6 +34,10 @@ const TransactionsProvider = ({ children }: { children: ReactNode }) => {
     const updateTransaction = (transaction: Transaction) => {
         setTransactions((prev) => prev.map((t) => (t._id === transaction._id ? transaction : t)));
     };
+
+    useEffect(() => {
+        syncTransactions();
+    }, []);
 
     return (
         <TransactionsContext.Provider
