@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import useUser from '../hooks/useUser';
-import useTransactions from '../hooks/useTransaction';
+import useTransactions from '../hooks/useTransactions';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../api/auth';
 

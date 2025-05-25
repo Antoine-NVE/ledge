@@ -1,8 +1,8 @@
 import { ReactNode, useEffect, useState } from 'react';
 import { Transaction } from '../types/transaction';
-import TransactionContext from '../contexts/TransactionContext';
+import TransactionsContext from '../contexts/TransactionsContext';
 
-const TransactionProvider = ({ children }: { children: ReactNode }) => {
+const TransactionsProvider = ({ children }: { children: ReactNode }) => {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -41,7 +41,7 @@ const TransactionProvider = ({ children }: { children: ReactNode }) => {
     };
 
     return (
-        <TransactionContext.Provider
+        <TransactionsContext.Provider
             value={{
                 transactions,
                 loading,
@@ -52,8 +52,8 @@ const TransactionProvider = ({ children }: { children: ReactNode }) => {
                 updateTransaction,
             }}>
             {children}
-        </TransactionContext.Provider>
+        </TransactionsContext.Provider>
     );
 };
 
-export default TransactionProvider;
+export default TransactionsProvider;

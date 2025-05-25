@@ -3,14 +3,14 @@ import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.tsx';
 import UserProvider from './providers/UserProvider.tsx';
-import TransactionProvider from './providers/TransactionProvider.tsx';
+import TransactionsProvider from './providers/TransactionsProvider.tsx';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
         <UserProvider>
-            <TransactionProvider>
+            <TransactionsProvider>
                 <App />
-            </TransactionProvider>
+            </TransactionsProvider>
         </UserProvider>
     </StrictMode>
 );

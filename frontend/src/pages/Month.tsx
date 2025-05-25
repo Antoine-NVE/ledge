@@ -4,7 +4,7 @@ import TransactionListSection from '../components/TransactionListSection';
 import { Transaction } from '../types/transaction';
 import TransactionModal from '../components/TransactionModal';
 import DeleteTransactionModal from '../components/DeleteTransactionModal';
-import useTransaction from '../hooks/useTransaction';
+import useTransactions from '../hooks/useTransactions';
 
 type SortOption = 'value-desc' | 'value-asc' | 'alphabetical' | 'reverse-alphabetical';
 
@@ -14,7 +14,7 @@ const Month = () => {
 
     const navigate = useNavigate();
 
-    const { transactions, addTransaction, updateTransaction, deleteTransaction } = useTransaction();
+    const { transactions, addTransaction, updateTransaction, deleteTransaction } = useTransactions();
 
     const regex = /^\d{4}-(0[1-9]|1[0-2])$/;
     if (!month || !regex.test(month)) {

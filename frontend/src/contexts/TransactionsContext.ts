@@ -1,7 +1,7 @@
 import { createContext } from 'react';
 import { Transaction } from '../types/transaction';
 
-interface TransactionContextType {
+interface TransactionsContextType {
     transactions: Transaction[];
     loading: boolean;
     error: string | null;
@@ -11,6 +11,6 @@ interface TransactionContextType {
     updateTransaction: (transaction: Transaction) => void;
 }
 
-const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
+const TransactionsContext = createContext<TransactionsContextType | undefined>(undefined);
 
-export default TransactionContext;
+export default TransactionsContext;
