@@ -14,7 +14,7 @@ const Login = () => {
     const { syncTransactions } = useTransactions();
     const navigate = useNavigate();
 
-    const fetchLogin = async (email: string, password: string) => {
+    const handleLogin = async (email: string, password: string) => {
         setLoading(true);
         setError(null);
         setSuccess(null);
@@ -38,7 +38,7 @@ const Login = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        fetchLogin(email, password);
+        handleLogin(email, password);
     };
 
     return (
