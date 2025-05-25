@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useUser } from '../contexts/UserContext';
 import { useTransactions } from '../contexts/TransactionContext';
 import { useNavigate } from 'react-router-dom';
+import { login } from '../api/auth';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -17,37 +18,21 @@ const Login = () => {
         setLoading(true);
         setError(null);
         setSuccess(null);
-        try {
-            const response = await fetch(import.meta.env.VITE_API_URL + '/auth/login', {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-            });
+        const [result, response] = await login(email, password);
 
-            if (!response.ok) {
-                const { message }: { message: string } = await response.json();
-                throw new Error(message || 'Login failed');
-            }
-
-            const { message }: { message: string; data: object } = await response.json();
-            setSuccess(message);
-            setEmail('');
-            setPassword('');
-
-            await refreshUser(); // Refresh user context after login
-            await refreshTransactions(); // Refresh transactions
-
-            navigate('/');
-        } catch (error) {
-            console.error(error);
-
-            setError(error instanceof Error ? error.message : 'An unexpected error occurred');
-        } finally {
+        if (!response || !response.ok) {
+            setError(result.message);
             setLoading(false);
+            return;
         }
+
+        setSuccess(result.message);
+        setTimeout(() => {
+            refreshUser();
+            refreshTransactions();
+            navigate('/');
+            setLoading(false);
+        }, 1000);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
