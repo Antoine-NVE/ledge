@@ -5,7 +5,7 @@ interface TransactionsContextType {
     transactions: Transaction[];
     loading: boolean;
     error: string | null;
-    refreshTransactions: () => Promise<void>;
+    syncTransactions: () => Promise<void>;
     addTransaction: (transaction: Transaction) => void;
     deleteTransaction: (transaction: Transaction) => void;
     updateTransaction: (transaction: Transaction) => void;

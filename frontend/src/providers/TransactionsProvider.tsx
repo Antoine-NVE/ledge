@@ -8,10 +8,10 @@ const TransactionsProvider = ({ children }: { children: ReactNode }) => {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        refreshTransactions();
+        syncTransactions();
     }, []);
 
-    const refreshTransactions = async () => {
+    const syncTransactions = async () => {
         setLoading(true);
         setError(null);
         try {
@@ -46,7 +46,7 @@ const TransactionsProvider = ({ children }: { children: ReactNode }) => {
                 transactions,
                 loading,
                 error,
-                refreshTransactions,
+                syncTransactions,
                 addTransaction,
                 deleteTransaction,
                 updateTransaction,

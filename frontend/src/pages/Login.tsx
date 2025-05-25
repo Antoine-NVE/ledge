@@ -11,7 +11,7 @@ const Login = () => {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const { setUser } = useUser();
-    const { refreshTransactions } = useTransactions();
+    const { syncTransactions } = useTransactions();
     const navigate = useNavigate();
 
     const fetchLogin = async (email: string, password: string) => {
@@ -29,7 +29,7 @@ const Login = () => {
         setSuccess(result.message);
         setTimeout(() => {
             setUser(result.data!.user);
-            refreshTransactions();
+            syncTransactions();
             navigate('/');
             setLoading(false);
         }, 1000);
