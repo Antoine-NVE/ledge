@@ -1,19 +1,8 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 import { Transaction } from '../types/transaction';
+import TransactionContext from '../contexts/TransactionContext';
 
-interface TransactionContextType {
-    transactions: Transaction[];
-    loading: boolean;
-    error: string | null;
-    refreshTransactions: () => Promise<void>;
-    addTransaction: (transaction: Transaction) => void;
-    deleteTransaction: (transaction: Transaction) => void;
-    updateTransaction: (transaction: Transaction) => void;
-}
-
-const TransactionContext = createContext<TransactionContextType | undefined>(undefined);
-
-export const TransactionProvider = ({ children }: { children: ReactNode }) => {
+const TransactionProvider = ({ children }: { children: ReactNode }) => {
     const [transactions, setTransactions] = useState<Transaction[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -26,7 +15,7 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
         setLoading(true);
         setError(null);
         try {
-            const response = await fetch(import.meta.env.VITE_API_URL + '/transactions', {credentials: 'include'});
+            const response = await fetch(import.meta.env.VITE_API_URL + '/transactions', { credentials: 'include' });
             const data = await response.json();
             if (!response.ok) {
                 throw new Error(data.message || 'Failed to refresh transactions');
@@ -67,10 +56,4 @@ export const TransactionProvider = ({ children }: { children: ReactNode }) => {
     );
 };
 
-export const useTransactions = () => {
-    const context = useContext(TransactionContext);
-    if (!context) {
-        throw new Error('useTransactions must be used within a TransactionProvider');
-    }
-    return context;
-};
+export default TransactionProvider;
