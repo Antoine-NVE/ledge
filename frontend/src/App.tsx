@@ -6,11 +6,13 @@ import NoNavbar from './layouts/NoNavbar';
 import ScrollToTop from './components/ScrollToTop';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import RouterEvents from './components/RouterEvents';
 
 function App() {
     return (
         <div className="min-h-screen bg-gray-100">
             <BrowserRouter>
+                <RouterEvents />
                 <ScrollToTop />
                 <Routes>
                     <Route element={<WithNavbar />}>

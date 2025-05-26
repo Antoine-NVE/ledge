@@ -1,5 +1,6 @@
 import { ApiResponse } from '../types/apiResponse';
 import { NewTransaction, Transaction } from '../types/transaction';
+import { customFetch } from '../utils/customFetch';
 
 const API_URL = import.meta.env.VITE_API_URL + '/transactions';
 
@@ -7,7 +8,7 @@ export const createTransaction = async (
     transaction: NewTransaction
 ): Promise<[ApiResponse<{ transaction: Transaction } | null, object | null>, Response | null]> => {
     try {
-        const response = await fetch(API_URL, {
+        const response = await customFetch(API_URL, {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -38,7 +39,7 @@ export const getAllTransactions = async (): Promise<
     [ApiResponse<{ transactions: Transaction[] } | null, null>, Response | null]
 > => {
     try {
-        const response = await fetch(API_URL, {
+        const response = await customFetch(API_URL, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -68,7 +69,7 @@ export const getTransactionById = async (
     transaction: Transaction
 ): Promise<[ApiResponse<{ transaction: Transaction } | null, null>, Response | null]> => {
     try {
-        const response = await fetch(API_URL + '/' + transaction._id, {
+        const response = await customFetch(API_URL + '/' + transaction._id, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -98,7 +99,7 @@ export const updateTransaction = async (
     transaction: Transaction
 ): Promise<[ApiResponse<{ transaction: Transaction } | null, object | null>, Response | null]> => {
     try {
-        const response = await fetch(API_URL + '/' + transaction._id, {
+        const response = await customFetch(API_URL + '/' + transaction._id, {
             method: 'PUT',
             credentials: 'include',
             headers: {
@@ -129,7 +130,7 @@ export const deleteTransaction = async (
     transaction: Transaction
 ): Promise<[ApiResponse<{ transaction: Transaction } | null, null>, Response | null]> => {
     try {
-        const response = await fetch(API_URL + '/' + transaction._id, {
+        const response = await customFetch(API_URL + '/' + transaction._id, {
             method: 'DELETE',
             credentials: 'include',
             headers: {

@@ -1,3 +1,5 @@
+import { navigateToLogin } from './navigation';
+
 export const customFetch = async (
     input: RequestInfo | URL,
     init?: RequestInit,
@@ -6,7 +8,7 @@ export const customFetch = async (
     const response = await fetch(input, init);
 
     if (handle401 && response.status === 401) {
-        window.location.href = '/login';
+        navigateToLogin();
     }
 
     return response;

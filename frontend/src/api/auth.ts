@@ -1,5 +1,6 @@
 import { ApiResponse } from '../types/apiResponse';
 import { User } from '../types/user';
+import { customFetch } from '../utils/customFetch';
 
 const API_URL = import.meta.env.VITE_API_URL + '/auth';
 
@@ -8,7 +9,7 @@ export const register = async (
     password: string
 ): Promise<[ApiResponse<{ user: User } | null, null>, Response | null]> => {
     try {
-        const response = await fetch(API_URL + '/register', {
+        const response = await customFetch(API_URL + '/register', {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -40,7 +41,7 @@ export const login = async (
     password: string
 ): Promise<[ApiResponse<{ user: User } | null, null>, Response | null]> => {
     try {
-        const response = await fetch(API_URL + '/login', {
+        const response = await customFetch(API_URL + '/login', {
             method: 'POST',
             credentials: 'include',
             headers: {
@@ -69,7 +70,7 @@ export const login = async (
 
 export const logout = async (): Promise<[ApiResponse<null, null>, Response | null]> => {
     try {
-        const response = await fetch(API_URL + '/logout', {
+        const response = await customFetch(API_URL + '/logout', {
             method: 'POST',
             credentials: 'include',
             headers: {

@@ -1,9 +1,10 @@
 import { ApiResponse } from '../types/apiResponse';
 import { User } from '../types/user';
+import { customFetch } from '../utils/customFetch';
 
 export const getCurrentUser = async (): Promise<[ApiResponse<{ user: User } | null, null>, Response | null]> => {
     try {
-        const response = await fetch(import.meta.env.VITE_API_URL + '/users/me', {
+        const response = await customFetch(import.meta.env.VITE_API_URL + '/users/me', {
             method: 'GET',
             credentials: 'include',
             headers: {
