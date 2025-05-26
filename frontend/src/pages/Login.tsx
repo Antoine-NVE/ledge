@@ -10,7 +10,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
-    const { setUser } = useUser();
+    const { user, setUser } = useUser();
     const { syncTransactions } = useTransactions();
     const navigate = useNavigate();
 
@@ -45,6 +45,14 @@ const Login = () => {
         <div className="flex items-center justify-center h-screen bg-gray-100">
             <div className="bg-white p-8 rounded shadow-md w-96">
                 <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+                {user && (
+                    <div className="mt-4 text-center">
+                        <span className="text-sm text-gray-600">Already logged in: </span>
+                        <a href="/" className="text-blue-600 hover:underline font-medium">
+                            Go to Dashboard
+                        </a>
+                    </div>
+                )}
                 <form onSubmit={(e) => handleSubmit(e)}>
                     <div className="mb-4">
                         <label htmlFor="email" className="block text-sm font-medium text-gray-700">
