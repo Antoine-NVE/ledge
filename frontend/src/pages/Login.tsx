@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import useUser from '../hooks/useUser';
-import useTransactions from '../hooks/useTransactions';
 import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../api/auth';
 
@@ -11,7 +10,6 @@ const Login = () => {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const { user, setUser } = useUser();
-    const { syncTransactions } = useTransactions();
     const navigate = useNavigate();
 
     const handleLogin = async (email: string, password: string) => {
@@ -29,7 +27,6 @@ const Login = () => {
         setSuccess(result.message);
         setTimeout(() => {
             setUser(result.data!.user);
-            syncTransactions();
             navigate('/');
             setLoading(false);
         }, 1000);

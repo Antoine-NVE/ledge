@@ -1,10 +1,10 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
 import TransactionListSection from '../components/TransactionListSection';
 import { Transaction } from '../types/transaction';
 import TransactionModal from '../components/TransactionModal';
 import DeleteTransactionModal from '../components/DeleteTransactionModal';
-import useTransactions from '../hooks/useTransactions';
+import { getAllTransactions } from '../api/transactions';
 
 type SortOption = 'value-desc' | 'value-asc' | 'alphabetical' | 'reverse-alphabetical';
 
@@ -14,7 +14,28 @@ const Month = () => {
 
     const navigate = useNavigate();
 
-    const { transactions, addTransaction, updateTransaction, deleteTransaction } = useTransactions();
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const addTransaction = (transaction: Transaction) => {
+        setTransactions((prev) => [...prev, transaction]);
+    };
+    const updateTransaction = (updatedTransaction: Transaction) => {
+        setTransactions((prev) => prev.map((t) => (t._id === updatedTransaction._id ? updatedTransaction : t)));
+    };
+    const deleteTransaction = (transaction: Transaction) => {
+        setTransactions((prev) => prev.filter((t) => t._id !== transaction._id));
+    };
+
+    useEffect(() => {
+        const fetchTransactions = async () => {
+            const [result, response] = await getAllTransactions();
+            if (!response || !response.ok) {
+                console.error(result.message);
+                return;
+            }
+            setTransactions(result.data!.transactions);
+        };
+        fetchTransactions();
+    }, []);
 
     const regex = /^\d{4}-(0[1-9]|1[0-2])$/;
     if (!month || !regex.test(month)) {
