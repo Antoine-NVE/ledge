@@ -1,12 +1,14 @@
 import { ApiResponse } from '../types/apiResponse';
 import { User } from '../types/user';
 
+const API_URL = import.meta.env.VITE_API_URL + '/auth';
+
 export const login = async (
     email: string,
     password: string
 ): Promise<[ApiResponse<{ user: User } | null, null>, Response | null]> => {
     try {
-        const response = await fetch(import.meta.env.VITE_API_URL + '/auth/login', {
+        const response = await fetch(API_URL + '/login', {
             method: 'POST',
             credentials: 'include',
             headers: {
