@@ -45,9 +45,9 @@ const Login = () => {
                 {user && (
                     <div className="mt-4 text-center">
                         <span className="text-sm text-gray-600">Already logged in: </span>
-                        <a href="/" className="text-blue-600 hover:underline font-medium">
+                        <Link to="/" className="text-blue-600 hover:underline font-medium">
                             Go to Dashboard
-                        </a>
+                        </Link>
                     </div>
                 )}
                 <form onSubmit={(e) => handleSubmit(e)}>
