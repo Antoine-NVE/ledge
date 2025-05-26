@@ -16,7 +16,7 @@ export const register = async (
             },
             body: JSON.stringify({ email, password }),
         });
-        
+
         // Can be any status code, including 200, 401, or 500
         // We will handle this in the component
         const result: ApiResponse<{ user: User } | null, null> = await response.json();
@@ -59,6 +59,34 @@ export const login = async (
         return [
             {
                 message: 'An error occurred while logging in',
+                data: null,
+                errors: null,
+            },
+            null, // In this case, we didn't receive a response from the server
+        ];
+    }
+};
+
+export const logout = async (): Promise<[ApiResponse<null, null>, Response | null]> => {
+    try {
+        const response = await fetch(API_URL + '/logout', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        // Can be any status code, including 200, 401, or 500
+        // We will handle this in the component
+        const result: ApiResponse<null, null> = await response.json();
+        return [result, response];
+    } catch (error: unknown) {
+        console.error(error);
+
+        return [
+            {
+                message: 'An error occurred while logging out',
                 data: null,
                 errors: null,
             },
