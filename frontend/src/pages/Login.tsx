@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import useUser from '../hooks/useUser';
 import useTransactions from '../hooks/useTransactions';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { login } from '../api/auth';
 
 const Login = () => {
@@ -89,9 +89,9 @@ const Login = () => {
                 </form>
                 <div className="mt-4 text-center">
                     <span className="text-sm text-gray-600">Don't have an account? </span>
-                    <a href="/register" className="text-blue-600 hover:underline font-medium">
+                    <Link to="/register" className="text-blue-600 hover:underline font-medium">
                         Register
-                    </a>
+                    </Link>
                 </div>
             </div>
         </div>
