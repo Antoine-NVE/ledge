@@ -31,12 +31,8 @@ const Register = () => {
             return;
         }
         setSuccess(result.message);
-        setTimeout(() => {
-            setEmail('');
-            setPassword('');
-            navigate('/');
-            setLoading(false);
-        }, 1000);
+        navigate('/');
+        setLoading(false);
     };
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

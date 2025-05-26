@@ -25,11 +25,9 @@ const Login = () => {
         }
 
         setSuccess(result.message);
-        setTimeout(() => {
-            setUser(result.data!.user);
-            navigate('/');
-            setLoading(false);
-        }, 1000);
+        setUser(result.data!.user);
+        navigate('/');
+        setLoading(false);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
