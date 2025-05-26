@@ -19,7 +19,7 @@ const UserSchema = new Schema<UserDocument>(
             type: String,
             trim: true,
             lowercase: true,
-            required: true,
+            required: [true, 'Email is required'],
             unique: true,
             validate: [
                 {
