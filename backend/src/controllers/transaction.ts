@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import TransactionModel from '../models/Transaction';
 import { Error as MongooseError } from 'mongoose';
-import { formatMongooseValidationErrors } from '../utils/errors';
+import { formatMongooseValidationErrors } from '../utils/error';
 
 interface TransactionBody {
     month: string;

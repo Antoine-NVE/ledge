@@ -3,7 +3,7 @@ import { Error as MongooseError } from 'mongoose';
 import bcrypt from 'bcrypt';
 import UserModel from '../models/User';
 import { sanitizeUser } from '../utils/sanitize';
-import { formatMongooseValidationErrors } from '../utils/errors';
+import { formatMongooseValidationErrors } from '../utils/error';
 import { clearAccessToken, setAccessTokenCookie } from '../services/authCookie';
 
 interface AuthBody {
