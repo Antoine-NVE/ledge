@@ -1,9 +1,10 @@
 import jwt, { Secret } from 'jsonwebtoken';
-import dotenv from 'dotenv';
 
-dotenv.config();
+let JWT_SECRET: Secret = process.env.JWT_SECRET || 'default-secret';
 
-const JWT_SECRET: Secret = process.env.JWT_SECRET!;
+export const setJwtSecret = (secret: Secret) => {
+    JWT_SECRET = secret;
+};
 
 export const createJwt = (payload: object, expiresIn: jwt.SignOptions['expiresIn'] = '1h') => {
     return jwt.sign(payload, JWT_SECRET, { expiresIn });
