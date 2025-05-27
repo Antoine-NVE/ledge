@@ -53,7 +53,7 @@ export const createTransaction = async (req: Request<object, object, Transaction
     }
 };
 
-export const getAllTransactions = async (req: Request, res: Response) => {
+export const getTransactions = async (req: Request, res: Response) => {
     const user = req.user;
 
     try {
@@ -77,7 +77,7 @@ export const getAllTransactions = async (req: Request, res: Response) => {
     }
 };
 
-export const getTransactionById = async (req: Request, res: Response) => {
+export const getTransaction = async (req: Request, res: Response) => {
     const transaction = req.transaction;
 
     try {

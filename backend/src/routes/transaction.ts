@@ -2,8 +2,8 @@ import express from 'express';
 import authenticate from '../middlewares/authenticate';
 import {
     createTransaction,
-    getAllTransactions,
-    getTransactionById,
+    getTransactions,
+    getTransaction,
     removeTransaction,
     updateTransaction,
 } from '../controllers/transaction';
@@ -12,8 +12,8 @@ import authorizeTransactionAccess from '../middlewares/authorizeTransactionAcces
 const router = express.Router();
 
 router.post('/', authenticate, createTransaction);
-router.get('/', authenticate, getAllTransactions);
-router.get('/:id', authenticate, authorizeTransactionAccess, getTransactionById);
+router.get('/', authenticate, getTransactions);
+router.get('/:id', authenticate, authorizeTransactionAccess, getTransaction);
 router.put('/:id', authenticate, authorizeTransactionAccess, updateTransaction);
 router.delete('/:id', authenticate, authorizeTransactionAccess, removeTransaction);
 

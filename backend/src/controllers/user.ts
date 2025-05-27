@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-export const me = async (req: Request, res: Response) => {
+export const getUser = async (req: Request, res: Response) => {
     try {
         const user = req.user;
 
