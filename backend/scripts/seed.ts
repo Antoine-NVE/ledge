@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import TransactionModel, { ITransaction } from '../src/models/Transaction';
+import TransactionModel, { Transaction } from '../src/models/Transaction';
 
 dotenv.config();
 
@@ -14,7 +14,7 @@ dotenv.config();
         await TransactionModel.deleteMany({});
         console.log('Cleared existing transactions');
 
-        const transactions: ITransaction[] = [];
+        const transactions: Transaction[] = [];
 
         // Helpers
         const random = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
