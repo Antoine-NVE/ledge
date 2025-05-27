@@ -10,6 +10,7 @@ export const generateUsers = async () => {
     await UserModel.deleteMany({});
     console.log('Deleted all users from the database');
 
+    // We do not use insertMany here because we want to hash the passwords
     return await Promise.all(
         usersData.map((data) => {
             const user = new UserModel(data);
