@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Transaction } from '../types/transaction';
+import { deleteTransaction } from '../api/transactions';
 
 interface Props {
     isOpen: boolean;
@@ -39,40 +40,31 @@ const DeleteTransactionModal = ({ isOpen, onClose, transaction, onDelete }: Prop
         };
     }, [isOpen]);
 
-    const [isFetching, setIsFetching] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const deleteTransaction = async (transaction: Transaction) => {
-        setIsFetching(true);
-        try {
-            const response = await fetch(import.meta.env.VITE_API_URL + '/transactions/' + transaction._id, {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
-            const data = await response.json();
+    const handleDelete = async (transaction: Transaction) => {
+        setIsLoading(true);
 
-            if (!response.ok) {
-                throw data;
-            }
-
-            onDelete(transaction);
-        } catch (error: any) {
-            if (error?.message) {
-                setError(error.message);
-            } else {
-                setError('An error occurred while deleting the transaction.');
-            }
-        } finally {
-            setIsFetching(false);
+        const [result, response] = await deleteTransaction(transaction);
+        if (!response || !response.ok) {
+            setError(result.message);
+            setIsLoading(false);
+            return;
         }
+
+        setIsLoading(false);
+        onDelete(transaction);
+        onClose();
+        setError(null);
     };
 
     return (
         isOpen && (
             <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
-                <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative" onClick={(e) => e.stopPropagation()}>
+                <div
+                    className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative"
+                    onClick={(e) => e.stopPropagation()}>
                     <button
                         onClick={onClose}
                         className="absolute top-3 right-3 text-gray-400 hover:text-gray-800 cursor-pointer">
@@ -93,14 +85,14 @@ const DeleteTransactionModal = ({ isOpen, onClose, transaction, onDelete }: Prop
                         <button
                             onClick={onClose}
                             className="bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md px-4 py-2 text-sm shadow cursor-pointer transition"
-                            disabled={isFetching}>
+                            disabled={isLoading}>
                             Cancel
                         </button>
                         <button
-                            onClick={() => deleteTransaction(transaction)}
+                            onClick={() => handleDelete(transaction)}
                             className="bg-red-600 hover:bg-red-700 text-white rounded-md px-4 py-2 text-sm shadow cursor-pointer transition"
-                            disabled={isFetching}>
-                            {isFetching ? 'Deleting...' : 'Delete'}
+                            disabled={isLoading}>
+                            {isLoading ? 'Deleting...' : 'Delete'}
                         </button>
                     </div>
                 </div>

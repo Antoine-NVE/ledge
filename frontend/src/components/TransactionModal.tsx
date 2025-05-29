@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { NewTransaction, Transaction } from '../types/transaction';
+import { createTransaction, updateTransaction } from '../api/transactions';
 
 interface Props {
     isOpen: boolean;
@@ -45,7 +46,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
     const [formErrors, setFormErrors] = useState<FormErrors>(EMPTY_ERRORS);
 
     const [isFormReady, setIsFormReady] = useState(false);
-    const [isFetching, setIsFetching] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     // === Handlers ===
     const handleSubmit = (e: React.FormEvent) => {
@@ -85,7 +86,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                 isFixed: form.isFixed!,
                 isIncome: form.isIncome!,
             };
-            updateTransaction(transaction);
+            handleUpdate(transaction);
         } else {
             const transaction: NewTransaction = {
                 ...form,
@@ -94,7 +95,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                 isIncome: form.isIncome!,
                 month,
             };
-            createTransaction(transaction);
+            handleCreate(transaction);
         }
     };
 
@@ -108,52 +109,41 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
     };
 
     // === Async functions ===
-    const createTransaction = async (transaction: NewTransaction) => {
-        setIsFetching(true);
-        try {
-            const response = await fetch(import.meta.env.VITE_API_URL + '/transactions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(transaction),
-            });
-            const data = await response.json();
+    const handleCreate = async (transaction: NewTransaction) => {
+        setIsLoading(true);
 
-            if (!response.ok) throw data;
+        const [result, response] = await createTransaction(transaction);
 
-            onSave(data.data.transaction);
-        } catch (error: any) {
-            if (error?.errors) {
-                setFormErrors({ ...error.errors, general: error.message });
+        if (!response || !response.ok) {
+            setIsLoading(false);
+            if (result.errors) {
+                setFormErrors((prev) => ({ ...prev, ...result.errors, general: result.message }));
             } else {
-                setFormErrors((prev) => ({ ...prev, general: 'An error occurred while creating the transaction.' }));
+                setFormErrors((prev) => ({ ...prev, general: result.message }));
             }
-        } finally {
-            setIsFetching(false);
+            return;
         }
+
+        setIsLoading(false);
+        onSave(result.data!.transaction);
     };
 
-    const updateTransaction = async (transaction: Transaction) => {
-        setIsFetching(true);
-        try {
-            const response = await fetch(import.meta.env.VITE_API_URL + '/transactions/' + transaction._id, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(transaction),
-            });
-            const data = await response.json();
+    const handleUpdate = async (transaction: Transaction) => {
+        setIsLoading(true);
 
-            if (!response.ok) throw data;
-
-            onSave(data.data.transaction);
-        } catch (error: any) {
-            if (error?.errors) {
-                setFormErrors({ ...error.errors, general: error.message });
+        const [result, response] = await updateTransaction(transaction);
+        if (!response || !response.ok) {
+            setIsLoading(false);
+            if (result.errors) {
+                setFormErrors((prev) => ({ ...prev, ...result.errors, general: result.message }));
             } else {
-                setFormErrors((prev) => ({ ...prev, general: 'An error occurred while updating the transaction.' }));
+                setFormErrors((prev) => ({ ...prev, general: result.message }));
             }
-        } finally {
-            setIsFetching(false);
+            return;
         }
+
+        setIsLoading(false);
+        onSave(result.data!.transaction);
     };
 
     // === Effects ===
@@ -323,9 +313,9 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                         {/* Submit */}
                         <button
                             type="submit"
-                            disabled={isFetching}
+                            disabled={isLoading}
                             className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded text-sm disabled:opacity-50 cursor-pointer transition">
-                            {isFetching
+                            {isLoading
                                 ? initialTransaction
                                     ? 'Updating...'
                                     : 'Adding...'

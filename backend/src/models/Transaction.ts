@@ -1,40 +1,63 @@
-import { Schema, model, Document } from 'mongoose';
+import { HydratedDocument, Schema, Types, model } from 'mongoose';
 
-export interface ITransaction extends Document {
+export interface Transaction {
     month: string;
     isIncome: boolean;
     isFixed: boolean;
     name: string;
     value: number;
+    user: Types.ObjectId;
 }
 
-const TransactionSchema = new Schema<ITransaction>(
+export type TransactionDocument = HydratedDocument<Transaction> & {
+    createdAt: Date;
+    updatedAt: Date;
+};
+
+const TransactionSchema = new Schema<TransactionDocument>(
     {
         month: {
             type: String,
-            required: true,
-            match: /^\d{4}-(0[1-9]|1[0-2])$/, // 2025-04, 2025-12, etc.
+            required: [true, 'Month is required.'],
+            match: [/^\d{4}-(0[1-9]|1[0-2])$/, 'Month must be in YYYY-MM format.'],
         },
-        isIncome: { type: Boolean, required: true },
-        isFixed: { type: Boolean, required: true },
-        name: { type: String, required: true, trim: true, minlength: 1, maxlength: 100 },
+        isIncome: {
+            type: Boolean,
+            required: [true, 'Please specify if this is money coming in.'],
+        },
+        isFixed: {
+            type: Boolean,
+            required: [true, 'Please specify if this is a regular (recurring) transaction.'],
+        },
+        name: {
+            type: String,
+            required: [true, 'Name is required.'],
+            trim: true,
+            minlength: [1, 'Name must be at least 1 character.'],
+            maxlength: [100, 'Name must be at most 100 characters.'],
+        },
         value: {
             type: Number,
-            required: true,
-            min: [1, 'Path `value` is less than minimum allowed value (0.01).'],
-            max: [100000000, 'Path `value` is more than maximum allowed value (1000000.00).'],
+            required: [true, 'Value is required.'],
+            min: [1, 'Value must be at least 1 centime.'],
+            max: [100000000, 'Value must be at most 100,000,000 centimes (1,000,000 euros).'],
             validate: {
                 validator: Number.isInteger,
-                message: 'Path `value` must be an integer.',
+                message: 'Value must be an integer (in centimes).',
             },
+        },
+        user: {
+            type: Schema.Types.ObjectId,
+            ref: 'User',
+            required: [true, 'User is required.'],
         },
     },
     {
-        timestamps: true, // Automatically create createdAt and updatedAt fields
-        versionKey: false, // Disable the __v field
-    }
+        timestamps: true,
+        optimisticConcurrency: true,
+    },
 );
 
-const TransactionModel = model<ITransaction>('Transaction', TransactionSchema);
+const TransactionModel = model<TransactionDocument>('Transaction', TransactionSchema);
 
 export default TransactionModel;

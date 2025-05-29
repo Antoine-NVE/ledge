@@ -2,12 +2,12 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import './index.css';
 import App from './App.tsx';
-import { TransactionProvider } from './contexts/TransactionContext.tsx';
+import UserProvider from './providers/UserProvider.tsx';
 
 createRoot(document.getElementById('root')!).render(
     <StrictMode>
-        <TransactionProvider>
+        <UserProvider>
             <App />
-        </TransactionProvider>
+        </UserProvider>
     </StrictMode>
 );

@@ -1,6 +1,7 @@
-import { Request, RequestHandler, Response } from 'express';
+import { Request, Response } from 'express';
 import TransactionModel from '../models/Transaction';
 import { Error as MongooseError } from 'mongoose';
+import { formatMongooseValidationErrors } from '../utils/error';
 
 interface TransactionBody {
     month: string;
@@ -10,8 +11,9 @@ interface TransactionBody {
     value: number;
 }
 
-const create = async (req: Request<{}, {}, TransactionBody>, res: Response) => {
+export const createTransaction = async (req: Request<object, object, TransactionBody>, res: Response) => {
     const { month, isIncome, isFixed, name, value } = req.body;
+    const user = req.user;
 
     try {
         const transaction = new TransactionModel({
@@ -20,9 +22,12 @@ const create = async (req: Request<{}, {}, TransactionBody>, res: Response) => {
             isFixed,
             name,
             value,
+            user,
         });
 
-        await transaction.save();
+        // Save the transaction and populate the user field
+        await (await transaction.save()).populate('user');
+
         res.status(201).json({
             message: 'Transaction created successfully',
             data: {
@@ -32,17 +37,12 @@ const create = async (req: Request<{}, {}, TransactionBody>, res: Response) => {
         });
     } catch (error: unknown) {
         if (error instanceof MongooseError.ValidationError) {
-            const errors: Record<string, string> = {};
-
-            for (const [key, err] of Object.entries(error.errors)) {
-                errors[key] = err.message;
-            }
-
             res.status(400).json({
                 message: 'Validation error',
                 data: null,
-                errors,
+                errors: formatMongooseValidationErrors(error),
             });
+            return;
         }
 
         res.status(500).json({
@@ -53,9 +53,11 @@ const create = async (req: Request<{}, {}, TransactionBody>, res: Response) => {
     }
 };
 
-const getAll = async (req: Request, res: Response) => {
+export const getTransactions = async (req: Request, res: Response) => {
+    const user = req.user;
+
     try {
-        const transactions = await TransactionModel.find();
+        const transactions = await TransactionModel.find({ user }).populate('user');
 
         res.status(200).json({
             message: 'Transactions retrieved successfully',
@@ -64,7 +66,9 @@ const getAll = async (req: Request, res: Response) => {
             },
             errors: null,
         });
-    } catch (error: unknown) {
+    } catch (error) {
+        console.error(error);
+
         res.status(500).json({
             message: 'Internal server error',
             data: null,
@@ -73,20 +77,10 @@ const getAll = async (req: Request, res: Response) => {
     }
 };
 
-const getById = async (req: Request<{ id: string }>, res: Response) => {
-    const { id } = req.params;
+export const getTransaction = async (req: Request, res: Response) => {
+    const transaction = req.transaction;
 
     try {
-        const transaction = await TransactionModel.findById(id);
-
-        if (!transaction) {
-            res.status(404).json({
-                message: 'Transaction not found',
-                data: null,
-                errors: null,
-            });
-        }
-
         res.status(200).json({
             message: 'Transaction retrieved successfully',
             data: {
@@ -111,30 +105,18 @@ const getById = async (req: Request<{ id: string }>, res: Response) => {
     }
 };
 
-const update = async (req: Request<{ id: string }, {}, TransactionBody>, res: Response) => {
-    const { id } = req.params;
+export const updateTransaction = async (req: Request<object, object, TransactionBody>, res: Response) => {
+    const transaction = req.transaction!;
     const { month, isIncome, isFixed, name, value } = req.body;
 
     try {
-        const transaction = await TransactionModel.findByIdAndUpdate(
-            id,
-            {
-                month,
-                isIncome,
-                isFixed,
-                name,
-                value,
-            },
-            { new: true, runValidators: true }
-        );
+        if (month !== undefined) transaction.month = month;
+        if (isIncome !== undefined) transaction.isIncome = isIncome;
+        if (isFixed !== undefined) transaction.isFixed = isFixed;
+        if (name !== undefined) transaction.name = name;
+        if (value !== undefined) transaction.value = value;
 
-        if (!transaction) {
-            res.status(404).json({
-                message: 'Transaction not found',
-                data: null,
-                errors: null,
-            });
-        }
+        await transaction.save();
 
         res.status(200).json({
             message: 'Transaction updated successfully',
@@ -145,16 +127,10 @@ const update = async (req: Request<{ id: string }, {}, TransactionBody>, res: Re
         });
     } catch (error: unknown) {
         if (error instanceof MongooseError.ValidationError) {
-            const errors: Record<string, string> = {};
-
-            for (const [key, err] of Object.entries(error.errors)) {
-                errors[key] = err.message;
-            }
-
             res.status(400).json({
                 message: 'Validation error',
                 data: null,
-                errors,
+                errors: formatMongooseValidationErrors(error),
             });
         }
 
@@ -174,19 +150,11 @@ const update = async (req: Request<{ id: string }, {}, TransactionBody>, res: Re
     }
 };
 
-const remove = async (req: Request<{ id: string }>, res: Response) => {
-    const { id } = req.params;
+export const removeTransaction = async (req: Request, res: Response) => {
+    const transaction = req.transaction!;
 
     try {
-        const transaction = await TransactionModel.findByIdAndDelete(id);
-
-        if (!transaction) {
-            res.status(404).json({
-                message: 'Transaction not found',
-                data: null,
-                errors: null,
-            });
-        }
+        await transaction.deleteOne();
 
         res.status(200).json({
             message: 'Transaction deleted successfully',
@@ -210,12 +178,4 @@ const remove = async (req: Request<{ id: string }>, res: Response) => {
             errors: null,
         });
     }
-};
-
-export default {
-    create,
-    getAll,
-    getById,
-    update,
-    remove,
 };
