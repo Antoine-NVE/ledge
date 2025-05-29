@@ -23,7 +23,7 @@ const TransactionSchema = new Schema<TransactionDocument>(
         },
         isIncome: {
             type: Boolean,
-            required: [true, 'Please specify if this is money coming in.'],
+            required: [true, 'Please specify if this is an income or an expense.'],
         },
         isRecurring: {
             type: Boolean,
