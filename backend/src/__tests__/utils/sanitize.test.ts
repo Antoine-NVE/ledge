@@ -1,6 +1,5 @@
-import { describe, it, jest, expect } from '@jest/globals';
-import { sanitizeUser } from '../../src/utils/sanitize';
-import { UserDocument } from '../../src/models/User';
+import { sanitizeUser } from '../../utils/sanitize';
+import { UserDocument } from '../../models/User';
 
 describe('sanitizeUser', () => {
     it('should remove the password and return the rest of the fields', () => {

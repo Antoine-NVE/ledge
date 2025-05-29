@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
-import { TransactionDocument } from '../src/models/Transaction';
+import { TransactionDocument } from '../models/Transaction';
 import { generateTransactions } from './transaction';
-import { UserDocument } from '../src/models/User';
+import { UserDocument } from '../models/User';
 import { generateUsers } from './user';
 
 dotenv.config();

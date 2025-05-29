@@ -1,4 +1,4 @@
-import UserModel from '../src/models/User';
+import UserModel from '../models/User';
 
 const usersData = [
     { email: 'alice@example.com', password: 'Azerty123!' },

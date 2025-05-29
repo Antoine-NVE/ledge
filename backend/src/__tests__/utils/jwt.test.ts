@@ -1,5 +1,4 @@
-import { describe, it, expect, beforeAll, beforeEach, afterEach, jest } from '@jest/globals';
-import { createJwt, verifyJwt, setJwtSecret } from '../../src/utils/jwt';
+import { createJwt, verifyJwt, setJwtSecret } from '../../utils/jwt';
 
 describe('JWT Utilities', () => {
     beforeAll(() => {

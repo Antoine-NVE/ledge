@@ -1,14 +1,12 @@
-import { jest, describe, it, expect, beforeEach } from '@jest/globals';
-
-jest.mock('../../src/models/User', () => ({
+jest.mock('../../models/User', () => ({
     __esModule: true,
     default: {
         findOne: jest.fn(),
     },
 }));
 
-import UserModel from '../../src/models/User';
-import { isEmailValid, isPasswordValid, isEmailUnique } from '../../src/validators/user';
+import UserModel from '../../models/User';
+import { isEmailValid, isPasswordValid, isEmailUnique } from '../../validators/user';
 
 describe('User Validators', () => {
     describe('isEmailValid', () => {

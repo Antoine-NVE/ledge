@@ -1,5 +1,5 @@
-import TransactionModel, { TransactionDocument } from '../src/models/Transaction';
-import { UserDocument } from '../src/models/User';
+import TransactionModel, { TransactionDocument } from '../models/Transaction';
+import { UserDocument } from '../models/User';
 import { random, pickSome } from './seed';
 
 export const generateTransactions = async (users: UserDocument[]) => {
