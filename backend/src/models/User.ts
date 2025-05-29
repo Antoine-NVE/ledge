@@ -45,8 +45,8 @@ const UserSchema = new Schema<UserDocument>(
         },
     },
     {
-        timestamps: true, // Automatically create createdAt and updatedAt fields
-        versionKey: false, // Disable the __v field
+        timestamps: true,
+        optimisticConcurrency: true,
     },
 );
 
