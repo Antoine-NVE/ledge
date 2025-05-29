@@ -6,20 +6,20 @@ import { formatMongooseValidationErrors } from '../utils/error';
 interface TransactionBody {
     month: string;
     isIncome: boolean;
-    isFixed: boolean;
+    isRecurring: boolean;
     name: string;
     value: number;
 }
 
 export const createTransaction = async (req: Request<object, object, TransactionBody>, res: Response) => {
-    const { month, isIncome, isFixed, name, value } = req.body;
+    const { month, isIncome, isRecurring, name, value } = req.body;
     const user = req.user;
 
     try {
         const transaction = new TransactionModel({
             month,
             isIncome,
-            isFixed,
+            isRecurring,
             name,
             value,
             user,
@@ -107,12 +107,12 @@ export const getTransaction = async (req: Request, res: Response) => {
 
 export const updateTransaction = async (req: Request<object, object, TransactionBody>, res: Response) => {
     const transaction = req.transaction!;
-    const { month, isIncome, isFixed, name, value } = req.body;
+    const { month, isIncome, isRecurring, name, value } = req.body;
 
     try {
         if (month !== undefined) transaction.month = month;
         if (isIncome !== undefined) transaction.isIncome = isIncome;
-        if (isFixed !== undefined) transaction.isFixed = isFixed;
+        if (isRecurring !== undefined) transaction.isRecurring = isRecurring;
         if (name !== undefined) transaction.name = name;
         if (value !== undefined) transaction.value = value;
 

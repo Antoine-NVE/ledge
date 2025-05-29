@@ -43,14 +43,22 @@ const TransactionListSection = ({ transactions, total, isIncome, onEdit, onDelet
                             {(transaction.value / 100).toFixed(2)} €
                         </p>
                         <p className="text-gray-500 text-sm">
-                            Added on {new Date(transaction.createdAt).toLocaleDateString('fr-FR')} at {new Date(transaction.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                            Added on {new Date(transaction.createdAt).toLocaleDateString('fr-FR')} at{' '}
+                            {new Date(transaction.createdAt).toLocaleTimeString('fr-FR', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                            })}
                         </p>
                         {transaction.updatedAt !== transaction.createdAt && (
                             <p className="text-gray-500 text-sm">
-                                Updated on {new Date(transaction.updatedAt).toLocaleDateString('fr-FR')} at {new Date(transaction.updatedAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                Updated on {new Date(transaction.updatedAt).toLocaleDateString('fr-FR')} at{' '}
+                                {new Date(transaction.updatedAt).toLocaleTimeString('fr-FR', {
+                                    hour: '2-digit',
+                                    minute: '2-digit',
+                                })}
                             </p>
                         )}
-                        {transaction.isFixed && <p className="text-blue-700 text-sm font-medium">Fixed</p>}
+                        {transaction.isRecurring && <p className="text-blue-700 text-sm font-medium">Recurring</p>}
                     </div>
                 ))
             ) : (

@@ -14,7 +14,7 @@ interface FormTransaction {
     name: string;
     value: string;
     isIncome: boolean | null;
-    isFixed: boolean | null;
+    isRecurring: boolean | null;
 }
 
 interface FormErrors {
@@ -22,14 +22,14 @@ interface FormErrors {
     name: string;
     value: string;
     isIncome: string;
-    isFixed: string;
+    isRecurring: string;
 }
 
 const EMPTY_FORM: FormTransaction = {
     name: '',
     value: '',
     isIncome: null,
-    isFixed: null,
+    isRecurring: null,
 };
 
 const EMPTY_ERRORS: FormErrors = {
@@ -37,7 +37,7 @@ const EMPTY_ERRORS: FormErrors = {
     name: '',
     value: '',
     isIncome: '',
-    isFixed: '',
+    isRecurring: '',
 };
 
 const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }: Props) => {
@@ -68,8 +68,8 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
         if (form.isIncome === null) {
             errors.isIncome = 'Type is required';
         }
-        if (form.isFixed === null) {
-            errors.isFixed = 'Fixed is required';
+        if (form.isRecurring === null) {
+            errors.isRecurring = 'Recurring is required';
         }
         setFormErrors(errors);
         if (Object.values(errors).some((error) => error !== '')) {
@@ -83,7 +83,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                 ...initialTransaction,
                 ...form,
                 value,
-                isFixed: form.isFixed!,
+                isRecurring: form.isRecurring!,
                 isIncome: form.isIncome!,
             };
             handleUpdate(transaction);
@@ -91,7 +91,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
             const transaction: NewTransaction = {
                 ...form,
                 value,
-                isFixed: form.isFixed!,
+                isRecurring: form.isRecurring!,
                 isIncome: form.isIncome!,
                 month,
             };
@@ -185,7 +185,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                       name: initialTransaction.name,
                       value: (initialTransaction.value / 100).toFixed(2),
                       isIncome: initialTransaction.isIncome,
-                      isFixed: initialTransaction.isFixed,
+                      isRecurring: initialTransaction.isRecurring,
                   }
                 : EMPTY_FORM
         );
@@ -279,17 +279,17 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                             {formErrors.isIncome && <p className="text-red-500 text-sm mt-1">{formErrors.isIncome}</p>}
                         </div>
 
-                        {/* Fixed */}
+                        {/* Recurring */}
                         <div>
-                            <label className="block text-sm font-medium mb-1">Fixed</label>
+                            <label className="block text-sm font-medium mb-1">Recurring</label>
                             <div className="flex items-center gap-4">
                                 <label className="flex items-center gap-2 cursor-pointer select-none">
                                     <input
                                         className="cursor-pointer"
                                         type="radio"
-                                        name="isFixedModal"
-                                        checked={form.isFixed === true}
-                                        onChange={() => setForm({ ...form, isFixed: true })}
+                                        name="isRecurringModal"
+                                        checked={form.isRecurring === true}
+                                        onChange={() => setForm({ ...form, isRecurring: true })}
                                     />
                                     <span>Yes</span>
                                 </label>
@@ -297,14 +297,16 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                                     <input
                                         className="cursor-pointer"
                                         type="radio"
-                                        name="isFixedModal"
-                                        checked={form.isFixed === false}
-                                        onChange={() => setForm({ ...form, isFixed: false })}
+                                        name="isRecurringModal"
+                                        checked={form.isRecurring === false}
+                                        onChange={() => setForm({ ...form, isRecurring: false })}
                                     />
                                     <span>No</span>
                                 </label>
                             </div>
-                            {formErrors.isFixed && <p className="text-red-500 text-sm mt-1">{formErrors.isFixed}</p>}
+                            {formErrors.isRecurring && (
+                                <p className="text-red-500 text-sm mt-1">{formErrors.isRecurring}</p>
+                            )}
                         </div>
 
                         {/* General error */}

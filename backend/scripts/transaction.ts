@@ -15,20 +15,20 @@ export const generateTransactions = async (users: UserDocument[]) => {
             const month = String(i + 1).padStart(2, '0');
             const fullMonth = `2025-${month}`;
 
-            // Fixed incomes
-            const fixedIncomes = [
+            // Recurring incomes
+            const recurringIncomes = [
                 { name: 'Salaire', value: random(250000, 400000) },
                 { name: 'Freelance', value: random(80000, 150000) },
                 { name: 'Allocations', value: random(20000, 50000) },
             ];
 
-            fixedIncomes.forEach((income) => {
+            recurringIncomes.forEach((income) => {
                 transactions.push(
                     new TransactionModel({
                         user: user,
                         month: fullMonth,
                         isIncome: true,
-                        isFixed: true,
+                        isRecurring: true,
                         name: income.name,
                         value: income.value,
                     }),
@@ -44,28 +44,28 @@ export const generateTransactions = async (users: UserDocument[]) => {
                         user: user,
                         month: fullMonth,
                         isIncome: true,
-                        isFixed: false,
+                        isRecurring: false,
                         name: income,
                         value: random(10000, 100000),
                     }),
                 );
             });
 
-            // Fixed expenses
-            const fixedExpenses = [
+            // Recurring expenses
+            const recurringExpenses = [
                 { name: 'Loyer', value: random(60000, 100000) },
                 { name: 'Assurance', value: random(20000, 40000) },
                 { name: 'Netflix', value: random(1000, 2000) },
                 { name: 'Internet', value: random(3000, 5000) },
             ];
 
-            fixedExpenses.forEach((expense) => {
+            recurringExpenses.forEach((expense) => {
                 transactions.push(
                     new TransactionModel({
                         user: user,
                         month: fullMonth,
                         isIncome: false,
-                        isFixed: true,
+                        isRecurring: true,
                         name: expense.name,
                         value: expense.value,
                     }),
@@ -91,7 +91,7 @@ export const generateTransactions = async (users: UserDocument[]) => {
                         user: user,
                         month: fullMonth,
                         isIncome: false,
-                        isFixed: false,
+                        isRecurring: false,
                         name: variableExpenses[random(0, variableExpenses.length - 1)],
                         value: random(500, 15000),
                     }),

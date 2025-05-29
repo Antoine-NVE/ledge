@@ -1,7 +1,7 @@
 export interface NewTransaction {
     month: string;
     isIncome: boolean;
-    isFixed: boolean;
+    isRecurring: boolean;
     name: string;
     value: number;
 }

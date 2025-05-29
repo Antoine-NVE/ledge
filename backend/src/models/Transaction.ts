@@ -3,7 +3,7 @@ import { HydratedDocument, Schema, Types, model } from 'mongoose';
 export interface Transaction {
     month: string;
     isIncome: boolean;
-    isFixed: boolean;
+    isRecurring: boolean;
     name: string;
     value: number;
     user: Types.ObjectId;
@@ -25,7 +25,7 @@ const TransactionSchema = new Schema<TransactionDocument>(
             type: Boolean,
             required: [true, 'Please specify if this is money coming in.'],
         },
-        isFixed: {
+        isRecurring: {
             type: Boolean,
             required: [true, 'Please specify if this is a regular (recurring) transaction.'],
         },
