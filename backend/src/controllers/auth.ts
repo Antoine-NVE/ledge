@@ -23,7 +23,9 @@ export const register = async (req: Request<object, object, AuthBody>, res: Resp
         user = await user.save();
 
         // Automatically connect the user after registration
-        const token = createJwt(user._id);
+        const token = createJwt({
+            _id: user._id,
+        });
         setAccessTokenCookie(res, token);
 
         // Remove password from the response
@@ -79,7 +81,9 @@ export const login = async (req: Request<object, object, AuthBody>, res: Respons
         }
 
         // Automatically connect the user after login
-        const token = createJwt(user._id);
+        const token = createJwt({
+            _id: user._id,
+        });
         setAccessTokenCookie(res, token);
 
         // Remove password from the response
