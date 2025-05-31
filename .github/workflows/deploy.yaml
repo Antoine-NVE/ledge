@@ -22,17 +22,16 @@ jobs:
 
       - name: Mark directory as safe
         run: |
-          git config --global --add safe.directory /home/antoine/docker/ledge/dev
+          git config --global --add safe.directory "$TARGET_PATH"
 
       - name: Pull latest changes
+        working-directory: ${{ env.TARGET_PATH }}
         run: |
-          cd $TARGET_PATH
-
           git fetch origin
           git checkout develop
           git pull origin develop
 
       - name: Restart Docker Compose
+        working-directory: ${{ env.TARGET_PATH }}
         run: |
-          cd $TARGET_PATH
           docker compose up -d --build --remove-orphans
