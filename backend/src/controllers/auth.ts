@@ -5,6 +5,7 @@ import UserModel from '../models/User';
 import { sanitizeUser } from '../utils/sanitize';
 import { formatMongooseValidationErrors } from '../utils/error';
 import { clearAccessToken, setAccessTokenCookie } from '../services/authCookie';
+import { createJwt } from '../utils/jwt';
 
 interface AuthBody {
     email: string;
@@ -22,7 +23,8 @@ export const register = async (req: Request<object, object, AuthBody>, res: Resp
         user = await user.save();
 
         // Automatically connect the user after registration
-        setAccessTokenCookie(res, user);
+        const token = createJwt(user._id);
+        setAccessTokenCookie(res, token);
 
         // Remove password from the response
         const userObj = sanitizeUser(user);
@@ -77,7 +79,8 @@ export const login = async (req: Request<object, object, AuthBody>, res: Respons
         }
 
         // Automatically connect the user after login
-        setAccessTokenCookie(res, user);
+        const token = createJwt(user._id);
+        setAccessTokenCookie(res, token);
 
         // Remove password from the response
         const userObj = sanitizeUser(user);

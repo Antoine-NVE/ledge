@@ -1,12 +1,6 @@
 import { Response } from 'express';
-import { UserDocument } from '../models/User';
-import { createJwt } from '../utils/jwt';
 
-export const setAccessTokenCookie = (res: Response, user: UserDocument) => {
-    const token = createJwt({
-        _id: user._id,
-    });
-
+export const setAccessTokenCookie = (res: Response, token: string) => {
     res.cookie('access_token', token, {
         httpOnly: true,
         secure: true,
