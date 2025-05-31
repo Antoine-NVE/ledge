@@ -1,14 +1,11 @@
-name: Deploy develop on Raspberry
+name: Deploy on Raspberry
 
 on:
   push:
-    branches:
-      - develop
+    branches: [develop, main]
   pull_request:
-    types:
-      - closed
-    branches:
-      - develop
+    types: [closed]
+    branches: [develop, main]
 
 jobs:
   deploy:
@@ -16,9 +13,15 @@ jobs:
     runs-on: [self-hosted, ledge]
 
     steps:
-      - name: Set deployment path
+      - name: Set environment variables
         run: |
-          echo "TARGET_PATH=/home/antoine/docker/ledge/dev/" >> $GITHUB_ENV
+          if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+            echo "TARGET_PATH=/home/antoine/docker/ledge/prod/" >> $GITHUB_ENV
+            echo "BRANCH=main" >> $GITHUB_ENV
+          else
+            echo "TARGET_PATH=/home/antoine/docker/ledge/dev/" >> $GITHUB_ENV
+            echo "BRANCH=develop" >> $GITHUB_ENV
+          fi
 
       - name: Mark directory as safe
         run: |
@@ -28,8 +31,8 @@ jobs:
         working-directory: ${{ env.TARGET_PATH }}
         run: |
           git fetch origin
-          git checkout develop
-          git pull origin develop
+          git checkout $BRANCH
+          git pull origin $BRANCH
 
       - name: Restart Docker Compose
         working-directory: ${{ env.TARGET_PATH }}
