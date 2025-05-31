@@ -12,7 +12,7 @@ export const setAccessTokenCookie = (res: Response, token: string) => {
 export const clearAccessToken = (res: Response) => {
     res.clearCookie('access_token', {
         httpOnly: true,
-        secure: false,
+        secure: true,
         sameSite: 'strict',
     });
 };
