@@ -47,9 +47,9 @@ const Login = () => {
                 <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
                 {user && (
-                    <div className="mt-4 text-center">
-                        <span className="text-sm text-gray-600">Already logged in: </span>
-                        <Link to="/" className="text-blue-600 hover:underline font-medium">
+                    <div className="mt-4 text-center text-sm text-gray-600">
+                        Already logged in:{' '}
+                        <Link to="/" className="text-blue-600 hover:underline">
                             Go to Dashboard
                         </Link>
                     </div>
