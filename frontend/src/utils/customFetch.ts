@@ -11,7 +11,7 @@ export const customFetch = async (
     if (response.status === 401 && retryOn401) {
         const [, refreshResponse] = await refresh();
 
-        if (refreshResponse && refreshResponse.status === 200) {
+        if (refreshResponse && refreshResponse.status !== 401) {
             return await fetch(input, init);
         }
 

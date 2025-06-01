@@ -173,11 +173,8 @@ export const refresh = async (req: Request, res: Response) => {
         });
         setAccessTokenCookie(res, accessToken);
 
-        const newToken = generateToken();
-        refreshToken.token = newToken;
         refreshToken.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         await refreshToken.save();
-        setRefreshTokenCookie(res, newToken);
 
         res.status(200).json({
             message: 'Tokens refreshed successfully',
