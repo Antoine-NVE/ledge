@@ -4,7 +4,12 @@ import bcrypt from 'bcrypt';
 import UserModel from '../models/User';
 import { sanitizeUser } from '../utils/sanitize';
 import { formatMongooseValidationErrors } from '../utils/error';
-import { clearAccessToken, setAccessTokenCookie, setRefreshTokenCookie } from '../services/authCookie';
+import {
+    clearAccessToken,
+    clearRefreshToken,
+    setAccessTokenCookie,
+    setRefreshTokenCookie,
+} from '../services/authCookie';
 import { createJwt } from '../utils/jwt';
 import { generateToken } from '../utils/token';
 import RefreshTokenModel from '../models/RefreshToken';
@@ -104,6 +109,71 @@ export const login = async (req: Request<object, object, AuthBody>, res: Respons
             message: 'User logged in successfully',
             data: {
                 user: userObj,
+            },
+            errors: null,
+        });
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            message: 'Internal server error',
+            data: null,
+            errors: null,
+        });
+    }
+};
+
+export const refresh = async (req: Request, res: Response) => {
+    const token = req.cookies.refresh_token;
+    if (!token) {
+        res.status(401).json({
+            message: 'Refresh token is required',
+            data: null,
+            errors: null,
+        });
+        return;
+    }
+
+    try {
+        const refreshToken = await RefreshTokenModel.findOne({ token }).populate('user');
+        if (!refreshToken || !refreshToken.user) {
+            clearRefreshToken(res);
+
+            res.status(401).json({
+                message: 'Invalid refresh token',
+                data: null,
+                errors: null,
+            });
+            return;
+        }
+
+        // Check if the refresh token is expired
+        if (refreshToken.expiresAt < new Date()) {
+            clearRefreshToken(res);
+
+            res.status(401).json({
+                message: 'Refresh token has expired',
+                data: null,
+                errors: null,
+            });
+            return;
+        }
+
+        const accessToken = createJwt({
+            _id: refreshToken.user._id,
+        });
+        setAccessTokenCookie(res, accessToken);
+
+        const newToken = generateToken();
+        refreshToken.token = newToken;
+        refreshToken.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+        await refreshToken.save();
+        setRefreshTokenCookie(res, newToken);
+
+        res.status(200).json({
+            message: 'Tokens refreshed successfully',
+            data: {
+                user: refreshToken.user,
             },
             errors: null,
         });
