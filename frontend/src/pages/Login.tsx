@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useUser from '../hooks/useUser';
 import { login } from '../api/auth';
@@ -13,7 +13,7 @@ const Login = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
-    const { user, setUser } = useUser();
+    const { user, setUser, syncUser } = useUser();
     const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -41,15 +41,19 @@ const Login = () => {
         setLoading(false);
     };
 
+    useEffect(() => {
+        if (!user) syncUser();
+    }, []);
+
     return (
         <div className="flex items-center justify-center h-screen bg-gray-100">
             <div className="bg-white p-8 rounded shadow-md w-96">
                 <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
 
                 {user && (
-                    <div className="mt-4 text-center">
-                        <span className="text-sm text-gray-600">Already logged in: </span>
-                        <Link to="/" className="text-blue-600 hover:underline font-medium">
+                    <div className="mt-4 text-center text-sm text-gray-600">
+                        Already logged in:{' '}
+                        <Link to="/" className="text-blue-600 hover:underline">
                             Go to Dashboard
                         </Link>
                     </div>

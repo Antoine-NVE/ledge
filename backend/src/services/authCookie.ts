@@ -1,12 +1,6 @@
 import { Response } from 'express';
-import { UserDocument } from '../models/User';
-import { createJwt } from '../utils/jwt';
 
-export const setAccessTokenCookie = (res: Response, user: UserDocument) => {
-    const token = createJwt({
-        _id: user._id,
-    });
-
+export const setAccessTokenCookie = (res: Response, token: string) => {
     res.cookie('access_token', token, {
         httpOnly: true,
         secure: true,
@@ -18,7 +12,24 @@ export const setAccessTokenCookie = (res: Response, user: UserDocument) => {
 export const clearAccessToken = (res: Response) => {
     res.clearCookie('access_token', {
         httpOnly: true,
-        secure: false,
+        secure: true,
+        sameSite: 'strict',
+    });
+};
+
+export const setRefreshTokenCookie = (res: Response, token: string) => {
+    res.cookie('refresh_token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        maxAge: 604800000, // 7 days
+    });
+};
+
+export const clearRefreshToken = (res: Response) => {
+    res.clearCookie('refresh_token', {
+        httpOnly: true,
+        secure: true,
         sameSite: 'strict',
     });
 };
