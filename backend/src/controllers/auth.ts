@@ -23,10 +23,10 @@ export const register = async (req: Request<object, object, AuthBody>, res: Resp
         user = await user.save();
 
         // Automatically connect the user after registration
-        const token = createJwt({
+        const accessToken = createJwt({
             _id: user._id,
         });
-        setAccessTokenCookie(res, token);
+        setAccessTokenCookie(res, accessToken);
 
         // Remove password from the response
         const userObj = sanitizeUser(user);
@@ -81,10 +81,10 @@ export const login = async (req: Request<object, object, AuthBody>, res: Respons
         }
 
         // Automatically connect the user after login
-        const token = createJwt({
+        const accessToken = createJwt({
             _id: user._id,
         });
-        setAccessTokenCookie(res, token);
+        setAccessTokenCookie(res, accessToken);
 
         // Remove password from the response
         const userObj = sanitizeUser(user);
