@@ -35,6 +35,15 @@ export const register = async (req: Request<object, object, AuthBody>, res: Resp
         });
         setAccessTokenCookie(res, accessToken);
 
+        // Generate and save the refresh token
+        const token = generateToken();
+        const refreshToken = new RefreshTokenModel({
+            token,
+            user,
+        });
+        await refreshToken.save();
+        setRefreshTokenCookie(res, token);
+
         // Remove password from the response
         const userObj = sanitizeUser(user);
 
