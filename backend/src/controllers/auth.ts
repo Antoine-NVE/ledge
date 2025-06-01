@@ -197,12 +197,28 @@ export const refresh = async (req: Request, res: Response) => {
     }
 };
 
-export const logout = (req: Request, res: Response) => {
-    clearAccessToken(res);
+export const logout = async (req: Request, res: Response) => {
+    try {
+        const token = req.cookies.refresh_token;
+        if (token) {
+            await RefreshTokenModel.deleteOne({ token });
+        }
 
-    res.status(200).json({
-        message: 'User logged out successfully',
-        data: null,
-        errors: null,
-    });
+        clearAccessToken(res);
+        clearRefreshToken(res);
+
+        res.status(200).json({
+            message: 'User logged out successfully',
+            data: null,
+            errors: null,
+        });
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            message: 'Internal server error',
+            data: null,
+            errors: null,
+        });
+    }
 };
