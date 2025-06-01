@@ -4,8 +4,10 @@ import bcrypt from 'bcrypt';
 import UserModel from '../models/User';
 import { sanitizeUser } from '../utils/sanitize';
 import { formatMongooseValidationErrors } from '../utils/error';
-import { clearAccessToken, setAccessTokenCookie } from '../services/authCookie';
+import { clearAccessToken, setAccessTokenCookie, setRefreshTokenCookie } from '../services/authCookie';
 import { createJwt } from '../utils/jwt';
+import { generateToken } from '../utils/token';
+import RefreshTokenModel from '../models/RefreshToken';
 
 interface AuthBody {
     email: string;
@@ -85,6 +87,15 @@ export const login = async (req: Request<object, object, AuthBody>, res: Respons
             _id: user._id,
         });
         setAccessTokenCookie(res, accessToken);
+
+        // Generate and save the refresh token
+        const token = generateToken();
+        const refreshToken = new RefreshTokenModel({
+            token,
+            user,
+        });
+        await refreshToken.save();
+        setRefreshTokenCookie(res, token);
 
         // Remove password from the response
         const userObj = sanitizeUser(user);
