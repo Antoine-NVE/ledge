@@ -38,19 +38,6 @@ const RefreshTokenSchema = new Schema<RefreshTokenDocument>(
     },
 );
 
-RefreshTokenSchema.pre<RefreshTokenDocument>('save', async function (next) {
-    if (!this.isModified('token')) {
-        return next();
-    }
-
-    try {
-        this.token = await bcrypt.hash(this.token, 10);
-        next();
-    } catch (error: unknown) {
-        next(error instanceof Error ? error : new Error('Unknown error during hashing'));
-    }
-});
-
 const RefreshTokenModel = model<RefreshTokenDocument>('RefreshToken', RefreshTokenSchema);
 
 export default RefreshTokenModel;
