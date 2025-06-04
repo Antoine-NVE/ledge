@@ -5,6 +5,7 @@ import { Transaction } from '../types/transaction';
 import TransactionModal from '../components/TransactionModal';
 import DeleteTransactionModal from '../components/DeleteTransactionModal';
 import { getAllTransactions } from '../api/transactions';
+import useUser from '../hooks/useUser';
 
 type SortOption = 'value-desc' | 'value-asc' | 'alphabetical' | 'reverse-alphabetical';
 
@@ -12,6 +13,7 @@ const Month = () => {
     const params = useParams<{ month: string }>();
     const month = params.month;
 
+    const { isLoading: isUserLoading } = useUser();
     const navigate = useNavigate();
 
     const [transactions, setTransactions] = useState<Transaction[]>([]);
@@ -26,6 +28,8 @@ const Month = () => {
     };
 
     useEffect(() => {
+        if (isUserLoading) return;
+
         const fetchTransactions = async () => {
             const [result, response] = await getAllTransactions();
             if (!response || !response.ok) {
@@ -35,7 +39,7 @@ const Month = () => {
             setTransactions(result.data!.transactions);
         };
         fetchTransactions();
-    }, []);
+    }, [isUserLoading]);
 
     const regex = /^\d{4}-(0[1-9]|1[0-2])$/;
     if (!month || !regex.test(month)) {
