@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import UserContext from '../contexts/UserContext';
 import { getCurrentUser } from '../api/user';
 import { User } from '../types/user';
@@ -7,6 +7,7 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
+    const hasMounted = useRef(false);
 
     const syncUser = async () => {
         setIsLoading(true);
@@ -26,6 +27,9 @@ const UserProvider = ({ children }: { children: React.ReactNode }) => {
     };
 
     useEffect(() => {
+        if (hasMounted.current) return;
+        hasMounted.current = true;
+
         syncUser();
     }, []);
 
