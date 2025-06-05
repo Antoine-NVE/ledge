@@ -34,3 +34,12 @@ services:
       - "${MONGO_PORT}:27017"
     volumes:
       - ./data/database:/data/db
+
+  smtp:
+    container_name: smtp
+    image: mailhog/mailhog
+    ports:
+      - "${MAILHOG_SMTP_PORT}:1025"
+      - "${MAILHOG_INTERFACE_PORT}:8025"
+    volumes:
+      - ./data/mailhog:/data
