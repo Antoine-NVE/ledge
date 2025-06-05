@@ -1,5 +1,4 @@
 import { HydratedDocument, model, Schema, Types } from 'mongoose';
-import bcrypt from 'bcrypt';
 
 export interface RefreshToken {
     token: string;
