@@ -3,7 +3,7 @@ import { User } from '../types/user';
 
 interface UserContextType {
     user: User | null;
-    loading: boolean;
+    isLoading: boolean;
     error: string | null;
     syncUser: () => Promise<void>;
     setUser: (user: User | null) => void;
