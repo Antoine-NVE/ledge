@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import useUser from '../hooks/useUser';
 import { login } from '../api/auth';
@@ -14,6 +14,7 @@ const Login = () => {
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const { user, setUser, syncUser } = useUser();
+    const hasMounted = useRef(false);
     const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,6 +43,9 @@ const Login = () => {
     };
 
     useEffect(() => {
+        if (hasMounted.current) return;
+        hasMounted.current = true;
+
         if (!user) syncUser();
     }, []);
 
