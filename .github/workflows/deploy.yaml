@@ -27,12 +27,12 @@ jobs:
         run: |
           git config --global --add safe.directory "$TARGET_PATH"
 
-      - name: Pull latest changes
+      - name: Force checkout latest branch
         working-directory: ${{ env.TARGET_PATH }}
         run: |
           git fetch origin
           git checkout $BRANCH
-          git pull origin $BRANCH
+          git reset --hard origin/$BRANCH
 
       - name: Restart Docker Compose
         working-directory: ${{ env.TARGET_PATH }}
