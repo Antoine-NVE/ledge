@@ -5,43 +5,50 @@ on:
     types: [closed]
     branches: [main]
   workflow_dispatch:
-    inputs:
-      confirm:
-        description: "Tape 'OUI' pour déployer en production"
-        required: true
-        default: "non"
 
 jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check if manual deployment is on main
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          if [[ "${{ github.ref_name }}" != "main" ]]; then
+            echo "::error ::Manual deployment is only allowed from the 'main' branch."
+            exit 1
+          fi
+          echo "Manual deployment confirmed on 'main' branch. Proceeding..."
+
   deploy:
+    needs: validate
     runs-on: [self-hosted, ledge]
     if: |
-      (github.event_name == 'workflow_dispatch' &&
-       github.event.inputs.confirm == 'OUI' &&
-       github.ref_name == 'main') ||
-      (github.event_name == 'pull_request' &&
-       github.event.pull_request.merged == true)
+      github.event_name == 'workflow_dispatch' && github.ref_name == 'main' ||
+      github.event_name == 'pull_request' && github.event.pull_request.merged == true
 
     steps:
-      - name: Set environment variables
+      - name: Determine environment (dev or prod)
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "TARGET_PATH=/home/antoine/docker/ledge/prod/" >> $GITHUB_ENV
+            echo "ENVIRONMENT=production" >> $GITHUB_ENV
           else
             echo "TARGET_PATH=/home/antoine/docker/ledge/dev/" >> $GITHUB_ENV
+            echo "ENVIRONMENT=development" >> $GITHUB_ENV
           fi
 
-      - name: Mark directory as safe
-        run: |
-          git config --global --add safe.directory "$TARGET_PATH"
+      - name: Mark target directory as safe
+        run: git config --global --add safe.directory "$TARGET_PATH"
 
-      - name: Pull latest changes
+      - name: Pull latest changes from main
         working-directory: ${{ env.TARGET_PATH }}
         run: |
           git fetch origin
           git checkout main
           git reset --hard origin/main
 
-      - name: Restart Docker Compose
+      - name: Rebuild and restart Docker Compose
         working-directory: ${{ env.TARGET_PATH }}
         run: |
+          echo "Deploying to $ENVIRONMENT environment at $TARGET_PATH"
           docker compose up -d --build --remove-orphans
