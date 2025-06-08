@@ -5,18 +5,31 @@ on:
     types: [closed]
     branches: [main]
   workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Tape 'OUI' pour déployer en production"
+        required: true
+        default: "non"
 
 jobs:
   deploy:
     runs-on: [self-hosted, ledge]
+    if: |
+      (github.event_name == 'workflow_dispatch' &&
+       github.event.inputs.confirm == 'OUI' &&
+       github.ref_name == 'main') ||
+      (github.event_name == 'pull_request' &&
+       github.event.pull_request.merged == true)
 
     steps:
       - name: Set environment variables
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "TARGET_PATH=/home/antoine/docker/ledge/prod/" >> $GITHUB_ENV
+            echo "ENVIRONMENT=prod" >> $GITHUB_ENV
           else
             echo "TARGET_PATH=/home/antoine/docker/ledge/dev/" >> $GITHUB_ENV
+            echo "ENVIRONMENT=dev" >> $GITHUB_ENV
           fi
 
       - name: Mark directory as safe
