@@ -26,10 +26,8 @@ jobs:
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "TARGET_PATH=/home/antoine/docker/ledge/prod/" >> $GITHUB_ENV
-            echo "ENVIRONMENT=prod" >> $GITHUB_ENV
           else
             echo "TARGET_PATH=/home/antoine/docker/ledge/dev/" >> $GITHUB_ENV
-            echo "ENVIRONMENT=dev" >> $GITHUB_ENV
           fi
 
       - name: Mark directory as safe
