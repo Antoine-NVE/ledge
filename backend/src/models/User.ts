@@ -6,6 +6,7 @@ import { isEmailValid, isEmailUnique, isPasswordValid } from '../validators/user
 export interface User {
     email: string;
     password: string;
+    isEmailVerified: boolean;
 }
 
 export type UserDocument = HydratedDocument<User> & {
@@ -42,6 +43,11 @@ const UserSchema = new Schema<UserDocument>(
                 message:
                     'Password must be between 8 and 100 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
             },
+        },
+        isEmailVerified: {
+            type: Boolean,
+            default: false,
+            required: [true, 'Email verification status is required'],
         },
     },
     {
