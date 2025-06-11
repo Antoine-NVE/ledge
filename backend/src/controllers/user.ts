@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import nodemailer from 'nodemailer';
+import { createJwt } from '../utils/jwt';
 
 export const getUser = async (req: Request, res: Response) => {
     try {
@@ -27,6 +28,12 @@ export const sendVerificationEmail = async (req: Request, res: Response) => {
     try {
         const user = req.user!;
 
+        const frontendUrl = process.env.FRONTEND_URL;
+
+        const jwt = createJwt({
+            _id: user._id,
+        });
+
         const transporter = nodemailer.createTransport({
             host: 'smtp',
             port: 1025,
@@ -37,7 +44,12 @@ export const sendVerificationEmail = async (req: Request, res: Response) => {
             from: '"Ledge" <no-reply@ledge.com>',
             to: user.email,
             subject: 'Please verify your email address',
-            html: 'Click here to verify your email address: <a href="http://localhost:3000/verify-email?token=your-verification-token">Verify Email</a>',
+            html:
+                'Click here to verify your email address: <a href="' +
+                frontendUrl +
+                '/verify-email/' +
+                jwt +
+                '">verify email</a>',
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
