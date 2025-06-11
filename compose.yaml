@@ -39,7 +39,7 @@ services:
     container_name: smtp
     image: mailhog/mailhog
     ports:
-      - "${MAILHOG_SMTP_PORT}:1025"
-      - "${MAILHOG_INTERFACE_PORT}:8025"
+      - "${MAILHOG_PORT}:8025" # MailHog web interface
+      # Note: MailHog SMTP port is 1025 by default, no need to expose it
     volumes:
       - ./data/mailhog:/data
