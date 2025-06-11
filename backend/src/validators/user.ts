@@ -1,11 +1,11 @@
-import UserModel from '../models/User';
+import UserModel, { UserDocument } from '../models/User';
 
 export const isEmailValid = (email: string): boolean => {
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(email);
 };
 
-export async function isEmailUnique(this: any, email: string): Promise<boolean> {
+export async function isEmailUnique(this: UserDocument, email: string): Promise<boolean> {
     const existingUser = await UserModel.findOne({ email });
 
     if (!existingUser) return true;

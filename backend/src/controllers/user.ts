@@ -54,6 +54,8 @@ export const sendVerificationEmail = async (req: Request, res: Response) => {
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
+            console.log(info);
+
             if (error) {
                 console.error(error);
 
@@ -115,7 +117,6 @@ export const verifyEmail = async (req: Request, res: Response) => {
             data: null,
             errors: null,
         });
-
         return;
     }
 

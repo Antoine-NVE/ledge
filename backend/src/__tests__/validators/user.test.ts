@@ -6,7 +6,7 @@ jest.mock('../../models/User', () => ({
 }));
 
 import { Types } from 'mongoose';
-import UserModel from '../../models/User';
+import UserModel, { UserDocument } from '../../models/User';
 import { isEmailValid, isPasswordValid, isEmailUnique } from '../../validators/user';
 
 describe('User Validators', () => {
@@ -59,7 +59,7 @@ describe('User Validators', () => {
                 }),
             };
 
-            await expect(isEmailUnique.call(fakeThis, 'new@example.com')).resolves.toBe(true);
+            await expect(isEmailUnique.call(fakeThis as UserDocument, 'new@example.com')).resolves.toBe(true);
             expect(findOneMock).toHaveBeenCalledWith({ email: 'new@example.com' });
         });
 
@@ -76,7 +76,7 @@ describe('User Validators', () => {
                 }),
             };
 
-            await expect(isEmailUnique.call(fakeThis, 'exists@example.com')).resolves.toBe(false);
+            await expect(isEmailUnique.call(fakeThis as UserDocument, 'exists@example.com')).resolves.toBe(false);
         });
 
         it('should return true if the email exists but belongs to the same user', async () => {
@@ -91,7 +91,7 @@ describe('User Validators', () => {
                 }),
             };
 
-            await expect(isEmailUnique.call(fakeThis, 'exists@example.com')).resolves.toBe(true);
+            await expect(isEmailUnique.call(fakeThis as UserDocument, 'exists@example.com')).resolves.toBe(true);
         });
     });
 });
