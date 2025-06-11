@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import nodemailer from 'nodemailer';
-import { createJwt } from '../utils/jwt';
+import { createJwt, verifyJwt } from '../utils/jwt';
+import UserModel from '../models/User';
 
 export const getUser = async (req: Request, res: Response) => {
     try {
@@ -79,4 +80,48 @@ export const sendVerificationEmail = async (req: Request, res: Response) => {
             errors: null,
         });
     }
+};
+
+export const verifyEmail = async (req: Request, res: Response) => {
+    const { token } = req.params;
+
+    const decoded = verifyJwt(token);
+
+    if (decoded !== null && typeof decoded === 'object' && '_id' in decoded) {
+        const user = await UserModel.findById(decoded._id);
+        if (!user) {
+            res.status(404).json({
+                message: 'User not found',
+                data: null,
+                errors: null,
+            });
+            return;
+        }
+
+        if (user.isEmailVerified) {
+            res.status(400).json({
+                message: 'Email already verified',
+                data: null,
+                errors: null,
+            });
+            return;
+        }
+
+        user.isEmailVerified = true;
+        await user.save();
+
+        res.status(200).json({
+            message: 'Email verified successfully',
+            data: null,
+            errors: null,
+        });
+
+        return;
+    }
+
+    res.status(400).json({
+        message: 'Invalid token',
+        data: null,
+        errors: null,
+    });
 };
