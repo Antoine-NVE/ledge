@@ -7,6 +7,7 @@ import ScrollToTop from './components/ScrollToTop';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Profile from './pages/Profile';
+import VerifyEmail from './pages/VerifyEmail';
 
 function App() {
     return (
@@ -22,6 +23,7 @@ function App() {
                     <Route element={<Public />}>
                         <Route path="/register" element={<Register />} />
                         <Route path="/login" element={<Login />} />
+                        <Route path="/verify-email/:token" element={<VerifyEmail />} />
                     </Route>
                 </Routes>
             </BrowserRouter>
