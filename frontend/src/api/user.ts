@@ -29,3 +29,26 @@ export const getCurrentUser = async (): Promise<[ApiResponse<{ user: User } | nu
         ];
     }
 };
+
+export const sendVerificationEmail = async (): Promise<ApiResponse<null, null>> => {
+    try {
+        const response = await customFetch(import.meta.env.VITE_API_URL + '/users/send-verification-email', {
+            method: 'POST',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const result: ApiResponse<null, null> = await response.json();
+        return result;
+    } catch (error: unknown) {
+        console.error(error);
+
+        return {
+            message: 'An error occurred while sending verification email',
+            data: null,
+            errors: null,
+        };
+    }
+};
