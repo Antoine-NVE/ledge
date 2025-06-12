@@ -108,7 +108,7 @@ export const sendVerificationEmail = async (req: Request, res: Response) => {
     }
 };
 
-export const verifyEmail = async (req: Request, res: Response) => {
+export const verifyEmail = async (req: Request<{ token: string }>, res: Response) => {
     const { token } = req.params;
 
     const decoded = verifyJwt(token);
