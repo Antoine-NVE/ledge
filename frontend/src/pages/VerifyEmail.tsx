@@ -21,18 +21,17 @@ export default function VerifyEmail() {
         }
 
         setLoading(true);
-
         const [result, response] = await verifyEmail(token);
+        setLoading(false);
 
         if (!response || !response.ok) {
             setSuccess(false);
             setMessage(result.message);
-        } else {
-            setSuccess(true);
-            setMessage(result.message);
+            return;
         }
 
-        setLoading(false);
+        setSuccess(true);
+        setMessage(result.message);
     };
 
     return (
