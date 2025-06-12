@@ -38,11 +38,23 @@ export const sendVerificationEmail = async (req: Request, res: Response) => {
             return;
         }
 
+        if (user.emailVerificationRequestExpiresAt && user.emailVerificationRequestExpiresAt > new Date()) {
+            res.status(400).json({
+                message: 'Email verification already sent, please wait before requesting again',
+                data: null,
+                errors: null,
+            });
+            return;
+        }
+
         const frontendUrl = process.env.FRONTEND_URL;
 
-        const jwt = createJwt({
-            _id: user._id,
-        });
+        const jwt = createJwt(
+            {
+                _id: user._id,
+            },
+            '15m',
+        );
 
         const transporter = nodemailer.createTransport({
             host: 'smtp',
@@ -59,7 +71,7 @@ export const sendVerificationEmail = async (req: Request, res: Response) => {
                 frontendUrl +
                 '/verify-email/' +
                 jwt +
-                '">verify email</a>',
+                '">verify email</a>. This link will expire in 15 minutes.',
         };
 
         transporter.sendMail(mailOptions, (error, info) => {
@@ -76,6 +88,9 @@ export const sendVerificationEmail = async (req: Request, res: Response) => {
                 return;
             }
         });
+
+        user.emailVerificationRequestExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+        await user.save();
 
         res.status(200).json({
             message: 'Verification email sent successfully',

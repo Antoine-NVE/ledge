@@ -7,6 +7,7 @@ export interface User {
     email: string;
     password: string;
     isEmailVerified: boolean;
+    emailVerificationRequestExpiresAt: Date | null;
 }
 
 export type UserDocument = HydratedDocument<User> & {
@@ -48,6 +49,11 @@ const UserSchema = new Schema<UserDocument>(
             type: Boolean,
             default: false,
             required: [true, 'Email verification status is required'],
+        },
+        emailVerificationRequestExpiresAt: {
+            type: Date,
+            default: null,
+            required: false,
         },
     },
     {
