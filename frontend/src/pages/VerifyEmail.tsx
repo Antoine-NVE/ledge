@@ -24,14 +24,14 @@ export default function VerifyEmail() {
         const [result, response] = await verifyEmail(token);
         setLoading(false);
 
+        setMessage(result.message);
+
         if (!response || !response.ok) {
             setSuccess(false);
-            setMessage(result.message);
             return;
         }
 
         setSuccess(true);
-        setMessage(result.message);
     };
 
     return (
