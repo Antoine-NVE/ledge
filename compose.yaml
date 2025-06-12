@@ -37,9 +37,10 @@ services:
 
   smtp:
     container_name: smtp
-    image: mailhog/mailhog
+    image: axllent/mailpit
     ports:
-      - "${MAILHOG_PORT}:8025" # MailHog web interface
-      # Note: MailHog SMTP port is 1025 by default, no need to expose it
+      - "${MAILPIT_PORT}:8025" # Mailpit web interface
+      # Note: Mailpit SMTP port is 1025 by default, no need to expose it
     volumes:
-      - ./data/mailhog:/data
+      - ./data/mailpit:/data
+    command: ["--database", "/data/mailpit.db"] # Use persistent storage for Mailpit
