@@ -5,7 +5,7 @@ import { useParams } from 'react-router-dom';
 export default function VerifyEmail() {
     const { token } = useParams<{ token: string }>();
 
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [success, setSuccess] = useState<boolean | null>(null);
     const [message, setMessage] = useState<string | null>(null);
 
@@ -20,9 +20,9 @@ export default function VerifyEmail() {
             return;
         }
 
-        setLoading(true);
+        setIsLoading(true);
         const [result, response] = await verifyEmail(token);
-        setLoading(false);
+        setIsLoading(false);
 
         setMessage(result.message);
 
@@ -44,8 +44,8 @@ export default function VerifyEmail() {
                         <button
                             onClick={handleClick}
                             className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 cursor-pointer"
-                            disabled={loading}>
-                            {loading ? 'Verifying...' : 'Verify Email'}
+                            disabled={isLoading}>
+                            {isLoading ? 'Verifying...' : 'Verify Email'}
                         </button>
                     </>
                 )}

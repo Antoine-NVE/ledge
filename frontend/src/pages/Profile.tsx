@@ -5,7 +5,7 @@ import useUser from '../hooks/useUser';
 const Profile = () => {
     const { user } = useUser();
 
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [success, setSuccess] = useState<boolean | null>(null);
     const [message, setMessage] = useState<string | null>(null);
 
@@ -13,9 +13,9 @@ const Profile = () => {
         setMessage(null);
         setSuccess(null);
 
-        setLoading(true);
+        setIsLoading(true);
         const [result, response] = await sendVerificationEmail();
-        setLoading(false);
+        setIsLoading(false);
 
         setMessage(result.message);
 
@@ -35,8 +35,8 @@ const Profile = () => {
                 <button
                     className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition cursor-pointer disabled:opacity-50"
                     onClick={handleSendVerificationEmail}
-                    disabled={loading}>
-                    {loading ? 'Sending...' : 'Send verification email'}
+                    disabled={isLoading}>
+                    {isLoading ? 'Sending...' : 'Send verification email'}
                 </button>
             )}
             {message && <div className={`mt-4 ${success ? 'text-green-600' : 'text-red-600'}`}>{message}</div>}

@@ -10,7 +10,7 @@ interface Form {
 
 const Login = () => {
     const [form, setForm] = useState<Form>({ email: '', password: '' });
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const { user, setUser } = useUser();
@@ -24,7 +24,7 @@ const Login = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
+        setIsLoading(true);
         setError(null);
         setSuccess(null);
 
@@ -38,7 +38,7 @@ const Login = () => {
             navigate('/');
         }
 
-        setLoading(false);
+        setIsLoading(false);
     };
 
     return (
@@ -90,8 +90,8 @@ const Login = () => {
                     <button
                         type="submit"
                         className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition duration-200"
-                        disabled={loading}>
-                        {loading ? 'Logging in...' : 'Login'}
+                        disabled={isLoading}>
+                        {isLoading ? 'Logging in...' : 'Login'}
                     </button>
                 </form>
 
