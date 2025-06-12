@@ -52,3 +52,26 @@ export const sendVerificationEmail = async (): Promise<ApiResponse<null, null>> 
         };
     }
 };
+
+export const verifyEmail = async (token: string): Promise<ApiResponse<null, null>> => {
+    try {
+        const response = await customFetch(import.meta.env.VITE_API_URL + `/users/verify-email/${token}`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const result: ApiResponse<null, null> = await response.json();
+        return result;
+    } catch (error: unknown) {
+        console.error(error);
+
+        return {
+            message: 'An error occurred while verifying email',
+            data: null,
+            errors: null,
+        };
+    }
+};
