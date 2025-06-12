@@ -1,7 +1,7 @@
 import { Outlet } from 'react-router-dom';
 
-const NoNavbar = () => {
+const Public = () => {
     return <Outlet />;
 };
 
-export default NoNavbar;
+export default Public;

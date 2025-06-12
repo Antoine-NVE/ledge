@@ -1,8 +1,8 @@
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import HomePage from './pages/Home';
 import MonthPage from './pages/Month';
-import WithNavbar from './layouts/WithNavbar';
-import NoNavbar from './layouts/NoNavbar';
+import Public from './layouts/Public';
+import Private from './layouts/Private';
 import ScrollToTop from './components/ScrollToTop';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -14,12 +14,12 @@ function App() {
             <BrowserRouter>
                 <ScrollToTop />
                 <Routes>
-                    <Route element={<WithNavbar />}>
+                    <Route element={<Private />}>
                         <Route path="/" element={<HomePage />} />
                         <Route path="/month/:month" element={<MonthPage />} />
                         <Route path="/profile" element={<Profile />} />'
                     </Route>
-                    <Route element={<NoNavbar />}>
+                    <Route element={<Public />}>
                         <Route path="/register" element={<Register />} />
                         <Route path="/login" element={<Login />} />
                     </Route>
