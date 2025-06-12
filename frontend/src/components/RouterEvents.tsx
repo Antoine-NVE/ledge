@@ -7,12 +7,14 @@ const RouterEvents = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        setUser(null);
+        const handler = () => {
+            setUser(null);
+            navigate('/login');
+        };
 
-        const handler = () => navigate('/login');
         window.addEventListener('unauthorized', handler);
         return () => window.removeEventListener('unauthorized', handler);
-    }, [navigate]);
+    }, [navigate, setUser]);
 
     return null;
 };

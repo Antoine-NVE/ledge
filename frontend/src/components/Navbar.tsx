@@ -1,9 +1,11 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { logout } from '../api/auth';
 import { useState } from 'react';
+import useUser from '../hooks/useUser';
 
 const Navbar = () => {
     const [loading, setLoading] = useState(false);
+    const { setUser } = useUser();
     const navigate = useNavigate();
 
     const handleLogout = async () => {
@@ -16,7 +18,9 @@ const Navbar = () => {
             return;
         }
 
+        setUser(null);
         navigate('/login');
+        setLoading(false);
     };
 
     return (
