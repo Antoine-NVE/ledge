@@ -1,11 +1,7 @@
 import { Outlet } from 'react-router-dom';
 
 const NoNavbar = () => {
-    return (
-        <main>
-            <Outlet />
-        </main>
-    );
+    return <Outlet />;
 };
 
 export default NoNavbar;

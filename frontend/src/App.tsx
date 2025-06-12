@@ -6,14 +6,12 @@ import NoNavbar from './layouts/NoNavbar';
 import ScrollToTop from './components/ScrollToTop';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import RouterEvents from './components/RouterEvents';
 import Profile from './pages/Profile';
 
 function App() {
     return (
         <div className="min-h-screen bg-gray-100">
             <BrowserRouter>
-                <RouterEvents />
                 <ScrollToTop />
                 <Routes>
                     <Route element={<WithNavbar />}>
@@ -22,7 +20,6 @@ function App() {
                         <Route path="/profile" element={<Profile />} />'
                     </Route>
                     <Route element={<NoNavbar />}>
-                        {/* Add any routes that don't need a navbar here */}
                         <Route path="/register" element={<Register />} />
                         <Route path="/login" element={<Login />} />
                     </Route>
