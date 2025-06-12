@@ -30,7 +30,7 @@ export const getCurrentUser = async (): Promise<[ApiResponse<{ user: User } | nu
     }
 };
 
-export const sendVerificationEmail = async (): Promise<ApiResponse<null, null>> => {
+export const sendVerificationEmail = async (): Promise<[ApiResponse<null, null>, Response | null]> => {
     try {
         const response = await customFetch(import.meta.env.VITE_API_URL + '/users/send-verification-email', {
             method: 'POST',
@@ -40,20 +40,25 @@ export const sendVerificationEmail = async (): Promise<ApiResponse<null, null>> 
             },
         });
 
+        // Can be any status code, including 200, 401, or 500
+        // We will handle this in the component
         const result: ApiResponse<null, null> = await response.json();
-        return result;
+        return [result, response];
     } catch (error: unknown) {
         console.error(error);
 
-        return {
-            message: 'An error occurred while sending verification email',
-            data: null,
-            errors: null,
-        };
+        return [
+            {
+                message: 'An error occurred while sending verification email',
+                data: null,
+                errors: null,
+            },
+            null,
+        ]; // In this case, we didn't receive a response from the server
     }
 };
 
-export const verifyEmail = async (token: string): Promise<ApiResponse<null, null>> => {
+export const verifyEmail = async (token: string): Promise<[ApiResponse<null, null>, Response | null]> => {
     try {
         const response = await customFetch(import.meta.env.VITE_API_URL + `/users/verify-email/${token}`, {
             method: 'GET',
@@ -63,15 +68,20 @@ export const verifyEmail = async (token: string): Promise<ApiResponse<null, null
             },
         });
 
+        // Can be any status code, including 200, 401, or 500
+        // We will handle this in the component
         const result: ApiResponse<null, null> = await response.json();
-        return result;
+        return [result, response];
     } catch (error: unknown) {
         console.error(error);
 
-        return {
-            message: 'An error occurred while verifying email',
-            data: null,
-            errors: null,
-        };
+        return [
+            {
+                message: 'An error occurred while verifying email',
+                data: null,
+                errors: null,
+            },
+            null,
+        ]; // In this case, we didn't receive a response from the server
     }
 };
