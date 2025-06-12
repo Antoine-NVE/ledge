@@ -3,20 +3,25 @@ import { sendVerificationEmail } from '../api/user';
 
 const Profile = () => {
     const [loading, setLoading] = useState(false);
-    const [success, setSuccess] = useState<string | null>(null);
-    const [error, setError] = useState<string | null>(null);
+    const [success, setSuccess] = useState<boolean | null>(null);
+    const [message, setMessage] = useState<string | null>(null);
 
     const handleSendVerificationEmail = async () => {
+        setMessage(null);
+        setSuccess(null);
+
         setLoading(true);
-        setError(null);
         const [result, response] = await sendVerificationEmail();
         setLoading(false);
+
+        setMessage(result.message);
+
         if (!response || !response.ok) {
-            setError(result.message);
+            setSuccess(false);
             return;
         }
-        setSuccess(result.message);
-        setError(null);
+
+        setSuccess(true);
     };
 
     return (
@@ -29,8 +34,7 @@ const Profile = () => {
                 disabled={loading}>
                 {loading ? 'Sending...' : 'Send verification email'}
             </button>
-            {success && <div className="mt-4 text-green-600">{success}</div>}
-            {error && <div className="mt-4 text-red-600">{error}</div>}
+            {message && <div className={`mt-4 ${success ? 'text-green-600' : 'text-red-600'}`}>{message}</div>}
         </div>
     );
 };
