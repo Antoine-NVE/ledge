@@ -30,9 +30,7 @@ export const register = async (req: Request<object, object, AuthBody>, res: Resp
         user = await user.save();
 
         // Automatically connect the user after registration
-        const accessToken = createJwt({
-            _id: user._id,
-        });
+        const accessToken = createJwt(user._id.toString());
         setAccessTokenCookie(res, accessToken);
 
         // Generate and save the refresh token
@@ -97,9 +95,7 @@ export const login = async (req: Request<object, object, AuthBody>, res: Respons
         }
 
         // Automatically connect the user after login
-        const accessToken = createJwt({
-            _id: user._id,
-        });
+        const accessToken = createJwt(user._id.toString());
         setAccessTokenCookie(res, accessToken);
 
         // Generate and save the refresh token
@@ -168,9 +164,7 @@ export const refresh = async (req: Request, res: Response) => {
             return;
         }
 
-        const accessToken = createJwt({
-            _id: refreshToken.user._id,
-        });
+        const accessToken = createJwt(refreshToken.user._id.toString());
         setAccessTokenCookie(res, accessToken);
 
         const newToken = generateToken();

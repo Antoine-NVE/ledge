@@ -49,12 +49,7 @@ export const sendVerificationEmail = async (req: Request, res: Response) => {
 
         const frontendUrl = process.env.FRONTEND_URL;
 
-        const jwt = createJwt(
-            {
-                _id: user._id,
-            },
-            '15m',
-        );
+        const jwt = createJwt(user._id.toString(), '15m');
 
         const transporter = nodemailer.createTransport({
             host: 'smtp',
@@ -112,8 +107,7 @@ export const verifyEmail = async (req: Request<{ token: string }>, res: Response
     const { token } = req.params;
 
     const decoded = verifyJwt(token);
-
-    if (decoded !== null && typeof decoded === 'object' && '_id' in decoded) {
+    if (decoded) {
         const user = await UserModel.findById(decoded._id);
         if (!user) {
             res.status(404).json({

@@ -23,8 +23,7 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     const decoded = verifyJwt(access_token);
-
-    if (decoded !== null && typeof decoded === 'object' && '_id' in decoded) {
+    if (decoded) {
         const user = await UserModel.findById(decoded._id);
         if (!user) {
             clearAccessToken(res);
