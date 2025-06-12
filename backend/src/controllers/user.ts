@@ -29,6 +29,15 @@ export const sendVerificationEmail = async (req: Request, res: Response) => {
     try {
         const user = req.user!;
 
+        if (user.isEmailVerified) {
+            res.status(400).json({
+                message: 'Email already verified',
+                data: null,
+                errors: null,
+            });
+            return;
+        }
+
         const frontendUrl = process.env.FRONTEND_URL;
 
         const jwt = createJwt({
