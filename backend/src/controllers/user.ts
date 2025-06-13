@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import nodemailer from 'nodemailer';
 import { createJwt, verifyJwt } from '../utils/jwt';
 import UserModel from '../models/User';
+import { sendEmail } from '../services/email';
 
 export const getUser = async (req: Request, res: Response) => {
     try {
@@ -51,38 +52,24 @@ export const sendVerificationEmail = async (req: Request, res: Response) => {
 
         const jwt = createJwt(user._id.toString(), '15m');
 
-        const transporter = nodemailer.createTransport({
-            host: 'smtp',
-            port: 1025,
-            secure: false,
-        });
+        const [info, error] = await sendEmail(
+            user.email,
+            'Please verify your email address',
+            `Click here to verify your email address: <a href="${frontendUrl}/verify-email/${jwt}">verify email</a>. This link will expire in 15 minutes.`,
+        );
 
-        const mailOptions = {
-            from: '"Ledge" <no-reply@ledge.com>',
-            to: user.email,
-            subject: 'Please verify your email address',
-            html:
-                'Click here to verify your email address: <a href="' +
-                frontendUrl +
-                '/verify-email/' +
-                jwt +
-                '">verify email</a>. This link will expire in 15 minutes.',
-        };
+        console.log(info);
 
-        transporter.sendMail(mailOptions, (error, info) => {
-            console.log(info);
+        if (error) {
+            console.error(error);
 
-            if (error) {
-                console.error(error);
-
-                res.status(500).json({
-                    message: 'Failed to send verification email',
-                    data: null,
-                    errors: error.message,
-                });
-                return;
-            }
-        });
+            res.status(500).json({
+                message: 'Failed to send verification email',
+                data: null,
+                errors: error.message,
+            });
+            return;
+        }
 
         user.emailVerificationRequestExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
         await user.save();
