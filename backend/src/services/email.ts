@@ -1,18 +1,22 @@
 import nodemailer from 'nodemailer';
 
-const transporter = nodemailer.createTransport({
-    host: 'smtp',
-    port: 1025,
-    secure: false,
-});
-
 export const sendEmail = async (
     to: string,
     subject: string,
     html: string,
 ): Promise<[nodemailer.SentMessageInfo | null, Error | null]> => {
+    const transporter = nodemailer.createTransport({
+        host: process.env.SMTP_HOST,
+        port: Number(process.env.SMTP_PORT),
+        secure: process.env.SMTP_SECURE === 'true',
+        auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+        },
+    });
+
     const mailOptions = {
-        from: '"Ledge" <no-reply@ledge.com>',
+        from: process.env.EMAIL_FROM,
         to,
         subject,
         html,
