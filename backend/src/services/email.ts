@@ -15,7 +15,7 @@ export const sendEmail = async (
         },
     });
 
-    const mailOptions = {
+    const emailOptions = {
         from: process.env.EMAIL_FROM,
         to,
         subject,
@@ -23,7 +23,7 @@ export const sendEmail = async (
     };
 
     try {
-        const info = await transporter.sendMail(mailOptions);
+        const info = await transporter.sendMail(emailOptions);
         return [info, null];
     } catch (error) {
         return [null, error as Error];
