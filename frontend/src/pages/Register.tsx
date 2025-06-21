@@ -15,7 +15,7 @@ interface FormErrors {
 const Register = () => {
     const [form, setForm] = useState<Form>({ email: '', password: '' });
     const [formErrors, setFormErrors] = useState<FormErrors>({});
-    const [loading, setLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
     const navigate = useNavigate();
@@ -33,7 +33,7 @@ const Register = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setLoading(true);
+        setIsLoading(true);
         setError(null);
         setSuccess(null);
 
@@ -42,12 +42,12 @@ const Register = () => {
         if (!response || !response.ok) {
             setError(result.message);
             setFormErrors(result.errors || {});
-            setLoading(false);
+            setIsLoading(false);
             return;
         }
 
         setSuccess(result.message);
-        setLoading(false);
+        setIsLoading(false);
         navigate('/');
     };
 
@@ -72,7 +72,7 @@ const Register = () => {
                             type="text"
                             value={form.email}
                             onChange={handleChange}
-                            disabled={loading}
+                            disabled={isLoading}
                             className={`${inputBaseClass} ${formErrors.email ? 'border-red-500' : 'border-gray-300'}`}
                         />
                         {formErrors.email && <p className="mt-1 text-xs text-red-600">{formErrors.email}</p>}
@@ -88,7 +88,7 @@ const Register = () => {
                             type="password"
                             value={form.password}
                             onChange={handleChange}
-                            disabled={loading}
+                            disabled={isLoading}
                             className={`${inputBaseClass} ${
                                 formErrors.password ? 'border-red-500' : 'border-gray-300'
                             }`}
@@ -99,8 +99,8 @@ const Register = () => {
                     <button
                         type="submit"
                         className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition"
-                        disabled={loading}>
-                        {loading ? 'Registering...' : 'Register'}
+                        disabled={isLoading}>
+                        {isLoading ? 'Registering...' : 'Register'}
                     </button>
                 </form>
 

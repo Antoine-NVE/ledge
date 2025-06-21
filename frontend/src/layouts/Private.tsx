@@ -1,15 +1,15 @@
 import { Outlet } from 'react-router-dom';
 import Navbar from '../components/Navbar';
+import RouterEvents from '../components/RouterEvents';
 
-const WithNavbar = () => {
+const Private = () => {
     return (
         <>
+            <RouterEvents />
             <Navbar />
-            <main>
-                <Outlet />
-            </main>
+            <Outlet />
         </>
     );
 };
 
-export default WithNavbar;
+export default Private;

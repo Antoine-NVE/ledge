@@ -5,7 +5,8 @@ jest.mock('../../models/User', () => ({
     },
 }));
 
-import UserModel from '../../models/User';
+import { Types } from 'mongoose';
+import UserModel, { UserDocument } from '../../models/User';
 import { isEmailValid, isPasswordValid, isEmailUnique } from '../../validators/user';
 
 describe('User Validators', () => {
@@ -50,13 +51,47 @@ describe('User Validators', () => {
 
         it('should return true if no user exists', async () => {
             findOneMock.mockReturnValueOnce(null);
-            await expect(isEmailUnique('new@example.com')).resolves.toBe(true);
+
+            const fakeThis = {
+                _id: new Types.ObjectId(),
+                model: () => ({
+                    findOne: findOneMock,
+                }),
+            };
+
+            await expect(isEmailUnique.call(fakeThis as UserDocument, 'new@example.com')).resolves.toBe(true);
             expect(findOneMock).toHaveBeenCalledWith({ email: 'new@example.com' });
         });
 
-        it('should return false if the email already exists', async () => {
-            findOneMock.mockReturnValueOnce({ _id: '123', email: 'exists@example.com' });
-            await expect(isEmailUnique('exists@example.com')).resolves.toBe(false);
+        it('should return false if the email already exists and belongs to another user', async () => {
+            const existingId = new Types.ObjectId();
+            const differentId = new Types.ObjectId();
+
+            findOneMock.mockReturnValueOnce({ _id: existingId, email: 'exists@example.com' });
+
+            const fakeThis = {
+                _id: differentId,
+                model: () => ({
+                    findOne: findOneMock,
+                }),
+            };
+
+            await expect(isEmailUnique.call(fakeThis as UserDocument, 'exists@example.com')).resolves.toBe(false);
+        });
+
+        it('should return true if the email exists but belongs to the same user', async () => {
+            const sameId = new Types.ObjectId();
+
+            findOneMock.mockReturnValueOnce({ _id: sameId, email: 'exists@example.com' });
+
+            const fakeThis = {
+                _id: sameId,
+                model: () => ({
+                    findOne: findOneMock,
+                }),
+            };
+
+            await expect(isEmailUnique.call(fakeThis as UserDocument, 'exists@example.com')).resolves.toBe(true);
         });
     });
 });

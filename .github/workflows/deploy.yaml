@@ -41,14 +41,14 @@ jobs:
         run: git config --global --add safe.directory "$TARGET_PATH"
 
       - name: Pull latest changes from main
-        working-directory: ${{ env.TARGET_PATH }}
         run: |
+          cd "$TARGET_PATH"
           git fetch origin
           git checkout main
           git reset --hard origin/main
 
       - name: Rebuild and restart Docker Compose
-        working-directory: ${{ env.TARGET_PATH }}
         run: |
+          cd "$TARGET_PATH"
           echo "Deploying to $ENVIRONMENT environment at $TARGET_PATH"
           docker compose up -d --build --remove-orphans
