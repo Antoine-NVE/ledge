@@ -183,8 +183,9 @@ export const refresh = async (req: Request, res: Response) => {
 };
 
 export const logout = async (req: Request, res: Response) => {
+    const token = req.cookies.refresh_token;
+
     try {
-        const token = req.cookies.refresh_token;
         if (token) {
             await RefreshTokenModel.deleteOne({ token });
         }
