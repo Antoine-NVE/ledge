@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { Error as MongooseError } from 'mongoose';
 import bcrypt from 'bcrypt';
 import UserModel from '../models/User';
-import { sanitizeUser } from '../utils/sanitize';
+import { removePassword } from '../utils/sanitize';
 import { formatMongooseValidationErrors } from '../utils/error';
 import {
     clearAccessToken,
@@ -41,13 +41,10 @@ export const register = async (req: Request<object, object, AuthBody>, res: Resp
         await refreshToken.save();
         setRefreshTokenCookie(res, refreshToken.token);
 
-        // Remove password from the response
-        const userObj = sanitizeUser(user);
-
         res.status(201).json({
             message: 'User registered successfully',
             data: {
-                user: userObj,
+                user: removePassword(user),
             },
             errors: null,
         });
@@ -105,13 +102,10 @@ export const login = async (req: Request<object, object, AuthBody>, res: Respons
         await refreshToken.save();
         setRefreshTokenCookie(res, refreshToken.token);
 
-        // Remove password from the response
-        const userObj = sanitizeUser(user);
-
         res.status(200).json({
             message: 'User logged in successfully',
             data: {
-                user: userObj,
+                user: removePassword(user),
             },
             errors: null,
         });
