@@ -34,13 +34,12 @@ export const register = async (req: Request<object, object, AuthBody>, res: Resp
         setAccessTokenCookie(res, accessToken);
 
         // Generate and save the refresh token
-        const token = generateToken();
         const refreshToken = new RefreshTokenModel({
-            token,
+            token: generateToken(),
             user,
         });
         await refreshToken.save();
-        setRefreshTokenCookie(res, token);
+        setRefreshTokenCookie(res, refreshToken.token);
 
         // Remove password from the response
         const userObj = sanitizeUser(user);
@@ -99,13 +98,12 @@ export const login = async (req: Request<object, object, AuthBody>, res: Respons
         setAccessTokenCookie(res, accessToken);
 
         // Generate and save the refresh token
-        const token = generateToken();
         const refreshToken = new RefreshTokenModel({
-            token,
+            token: generateToken(),
             user,
         });
         await refreshToken.save();
-        setRefreshTokenCookie(res, token);
+        setRefreshTokenCookie(res, refreshToken.token);
 
         // Remove password from the response
         const userObj = sanitizeUser(user);
@@ -167,11 +165,10 @@ export const refresh = async (req: Request, res: Response) => {
         const accessToken = createJwt(refreshToken.user._id.toString());
         setAccessTokenCookie(res, accessToken);
 
-        const newToken = generateToken();
-        refreshToken.token = newToken;
+        refreshToken.token = generateToken();
         refreshToken.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         await refreshToken.save();
-        setRefreshTokenCookie(res, newToken);
+        setRefreshTokenCookie(res, refreshToken.token);
 
         res.status(200).json({
             message: 'Tokens refreshed successfully',
