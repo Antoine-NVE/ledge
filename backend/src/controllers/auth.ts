@@ -2,25 +2,35 @@ import { Request, Response } from 'express';
 import { Error as MongooseError } from 'mongoose';
 import bcrypt from 'bcrypt';
 import UserModel from '../models/User';
-import { sanitizeUser } from '../utils/sanitize';
+import { removePassword } from '../utils/sanitize';
 import { formatMongooseValidationErrors } from '../utils/error';
 import {
-    clearAccessToken,
-    clearRefreshToken,
+    clearAllAuthCookies,
     setAccessTokenCookie,
     setRefreshTokenCookie,
+    setRememberMeCookie,
 } from '../services/authCookie';
 import { createJwt } from '../utils/jwt';
 import { generateToken } from '../utils/token';
 import RefreshTokenModel from '../models/RefreshToken';
 
-interface AuthBody {
+interface RegisterBody {
     email: string;
     password: string;
 }
 
-export const register = async (req: Request<object, object, AuthBody>, res: Response) => {
+interface LoginBody {
+    email: string;
+    password: string;
+    rememberMe: boolean;
+}
+
+export const register = async (req: Request<object, object, RegisterBody>, res: Response) => {
     const { email, password } = req.body;
+
+    // The user can't choose to be remembered at registration
+    // Next time the user logs in, they can choose to be remembered
+    const rememberMe = false;
 
     try {
         let user = new UserModel({
@@ -31,24 +41,21 @@ export const register = async (req: Request<object, object, AuthBody>, res: Resp
 
         // Automatically connect the user after registration
         const accessToken = createJwt(user._id.toString());
-        setAccessTokenCookie(res, accessToken);
+        setAccessTokenCookie(res, accessToken, rememberMe);
 
         // Generate and save the refresh token
-        const token = generateToken();
-        const refreshToken = new RefreshTokenModel({
-            token,
+        const refreshToken = await new RefreshTokenModel({
+            token: generateToken(),
             user,
-        });
-        await refreshToken.save();
-        setRefreshTokenCookie(res, token);
+        }).save();
+        setRefreshTokenCookie(res, refreshToken.token, rememberMe);
 
-        // Remove password from the response
-        const userObj = sanitizeUser(user);
+        setRememberMeCookie(res, rememberMe);
 
         res.status(201).json({
             message: 'User registered successfully',
             data: {
-                user: userObj,
+                user: removePassword(user),
             },
             errors: null,
         });
@@ -69,8 +76,8 @@ export const register = async (req: Request<object, object, AuthBody>, res: Resp
     }
 };
 
-export const login = async (req: Request<object, object, AuthBody>, res: Response) => {
-    const { email, password } = req.body;
+export const login = async (req: Request<object, object, LoginBody>, res: Response) => {
+    const { email, password, rememberMe } = req.body;
 
     try {
         const user = await UserModel.findOne({ email }).select('+password');
@@ -96,24 +103,21 @@ export const login = async (req: Request<object, object, AuthBody>, res: Respons
 
         // Automatically connect the user after login
         const accessToken = createJwt(user._id.toString());
-        setAccessTokenCookie(res, accessToken);
+        setAccessTokenCookie(res, accessToken, rememberMe);
 
         // Generate and save the refresh token
-        const token = generateToken();
-        const refreshToken = new RefreshTokenModel({
-            token,
+        const refreshToken = await new RefreshTokenModel({
+            token: generateToken(),
             user,
-        });
-        await refreshToken.save();
-        setRefreshTokenCookie(res, token);
+        }).save();
+        setRefreshTokenCookie(res, refreshToken.token, rememberMe);
 
-        // Remove password from the response
-        const userObj = sanitizeUser(user);
+        setRememberMeCookie(res, rememberMe);
 
         res.status(200).json({
             message: 'User logged in successfully',
             data: {
-                user: userObj,
+                user: removePassword(user),
             },
             errors: null,
         });
@@ -139,10 +143,12 @@ export const refresh = async (req: Request, res: Response) => {
         return;
     }
 
+    const rememberMe = req.cookies.remember_me === 'true';
+
     try {
-        const refreshToken = await RefreshTokenModel.findOne({ token }).populate('user');
+        let refreshToken = await RefreshTokenModel.findOne({ token }).populate('user');
         if (!refreshToken || !refreshToken.user) {
-            clearRefreshToken(res);
+            clearAllAuthCookies(res);
 
             res.status(401).json({
                 message: 'Invalid refresh token',
@@ -154,7 +160,7 @@ export const refresh = async (req: Request, res: Response) => {
 
         // Check if the refresh token is expired
         if (refreshToken.expiresAt < new Date()) {
-            clearRefreshToken(res);
+            clearAllAuthCookies(res);
 
             res.status(401).json({
                 message: 'Refresh token has expired',
@@ -165,13 +171,14 @@ export const refresh = async (req: Request, res: Response) => {
         }
 
         const accessToken = createJwt(refreshToken.user._id.toString());
-        setAccessTokenCookie(res, accessToken);
+        setAccessTokenCookie(res, accessToken, rememberMe);
 
-        const newToken = generateToken();
-        refreshToken.token = newToken;
-        refreshToken.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-        await refreshToken.save();
-        setRefreshTokenCookie(res, newToken);
+        const user = refreshToken.user;
+        await RefreshTokenModel.deleteOne({ token });
+        refreshToken = await new RefreshTokenModel({ token: generateToken(), user }).save();
+        setRefreshTokenCookie(res, refreshToken.token, rememberMe);
+
+        setRememberMeCookie(res, rememberMe);
 
         res.status(200).json({
             message: 'Tokens refreshed successfully',
@@ -192,14 +199,14 @@ export const refresh = async (req: Request, res: Response) => {
 };
 
 export const logout = async (req: Request, res: Response) => {
+    const token = req.cookies.refresh_token;
+
     try {
-        const token = req.cookies.refresh_token;
         if (token) {
             await RefreshTokenModel.deleteOne({ token });
         }
 
-        clearAccessToken(res);
-        clearRefreshToken(res);
+        clearAllAuthCookies(res);
 
         res.status(200).json({
             message: 'User logged out successfully',

@@ -1,35 +1,64 @@
 import { Response } from 'express';
 
-export const setAccessTokenCookie = (res: Response, token: string) => {
+interface CookieOptions {
+    httpOnly: boolean;
+    secure: boolean;
+    sameSite: 'strict' | 'lax' | 'none';
+}
+
+const cookieBaseOptions: CookieOptions = {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'strict',
+};
+
+const rememberMeCookieOptions: CookieOptions = {
+    httpOnly: false,
+    secure: true,
+    sameSite: 'strict',
+};
+
+export const setAccessTokenCookie = (res: Response, token: string, rememberMe: boolean) => {
     res.cookie('access_token', token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        maxAge: 3600000, // 1 hour
+        ...cookieBaseOptions,
+        ...(rememberMe ? { maxAge: 3600000 } : {}), // 1 hour
     });
 };
 
-export const clearAccessToken = (res: Response) => {
+export const clearAccessTokenCookie = (res: Response) => {
     res.clearCookie('access_token', {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
+        ...cookieBaseOptions,
     });
 };
 
-export const setRefreshTokenCookie = (res: Response, token: string) => {
+export const setRefreshTokenCookie = (res: Response, token: string, rememberMe: boolean) => {
     res.cookie('refresh_token', token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-        maxAge: 604800000, // 7 days
+        ...cookieBaseOptions,
+        ...(rememberMe ? { maxAge: 604800000 } : {}), // 7 days
     });
 };
 
-export const clearRefreshToken = (res: Response) => {
+export const clearRefreshTokenCookie = (res: Response) => {
     res.clearCookie('refresh_token', {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
+        ...cookieBaseOptions,
     });
+};
+
+export const setRememberMeCookie = (res: Response, rememberMe: boolean) => {
+    res.cookie('remember_me', rememberMe, {
+        ...rememberMeCookieOptions,
+        ...(rememberMe ? { maxAge: 604800000 } : {}), // 7 days
+    });
+};
+
+export const clearRememberMeCookie = (res: Response) => {
+    res.clearCookie('remember_me', {
+        ...rememberMeCookieOptions,
+    });
+};
+
+export const clearAllAuthCookies = (res: Response) => {
+    clearAccessTokenCookie(res);
+    clearRefreshTokenCookie(res);
+    clearRememberMeCookie(res);
 };
