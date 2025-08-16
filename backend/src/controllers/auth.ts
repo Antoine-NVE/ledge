@@ -30,6 +30,10 @@ interface LoginBody {
 export const register = async (req: Request<object, object, RegisterBody>, res: Response) => {
     const { email, password } = req.body;
 
+    // The user can't choose to be remembered at registration
+    // Next time the user logs in, they can choose to be remembered
+    const rememberMe = false;
+
     try {
         let user = new UserModel({
             email,
@@ -39,7 +43,7 @@ export const register = async (req: Request<object, object, RegisterBody>, res: 
 
         // Automatically connect the user after registration
         const accessToken = createJwt(user._id.toString());
-        setAccessTokenCookie(res, accessToken, false);
+        setAccessTokenCookie(res, accessToken, rememberMe);
 
         // Generate and save the refresh token
         const refreshToken = new RefreshTokenModel({
@@ -47,9 +51,9 @@ export const register = async (req: Request<object, object, RegisterBody>, res: 
             user,
         });
         await refreshToken.save();
-        setRefreshTokenCookie(res, refreshToken.token, false);
+        setRefreshTokenCookie(res, refreshToken.token, rememberMe);
 
-        setRememberMeCookie(res, false);
+        setRememberMeCookie(res, rememberMe);
 
         res.status(201).json({
             message: 'User registered successfully',
