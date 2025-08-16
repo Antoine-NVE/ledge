@@ -38,7 +38,8 @@ export const register = async (
 
 export const login = async (
     email: string,
-    password: string
+    password: string,
+    rememberMe: boolean
 ): Promise<[ApiResponse<{ user: User } | null, null>, Response | null]> => {
     try {
         const response = await customFetch(
@@ -49,7 +50,7 @@ export const login = async (
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ email, password }),
+                body: JSON.stringify({ email, password, rememberMe }),
             },
             false // We don't want to retry on 401 for the login endpoint
         );
