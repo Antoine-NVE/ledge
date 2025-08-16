@@ -1,7 +1,7 @@
-import { sanitizeUser } from '../../utils/sanitize';
+import { removePassword } from '../../utils/sanitize';
 import { UserDocument } from '../../models/User';
 
-describe('sanitizeUser', () => {
+describe('removePassword', () => {
     it('should remove the password and return the rest of the fields', () => {
         const fakeUser: Partial<UserDocument> = {
             toObject: jest.fn().mockReturnValue({
@@ -16,7 +16,7 @@ describe('sanitizeUser', () => {
 
         const userDoc = fakeUser as UserDocument;
 
-        const result = sanitizeUser(userDoc);
+        const result = removePassword(userDoc);
 
         expect(fakeUser.toObject).toHaveBeenCalled();
         expect(result).toHaveProperty('_id', 'abc123');
