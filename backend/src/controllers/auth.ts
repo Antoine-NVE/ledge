@@ -5,9 +5,7 @@ import UserModel from '../models/User';
 import { removePassword } from '../utils/sanitize';
 import { formatMongooseValidationErrors } from '../utils/error';
 import {
-    clearAccessToken,
-    clearRefreshToken,
-    clearRememberMeCookie,
+    clearAllAuthCookies,
     setAccessTokenCookie,
     setRefreshTokenCookie,
     setRememberMeCookie,
@@ -152,7 +150,7 @@ export const refresh = async (req: Request, res: Response) => {
     try {
         const refreshToken = await RefreshTokenModel.findOne({ token }).populate('user');
         if (!refreshToken || !refreshToken.user) {
-            clearRefreshToken(res);
+            clearAllAuthCookies(res);
 
             res.status(401).json({
                 message: 'Invalid refresh token',
@@ -164,7 +162,7 @@ export const refresh = async (req: Request, res: Response) => {
 
         // Check if the refresh token is expired
         if (refreshToken.expiresAt < new Date()) {
-            clearRefreshToken(res);
+            clearAllAuthCookies(res);
 
             res.status(401).json({
                 message: 'Refresh token has expired',
@@ -210,9 +208,7 @@ export const logout = async (req: Request, res: Response) => {
             await RefreshTokenModel.deleteOne({ token });
         }
 
-        clearAccessToken(res);
-        clearRefreshToken(res);
-        clearRememberMeCookie(res);
+        clearAllAuthCookies(res);
 
         res.status(200).json({
             message: 'User logged out successfully',

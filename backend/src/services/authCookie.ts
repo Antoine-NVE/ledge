@@ -52,3 +52,9 @@ export const clearRememberMeCookie = (res: Response) => {
         ...rememberMeCookieOptions,
     });
 };
+
+export const clearAllAuthCookies = (res: Response) => {
+    clearAccessToken(res);
+    clearRefreshToken(res);
+    clearRememberMeCookie(res);
+};
