@@ -21,7 +21,7 @@ export const setAccessTokenCookie = (res: Response, token: string, rememberMe: b
     });
 };
 
-export const clearAccessToken = (res: Response) => {
+export const clearAccessTokenCookie = (res: Response) => {
     res.clearCookie('access_token', {
         ...cookieBaseOptions,
     });
@@ -34,7 +34,7 @@ export const setRefreshTokenCookie = (res: Response, token: string, rememberMe: 
     });
 };
 
-export const clearRefreshToken = (res: Response) => {
+export const clearRefreshTokenCookie = (res: Response) => {
     res.clearCookie('refresh_token', {
         ...cookieBaseOptions,
     });
@@ -54,7 +54,7 @@ export const clearRememberMeCookie = (res: Response) => {
 };
 
 export const clearAllAuthCookies = (res: Response) => {
-    clearAccessToken(res);
-    clearRefreshToken(res);
+    clearAccessTokenCookie(res);
+    clearRefreshTokenCookie(res);
     clearRememberMeCookie(res);
 };
