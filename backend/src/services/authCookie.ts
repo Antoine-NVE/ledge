@@ -1,6 +1,10 @@
 import { Response } from 'express';
 
-type CookieOptions = { httpOnly: boolean; secure: boolean; sameSite: 'strict' | 'lax' | 'none' };
+interface CookieOptions {
+    httpOnly: boolean;
+    secure: boolean;
+    sameSite: 'strict' | 'lax' | 'none';
+}
 
 const cookieBaseOptions: CookieOptions = {
     httpOnly: true,
