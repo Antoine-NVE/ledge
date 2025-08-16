@@ -148,7 +148,7 @@ export const refresh = async (req: Request, res: Response) => {
     const rememberMe = req.cookies.remember_me === 'true';
 
     try {
-        const refreshToken = await RefreshTokenModel.findOne({ token }).populate('user');
+        let refreshToken = await RefreshTokenModel.findOne({ token }).populate('user');
         if (!refreshToken || !refreshToken.user) {
             clearAllAuthCookies(res);
 
@@ -175,9 +175,9 @@ export const refresh = async (req: Request, res: Response) => {
         const accessToken = createJwt(refreshToken.user._id.toString());
         setAccessTokenCookie(res, accessToken, rememberMe);
 
-        refreshToken.token = generateToken();
-        refreshToken.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-        await refreshToken.save();
+        const user = refreshToken.user;
+        await RefreshTokenModel.deleteOne({ token });
+        refreshToken = await new RefreshTokenModel({ token: generateToken(), user }).save();
         setRefreshTokenCookie(res, refreshToken.token, rememberMe);
 
         setRememberMeCookie(res, rememberMe);
