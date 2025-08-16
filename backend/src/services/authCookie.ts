@@ -1,11 +1,11 @@
 import { Response } from 'express';
 
-export const setAccessTokenCookie = (res: Response, token: string) => {
+export const setAccessTokenCookie = (res: Response, token: string, rememberMe: boolean) => {
     res.cookie('access_token', token, {
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
-        maxAge: 3600000, // 1 hour
+        ...(rememberMe ? { maxAge: 3600000 } : {}), // 1 hour
     });
 };
 
@@ -17,17 +17,34 @@ export const clearAccessToken = (res: Response) => {
     });
 };
 
-export const setRefreshTokenCookie = (res: Response, token: string) => {
+export const setRefreshTokenCookie = (res: Response, token: string, rememberMe: boolean) => {
     res.cookie('refresh_token', token, {
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
-        maxAge: 604800000, // 7 days
+        ...(rememberMe ? { maxAge: 604800000 } : {}), // 7 days
     });
 };
 
 export const clearRefreshToken = (res: Response) => {
     res.clearCookie('refresh_token', {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+    });
+};
+
+export const setRememberMeCookie = (res: Response, rememberMe: boolean) => {
+    res.cookie('remember_me', rememberMe, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
+        ...(rememberMe ? { maxAge: 604800000 } : {}), // 7 days
+    });
+};
+
+export const clearRememberMeCookie = (res: Response) => {
+    res.clearCookie('remember_me', {
         httpOnly: true,
         secure: true,
         sameSite: 'strict',

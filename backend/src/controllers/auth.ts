@@ -7,19 +7,27 @@ import { formatMongooseValidationErrors } from '../utils/error';
 import {
     clearAccessToken,
     clearRefreshToken,
+    clearRememberMeCookie,
     setAccessTokenCookie,
     setRefreshTokenCookie,
+    setRememberMeCookie,
 } from '../services/authCookie';
 import { createJwt } from '../utils/jwt';
 import { generateToken } from '../utils/token';
 import RefreshTokenModel from '../models/RefreshToken';
 
-interface AuthBody {
+interface RegisterBody {
     email: string;
     password: string;
 }
 
-export const register = async (req: Request<object, object, AuthBody>, res: Response) => {
+interface LoginBody {
+    email: string;
+    password: string;
+    rememberMe: boolean;
+}
+
+export const register = async (req: Request<object, object, RegisterBody>, res: Response) => {
     const { email, password } = req.body;
 
     try {
@@ -31,7 +39,7 @@ export const register = async (req: Request<object, object, AuthBody>, res: Resp
 
         // Automatically connect the user after registration
         const accessToken = createJwt(user._id.toString());
-        setAccessTokenCookie(res, accessToken);
+        setAccessTokenCookie(res, accessToken, false);
 
         // Generate and save the refresh token
         const refreshToken = new RefreshTokenModel({
@@ -39,7 +47,9 @@ export const register = async (req: Request<object, object, AuthBody>, res: Resp
             user,
         });
         await refreshToken.save();
-        setRefreshTokenCookie(res, refreshToken.token);
+        setRefreshTokenCookie(res, refreshToken.token, false);
+
+        setRememberMeCookie(res, false);
 
         res.status(201).json({
             message: 'User registered successfully',
@@ -65,8 +75,8 @@ export const register = async (req: Request<object, object, AuthBody>, res: Resp
     }
 };
 
-export const login = async (req: Request<object, object, AuthBody>, res: Response) => {
-    const { email, password } = req.body;
+export const login = async (req: Request<object, object, LoginBody>, res: Response) => {
+    const { email, password, rememberMe } = req.body;
 
     try {
         const user = await UserModel.findOne({ email }).select('+password');
@@ -92,7 +102,7 @@ export const login = async (req: Request<object, object, AuthBody>, res: Respons
 
         // Automatically connect the user after login
         const accessToken = createJwt(user._id.toString());
-        setAccessTokenCookie(res, accessToken);
+        setAccessTokenCookie(res, accessToken, rememberMe);
 
         // Generate and save the refresh token
         const refreshToken = new RefreshTokenModel({
@@ -100,7 +110,9 @@ export const login = async (req: Request<object, object, AuthBody>, res: Respons
             user,
         });
         await refreshToken.save();
-        setRefreshTokenCookie(res, refreshToken.token);
+        setRefreshTokenCookie(res, refreshToken.token, rememberMe);
+
+        setRememberMeCookie(res, rememberMe);
 
         res.status(200).json({
             message: 'User logged in successfully',
@@ -131,6 +143,8 @@ export const refresh = async (req: Request, res: Response) => {
         return;
     }
 
+    const rememberMe = req.cookies.remember_me === 'true';
+
     try {
         const refreshToken = await RefreshTokenModel.findOne({ token }).populate('user');
         if (!refreshToken || !refreshToken.user) {
@@ -157,12 +171,14 @@ export const refresh = async (req: Request, res: Response) => {
         }
 
         const accessToken = createJwt(refreshToken.user._id.toString());
-        setAccessTokenCookie(res, accessToken);
+        setAccessTokenCookie(res, accessToken, rememberMe);
 
         refreshToken.token = generateToken();
         refreshToken.expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
         await refreshToken.save();
-        setRefreshTokenCookie(res, refreshToken.token);
+        setRefreshTokenCookie(res, refreshToken.token, rememberMe);
+
+        setRememberMeCookie(res, rememberMe);
 
         res.status(200).json({
             message: 'Tokens refreshed successfully',
@@ -192,6 +208,7 @@ export const logout = async (req: Request, res: Response) => {
 
         clearAccessToken(res);
         clearRefreshToken(res);
+        clearRememberMeCookie(res);
 
         res.status(200).json({
             message: 'User logged out successfully',
