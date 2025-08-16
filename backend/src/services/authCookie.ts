@@ -36,7 +36,7 @@ export const clearRefreshToken = (res: Response) => {
 
 export const setRememberMeCookie = (res: Response, rememberMe: boolean) => {
     res.cookie('remember_me', rememberMe, {
-        httpOnly: true,
+        httpOnly: false,
         secure: true,
         sameSite: 'strict',
         ...(rememberMe ? { maxAge: 604800000 } : {}), // 7 days
@@ -45,7 +45,7 @@ export const setRememberMeCookie = (res: Response, rememberMe: boolean) => {
 
 export const clearRememberMeCookie = (res: Response) => {
     res.clearCookie('remember_me', {
-        httpOnly: true,
+        httpOnly: false,
         secure: true,
         sameSite: 'strict',
     });
