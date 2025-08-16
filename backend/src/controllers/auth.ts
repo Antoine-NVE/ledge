@@ -44,11 +44,10 @@ export const register = async (req: Request<object, object, RegisterBody>, res: 
         setAccessTokenCookie(res, accessToken, rememberMe);
 
         // Generate and save the refresh token
-        const refreshToken = new RefreshTokenModel({
+        const refreshToken = await new RefreshTokenModel({
             token: generateToken(),
             user,
-        });
-        await refreshToken.save();
+        }).save();
         setRefreshTokenCookie(res, refreshToken.token, rememberMe);
 
         setRememberMeCookie(res, rememberMe);
@@ -107,11 +106,10 @@ export const login = async (req: Request<object, object, LoginBody>, res: Respon
         setAccessTokenCookie(res, accessToken, rememberMe);
 
         // Generate and save the refresh token
-        const refreshToken = new RefreshTokenModel({
+        const refreshToken = await new RefreshTokenModel({
             token: generateToken(),
             user,
-        });
-        await refreshToken.save();
+        }).save();
         setRefreshTokenCookie(res, refreshToken.token, rememberMe);
 
         setRememberMeCookie(res, rememberMe);
