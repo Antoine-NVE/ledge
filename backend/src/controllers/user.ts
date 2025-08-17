@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import nodemailer from 'nodemailer';
 import { createJwt, verifyJwt } from '../utils/jwt';
 import UserModel from '../models/User';
 import { sendEmail } from '../services/email';
