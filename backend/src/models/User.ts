@@ -37,23 +37,29 @@ const UserSchema = new Schema<UserDocument>(
         password: {
             type: String,
             select: false, // Do not include password in queries by default
-            trim: true,
             required: [true, 'Password is required'],
-            validate: {
-                validator: isPasswordValid,
-                message:
-                    'Password must be between 8 and 100 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
-            },
+            validate: [
+                {
+                    // We use a validator instead of 'trim: true' to provide a custom error message
+                    // Avoid unwanted behavior where leading/trailing spaces are removed without notifying the user
+                    validator: (password: string) => password.trim() === password,
+                    message: 'Password cannot start or end with whitespace',
+                },
+                {
+                    validator: isPasswordValid,
+                    message:
+                        'Password must be between 8 and 100 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+                },
+            ],
         },
         isEmailVerified: {
             type: Boolean,
             default: false,
-            required: [true, 'Email verification status is required'],
+            // No need to set 'required' as any incorrect value will be casted as a boolean
         },
         emailVerificationRequestExpiresAt: {
             type: Date,
             default: null,
-            required: false,
         },
     },
     {
@@ -62,17 +68,10 @@ const UserSchema = new Schema<UserDocument>(
     },
 );
 
-UserSchema.pre<UserDocument>('save', async function (next) {
-    if (!this.isModified('password')) {
-        return next();
-    }
+UserSchema.pre<UserDocument>('save', async function () {
+    if (!this.isModified('password')) return;
 
-    try {
-        this.password = await bcrypt.hash(this.password, 10);
-        next();
-    } catch (error: unknown) {
-        next(error instanceof Error ? error : new Error('Unknown error during hashing'));
-    }
+    this.password = await bcrypt.hash(this.password, 10);
 });
 
 const UserModel: Model<UserDocument> = model<UserDocument>('User', UserSchema);
