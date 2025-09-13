@@ -68,17 +68,10 @@ const UserSchema = new Schema<UserDocument>(
     },
 );
 
-UserSchema.pre<UserDocument>('save', async function (next) {
-    if (!this.isModified('password')) {
-        return next();
-    }
+UserSchema.pre<UserDocument>('save', async function () {
+    if (!this.isModified('password')) return;
 
-    try {
-        this.password = await bcrypt.hash(this.password, 10);
-        next();
-    } catch (error: unknown) {
-        next(error instanceof Error ? error : new Error('Unknown error during hashing'));
-    }
+    this.password = await bcrypt.hash(this.password, 10);
 });
 
 const UserModel: Model<UserDocument> = model<UserDocument>('User', UserSchema);
