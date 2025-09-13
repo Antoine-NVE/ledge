@@ -37,13 +37,18 @@ const UserSchema = new Schema<UserDocument>(
         password: {
             type: String,
             select: false, // Do not include password in queries by default
-            trim: true,
             required: [true, 'Password is required'],
-            validate: {
-                validator: isPasswordValid,
-                message:
-                    'Password must be between 8 and 100 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
-            },
+            validate: [
+                {
+                    validator: (password: string) => password.trim() === password,
+                    message: 'Password cannot start or end with whitespace',
+                },
+                {
+                    validator: isPasswordValid,
+                    message:
+                        'Password must be between 8 and 100 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+                },
+            ],
         },
         isEmailVerified: {
             type: Boolean,
