@@ -48,12 +48,11 @@ const UserSchema = new Schema<UserDocument>(
         isEmailVerified: {
             type: Boolean,
             default: false,
-            required: [true, 'Email verification status is required'],
+            // No need to set 'required' as any incorrect value will be casted as a boolean
         },
         emailVerificationRequestExpiresAt: {
             type: Date,
             default: null,
-            required: false,
         },
     },
     {

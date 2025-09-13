@@ -21,8 +21,7 @@ const RefreshTokenSchema = new Schema<RefreshTokenDocument>(
         },
         expiresAt: {
             type: Date,
-            required: [true, 'Expiration date is required.'],
-            default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            set: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // We use a setter to always set the expiry date to 7 days from now
             index: { expires: 0 },
         },
         user: {
