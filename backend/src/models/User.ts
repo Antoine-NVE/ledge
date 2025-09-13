@@ -40,6 +40,8 @@ const UserSchema = new Schema<UserDocument>(
             required: [true, 'Password is required'],
             validate: [
                 {
+                    // We use a validator instead of 'trim: true' to provide a custom error message
+                    // Avoid unwanted behavior where leading/trailing spaces are removed without notifying the user
                     validator: (password: string) => password.trim() === password,
                     message: 'Password cannot start or end with whitespace',
                 },
