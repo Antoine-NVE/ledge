@@ -12,10 +12,16 @@ export const createAccessTokenJwt = (userId: string, secret: Secret): string => 
 // Base function, only called in this service
 const verifyJwt = (token: string, secret: Secret, options?: VerifyOptions): JwtPayload | null => {
     try {
-        const decoded = jwt.verify(token, secret, options);
+        // jwt.Jwt can only be returned if we use 'complete: true' option, otherwise it's JwtPayload | string
+        const decoded = jwt.verify(token, secret, options) as jwt.JwtPayload | string;
 
         if (typeof decoded !== 'object') {
             console.error('Invalid JWT format');
+            return null;
+        }
+
+        if (!decoded.sub) {
+            console.error('JWT does not contain a subject (sub)');
             return null;
         }
 
@@ -28,16 +34,5 @@ const verifyJwt = (token: string, secret: Secret, options?: VerifyOptions): JwtP
 };
 
 export const verifyAccessTokenJwt = (token: string, secret: Secret): JwtPayload | null => {
-    const decoded = verifyJwt(token, secret, { audience: 'access' });
-
-    if (!decoded) {
-        return null;
-    }
-
-    if (!decoded.sub) {
-        console.error('JWT does not contain an user ID');
-        return null;
-    }
-
-    return decoded;
+    return verifyJwt(token, secret, { audience: 'access' });
 };
