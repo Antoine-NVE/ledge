@@ -14,7 +14,7 @@ interface FormTransaction {
     name: string;
     value: string;
     isIncome: boolean | null;
-    isRecurring: boolean | null;
+    isRecurring: boolean;
 }
 
 interface FormErrors {
@@ -29,7 +29,7 @@ const EMPTY_FORM: FormTransaction = {
     name: '',
     value: '',
     isIncome: null,
-    isRecurring: null,
+    isRecurring: false,
 };
 
 const EMPTY_ERRORS: FormErrors = {
@@ -67,9 +67,6 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
         }
         if (form.isIncome === null) {
             errors.isIncome = 'Type is required';
-        }
-        if (form.isRecurring === null) {
-            errors.isRecurring = 'Recurring is required';
         }
         setFormErrors(errors);
         if (Object.values(errors).some((error) => error !== '')) {
@@ -281,29 +278,15 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
 
                         {/* Recurring */}
                         <div>
-                            <label className="block text-sm font-medium mb-1">Recurring</label>
-                            <div className="flex items-center gap-4">
-                                <label className="flex items-center gap-2 cursor-pointer select-none">
-                                    <input
-                                        className="cursor-pointer"
-                                        type="radio"
-                                        name="isRecurringModal"
-                                        checked={form.isRecurring === true}
-                                        onChange={() => setForm({ ...form, isRecurring: true })}
-                                    />
-                                    <span>Yes</span>
-                                </label>
-                                <label className="flex items-center gap-2 cursor-pointer select-none">
-                                    <input
-                                        className="cursor-pointer"
-                                        type="radio"
-                                        name="isRecurringModal"
-                                        checked={form.isRecurring === false}
-                                        onChange={() => setForm({ ...form, isRecurring: false })}
-                                    />
-                                    <span>No</span>
-                                </label>
-                            </div>
+                            <label className="flex items-center gap-2 cursor-pointer select-none">
+                                <input
+                                    className="cursor-pointer"
+                                    type="checkbox"
+                                    checked={form.isRecurring}
+                                    onChange={() => setForm({ ...form, isRecurring: !form.isRecurring })}
+                                />
+                                <span>Recurring</span>
+                            </label>
                             {formErrors.isRecurring && (
                                 <p className="text-red-500 text-sm mt-1">{formErrors.isRecurring}</p>
                             )}
