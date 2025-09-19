@@ -40,3 +40,7 @@ const verifyJwt = (jwt: string, secret: Secret, options?: VerifyOptions): JwtPay
 export const verifyAccessJwt = (jwt: string, secret: Secret): JwtPayload | null => {
     return verifyJwt(jwt, secret, { audience: 'access' });
 };
+
+export const verifyEmailVerificationJwt = (jwt: string, secret: Secret): JwtPayload | null => {
+    return verifyJwt(jwt, secret, { audience: 'email-verification' });
+};
