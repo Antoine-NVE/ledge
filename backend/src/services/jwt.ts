@@ -1,8 +1,8 @@
-import jwt, { Secret, JwtPayload, SignOptions, VerifyOptions } from 'jsonwebtoken';
+import { sign, verify, Secret, JwtPayload, SignOptions, VerifyOptions } from 'jsonwebtoken';
 
 // Base function, only called in this service
 const createJwt = (payload: object, secret: Secret, options?: SignOptions): string => {
-    return jwt.sign(payload, secret, options);
+    return sign(payload, secret, options);
 };
 
 export const createAccessTokenJwt = (userId: string, secret: Secret): string => {
@@ -10,10 +10,10 @@ export const createAccessTokenJwt = (userId: string, secret: Secret): string => 
 };
 
 // Base function, only called in this service
-const verifyJwt = (token: string, secret: Secret, options?: VerifyOptions): JwtPayload | null => {
+const verifyJwt = (jwt: string, secret: Secret, options?: VerifyOptions): JwtPayload | null => {
     try {
-        // jwt.Jwt can only be returned if we use 'complete: true' option, otherwise it's JwtPayload | string
-        const decoded = jwt.verify(token, secret, options) as JwtPayload | string;
+        // Jwt can only be returned if we use 'complete: true' option, otherwise it's JwtPayload | string
+        const decoded = verify(jwt, secret, options) as JwtPayload | string;
 
         if (typeof decoded !== 'object') {
             console.error('Invalid JWT format');
@@ -33,6 +33,6 @@ const verifyJwt = (token: string, secret: Secret, options?: VerifyOptions): JwtP
     }
 };
 
-export const verifyAccessTokenJwt = (token: string, secret: Secret): JwtPayload | null => {
-    return verifyJwt(token, secret, { audience: 'access' });
+export const verifyAccessTokenJwt = (jwt: string, secret: Secret): JwtPayload | null => {
+    return verifyJwt(jwt, secret, { audience: 'access' });
 };
