@@ -9,6 +9,10 @@ export const createAccessJwt = (userId: string, secret: Secret): string => {
     return createJwt({ sub: userId, aud: 'access' }, secret, { expiresIn: '15m' });
 };
 
+export const createEmailVerificationJwt = (userId: string, secret: Secret): string => {
+    return createJwt({ sub: userId, aud: 'email-verification' }, secret, { expiresIn: '1h' });
+};
+
 // Base function, only called in this service
 const verifyJwt = (jwt: string, secret: Secret, options?: VerifyOptions): JwtPayload | null => {
     try {
