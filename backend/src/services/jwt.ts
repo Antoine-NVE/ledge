@@ -13,7 +13,7 @@ export const createAccessTokenJwt = (userId: string, secret: Secret): string => 
 const verifyJwt = (token: string, secret: Secret, options?: VerifyOptions): JwtPayload | null => {
     try {
         // jwt.Jwt can only be returned if we use 'complete: true' option, otherwise it's JwtPayload | string
-        const decoded = jwt.verify(token, secret, options) as jwt.JwtPayload | string;
+        const decoded = jwt.verify(token, secret, options) as JwtPayload | string;
 
         if (typeof decoded !== 'object') {
             console.error('Invalid JWT format');
