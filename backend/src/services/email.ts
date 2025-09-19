@@ -1,31 +1,43 @@
-import nodemailer from 'nodemailer';
+import { Transporter, SentMessageInfo, createTransport } from 'nodemailer';
 
-export const sendEmail = async (
+export const createTransporter = (
+    host: string,
+    port: number,
+    secure: boolean,
+    auth: { user: string; pass: string },
+): Transporter => {
+    return createTransport({
+        host,
+        port,
+        secure,
+        auth,
+    });
+};
+
+const sendEmail = async (
+    from: string,
     to: string,
     subject: string,
     html: string,
-): Promise<[nodemailer.SentMessageInfo | null, Error | null]> => {
-    const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: Number(process.env.SMTP_PORT),
-        secure: process.env.SMTP_SECURE === 'true',
-        auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-        },
-    });
-
-    const emailOptions = {
-        from: process.env.EMAIL_FROM,
-        to,
-        subject,
-        html,
-    };
-
+    transporter: Transporter,
+): Promise<SentMessageInfo | null> => {
     try {
-        const info = await transporter.sendMail(emailOptions);
-        return [info, null];
+        return await transporter.sendMail({ from, to, subject, html });
     } catch (error) {
-        return [null, error as Error];
+        console.error(error);
+        return null;
     }
+};
+
+export const sendEmailVerificationEmail = async (
+    from: string,
+    to: string,
+    transporter: Transporter,
+    frontendUrl: string,
+    jwt: string,
+): Promise<SentMessageInfo | null> => {
+    const subject = 'Please verify your email address';
+    const html = `Click here to verify your email address: <a href="${frontendUrl}/verify-email/${jwt}">verify email</a>. This link will expire in 1 hour.`;
+
+    return await sendEmail(from, to, subject, html, transporter);
 };
