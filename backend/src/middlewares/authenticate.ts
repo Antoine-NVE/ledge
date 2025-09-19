@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { verifyJwt } from '../utils/jwt';
 import UserModel, { UserDocument } from '../models/User';
 import { clearAccessTokenCookie } from '../services/authCookie';
+import { verifyAccessJwt } from '../services/jwt';
 
 // Extend Express Request interface to include userId
 declare module 'express-serve-static-core' {
@@ -22,9 +22,9 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
         return;
     }
 
-    const decoded = verifyJwt(access_token);
+    const decoded = verifyAccessJwt(access_token, process.env.JWT_SECRET!);
     if (decoded) {
-        const user = await UserModel.findById(decoded._id);
+        const user = await UserModel.findById(decoded.sub);
         if (!user) {
             clearAccessTokenCookie(res);
             res.status(401).json({
