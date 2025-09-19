@@ -5,7 +5,7 @@ const createJwt = (payload: object, secret: Secret, options?: SignOptions): stri
     return sign(payload, secret, options);
 };
 
-export const createAccessTokenJwt = (userId: string, secret: Secret): string => {
+export const createAccessJwt = (userId: string, secret: Secret): string => {
     return createJwt({ sub: userId, aud: 'access' }, secret, { expiresIn: '15m' });
 };
 
@@ -33,6 +33,6 @@ const verifyJwt = (jwt: string, secret: Secret, options?: VerifyOptions): JwtPay
     }
 };
 
-export const verifyAccessTokenJwt = (jwt: string, secret: Secret): JwtPayload | null => {
+export const verifyAccessJwt = (jwt: string, secret: Secret): JwtPayload | null => {
     return verifyJwt(jwt, secret, { audience: 'access' });
 };
