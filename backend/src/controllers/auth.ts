@@ -10,9 +10,9 @@ import {
     setRefreshTokenCookie,
     setRememberMeCookie,
 } from '../services/authCookie';
-import { createJwt } from '../utils/jwt';
 import { generateToken } from '../utils/token';
 import RefreshTokenModel from '../models/RefreshToken';
+import { createAccessJwt } from '../services/jwt';
 
 interface RegisterBody {
     email: string;
@@ -40,7 +40,7 @@ export const register = async (req: Request<object, object, RegisterBody>, res: 
         user = await user.save();
 
         // Automatically connect the user after registration
-        const accessToken = createJwt(user._id.toString());
+        const accessToken = createAccessJwt(user._id.toString(), process.env.JWT_SECRET!);
         setAccessTokenCookie(res, accessToken, rememberMe);
 
         // Generate and save the refresh token
@@ -102,7 +102,7 @@ export const login = async (req: Request<object, object, LoginBody>, res: Respon
         }
 
         // Automatically connect the user after login
-        const accessToken = createJwt(user._id.toString());
+        const accessToken = createAccessJwt(user._id.toString(), process.env.JWT_SECRET!);
         setAccessTokenCookie(res, accessToken, rememberMe);
 
         // Generate and save the refresh token
@@ -170,7 +170,7 @@ export const refresh = async (req: Request, res: Response) => {
             return;
         }
 
-        const accessToken = createJwt(refreshToken.user._id.toString());
+        const accessToken = createAccessJwt(refreshToken.user._id.toString(), process.env.JWT_SECRET!);
         setAccessTokenCookie(res, accessToken, rememberMe);
 
         const user = refreshToken.user;

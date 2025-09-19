@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { createJwt, verifyJwt } from '../utils/jwt';
 import UserModel from '../models/User';
 import { sendEmail } from '../services/email';
+import { createEmailVerificationJwt, verifyEmailVerificationJwt } from '../services/jwt';
 
 export const getUser = async (req: Request, res: Response) => {
     try {
@@ -49,7 +49,7 @@ export const sendVerificationEmail = async (req: Request, res: Response) => {
 
         const frontendUrl = process.env.FRONTEND_URL;
 
-        const jwt = createJwt(user._id.toString(), '15m');
+        const jwt = createEmailVerificationJwt(user._id.toString(), process.env.JWT_SECRET!);
 
         const [info, error] = await sendEmail(
             user.email,
@@ -92,9 +92,9 @@ export const sendVerificationEmail = async (req: Request, res: Response) => {
 export const verifyEmail = async (req: Request<{ token: string }>, res: Response) => {
     const { token } = req.params;
 
-    const decoded = verifyJwt(token);
+    const decoded = verifyEmailVerificationJwt(token, process.env.JWT_SECRET!);
     if (decoded) {
-        const user = await UserModel.findById(decoded._id);
+        const user = await UserModel.findById(decoded.sub);
         if (!user) {
             res.status(404).json({
                 message: 'User not found',
