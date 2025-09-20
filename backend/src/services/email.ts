@@ -14,6 +14,7 @@ export const createTransporter = (
     });
 };
 
+// Base function, only called in this service
 const sendEmail = async (
     from: string,
     to: string,
