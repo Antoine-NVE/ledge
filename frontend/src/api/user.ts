@@ -38,6 +38,7 @@ export const sendVerificationEmail = async (): Promise<[ApiResponse<null, null>,
             headers: {
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify({ frontendBaseUrl: window.location.origin }),
         });
 
         // Can be any status code, including 200, 401, or 500

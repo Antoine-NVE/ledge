@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import UserModel from '../models/User';
-import { sendEmail } from '../services/email';
 import { createEmailVerificationJwt, verifyEmailVerificationJwt } from '../services/jwt';
+import { createTransporter, sendEmailVerificationEmail } from '../services/email';
 
 export const getUser = async (req: Request, res: Response) => {
     try {
@@ -26,6 +26,17 @@ export const getUser = async (req: Request, res: Response) => {
 };
 
 export const sendVerificationEmail = async (req: Request, res: Response) => {
+    const { frontendBaseUrl } = req.body || {};
+    const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
+    if (!frontendBaseUrl || !allowedOrigins.includes(frontendBaseUrl)) {
+        res.status(400).json({
+            message: 'Invalid frontend URL',
+            data: null,
+            errors: null,
+        });
+        return;
+    }
+
     try {
         const user = req.user!;
 
@@ -38,7 +49,7 @@ export const sendVerificationEmail = async (req: Request, res: Response) => {
             return;
         }
 
-        if (user.emailVerificationRequestExpiresAt && user.emailVerificationRequestExpiresAt > new Date()) {
+        if (user.emailVerificationCooldownExpiresAt && user.emailVerificationCooldownExpiresAt > new Date()) {
             res.status(400).json({
                 message: 'Email verification already sent, please wait before requesting again',
                 data: null,
@@ -47,30 +58,31 @@ export const sendVerificationEmail = async (req: Request, res: Response) => {
             return;
         }
 
-        const frontendUrl = process.env.FRONTEND_URL;
-
+        const from = process.env.EMAIL_FROM!;
+        const to = user.email;
+        const transporter = createTransporter(
+            process.env.SMTP_HOST!,
+            Number(process.env.SMTP_PORT),
+            process.env.SMTP_SECURE === 'true',
+            {
+                user: process.env.SMTP_USER!,
+                pass: process.env.SMTP_PASS!,
+            },
+        );
         const jwt = createEmailVerificationJwt(user._id.toString(), process.env.JWT_SECRET!);
 
-        const [info, error] = await sendEmail(
-            user.email,
-            'Please verify your email address',
-            `Click here to verify your email address: <a href="${frontendUrl}/verify-email/${jwt}">verify email</a>. This link will expire in 15 minutes.`,
-        );
+        const info = await sendEmailVerificationEmail(from, to, transporter, frontendBaseUrl, jwt);
 
-        console.log(info);
-
-        if (error) {
-            console.error(error);
-
+        if (!info) {
             res.status(500).json({
                 message: 'Failed to send verification email',
                 data: null,
-                errors: error.message,
+                errors: null,
             });
             return;
         }
 
-        user.emailVerificationRequestExpiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+        user.emailVerificationCooldownExpiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
         await user.save();
 
         res.status(200).json({
