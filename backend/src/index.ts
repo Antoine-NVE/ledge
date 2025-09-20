@@ -14,7 +14,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-const allowedOrigins = process.env.ALLOWED_FRONTEND_URLS?.split(',') || [];
+const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
 
 app.use(
     cors({
