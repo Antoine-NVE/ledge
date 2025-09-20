@@ -26,6 +26,17 @@ export const getUser = async (req: Request, res: Response) => {
 };
 
 export const sendVerificationEmail = async (req: Request, res: Response) => {
+    const { frontendBaseUrl } = req.body || {};
+    const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
+    if (!frontendBaseUrl || !allowedOrigins.includes(frontendBaseUrl)) {
+        res.status(400).json({
+            message: 'Invalid frontend URL',
+            data: null,
+            errors: null,
+        });
+        return;
+    }
+
     try {
         const user = req.user!;
 
@@ -58,10 +69,9 @@ export const sendVerificationEmail = async (req: Request, res: Response) => {
                 pass: process.env.SMTP_PASS!,
             },
         );
-        const frontendUrl = process.env.FRONTEND_URL!;
         const jwt = createEmailVerificationJwt(user._id.toString(), process.env.JWT_SECRET!);
 
-        const info = await sendEmailVerificationEmail(from, to, transporter, frontendUrl, jwt);
+        const info = await sendEmailVerificationEmail(from, to, transporter, frontendBaseUrl, jwt);
 
         if (!info) {
             res.status(500).json({
