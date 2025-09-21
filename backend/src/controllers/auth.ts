@@ -9,7 +9,7 @@ import {
     setAccessTokenCookie,
     setRefreshTokenCookie,
     setRememberMeCookie,
-} from '../services/authCookie';
+} from '../services/cookie';
 import { generateToken } from '../utils/token';
 import RefreshTokenModel from '../models/RefreshToken';
 import { createAccessJwt } from '../services/jwt';

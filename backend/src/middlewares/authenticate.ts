@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import UserModel, { UserDocument } from '../models/User';
-import { clearAccessTokenCookie } from '../services/authCookie';
+import { clearAccessTokenCookie } from '../services/cookie';
 import { verifyAccessJwt } from '../services/jwt';
 
 // Extend Express Request interface to include userId
