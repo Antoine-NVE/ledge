@@ -1,4 +1,4 @@
-import { CookieOptions, Response } from 'express';
+import { CookieOptions, Request, Response } from 'express';
 
 // Base function, only called in this service
 const setCookie = (res: Response, name: string, value: string, options: CookieOptions): void => {
@@ -36,6 +36,24 @@ export const setRememberMeCookie = (res: Response, rememberMe: boolean): void =>
         secure: true,
         sameSite: 'strict',
     });
+};
+
+// Base function, only called in this service
+const getCookie = (req: Request, name: string): string | undefined => {
+    return req.cookies[name];
+}
+
+export const getAccessTokenCookie = (req: Request): string | undefined => {
+    return getCookie(req, 'access_token');
+}
+
+export const getRefreshTokenCookie = (req: Request): string | undefined => {
+    return getCookie(req, 'refresh_token');
+}
+
+export const getRememberMeCookie = (req: Request): boolean => {
+    const value = getCookie(req, 'remember_me');
+    return value === 'true';
 };
 
 // Base function, only called in this service
