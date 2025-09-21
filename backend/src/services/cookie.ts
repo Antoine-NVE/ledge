@@ -1,60 +1,58 @@
-import { Response } from 'express';
+import { CookieOptions, Response } from 'express';
 
-interface CookieOptions {
-    httpOnly: boolean;
-    secure: boolean;
-    sameSite: 'strict' | 'lax' | 'none';
-}
-
-const cookieBaseOptions: CookieOptions = {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'strict',
-};
-
-const rememberMeCookieOptions: CookieOptions = {
-    httpOnly: false,
-    secure: true,
-    sameSite: 'strict',
+// Base function, only called in this service
+const setCookie = (res: Response, name: string, value: string, options: CookieOptions) => {
+    res.cookie(name, value, options);
 };
 
 export const setAccessTokenCookie = (res: Response, token: string, rememberMe: boolean) => {
-    res.cookie('access_token', token, {
-        ...cookieBaseOptions,
-        ...(rememberMe ? { maxAge: 3600000 } : {}), // 1 hour
-    });
-};
+    const maxAge = rememberMe ? 15 * 60 * 1000 : undefined; // 15 minutes
 
-export const clearAccessTokenCookie = (res: Response) => {
-    res.clearCookie('access_token', {
-        ...cookieBaseOptions,
+    setCookie(res, 'access_token', token, {
+        maxAge,
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
     });
 };
 
 export const setRefreshTokenCookie = (res: Response, token: string, rememberMe: boolean) => {
-    res.cookie('refresh_token', token, {
-        ...cookieBaseOptions,
-        ...(rememberMe ? { maxAge: 604800000 } : {}), // 7 days
-    });
-};
+    const maxAge = rememberMe ? 7 * 24 * 60 * 60 * 1000 : undefined; // 7 days
 
-export const clearRefreshTokenCookie = (res: Response) => {
-    res.clearCookie('refresh_token', {
-        ...cookieBaseOptions,
+    setCookie(res, 'refresh_token', token, {
+        maxAge,
+        httpOnly: true,
+        secure: true,
+        sameSite: 'strict',
     });
 };
 
 export const setRememberMeCookie = (res: Response, rememberMe: boolean) => {
-    res.cookie('remember_me', rememberMe, {
-        ...rememberMeCookieOptions,
-        ...(rememberMe ? { maxAge: 604800000 } : {}), // 7 days
+    const maxAge = rememberMe ? 7 * 24 * 60 * 60 * 1000 : undefined; // 7 days
+
+    setCookie(res, 'remember_me', rememberMe.toString(), {
+        maxAge,
+        httpOnly: false,
+        secure: true,
+        sameSite: 'strict',
     });
 };
 
+// Base function, only called in this service
+const clearCookie = (res: Response, name: string) => {
+    res.clearCookie(name);
+};
+
+export const clearAccessTokenCookie = (res: Response) => {
+    clearCookie(res, 'access_token');
+};
+
+export const clearRefreshTokenCookie = (res: Response) => {
+    clearCookie(res, 'refresh_token');
+};
+
 export const clearRememberMeCookie = (res: Response) => {
-    res.clearCookie('remember_me', {
-        ...rememberMeCookieOptions,
-    });
+    clearCookie(res, 'remember_me');
 };
 
 export const clearAllAuthCookies = (res: Response) => {
