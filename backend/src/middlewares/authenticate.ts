@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import UserModel, { UserDocument } from '../models/User';
-import { clearAccessTokenCookie } from '../services/authCookie';
+import { clearAccessTokenCookie, getAccessTokenCookie } from '../services/cookie';
 import { verifyAccessJwt } from '../services/jwt';
 
 // Extend Express Request interface to include userId
@@ -11,7 +11,7 @@ declare module 'express-serve-static-core' {
 }
 
 const authenticate = async (req: Request, res: Response, next: NextFunction) => {
-    const access_token = req.cookies.access_token;
+    const access_token = getAccessTokenCookie(req);
 
     if (!access_token) {
         res.status(401).json({

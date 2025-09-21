@@ -6,10 +6,12 @@ import { removePassword } from '../utils/sanitize';
 import { formatMongooseValidationErrors } from '../utils/error';
 import {
     clearAllAuthCookies,
+    getRefreshTokenCookie,
+    getRememberMeCookie,
     setAccessTokenCookie,
     setRefreshTokenCookie,
     setRememberMeCookie,
-} from '../services/authCookie';
+} from '../services/cookie';
 import { generateToken } from '../utils/token';
 import RefreshTokenModel from '../models/RefreshToken';
 import { createAccessJwt } from '../services/jwt';
@@ -133,7 +135,7 @@ export const login = async (req: Request<object, object, LoginBody>, res: Respon
 };
 
 export const refresh = async (req: Request, res: Response) => {
-    const token = req.cookies.refresh_token;
+    const token = getRefreshTokenCookie(req);
     if (!token) {
         res.status(401).json({
             message: 'Refresh token is required',
@@ -143,7 +145,7 @@ export const refresh = async (req: Request, res: Response) => {
         return;
     }
 
-    const rememberMe = req.cookies.remember_me === 'true';
+    const rememberMe = getRememberMeCookie(req);
 
     try {
         let refreshToken = await RefreshTokenModel.findOne({ token }).populate('user');
@@ -199,7 +201,7 @@ export const refresh = async (req: Request, res: Response) => {
 };
 
 export const logout = async (req: Request, res: Response) => {
-    const token = req.cookies.refresh_token;
+    const token = getRefreshTokenCookie(req);
 
     try {
         if (token) {
