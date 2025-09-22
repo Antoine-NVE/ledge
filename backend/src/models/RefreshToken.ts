@@ -15,20 +15,20 @@ const RefreshTokenSchema = new Schema<RefreshTokenDocument>(
     {
         token: {
             type: String,
-            required: [true, 'Token is required.'],
+            required: [true, 'Token is required'],
             unique: true,
             trim: true,
         },
         expiresAt: {
             type: Date,
             default: () => new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-            required: [true, 'Expiration date is required.'], // To avoid null values
+            required: [true, 'Expiration date is required'], // To avoid null values
             index: { expires: 0 },
         },
         user: {
             type: Schema.Types.ObjectId,
             ref: 'User',
-            required: [true, 'User is required.'],
+            required: [true, 'User is required'],
         },
     },
     {
