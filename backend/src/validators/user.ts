@@ -14,6 +14,10 @@ export async function isEmailUnique(this: UserDocument, email: string): Promise<
     return existingUser._id.equals(this._id);
 }
 
+export const isPasswordTrimmed = (password: string): boolean => {
+    return password.trim() === password;
+};
+
 export const isPasswordValid = (password: string): boolean => {
     const isValidLength = password.length >= 8;
     const hasUpperCase = /[A-Z]/.test(password);

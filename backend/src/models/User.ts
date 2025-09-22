@@ -1,7 +1,7 @@
 import { HydratedDocument, Model, model, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 
-import { isEmailValid, isEmailUnique, isPasswordValid } from '../validators/user';
+import { isEmailValid, isEmailUnique, isPasswordValid, isPasswordTrimmed } from '../validators/user';
 
 export interface User {
     email: string;
@@ -42,7 +42,7 @@ const UserSchema = new Schema<UserDocument>(
                 {
                     // We use a validator instead of 'trim: true' to provide a custom error message
                     // Avoid unwanted behavior where leading/trailing spaces are removed without notifying the user
-                    validator: (password: string) => password.trim() === password,
+                    validator: isPasswordTrimmed,
                     message: 'Password cannot start or end with whitespace',
                 },
                 {
