@@ -48,7 +48,7 @@ const UserSchema = new Schema<UserDocument>(
                 {
                     validator: isPasswordValid,
                     message:
-                        'Password must be between 8 and 100 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+                        'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character',
                 },
             ],
         },

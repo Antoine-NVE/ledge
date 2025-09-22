@@ -15,7 +15,7 @@ export async function isEmailUnique(this: UserDocument, email: string): Promise<
 }
 
 export const isPasswordValid = (password: string): boolean => {
-    const isValidLength = password.length >= 8 && password.length <= 100;
+    const isValidLength = password.length >= 8;
     const hasUpperCase = /[A-Z]/.test(password);
     const hasLowerCase = /[a-z]/.test(password);
     const hasNumber = /\d/.test(password);
