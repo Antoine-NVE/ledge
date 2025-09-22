@@ -54,8 +54,7 @@ const UserSchema = new Schema<UserDocument>(
         },
         isEmailVerified: {
             type: Boolean,
-            default: false,
-            // No need to set 'required' as any incorrect value will be casted as a boolean
+            required: [true, 'You must specify if the email is verified or not'],
         },
         emailVerificationCooldownExpiresAt: {
             type: Date,
