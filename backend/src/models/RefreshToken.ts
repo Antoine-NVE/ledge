@@ -15,8 +15,8 @@ const RefreshTokenSchema = new Schema<RefreshTokenDocument>(
     {
         token: {
             type: String,
-            required: [true, 'Token is required'],
             trim: true,
+            required: [true, 'Token is required'],
         },
         expiresAt: {
             type: Date,
