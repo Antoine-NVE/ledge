@@ -1,20 +1,12 @@
 import { Request, Response } from 'express';
-import { Error as MongooseError } from 'mongoose';
 import bcrypt from 'bcrypt';
 import UserModel from '../models/User';
 import { removePassword } from '../utils/sanitize';
-import { formatMongooseValidationErrors } from '../utils/error';
-import {
-    clearAllAuthCookies,
-    getRefreshTokenCookie,
-    getRememberMeCookie,
-    setAccessTokenCookie,
-    setRefreshTokenCookie,
-    setRememberMeCookie,
-} from '../services/cookie';
+import AuthCookieService from '../services/AuthCookieService';
 import { generateToken } from '../utils/token';
 import RefreshTokenModel from '../models/RefreshToken';
 import { createAccessJwt } from '../services/jwt';
+import AuthService from '../services/AuthService';
 
 interface RegisterBody {
     email: string;
@@ -34,50 +26,19 @@ export const register = async (req: Request<object, object, RegisterBody>, res: 
     // Next time the user logs in, they can choose to be remembered
     const rememberMe = false;
 
-    try {
-        let user = new UserModel({
-            email,
-            password,
-            isEmailVerified: false,
-        });
-        user = await user.save();
+    const authService = new AuthService();
+    const { user, accessToken, refreshToken } = await authService.register(email, password);
 
-        // Automatically connect the user after registration
-        const accessToken = createAccessJwt(user._id.toString(), process.env.JWT_SECRET!);
-        setAccessTokenCookie(res, accessToken, rememberMe);
+    const authCookieService = new AuthCookieService(req, res);
+    authCookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
 
-        // Generate and save the refresh token
-        const refreshToken = await new RefreshTokenModel({
-            token: generateToken(),
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    res.status(201).json({
+        message: 'User registered successfully',
+        data: {
             user,
-        }).save();
-        setRefreshTokenCookie(res, refreshToken.token, rememberMe);
-
-        setRememberMeCookie(res, rememberMe);
-
-        res.status(201).json({
-            message: 'User registered successfully',
-            data: {
-                user: removePassword(user),
-            },
-            errors: null,
-        });
-    } catch (error: unknown) {
-        if (error instanceof MongooseError.ValidationError) {
-            res.status(400).json({
-                message: 'Validation error',
-                data: null,
-                errors: formatMongooseValidationErrors(error),
-            });
-        } else {
-            res.status(500).json({
-                message: 'Internal server error',
-                data: null,
-                errors: null,
-            });
-        }
-    }
+        },
+        errors: null,
+    });
 };
 
 export const login = async (req: Request<object, object, LoginBody>, res: Response) => {
@@ -107,7 +68,8 @@ export const login = async (req: Request<object, object, LoginBody>, res: Respon
 
         // Automatically connect the user after login
         const accessToken = createAccessJwt(user._id.toString(), process.env.JWT_SECRET!);
-        setAccessTokenCookie(res, accessToken, rememberMe);
+        const authCookieService = new AuthCookieService(req, res);
+        authCookieService.setAccessTokenCookie(accessToken, rememberMe);
 
         // Generate and save the refresh token
         const refreshToken = await new RefreshTokenModel({
@@ -115,9 +77,9 @@ export const login = async (req: Request<object, object, LoginBody>, res: Respon
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
             user,
         }).save();
-        setRefreshTokenCookie(res, refreshToken.token, rememberMe);
+        authCookieService.setRefreshTokenCookie(refreshToken.token, rememberMe);
 
-        setRememberMeCookie(res, rememberMe);
+        authCookieService.setRememberMeCookie(rememberMe);
 
         res.status(200).json({
             message: 'User logged in successfully',
@@ -138,7 +100,8 @@ export const login = async (req: Request<object, object, LoginBody>, res: Respon
 };
 
 export const refresh = async (req: Request, res: Response) => {
-    const token = getRefreshTokenCookie(req);
+    const authCookieService = new AuthCookieService(req, res);
+    const token = authCookieService.getRefreshTokenCookie();
     if (!token) {
         res.status(401).json({
             message: 'Refresh token is required',
@@ -148,12 +111,15 @@ export const refresh = async (req: Request, res: Response) => {
         return;
     }
 
-    const rememberMe = getRememberMeCookie(req);
+    let rememberMe = authCookieService.getRememberMeCookie();
+    if (rememberMe === undefined) {
+        rememberMe = false;
+    }
 
     try {
         let refreshToken = await RefreshTokenModel.findOne({ token }).populate('user');
         if (!refreshToken || !refreshToken.user) {
-            clearAllAuthCookies(res);
+            authCookieService.clearAllAuthCookies();
 
             res.status(401).json({
                 message: 'Invalid refresh token',
@@ -165,7 +131,7 @@ export const refresh = async (req: Request, res: Response) => {
 
         // Check if the refresh token is expired
         if (refreshToken.expiresAt < new Date()) {
-            clearAllAuthCookies(res);
+            authCookieService.clearAllAuthCookies();
 
             res.status(401).json({
                 message: 'Refresh token has expired',
@@ -176,7 +142,7 @@ export const refresh = async (req: Request, res: Response) => {
         }
 
         const accessToken = createAccessJwt(refreshToken.user._id.toString(), process.env.JWT_SECRET!);
-        setAccessTokenCookie(res, accessToken, rememberMe);
+        authCookieService.setAccessTokenCookie(accessToken, rememberMe);
 
         const user = refreshToken.user;
         await RefreshTokenModel.deleteOne({ token });
@@ -185,9 +151,9 @@ export const refresh = async (req: Request, res: Response) => {
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             user,
         }).save();
-        setRefreshTokenCookie(res, refreshToken.token, rememberMe);
+        authCookieService.setRefreshTokenCookie(refreshToken.token, rememberMe);
 
-        setRememberMeCookie(res, rememberMe);
+        authCookieService.setRememberMeCookie(rememberMe);
 
         res.status(200).json({
             message: 'Tokens refreshed successfully',
@@ -208,14 +174,15 @@ export const refresh = async (req: Request, res: Response) => {
 };
 
 export const logout = async (req: Request, res: Response) => {
-    const token = getRefreshTokenCookie(req);
+    const authCookieService = new AuthCookieService(req, res);
+    const token = authCookieService.getRefreshTokenCookie();
 
     try {
         if (token) {
             await RefreshTokenModel.deleteOne({ token });
         }
 
-        clearAllAuthCookies(res);
+        authCookieService.clearAllAuthCookies();
 
         res.status(200).json({
             message: 'User logged out successfully',

@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import UserModel, { UserDocument } from '../models/User';
-import { clearAccessTokenCookie, getAccessTokenCookie } from '../services/cookie';
+import AuthCookieService from '../services/AuthCookieService';
 import { verifyAccessJwt } from '../services/jwt';
 
 // Extend Express Request interface to include userId
@@ -11,7 +11,8 @@ declare module 'express-serve-static-core' {
 }
 
 const authenticate = async (req: Request, res: Response, next: NextFunction) => {
-    const access_token = getAccessTokenCookie(req);
+    const authCookieService = new AuthCookieService(req, res);
+    const access_token = authCookieService.getAccessTokenCookie();
 
     if (!access_token) {
         res.status(401).json({
@@ -26,7 +27,7 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
     if (decoded) {
         const user = await UserModel.findById(decoded.sub);
         if (!user) {
-            clearAccessTokenCookie(res);
+            authCookieService.clearAccessTokenCookie();
             res.status(401).json({
                 message: 'Unauthorized',
                 data: null,
@@ -40,7 +41,7 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
         return;
     }
 
-    clearAccessTokenCookie(res);
+    authCookieService.clearAccessTokenCookie();
     res.status(401).json({
         message: 'Unauthorized',
         data: null,
