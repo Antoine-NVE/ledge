@@ -43,6 +43,12 @@ export default class AuthCookieService {
         });
     }
 
+    setAllAuthCookies(accessToken: string, refreshToken: string, rememberMe: boolean): void {
+        this.setAccessTokenCookie(accessToken, rememberMe);
+        this.setRefreshTokenCookie(refreshToken, rememberMe);
+        this.setRememberMeCookie(rememberMe);
+    }
+
     private getCookie(name: string): string | undefined {
         return this.req.cookies[name];
     }
