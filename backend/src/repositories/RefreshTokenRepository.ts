@@ -1,0 +1,20 @@
+import { Model, Types } from 'mongoose';
+import { RefreshToken, RefreshTokenDocument } from '../models/RefreshToken';
+
+export default class RefreshTokenRepository {
+    constructor(private refreshTokenModel: Model<RefreshTokenDocument>) {}
+
+    async create(data: Partial<RefreshToken>): Promise<RefreshTokenDocument> {
+        // We do not use refreshTokenModel.create to ensure that pre-save hooks are executed
+        const refreshToken = new this.refreshTokenModel(data);
+        return await refreshToken.save();
+    }
+
+    async findByToken(token: string): Promise<RefreshTokenDocument | null> {
+        return await this.refreshTokenModel.findOne({ token });
+    }
+
+    async delete(id: Types.ObjectId): Promise<RefreshTokenDocument | null> {
+        return await this.refreshTokenModel.findByIdAndDelete(id);
+    }
+}
