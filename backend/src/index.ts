@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
@@ -36,6 +36,11 @@ app.use(
 app.use('/auth', authRoutes);
 app.use('/transactions', transactionRoutes);
 app.use('/users', userRoutes);
+
+app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+    console.error(err);
+    res.status(500).json({ message: 'Internal Server Error' });
+});
 
 const port = 3000;
 app.listen(port, () => {
