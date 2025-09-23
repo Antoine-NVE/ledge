@@ -1,7 +1,7 @@
 import { HydratedDocument, Model, model, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 
-import { isEmailValid, isEmailUnique, isPasswordValid } from '../validators/user';
+import { isEmailValid, isEmailUnique, isPasswordValid, isPasswordTrimmed } from '../validators/user';
 
 export interface User {
     email: string;
@@ -22,7 +22,6 @@ const UserSchema = new Schema<UserDocument>(
             trim: true,
             lowercase: true,
             required: [true, 'Email is required'],
-            unique: true,
             validate: [
                 {
                     validator: isEmailValid,
@@ -33,29 +32,29 @@ const UserSchema = new Schema<UserDocument>(
                     message: 'Email already exists',
                 },
             ],
+            unique: true,
         },
         password: {
             type: String,
-            select: false, // Do not include password in queries by default
             required: [true, 'Password is required'],
             validate: [
                 {
                     // We use a validator instead of 'trim: true' to provide a custom error message
                     // Avoid unwanted behavior where leading/trailing spaces are removed without notifying the user
-                    validator: (password: string) => password.trim() === password,
+                    validator: isPasswordTrimmed,
                     message: 'Password cannot start or end with whitespace',
                 },
                 {
                     validator: isPasswordValid,
                     message:
-                        'Password must be between 8 and 100 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character.',
+                        'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character',
                 },
             ],
+            select: false, // Do not include password in queries by default
         },
         isEmailVerified: {
             type: Boolean,
-            default: false,
-            // No need to set 'required' as any incorrect value will be casted as a boolean
+            required: [true, 'You must specify if the email is verified or not'],
         },
         emailVerificationCooldownExpiresAt: {
             type: Date,
