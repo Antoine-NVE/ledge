@@ -55,9 +55,9 @@ export default class AuthCookieService {
         return this.getCookie('refresh_token');
     }
 
-    getRememberMeCookie(): boolean {
+    getRememberMeCookie(): boolean | undefined {
         const value = this.getCookie('remember_me');
-        return value === 'true';
+        return value === 'true' ? true : value === 'false' ? false : undefined;
     }
 
     private clearCookie(name: string): void {
