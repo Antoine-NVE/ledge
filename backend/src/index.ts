@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth';
 import transactionRoutes from './routes/transaction';
 import userRoutes from './routes/user';
+import { formatMongooseValidationErrors } from './utils/error';
 
 dotenv.config();
 
@@ -37,7 +38,16 @@ app.use('/auth', authRoutes);
 app.use('/transactions', transactionRoutes);
 app.use('/users', userRoutes);
 
-app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
+app.use((err: unknown, req: Request, res: Response, next: NextFunction): void => {
+    if (err instanceof mongoose.Error.ValidationError) {
+        res.status(400).json({
+            message: 'Validation Error',
+            data: null,
+            errors: formatMongooseValidationErrors(err),
+        });
+        return;
+    }
+
     console.error(err);
     res.status(500).json({ message: 'Internal Server Error' });
 });
