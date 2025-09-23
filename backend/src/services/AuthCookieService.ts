@@ -1,80 +1,84 @@
 import { CookieOptions, Request, Response } from 'express';
 
-// Base function, only called in this service
-const setCookie = (res: Response, name: string, value: string, options: CookieOptions): void => {
-    res.cookie(name, value, options);
-};
+export default class AuthCookieService {
+    constructor(
+        private req: Request,
+        private res: Response,
+    ) {}
 
-export const setAccessTokenCookie = (res: Response, token: string, rememberMe: boolean): void => {
-    const maxAge = rememberMe ? 15 * 60 * 1000 : undefined; // 15 minutes
+    private setCookie(name: string, value: string, options: CookieOptions): void {
+        this.res.cookie(name, value, options);
+    }
 
-    setCookie(res, 'access_token', token, {
-        maxAge,
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-    });
-};
+    setAccessTokenCookie(token: string, rememberMe: boolean): void {
+        const maxAge = rememberMe ? 15 * 60 * 1000 : undefined; // 15 minutes
 
-export const setRefreshTokenCookie = (res: Response, token: string, rememberMe: boolean): void => {
-    const maxAge = rememberMe ? 7 * 24 * 60 * 60 * 1000 : undefined; // 7 days
+        this.setCookie('access_token', token, {
+            maxAge,
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+        });
+    }
 
-    setCookie(res, 'refresh_token', token, {
-        maxAge,
-        httpOnly: true,
-        secure: true,
-        sameSite: 'strict',
-    });
-};
+    setRefreshTokenCookie(token: string, rememberMe: boolean): void {
+        const maxAge = rememberMe ? 7 * 24 * 60 * 60 * 1000 : undefined; // 7 days
 
-export const setRememberMeCookie = (res: Response, rememberMe: boolean): void => {
-    const maxAge = rememberMe ? 7 * 24 * 60 * 60 * 1000 : undefined; // 7 days
+        this.setCookie('refresh_token', token, {
+            maxAge,
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+        });
+    }
 
-    setCookie(res, 'remember_me', rememberMe.toString(), {
-        maxAge,
-        httpOnly: false,
-        secure: true,
-        sameSite: 'strict',
-    });
-};
+    setRememberMeCookie(rememberMe: boolean): void {
+        const maxAge = rememberMe ? 7 * 24 * 60 * 60 * 1000 : undefined; // 7 days
 
-// Base function, only called in this service
-const getCookie = (req: Request, name: string): string | undefined => {
-    return req.cookies[name];
+        this.setCookie('remember_me', rememberMe.toString(), {
+            maxAge,
+            httpOnly: false,
+            secure: true,
+            sameSite: 'strict',
+        });
+    }
+
+    private getCookie(name: string): string | undefined {
+        return this.req.cookies[name];
+    }
+
+    getAccessTokenCookie(): string | undefined {
+        return this.getCookie('access_token');
+    }
+
+    getRefreshTokenCookie(): string | undefined {
+        return this.getCookie('refresh_token');
+    }
+
+    getRememberMeCookie(): boolean {
+        const value = this.getCookie('remember_me');
+        return value === 'true';
+    }
+
+    private clearCookie(name: string): void {
+        this.res.clearCookie(name);
+    }
+
+    clearAccessTokenCookie(): void {
+        this.clearCookie('access_token');
+    }
+
+    clearRefreshTokenCookie(): void {
+        this.clearCookie('refresh_token');
+    }
+
+    clearRememberMeCookie(): void {
+        this.clearCookie('remember_me');
+    }
+
+    clearAllAuthCookies(): void {
+        this.clearAccessTokenCookie();
+        this.clearRefreshTokenCookie();
+        this.clearRememberMeCookie();
+    }
 }
-
-export const getAccessTokenCookie = (req: Request): string | undefined => {
-    return getCookie(req, 'access_token');
-}
-
-export const getRefreshTokenCookie = (req: Request): string | undefined => {
-    return getCookie(req, 'refresh_token');
-}
-
-export const getRememberMeCookie = (req: Request): boolean => {
-    const value = getCookie(req, 'remember_me');
-    return value === 'true';
-};
-
-// Base function, only called in this service
-const clearCookie = (res: Response, name: string): void => {
-    res.clearCookie(name);
-};
-
-export const clearAccessTokenCookie = (res: Response): void => {
-    clearCookie(res, 'access_token');
-};
-
-export const clearRefreshTokenCookie = (res: Response): void => {
-    clearCookie(res, 'refresh_token');
-};
-
-export const clearRememberMeCookie = (res: Response): void => {
-    clearCookie(res, 'remember_me');
-};
-
-export const clearAllAuthCookies = (res: Response): void => {
-    clearAccessTokenCookie(res);
-    clearRefreshTokenCookie(res);
-    clearRememberMeCookie(res);
-};
