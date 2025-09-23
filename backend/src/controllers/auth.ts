@@ -38,6 +38,7 @@ export const register = async (req: Request<object, object, RegisterBody>, res: 
         let user = new UserModel({
             email,
             password,
+            isEmailVerified: false,
         });
         user = await user.save();
 
@@ -48,6 +49,7 @@ export const register = async (req: Request<object, object, RegisterBody>, res: 
         // Generate and save the refresh token
         const refreshToken = await new RefreshTokenModel({
             token: generateToken(),
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
             user,
         }).save();
         setRefreshTokenCookie(res, refreshToken.token, rememberMe);
@@ -110,6 +112,7 @@ export const login = async (req: Request<object, object, LoginBody>, res: Respon
         // Generate and save the refresh token
         const refreshToken = await new RefreshTokenModel({
             token: generateToken(),
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
             user,
         }).save();
         setRefreshTokenCookie(res, refreshToken.token, rememberMe);
@@ -177,7 +180,11 @@ export const refresh = async (req: Request, res: Response) => {
 
         const user = refreshToken.user;
         await RefreshTokenModel.deleteOne({ token });
-        refreshToken = await new RefreshTokenModel({ token: generateToken(), user }).save();
+        refreshToken = await new RefreshTokenModel({
+            token: generateToken(),
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+            user,
+        }).save();
         setRefreshTokenCookie(res, refreshToken.token, rememberMe);
 
         setRememberMeCookie(res, rememberMe);
