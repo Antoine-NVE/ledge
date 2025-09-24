@@ -50,7 +50,6 @@ const UserSchema = new Schema<UserDocument>(
                         'Password must be at least 8 characters long, contain at least one uppercase letter, one lowercase letter, one number, and one special character',
                 },
             ],
-            select: false, // Do not include password in queries by default
         },
         isEmailVerified: {
             type: Boolean,
