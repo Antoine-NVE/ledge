@@ -5,7 +5,7 @@ import { removePassword } from '../utils/sanitize';
 import AuthCookieService from '../services/AuthCookieService';
 import { generateToken } from '../utils/token';
 import RefreshTokenModel from '../models/RefreshToken';
-import { createAccessJwt } from '../services/JwtService';
+import JwtService from '../services/JwtService';
 import AuthService from '../services/AuthService';
 import UserRepository from '../repositories/UserRepository';
 
@@ -27,7 +27,7 @@ export const register = async (req: Request<object, object, RegisterBody>, res: 
     // Next time the user logs in, they can choose to be remembered
     const rememberMe = false;
 
-    const authService = new AuthService(new UserRepository(UserModel));
+    const authService = new AuthService(new UserRepository(UserModel), new JwtService(process.env.JWT_SECRET!));
     const { user, accessToken, refreshToken } = await authService.register(email, password);
 
     const authCookieService = new AuthCookieService(req, res);
@@ -45,7 +45,7 @@ export const register = async (req: Request<object, object, RegisterBody>, res: 
 export const login = async (req: Request<object, object, LoginBody>, res: Response) => {
     const { email, password, rememberMe } = req.body;
 
-    const authService = new AuthService(new UserRepository(UserModel));
+    const authService = new AuthService(new UserRepository(UserModel), new JwtService(process.env.JWT_SECRET!));
     const { user, accessToken, refreshToken } = await authService.login(email, password);
 
     const authCookieService = new AuthCookieService(req, res);
@@ -102,7 +102,8 @@ export const refresh = async (req: Request, res: Response) => {
             return;
         }
 
-        const accessToken = createAccessJwt(refreshToken.user._id.toString(), process.env.JWT_SECRET!);
+        const jwtService = new JwtService(process.env.JWT_SECRET!);
+        const accessToken = jwtService.signAccessJwt(refreshToken.user._id.toString());
         authCookieService.setAccessTokenCookie(accessToken, rememberMe);
 
         const user = refreshToken.user;

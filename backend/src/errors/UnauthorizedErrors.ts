@@ -11,3 +11,10 @@ export class InvalidCredentialsError extends UnauthorizedError {
         this.name = 'InvalidCredentialsError';
     }
 }
+
+export class InvalidJwtError extends UnauthorizedError {
+    constructor(message: string = 'Invalid JWT') {
+        super(message);
+        this.name = 'InvalidJwtError';
+    }
+}

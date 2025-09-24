@@ -4,11 +4,14 @@ import UserModel, { UserDocument } from '../models/User';
 import RefreshTokenRepository from '../repositories/RefreshTokenRepository';
 import UserRepository from '../repositories/UserRepository';
 import { generateToken } from '../utils/token';
-import { createAccessJwt } from './JwtService';
 import bcrypt from 'bcrypt';
+import JwtService from './JwtService';
 
 export default class AuthService {
-    constructor(private userRepository: UserRepository) {}
+    constructor(
+        private userRepository: UserRepository,
+        private jwtService: JwtService,
+    ) {}
 
     async register(
         email: string,
@@ -27,7 +30,7 @@ export default class AuthService {
             isEmailVerified,
         });
 
-        const accessToken = createAccessJwt(user._id.toString(), process.env.JWT_SECRET!);
+        const accessToken = this.jwtService.signAccessJwt(user._id.toString());
 
         const refreshTokenModel = new RefreshTokenRepository(RefreshTokenModel);
         const refreshToken = await refreshTokenModel.create({
@@ -53,7 +56,7 @@ export default class AuthService {
         const doesMatch = await bcrypt.compare(password, user.password);
         if (!doesMatch) throw new InvalidCredentialsError();
 
-        const accessToken = createAccessJwt(user._id.toString(), process.env.JWT_SECRET!);
+        const accessToken = this.jwtService.signAccessJwt(user._id.toString());
 
         const refreshTokenModel = new RefreshTokenRepository(RefreshTokenModel);
         const refreshToken = await refreshTokenModel.create({

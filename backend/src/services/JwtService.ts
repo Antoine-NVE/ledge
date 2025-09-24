@@ -1,46 +1,38 @@
 import { sign, verify, Secret, JwtPayload, SignOptions, VerifyOptions } from 'jsonwebtoken';
+import { InvalidJwtError } from '../errors/UnauthorizedErrors';
 
-// Base function, only called in this service
-const createJwt = (payload: object, secret: Secret, options?: SignOptions): string => {
-    return sign(payload, secret, options);
-};
+export default class JwtService {
+    constructor(private secret: Secret) {}
 
-export const createAccessJwt = (userId: string, secret: Secret): string => {
-    return createJwt({ sub: userId, aud: 'access' }, secret, { expiresIn: '15m' });
-};
+    private signJwt(payload: object, options?: SignOptions): string {
+        return sign(payload, this.secret, options);
+    }
 
-export const createEmailVerificationJwt = (userId: string, secret: Secret): string => {
-    return createJwt({ sub: userId, aud: 'email-verification' }, secret, { expiresIn: '1h' });
-};
+    signAccessJwt(userId: string): string {
+        return this.signJwt({ sub: userId, aud: 'access' }, { expiresIn: '15m' });
+    }
 
-// Base function, only called in this service
-const verifyJwt = (jwt: string, secret: Secret, options?: VerifyOptions): JwtPayload | null => {
-    try {
+    signEmailVerificationJwt(userId: string): string {
+        return this.signJwt({ sub: userId, aud: 'email-verification' }, { expiresIn: '1h' });
+    }
+
+    private verifyJwt(jwt: string, options?: VerifyOptions): JwtPayload {
         // Jwt can only be returned if we use 'complete: true' option, otherwise it's JwtPayload | string
-        const decoded = verify(jwt, secret, options) as JwtPayload | string;
+        const decoded = verify(jwt, this.secret, options) as JwtPayload | string;
 
-        if (typeof decoded !== 'object') {
-            console.error('Invalid JWT format');
-            return null;
-        }
-
-        if (!decoded.sub) {
-            console.error('JWT does not contain a subject (sub)');
-            return null;
+        // If the token is valid but does not contain a 'sub' claim, we consider it invalid
+        if (typeof decoded !== 'object' || !decoded.sub) {
+            throw new InvalidJwtError();
         }
 
         return decoded;
-    } catch (error) {
-        // Catch expired token, invalid signature or audience errors
-        console.error('JWT verification error:', error);
-        return null;
     }
-};
 
-export const verifyAccessJwt = (jwt: string, secret: Secret): JwtPayload | null => {
-    return verifyJwt(jwt, secret, { audience: 'access' });
-};
+    verifyAccessJwt(jwt: string): JwtPayload | null {
+        return this.verifyJwt(jwt, { audience: 'access' });
+    }
 
-export const verifyEmailVerificationJwt = (jwt: string, secret: Secret): JwtPayload | null => {
-    return verifyJwt(jwt, secret, { audience: 'email-verification' });
-};
+    verifyEmailVerificationJwt(jwt: string): JwtPayload | null {
+        return this.verifyJwt(jwt, { audience: 'email-verification' });
+    }
+}
