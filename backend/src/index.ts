@@ -8,6 +8,7 @@ import authRoutes from './routes/auth';
 import transactionRoutes from './routes/transaction';
 import userRoutes from './routes/user';
 import { formatMongooseValidationErrors } from './utils/error';
+import { UnauthorizedError } from './errors/UnauthorizedErrors';
 
 dotenv.config();
 
@@ -44,6 +45,15 @@ app.use((err: unknown, req: Request, res: Response, next: NextFunction): void =>
             message: 'Validation Error',
             data: null,
             errors: formatMongooseValidationErrors(err),
+        });
+        return;
+    }
+
+    if (err instanceof UnauthorizedError) {
+        res.status(401).json({
+            message: err.message,
+            data: null,
+            errors: null,
         });
         return;
     }
