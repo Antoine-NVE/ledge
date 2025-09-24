@@ -5,7 +5,7 @@ import { removePassword } from '../utils/sanitize';
 import AuthCookieService from '../services/AuthCookieService';
 import { generateToken } from '../utils/token';
 import RefreshTokenModel from '../models/RefreshToken';
-import { createAccessJwt } from '../services/jwt';
+import { createAccessJwt } from '../services/JwtService';
 import AuthService from '../services/AuthService';
 import UserRepository from '../repositories/UserRepository';
 

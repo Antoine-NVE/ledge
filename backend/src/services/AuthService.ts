@@ -4,7 +4,7 @@ import UserModel, { UserDocument } from '../models/User';
 import RefreshTokenRepository from '../repositories/RefreshTokenRepository';
 import UserRepository from '../repositories/UserRepository';
 import { generateToken } from '../utils/token';
-import { createAccessJwt } from './jwt';
+import { createAccessJwt } from './JwtService';
 import bcrypt from 'bcrypt';
 
 export default class AuthService {
