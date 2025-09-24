@@ -7,6 +7,7 @@ import { generateToken } from '../utils/token';
 import RefreshTokenModel from '../models/RefreshToken';
 import { createAccessJwt } from '../services/jwt';
 import AuthService from '../services/AuthService';
+import UserRepository from '../repositories/UserRepository';
 
 interface RegisterBody {
     email: string;
@@ -26,7 +27,7 @@ export const register = async (req: Request<object, object, RegisterBody>, res: 
     // Next time the user logs in, they can choose to be remembered
     const rememberMe = false;
 
-    const authService = new AuthService();
+    const authService = new AuthService(new UserRepository(UserModel));
     const { user, accessToken, refreshToken } = await authService.register(email, password);
 
     const authCookieService = new AuthCookieService(req, res);
@@ -44,7 +45,7 @@ export const register = async (req: Request<object, object, RegisterBody>, res: 
 export const login = async (req: Request<object, object, LoginBody>, res: Response) => {
     const { email, password, rememberMe } = req.body;
 
-    const authService = new AuthService();
+    const authService = new AuthService(new UserRepository(UserModel));
     const { user, accessToken, refreshToken } = await authService.login(email, password);
 
     const authCookieService = new AuthCookieService(req, res);

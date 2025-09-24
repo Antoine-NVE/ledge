@@ -8,6 +8,8 @@ import { createAccessJwt } from './jwt';
 import bcrypt from 'bcrypt';
 
 export default class AuthService {
+    constructor(private userRepository: UserRepository) {}
+
     async register(
         email: string,
         password: string,
@@ -19,8 +21,7 @@ export default class AuthService {
         // By default, new users are not email verified
         const isEmailVerified = false;
 
-        const userRepository = new UserRepository(UserModel);
-        const user = await userRepository.create({
+        const user = await this.userRepository.create({
             email,
             password,
             isEmailVerified,
@@ -46,9 +47,7 @@ export default class AuthService {
         accessToken: string;
         refreshToken: RefreshTokenDocument;
     }> {
-        const userRepository = new UserRepository(UserModel);
-
-        const user = await userRepository.findByEmail(email);
+        const user = await this.userRepository.findByEmail(email);
         if (!user) throw new InvalidCredentialsError();
 
         const doesMatch = await bcrypt.compare(password, user.password);
