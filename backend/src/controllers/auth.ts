@@ -44,59 +44,19 @@ export const register = async (req: Request<object, object, RegisterBody>, res: 
 export const login = async (req: Request<object, object, LoginBody>, res: Response) => {
     const { email, password, rememberMe } = req.body;
 
-    try {
-        const user = await UserModel.findOne({ email }).select('+password');
+    const authService = new AuthService();
+    const { user, accessToken, refreshToken } = await authService.login(email, password);
 
-        if (!user) {
-            res.status(401).json({
-                message: 'Invalid email or password',
-                data: null,
-                errors: null,
-            });
-            return;
-        }
+    const authCookieService = new AuthCookieService(req, res);
+    authCookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
 
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            res.status(401).json({
-                message: 'Invalid email or password',
-                data: null,
-                errors: null,
-            });
-            return;
-        }
-
-        // Automatically connect the user after login
-        const accessToken = createAccessJwt(user._id.toString(), process.env.JWT_SECRET!);
-        const authCookieService = new AuthCookieService(req, res);
-        authCookieService.setAccessTokenCookie(accessToken, rememberMe);
-
-        // Generate and save the refresh token
-        const refreshToken = await new RefreshTokenModel({
-            token: generateToken(),
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+    res.status(200).json({
+        message: 'User logged in successfully',
+        data: {
             user,
-        }).save();
-        authCookieService.setRefreshTokenCookie(refreshToken.token, rememberMe);
-
-        authCookieService.setRememberMeCookie(rememberMe);
-
-        res.status(200).json({
-            message: 'User logged in successfully',
-            data: {
-                user: removePassword(user),
-            },
-            errors: null,
-        });
-    } catch (error) {
-        console.error(error);
-
-        res.status(500).json({
-            message: 'Internal server error',
-            data: null,
-            errors: null,
-        });
-    }
+        },
+        errors: null,
+    });
 };
 
 export const refresh = async (req: Request, res: Response) => {
