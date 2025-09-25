@@ -6,11 +6,13 @@ import UserRepository from '../repositories/UserRepository';
 import { generateToken } from '../utils/token';
 import bcrypt from 'bcrypt';
 import JwtService from './JwtService';
+import RefreshTokenService from './RefreshTokenService';
 
 export default class AuthService {
     constructor(
         private userRepository: UserRepository,
         private jwtService: JwtService,
+        private refreshTokenService: RefreshTokenService,
     ) {}
 
     async register(
@@ -32,12 +34,7 @@ export default class AuthService {
 
         const accessToken = this.jwtService.signAccessJwt(user._id.toString());
 
-        const refreshTokenModel = new RefreshTokenRepository(RefreshTokenModel);
-        const refreshToken = await refreshTokenModel.create({
-            token: generateToken(),
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-            user: user._id,
-        });
+        const refreshToken = await this.refreshTokenService.createRefreshToken(user._id);
 
         return { user, accessToken, refreshToken };
     }
@@ -58,12 +55,7 @@ export default class AuthService {
 
         const accessToken = this.jwtService.signAccessJwt(user._id.toString());
 
-        const refreshTokenModel = new RefreshTokenRepository(RefreshTokenModel);
-        const refreshToken = await refreshTokenModel.create({
-            token: generateToken(),
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-            user: user._id,
-        });
+        const refreshToken = await this.refreshTokenService.createRefreshToken(user._id);
 
         return { user, accessToken, refreshToken };
     }
