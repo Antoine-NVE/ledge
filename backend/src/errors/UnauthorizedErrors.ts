@@ -18,3 +18,24 @@ export class InvalidJwtError extends UnauthorizedError {
         this.name = 'InvalidJwtError';
     }
 }
+
+export class RequiredRefreshTokenError extends UnauthorizedError {
+    constructor(message: string = 'Refresh token is required') {
+        super(message);
+        this.name = 'RequiredRefreshTokenError';
+    }
+}
+
+export class InvalidRefreshTokenError extends UnauthorizedError {
+    constructor(message: string = 'Invalid refresh token') {
+        super(message);
+        this.name = 'InvalidRefreshTokenError';
+    }
+}
+
+export class ExpiredRefreshTokenError extends UnauthorizedError {
+    constructor(message: string = 'Refresh token has expired') {
+        super(message);
+        this.name = 'ExpiredRefreshTokenError';
+    }
+}
