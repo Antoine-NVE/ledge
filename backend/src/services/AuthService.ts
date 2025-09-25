@@ -32,8 +32,7 @@ export default class AuthService {
             isEmailVerified,
         });
 
-        const accessToken = this.jwtService.signAccessJwt(user._id.toString());
-
+        const accessToken = this.jwtService.signAccessJwt(user._id);
         const refreshToken = await this.refreshTokenService.createRefreshToken(user._id);
 
         return { user, accessToken, refreshToken };
@@ -53,8 +52,7 @@ export default class AuthService {
         const doesMatch = await bcrypt.compare(password, user.password);
         if (!doesMatch) throw new InvalidCredentialsError();
 
-        const accessToken = this.jwtService.signAccessJwt(user._id.toString());
-
+        const accessToken = this.jwtService.signAccessJwt(user._id);
         const refreshToken = await this.refreshTokenService.createRefreshToken(user._id);
 
         return { user, accessToken, refreshToken };
