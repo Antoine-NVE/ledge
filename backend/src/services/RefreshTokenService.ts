@@ -19,7 +19,7 @@ export default class RefreshTokenService {
 
     async findByTokenAndPopulate(token: string): Promise<RefreshTokenPopulatedDocument> {
         const refreshTokenPopulated = await this.refreshTokenRepository.findByTokenAndPopulate(token);
-        if (!refreshTokenPopulated || !refreshTokenPopulated.user) throw new InvalidRefreshTokenError(); // 404 instead ? Also check user existence but should not happen
+        if (!refreshTokenPopulated || !refreshTokenPopulated.user) throw new InvalidRefreshTokenError(); // Also check user existence but should not happen
         if (refreshTokenPopulated.expiresAt < new Date()) throw new ExpiredRefreshTokenError();
         return refreshTokenPopulated;
     }
