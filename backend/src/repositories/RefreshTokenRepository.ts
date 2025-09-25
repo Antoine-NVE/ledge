@@ -12,6 +12,10 @@ export default class RefreshTokenRepository {
         return await this.refreshTokenModel.findOne({ token });
     }
 
+    async findByTokenWithUser(token: string): Promise<RefreshTokenDocument | null> {
+        return await this.refreshTokenModel.findOne({ token }).populate('user');
+    }
+
     async delete(id: Types.ObjectId): Promise<RefreshTokenDocument | null> {
         return await this.refreshTokenModel.findByIdAndDelete(id);
     }
