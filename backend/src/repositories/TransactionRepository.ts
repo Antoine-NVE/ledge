@@ -5,9 +5,7 @@ export default class TransactionRepository {
     constructor(private transactionModel: Model<TransactionDocument>) {}
 
     async create(data: Partial<Transaction>): Promise<TransactionDocument> {
-        // We do not use transactionModel.create to ensure that pre-save hooks are executed
-        const transaction = new this.transactionModel(data);
-        return await transaction.save();
+        return await this.transactionModel.create(data);
     }
 
     async findById(id: Types.ObjectId): Promise<TransactionDocument | null> {

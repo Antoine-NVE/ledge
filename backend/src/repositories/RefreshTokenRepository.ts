@@ -5,9 +5,7 @@ export default class RefreshTokenRepository {
     constructor(private refreshTokenModel: Model<RefreshTokenDocument>) {}
 
     async create(data: Partial<RefreshToken>): Promise<RefreshTokenDocument> {
-        // We do not use refreshTokenModel.create to ensure that pre-save hooks are executed
-        const refreshToken = new this.refreshTokenModel(data);
-        return await refreshToken.save();
+        return await this.refreshTokenModel.create(data);
     }
 
     async findByToken(token: string): Promise<RefreshTokenDocument | null> {

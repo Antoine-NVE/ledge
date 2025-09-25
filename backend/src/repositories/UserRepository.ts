@@ -5,9 +5,7 @@ export default class UserRepository {
     constructor(private userModel: Model<UserDocument>) {}
 
     async create(data: Partial<User>): Promise<UserDocument> {
-        // We do not use userModel.create to ensure that pre-save hooks are executed
-        const user = new this.userModel(data);
-        return await user.save();
+        return await this.userModel.create(data);
     }
 
     async findById(id: Types.ObjectId): Promise<UserDocument | null> {
