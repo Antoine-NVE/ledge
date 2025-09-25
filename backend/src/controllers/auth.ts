@@ -113,7 +113,7 @@ export const refresh = async (req: Request, res: Response) => {
         }
 
         const jwtService = new JwtService(process.env.JWT_SECRET!);
-        const accessToken = jwtService.signAccessJwt(refreshToken.user._id.toString());
+        const accessToken = jwtService.signAccessJwt(refreshToken.user._id);
         authCookieService.setAccessTokenCookie(accessToken, rememberMe);
 
         const user = refreshToken.user;
