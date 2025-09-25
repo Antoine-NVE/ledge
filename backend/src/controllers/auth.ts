@@ -10,6 +10,7 @@ import AuthService from '../services/AuthService';
 import UserRepository from '../repositories/UserRepository';
 import RefreshTokenService from '../services/RefreshTokenService';
 import RefreshTokenRepository from '../repositories/RefreshTokenRepository';
+import { exit } from 'process';
 
 interface RegisterBody {
     email: string;
@@ -73,76 +74,26 @@ export const login = async (req: Request<object, object, LoginBody>, res: Respon
 export const refresh = async (req: Request, res: Response) => {
     const authCookieService = new AuthCookieService(req, res);
     const token = authCookieService.getRefreshTokenCookie();
-    if (!token) {
-        res.status(401).json({
-            message: 'Refresh token is required',
-            data: null,
-            errors: null,
-        });
-        return;
-    }
 
     let rememberMe = authCookieService.getRememberMeCookie();
-    if (rememberMe === undefined) {
-        rememberMe = false;
-    }
+    if (rememberMe === undefined) rememberMe = false; // Default to false if not provided
 
-    try {
-        let refreshToken = await RefreshTokenModel.findOne({ token }).populate('user');
-        if (!refreshToken || !refreshToken.user) {
-            authCookieService.clearAllAuthCookies();
+    const authService = new AuthService(
+        new UserRepository(UserModel),
+        new JwtService(process.env.JWT_SECRET!),
+        new RefreshTokenService(new RefreshTokenRepository(RefreshTokenModel)),
+    );
+    const { accessToken, refreshTokenPopulated } = await authService.refresh(token);
 
-            res.status(401).json({
-                message: 'Invalid refresh token',
-                data: null,
-                errors: null,
-            });
-            return;
-        }
+    authCookieService.setAllAuthCookies(accessToken, refreshTokenPopulated.token, rememberMe);
 
-        // Check if the refresh token is expired
-        if (refreshToken.expiresAt < new Date()) {
-            authCookieService.clearAllAuthCookies();
-
-            res.status(401).json({
-                message: 'Refresh token has expired',
-                data: null,
-                errors: null,
-            });
-            return;
-        }
-
-        const jwtService = new JwtService(process.env.JWT_SECRET!);
-        const accessToken = jwtService.signAccessJwt(refreshToken.user._id);
-        authCookieService.setAccessTokenCookie(accessToken, rememberMe);
-
-        const user = refreshToken.user;
-        await RefreshTokenModel.deleteOne({ token });
-        refreshToken = await new RefreshTokenModel({
-            token: generateToken(),
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-            user,
-        }).save();
-        authCookieService.setRefreshTokenCookie(refreshToken.token, rememberMe);
-
-        authCookieService.setRememberMeCookie(rememberMe);
-
-        res.status(200).json({
-            message: 'Tokens refreshed successfully',
-            data: {
-                user: refreshToken.user,
-            },
-            errors: null,
-        });
-    } catch (error) {
-        console.error(error);
-
-        res.status(500).json({
-            message: 'Internal server error',
-            data: null,
-            errors: null,
-        });
-    }
+    res.status(200).json({
+        message: 'Token refreshed successfully',
+        data: {
+            user: refreshTokenPopulated.user,
+        },
+        errors: null,
+    });
 };
 
 export const logout = async (req: Request, res: Response) => {

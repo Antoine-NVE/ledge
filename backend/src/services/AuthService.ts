@@ -1,5 +1,10 @@
-import { InvalidCredentialsError } from '../errors/UnauthorizedErrors';
-import RefreshTokenModel, { RefreshTokenDocument } from '../models/RefreshToken';
+import {
+    ExpiredRefreshTokenError,
+    InvalidCredentialsError,
+    InvalidRefreshTokenError,
+    RequiredRefreshTokenError,
+} from '../errors/UnauthorizedErrors';
+import RefreshTokenModel, { RefreshTokenDocument, RefreshTokenPopulatedDocument } from '../models/RefreshToken';
 import UserModel, { UserDocument } from '../models/User';
 import RefreshTokenRepository from '../repositories/RefreshTokenRepository';
 import UserRepository from '../repositories/UserRepository';
@@ -33,7 +38,7 @@ export default class AuthService {
         });
 
         const accessToken = this.jwtService.signAccessJwt(user._id);
-        const refreshToken = await this.refreshTokenService.createRefreshToken(user._id);
+        const refreshToken = await this.refreshTokenService.create(user._id);
 
         return { user, accessToken, refreshToken };
     }
@@ -53,8 +58,22 @@ export default class AuthService {
         if (!doesMatch) throw new InvalidCredentialsError();
 
         const accessToken = this.jwtService.signAccessJwt(user._id);
-        const refreshToken = await this.refreshTokenService.createRefreshToken(user._id);
+        const refreshToken = await this.refreshTokenService.create(user._id);
 
         return { user, accessToken, refreshToken };
+    }
+
+    async refresh(
+        token: string | undefined,
+    ): Promise<{ accessToken: string; refreshTokenPopulated: RefreshTokenPopulatedDocument }> {
+        if (!token) throw new RequiredRefreshTokenError();
+
+        const refreshTokenPopulated = await this.refreshTokenService.findByTokenAndPopulate(token);
+        const accessToken = this.jwtService.signAccessJwt(refreshTokenPopulated.user._id);
+
+        // Extend the refresh token expiration each time it is used
+        const newRefreshTokenPopulated = await this.refreshTokenService.extendExpiration(refreshTokenPopulated);
+
+        return { accessToken, refreshTokenPopulated: newRefreshTokenPopulated };
     }
 }
