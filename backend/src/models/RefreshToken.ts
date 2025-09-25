@@ -1,4 +1,5 @@
 import { HydratedDocument, model, Schema, Types } from 'mongoose';
+import { UserDocument } from './User';
 
 export interface RefreshToken {
     token: string;
@@ -9,6 +10,10 @@ export interface RefreshToken {
 export type RefreshTokenDocument = HydratedDocument<RefreshToken> & {
     createdAt: Date;
     updatedAt: Date;
+};
+
+export type RefreshTokenPopulatedDocument = Omit<RefreshTokenDocument, 'user'> & {
+    user: UserDocument;
 };
 
 const RefreshTokenSchema = new Schema<RefreshTokenDocument>(
