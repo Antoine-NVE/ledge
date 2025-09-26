@@ -3,7 +3,7 @@ import {
     InvalidCredentialsError,
     InvalidRefreshTokenError,
     RequiredRefreshTokenError,
-} from '../errors/UnauthorizedErrors';
+} from '../errors/UnauthorizedError';
 import RefreshTokenModel, { RefreshTokenDocument, RefreshTokenPopulatedDocument } from '../models/RefreshToken';
 import UserModel, { UserDocument } from '../models/User';
 import RefreshTokenRepository from '../repositories/RefreshTokenRepository';

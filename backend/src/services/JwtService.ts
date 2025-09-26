@@ -1,5 +1,5 @@
 import { sign, verify, Secret, JwtPayload, SignOptions, VerifyOptions } from 'jsonwebtoken';
-import { InvalidJwtError } from '../errors/UnauthorizedErrors';
+import { InvalidJwtError } from '../errors/UnauthorizedError';
 import { Types } from 'mongoose';
 
 export default class JwtService {

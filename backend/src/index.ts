@@ -8,7 +8,7 @@ import authRoutes from './routes/auth';
 import transactionRoutes from './routes/transaction';
 import userRoutes from './routes/user';
 import { formatMongooseValidationErrors } from './utils/error';
-import { UnauthorizedError } from './errors/UnauthorizedErrors';
+import { UnauthorizedError } from './errors/UnauthorizedError';
 
 dotenv.config();
 
