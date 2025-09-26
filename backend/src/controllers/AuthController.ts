@@ -23,95 +23,79 @@ interface LoginBody {
     rememberMe: boolean;
 }
 
-export const register = async (req: Request<object, object, RegisterBody>, res: Response) => {
-    const { email, password } = req.body;
+export class AuthController {
+    constructor(private authService: AuthService) {}
 
-    // The user can't choose to be remembered at registration
-    // Next time the user logs in, they can choose to be remembered
-    const rememberMe = false;
+    async register(req: Request<object, object, RegisterBody>, res: Response) {
+        const { email, password } = req.body;
 
-    const authService = new AuthService(
-        new UserRepository(UserModel),
-        new JwtService(process.env.JWT_SECRET!),
-        new RefreshTokenService(new RefreshTokenRepository(RefreshTokenModel)),
-    );
-    const { user, accessToken, refreshToken } = await authService.register(email, password);
+        // The user can't choose to be remembered at registration
+        // Next time the user logs in, they can choose to be remembered
+        const rememberMe = false;
 
-    const authCookieService = new AuthCookieService(req, res);
-    authCookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
+        const { user, accessToken, refreshToken } = await this.authService.register(email, password);
 
-    res.status(201).json({
-        message: 'User registered successfully',
-        data: {
-            user,
-        },
-        errors: null,
-    });
-};
+        const authCookieService = new AuthCookieService(req, res);
+        authCookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
 
-export const login = async (req: Request<object, object, LoginBody>, res: Response) => {
-    const { email, password, rememberMe } = req.body;
+        res.status(201).json({
+            message: 'User registered successfully',
+            data: {
+                user,
+            },
+            errors: null,
+        });
+    }
 
-    const authService = new AuthService(
-        new UserRepository(UserModel),
-        new JwtService(process.env.JWT_SECRET!),
-        new RefreshTokenService(new RefreshTokenRepository(RefreshTokenModel)),
-    );
-    const { user, accessToken, refreshToken } = await authService.login(email, password);
+    async login(req: Request<object, object, LoginBody>, res: Response) {
+        const { email, password, rememberMe } = req.body;
 
-    const authCookieService = new AuthCookieService(req, res);
-    authCookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
+        const { user, accessToken, refreshToken } = await this.authService.login(email, password);
 
-    res.status(200).json({
-        message: 'User logged in successfully',
-        data: {
-            user,
-        },
-        errors: null,
-    });
-};
+        const authCookieService = new AuthCookieService(req, res);
+        authCookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
 
-export const refresh = async (req: Request, res: Response) => {
-    const authCookieService = new AuthCookieService(req, res);
-    const token = authCookieService.getRefreshTokenCookie();
+        res.status(200).json({
+            message: 'User logged in successfully',
+            data: {
+                user,
+            },
+            errors: null,
+        });
+    }
 
-    let rememberMe = authCookieService.getRememberMeCookie();
-    if (rememberMe === undefined) rememberMe = false; // Default to false if not provided
+    async refresh(req: Request, res: Response) {
+        const authCookieService = new AuthCookieService(req, res);
+        const token = authCookieService.getRefreshTokenCookie();
 
-    const authService = new AuthService(
-        new UserRepository(UserModel),
-        new JwtService(process.env.JWT_SECRET!),
-        new RefreshTokenService(new RefreshTokenRepository(RefreshTokenModel)),
-    );
-    const { accessToken, refreshTokenPopulated } = await authService.refresh(token);
+        let rememberMe = authCookieService.getRememberMeCookie();
+        if (rememberMe === undefined) rememberMe = false; // Default to false if not provided
 
-    authCookieService.setAllAuthCookies(accessToken, refreshTokenPopulated.token, rememberMe);
+        const { accessToken, refreshTokenPopulated } = await this.authService.refresh(token);
 
-    res.status(200).json({
-        message: 'Token refreshed successfully',
-        data: {
-            user: refreshTokenPopulated.user,
-        },
-        errors: null,
-    });
-};
+        authCookieService.setAllAuthCookies(accessToken, refreshTokenPopulated.token, rememberMe);
 
-export const logout = async (req: Request, res: Response) => {
-    const authCookieService = new AuthCookieService(req, res);
-    const token = authCookieService.getRefreshTokenCookie();
+        res.status(200).json({
+            message: 'Token refreshed successfully',
+            data: {
+                user: refreshTokenPopulated.user,
+            },
+            errors: null,
+        });
+    }
 
-    const authService = new AuthService(
-        new UserRepository(UserModel),
-        new JwtService(process.env.JWT_SECRET!),
-        new RefreshTokenService(new RefreshTokenRepository(RefreshTokenModel)),
-    );
-    authService.logout(token);
+    async logout(req: Request, res: Response) {
+        const authCookieService = new AuthCookieService(req, res);
+        const token = authCookieService.getRefreshTokenCookie();
 
-    authCookieService.clearAllAuthCookies();
+        await this.authService.logout(token);
 
-    res.status(200).json({
-        message: 'User logged out successfully',
-        data: null,
-        errors: null,
-    });
-};
+        authCookieService.clearAllAuthCookies();
+
+        res.status(200).json({
+            message: 'User logged out successfully',
+            data: null,
+            errors: null,
+        });
+    }
+}
