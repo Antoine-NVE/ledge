@@ -76,4 +76,10 @@ export default class AuthService {
 
         return { accessToken, refreshTokenPopulated: newRefreshTokenPopulated };
     }
+
+    async logout(token: string | undefined): Promise<void> {
+        if (token) {
+            await this.refreshTokenService.deleteByToken(token);
+        }
+    }
 }

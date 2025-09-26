@@ -1,4 +1,4 @@
-import { Model, Types } from 'mongoose';
+import { DeleteResult, Model, Types } from 'mongoose';
 import { RefreshToken, RefreshTokenDocument, RefreshTokenPopulatedDocument } from '../models/RefreshToken';
 import { UserDocument } from '../models/User';
 
@@ -23,7 +23,7 @@ export default class RefreshTokenRepository {
         return (await refreshTokenPopulated.save()) as unknown as RefreshTokenPopulatedDocument;
     }
 
-    async delete(id: Types.ObjectId): Promise<RefreshTokenDocument | null> {
-        return await this.refreshTokenModel.findByIdAndDelete(id);
+    async deleteByToken(token: string): Promise<DeleteResult> {
+        return await this.refreshTokenModel.deleteOne({ token });
     }
 }

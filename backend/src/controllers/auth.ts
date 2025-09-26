@@ -100,25 +100,18 @@ export const logout = async (req: Request, res: Response) => {
     const authCookieService = new AuthCookieService(req, res);
     const token = authCookieService.getRefreshTokenCookie();
 
-    try {
-        if (token) {
-            await RefreshTokenModel.deleteOne({ token });
-        }
+    const authService = new AuthService(
+        new UserRepository(UserModel),
+        new JwtService(process.env.JWT_SECRET!),
+        new RefreshTokenService(new RefreshTokenRepository(RefreshTokenModel)),
+    );
+    authService.logout(token);
 
-        authCookieService.clearAllAuthCookies();
+    authCookieService.clearAllAuthCookies();
 
-        res.status(200).json({
-            message: 'User logged out successfully',
-            data: null,
-            errors: null,
-        });
-    } catch (error) {
-        console.error(error);
-
-        res.status(500).json({
-            message: 'Internal server error',
-            data: null,
-            errors: null,
-        });
-    }
+    res.status(200).json({
+        message: 'User logged out successfully',
+        data: null,
+        errors: null,
+    });
 };

@@ -1,4 +1,4 @@
-import { Types } from 'mongoose';
+import { DeleteResult, Types } from 'mongoose';
 import { RefreshToken, RefreshTokenDocument, RefreshTokenPopulatedDocument } from '../models/RefreshToken';
 import RefreshTokenRepository from '../repositories/RefreshTokenRepository';
 import { generateToken } from '../utils/token';
@@ -30,5 +30,9 @@ export default class RefreshTokenService {
         return await this.refreshTokenRepository.updateFromPopulatedDocument(refreshTokenPopulated, {
             expiresAt: new Date(Date.now() + this.REFRESH_TOKEN_EXPIRATION),
         });
+    }
+
+    async deleteByToken(token: string): Promise<DeleteResult> {
+        return await this.refreshTokenRepository.deleteByToken(token);
     }
 }
