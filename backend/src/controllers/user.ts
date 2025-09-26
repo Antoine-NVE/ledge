@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import UserModel from '../models/User';
 import { createEmailVerificationJwt, verifyEmailVerificationJwt } from '../services/JwtService';
-import { createTransporter, sendEmailVerificationEmail } from '../services/email';
+import { createTransporter, sendEmailVerificationEmail } from '../services/EmailService';
 
 export const getUser = async (req: Request, res: Response) => {
     try {
