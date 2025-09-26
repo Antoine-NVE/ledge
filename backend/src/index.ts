@@ -9,6 +9,7 @@ import transactionRoutes from './routes/transaction';
 import userRoutes from './routes/user';
 import { formatMongooseValidationErrors } from './utils/error';
 import { UnauthorizedError } from './errors/UnauthorizedError';
+import { HttpError } from './errors/HttpError';
 
 dotenv.config();
 
@@ -49,8 +50,8 @@ app.use((err: unknown, req: Request, res: Response, next: NextFunction): void =>
         return;
     }
 
-    if (err instanceof UnauthorizedError) {
-        res.status(401).json({
+    if (err instanceof HttpError) {
+        res.status(err.statusCode).json({
             message: err.message,
             data: null,
             errors: null,
