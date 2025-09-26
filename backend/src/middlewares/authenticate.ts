@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import UserModel, { UserDocument } from '../models/User';
-import AuthCookieService from '../services/AuthCookieService';
-import JwtService from '../services/JwtService';
+import { AuthCookieService } from '../services/AuthCookieService';
+import { JwtService } from '../services/JwtService';
 
 // Extend Express Request interface to include userId
 declare module 'express-serve-static-core' {

@@ -2,7 +2,7 @@ import { sign, verify, Secret, JwtPayload, SignOptions, VerifyOptions } from 'js
 import { InvalidJwtError } from '../errors/UnauthorizedError';
 import { Types } from 'mongoose';
 
-export default class JwtService {
+export class JwtService {
     constructor(private secret: Secret) {}
 
     private signJwt(payload: object, options?: SignOptions): string {

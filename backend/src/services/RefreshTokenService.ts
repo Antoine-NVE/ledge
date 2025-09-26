@@ -1,10 +1,10 @@
 import { DeleteResult, Types } from 'mongoose';
 import { RefreshToken, RefreshTokenDocument, RefreshTokenPopulatedDocument } from '../models/RefreshToken';
-import RefreshTokenRepository from '../repositories/RefreshTokenRepository';
+import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { generateToken } from '../utils/token';
 import { ExpiredRefreshTokenError, InvalidRefreshTokenError } from '../errors/UnauthorizedError';
 
-export default class RefreshTokenService {
+export class RefreshTokenService {
     private readonly REFRESH_TOKEN_EXPIRATION = 7 * 24 * 60 * 60 * 1000; // 7 days
 
     constructor(private refreshTokenRepository: RefreshTokenRepository) {}

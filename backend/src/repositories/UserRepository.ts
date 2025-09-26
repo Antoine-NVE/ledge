@@ -1,7 +1,7 @@
 import { Model, Types } from 'mongoose';
 import { User, UserDocument } from '../models/User';
 
-export default class UserRepository {
+export class UserRepository {
     constructor(private userModel: Model<UserDocument>) {}
 
     async create(data: Partial<User>): Promise<UserDocument> {

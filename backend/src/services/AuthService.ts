@@ -6,14 +6,14 @@ import {
 } from '../errors/UnauthorizedError';
 import RefreshTokenModel, { RefreshTokenDocument, RefreshTokenPopulatedDocument } from '../models/RefreshToken';
 import UserModel, { UserDocument } from '../models/User';
-import RefreshTokenRepository from '../repositories/RefreshTokenRepository';
-import UserRepository from '../repositories/UserRepository';
+import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
+import { UserRepository } from '../repositories/UserRepository';
 import { generateToken } from '../utils/token';
 import bcrypt from 'bcrypt';
-import JwtService from './JwtService';
-import RefreshTokenService from './RefreshTokenService';
+import { JwtService } from './JwtService';
+import { RefreshTokenService } from './RefreshTokenService';
 
-export default class AuthService {
+export class AuthService {
     constructor(
         private userRepository: UserRepository,
         private jwtService: JwtService,

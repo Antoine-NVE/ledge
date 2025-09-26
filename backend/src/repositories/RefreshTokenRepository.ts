@@ -2,7 +2,7 @@ import { DeleteResult, Model, Types } from 'mongoose';
 import { RefreshToken, RefreshTokenDocument, RefreshTokenPopulatedDocument } from '../models/RefreshToken';
 import { UserDocument } from '../models/User';
 
-export default class RefreshTokenRepository {
+export class RefreshTokenRepository {
     constructor(private refreshTokenModel: Model<RefreshTokenDocument>) {}
 
     async create(data: Partial<RefreshToken>): Promise<RefreshTokenDocument> {

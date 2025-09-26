@@ -1,7 +1,7 @@
 import { Model, Types } from 'mongoose';
 import { Transaction, TransactionDocument } from '../models/Transaction';
 
-export default class TransactionRepository {
+export class TransactionRepository {
     constructor(private transactionModel: Model<TransactionDocument>) {}
 
     async create(data: Partial<Transaction>): Promise<TransactionDocument> {

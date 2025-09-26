@@ -2,14 +2,14 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import UserModel from '../models/User';
 import { removePassword } from '../utils/sanitize';
-import AuthCookieService from '../services/AuthCookieService';
+import { AuthCookieService } from '../services/AuthCookieService';
 import { generateToken } from '../utils/token';
 import RefreshTokenModel from '../models/RefreshToken';
-import JwtService from '../services/JwtService';
-import AuthService from '../services/AuthService';
-import UserRepository from '../repositories/UserRepository';
-import RefreshTokenService from '../services/RefreshTokenService';
-import RefreshTokenRepository from '../repositories/RefreshTokenRepository';
+import { JwtService } from '../services/JwtService';
+import { AuthService } from '../services/AuthService';
+import { UserRepository } from '../repositories/UserRepository';
+import { RefreshTokenService } from '../services/RefreshTokenService';
+import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { exit } from 'process';
 
 interface RegisterBody {

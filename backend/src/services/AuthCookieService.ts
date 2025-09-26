@@ -1,6 +1,6 @@
 import { CookieOptions, Request, Response } from 'express';
 
-export default class AuthCookieService {
+export class AuthCookieService {
     constructor(
         private req: Request<object, object, object, object>,
         private res: Response,
