@@ -40,7 +40,7 @@ app.use('/auth', authRoutes);
 app.use('/transactions', transactionRoutes);
 app.use('/users', userRoutes);
 
-app.use((err: unknown, req: Request, res: Response, next: NextFunction): void => {
+app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
     if (err instanceof mongoose.Error.ValidationError) {
         res.status(400).json({
             message: 'Validation Error',
@@ -60,7 +60,11 @@ app.use((err: unknown, req: Request, res: Response, next: NextFunction): void =>
     }
 
     console.error(err);
-    res.status(500).json({ message: 'Internal Server Error' });
+    if (process.env.NODE_ENV === 'development') {
+        res.status(500).json({ message: err.message, data: null, errors: null });
+        return;
+    }
+    res.status(500).json({ message: 'Internal server error', data: null, errors: null });
 });
 
 const port = 3000;
