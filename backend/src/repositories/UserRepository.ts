@@ -8,7 +8,7 @@ export class UserRepository {
         return await this.userModel.create(data);
     }
 
-    async findById(id: Types.ObjectId): Promise<UserDocument | null> {
+    async findById(id: string): Promise<UserDocument | null> {
         return await this.userModel.findById(id);
     }
 

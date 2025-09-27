@@ -2,6 +2,8 @@ import { sign, verify, Secret, JwtPayload, SignOptions, VerifyOptions } from 'js
 import { InvalidJwtError } from '../errors/UnauthorizedError';
 import { Types } from 'mongoose';
 
+type VerifiedJwtPayload = Omit<JwtPayload, 'sub'> & { sub: string };
+
 export class JwtService {
     constructor(private secret: Secret) {}
 
@@ -17,7 +19,7 @@ export class JwtService {
         return this.signJwt({ sub: userId, aud: 'email-verification' }, { expiresIn: '1h' });
     }
 
-    private verifyJwt(jwt: string, options?: VerifyOptions): JwtPayload {
+    private verifyJwt(jwt: string, options?: VerifyOptions): VerifiedJwtPayload {
         // Jwt can only be returned if we use 'complete: true' option, otherwise it's JwtPayload | string
         const decoded = verify(jwt, this.secret, options) as JwtPayload | string;
 
@@ -26,14 +28,14 @@ export class JwtService {
             throw new InvalidJwtError();
         }
 
-        return decoded;
+        return decoded as VerifiedJwtPayload;
     }
 
-    verifyAccessJwt(jwt: string): JwtPayload | null {
+    verifyAccessJwt(jwt: string): VerifiedJwtPayload {
         return this.verifyJwt(jwt, { audience: 'access' });
     }
 
-    verifyEmailVerificationJwt(jwt: string): JwtPayload | null {
+    verifyEmailVerificationJwt(jwt: string): VerifiedJwtPayload {
         return this.verifyJwt(jwt, { audience: 'email-verification' });
     }
 }

@@ -50,40 +50,24 @@ export const sendEmailVerificationEmail = async (
 export const verifyEmail = async (req: Request<{ token: string }>, res: Response) => {
     const { token } = req.params;
 
-    const decoded = verifyEmailVerificationJwt(token, process.env.JWT_SECRET!);
-    if (decoded) {
-        const user = await UserModel.findById(decoded.sub);
-        if (!user) {
-            res.status(404).json({
-                message: 'User not found',
-                data: null,
-                errors: null,
-            });
-            return;
-        }
+    const userService = new UserService(
+        new JwtService(process.env.JWT_SECRET!),
+        new EmailService({
+            host: process.env.SMTP_HOST!,
+            port: Number(process.env.SMTP_PORT),
+            secure: process.env.SMTP_SECURE === 'true',
+            auth: {
+                user: process.env.SMTP_USER!,
+                pass: process.env.SMTP_PASS!,
+            },
+        }),
+        new UserRepository(UserModel),
+    );
 
-        if (user.isEmailVerified) {
-            res.status(400).json({
-                message: 'Email already verified',
-                data: null,
-                errors: null,
-            });
-            return;
-        }
+    await userService.verifyEmail(token);
 
-        user.isEmailVerified = true;
-        await user.save();
-
-        res.status(200).json({
-            message: 'Email verified successfully',
-            data: null,
-            errors: null,
-        });
-        return;
-    }
-
-    res.status(400).json({
-        message: 'Invalid token',
+    res.status(200).json({
+        message: 'Email verified successfully',
         data: null,
         errors: null,
     });
