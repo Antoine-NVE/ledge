@@ -1,6 +1,6 @@
 import express from 'express';
 
-import { me, sendEmailVerificationEmail, verifyEmail } from '../controllers/user';
+import { me, sendEmailVerificationEmail, verifyEmail } from '../controllers/UserController';
 import authenticate from '../middlewares/authenticate';
 
 const router = express.Router();
