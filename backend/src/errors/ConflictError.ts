@@ -11,3 +11,9 @@ export class EmailAlreadyExistsError extends ConflictError {
         super('Email already exists');
     }
 }
+
+export class EmailAlreadyVerifiedError extends ConflictError {
+    constructor() {
+        super('Email already verified');
+    }
+}

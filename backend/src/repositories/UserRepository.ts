@@ -16,10 +16,7 @@ export class UserRepository {
         return await this.userModel.findOne({ email });
     }
 
-    async update(id: Types.ObjectId, data: Partial<User>): Promise<UserDocument | null> {
-        // We do not use findByIdAndUpdate to ensure that pre-save hooks are executed
-        const user = await this.userModel.findById(id);
-        if (!user) return null;
+    async updateFromDocument(user: UserDocument, data: Partial<User>): Promise<UserDocument> {
         Object.assign(user, data);
         return await user.save();
     }
