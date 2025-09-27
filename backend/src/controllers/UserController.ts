@@ -5,70 +5,46 @@ import { EmailService } from '../services/EmailService';
 import { UserService } from '../services/UserService';
 import { UserRepository } from '../repositories/UserRepository';
 
-export const me = async (req: Request, res: Response) => {
-    const user = req.user!;
+export class UserController {
+    constructor(private userService: UserService) {}
 
-    res.status(200).json({
-        message: 'User retrieved successfully',
-        data: {
-            user,
-        },
-        errors: null,
-    });
-};
+    async me(req: Request, res: Response): Promise<void> {
+        const user = req.user!;
 
-export const sendEmailVerificationEmail = async (
-    req: Request<object, object, { frontendBaseUrl: string }>,
-    res: Response,
-) => {
-    const { frontendBaseUrl } = req.body;
-    const user = req.user!;
-
-    const userService = new UserService(
-        new JwtService(process.env.JWT_SECRET!),
-        new EmailService({
-            host: process.env.SMTP_HOST!,
-            port: Number(process.env.SMTP_PORT),
-            secure: process.env.SMTP_SECURE === 'true',
-            auth: {
-                user: process.env.SMTP_USER!,
-                pass: process.env.SMTP_PASS!,
+        res.status(200).json({
+            message: 'User retrieved successfully',
+            data: {
+                user,
             },
-        }),
-        new UserRepository(UserModel),
-    );
+            errors: null,
+        });
+    }
 
-    await userService.sendEmailVerificationEmail(process.env.EMAIL_FROM!, user, frontendBaseUrl);
+    async sendEmailVerificationEmail(
+        req: Request<object, object, { frontendBaseUrl: string }>,
+        res: Response,
+    ): Promise<void> {
+        const { frontendBaseUrl } = req.body;
+        const user = req.user!;
 
-    res.status(200).json({
-        message: 'Verification email sent successfully',
-        data: null,
-        errors: null,
-    });
-};
+        await this.userService.sendEmailVerificationEmail(process.env.EMAIL_FROM!, user, frontendBaseUrl);
 
-export const verifyEmail = async (req: Request<{ token: string }>, res: Response) => {
-    const { token } = req.params;
+        res.status(200).json({
+            message: 'Verification email sent successfully',
+            data: null,
+            errors: null,
+        });
+    }
 
-    const userService = new UserService(
-        new JwtService(process.env.JWT_SECRET!),
-        new EmailService({
-            host: process.env.SMTP_HOST!,
-            port: Number(process.env.SMTP_PORT),
-            secure: process.env.SMTP_SECURE === 'true',
-            auth: {
-                user: process.env.SMTP_USER!,
-                pass: process.env.SMTP_PASS!,
-            },
-        }),
-        new UserRepository(UserModel),
-    );
+    async verifyEmail(req: Request<{ token: string }>, res: Response): Promise<void> {
+        const { token } = req.params;
 
-    await userService.verifyEmail(token);
+        await this.userService.verifyEmail(token);
 
-    res.status(200).json({
-        message: 'Email verified successfully',
-        data: null,
-        errors: null,
-    });
-};
+        res.status(200).json({
+            message: 'Email verified successfully',
+            data: null,
+            errors: null,
+        });
+    }
+}
