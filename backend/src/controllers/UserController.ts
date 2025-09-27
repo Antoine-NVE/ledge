@@ -4,12 +4,14 @@ import { JwtService } from '../services/JwtService';
 import { EmailService } from '../services/EmailService';
 import { UserService } from '../services/UserService';
 import { UserRepository } from '../repositories/UserRepository';
+import { UndefinedUserError } from '../errors/InternalServerError';
 
 export class UserController {
     constructor(private userService: UserService) {}
 
     async me(req: Request, res: Response): Promise<void> {
-        const user = req.user!;
+        const user = req.user;
+        if (!user) throw new UndefinedUserError();
 
         res.status(200).json({
             message: 'User retrieved successfully',
@@ -24,8 +26,9 @@ export class UserController {
         req: Request<object, object, { frontendBaseUrl: string }>,
         res: Response,
     ): Promise<void> {
+        const user = req.user;
+        if (!user) throw new UndefinedUserError();
         const { frontendBaseUrl } = req.body;
-        const user = req.user!;
 
         await this.userService.sendEmailVerificationEmail(process.env.EMAIL_FROM!, user, frontendBaseUrl);
 
