@@ -1,6 +1,4 @@
 import express from 'express';
-import dotenv from 'dotenv';
-dotenv.config();
 
 import { AuthController } from '../controllers/AuthController';
 import { AuthService } from '../services/AuthService';
@@ -10,12 +8,13 @@ import { RefreshTokenService } from '../services/RefreshTokenService';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import RefreshTokenModel from '../models/RefreshToken';
 import UserModel from '../models/User';
+import { env } from '../config/env';
 
 const router = express.Router();
 
 const userModel = UserModel;
 const userRepository = new UserRepository(userModel);
-const secret = process.env.JWT_SECRET!;
+const secret = env.JWT_SECRET!;
 const jwtService = new JwtService(secret);
 const refreshTokenModel = RefreshTokenModel;
 const refreshTokenRepository = new RefreshTokenRepository(refreshTokenModel);

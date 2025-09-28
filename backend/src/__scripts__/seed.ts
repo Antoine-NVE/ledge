@@ -4,8 +4,7 @@ import { TransactionDocument } from '../models/Transaction';
 import { generateTransactions } from './transaction';
 import { UserDocument } from '../models/User';
 import { generateUsers } from './user';
-
-dotenv.config();
+import { env } from '../config/env';
 
 export const random = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -16,8 +15,10 @@ export const pickSome = <T>(array: T[]): T[] => {
 };
 
 (async () => {
+    console.log(env);
+
     try {
-        const mongoUri = `mongodb://${process.env.DATABASE_SERVICE}:27017/ledge`;
+        const mongoUri = `mongodb://${env.DATABASE_SERVICE}:27017/ledge`;
         await mongoose.connect(mongoUri);
         console.log('Connected to MongoDB');
 

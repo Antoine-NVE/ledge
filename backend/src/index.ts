@@ -1,6 +1,5 @@
 import express, { NextFunction, Request, Response } from 'express';
 import mongoose from 'mongoose';
-import dotenv from 'dotenv';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 
@@ -10,14 +9,13 @@ import userRoutes from './routes/user';
 import { formatMongooseValidationErrors } from './utils/error';
 import { UnauthorizedError } from './errors/UnauthorizedError';
 import { HttpError } from './errors/HttpError';
-
-dotenv.config();
+import { env } from './config/env';
 
 const app = express();
 app.use(express.json());
 app.use(cookieParser());
 
-const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [];
+const allowedOrigins = env.ALLOWED_ORIGINS?.split(',') || [];
 
 app.use(
     cors({
@@ -28,7 +26,7 @@ app.use(
 
 (async () => {
     try {
-        const mongoUri = `mongodb://${process.env.DATABASE_SERVICE}:27017/ledge`;
+        const mongoUri = `mongodb://${env.DATABASE_SERVICE}:27017/ledge`;
         await mongoose.connect(mongoUri);
         console.log('Connected to MongoDB');
     } catch (err) {
@@ -60,7 +58,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
     }
 
     console.error(err);
-    if (process.env.NODE_ENV === 'development') {
+    if (env.NODE_ENV === 'development') {
         res.status(500).json({ message: err.message, data: null, errors: null });
         return;
     }

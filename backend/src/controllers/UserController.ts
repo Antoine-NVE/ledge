@@ -5,6 +5,7 @@ import { EmailService } from '../services/EmailService';
 import { UserService } from '../services/UserService';
 import { UserRepository } from '../repositories/UserRepository';
 import { UndefinedUserError } from '../errors/InternalServerError';
+import { env } from '../config/env';
 
 export class UserController {
     constructor(private userService: UserService) {}
@@ -30,7 +31,7 @@ export class UserController {
         if (!user) throw new UndefinedUserError();
         const { frontendBaseUrl } = req.body;
 
-        await this.userService.sendEmailVerificationEmail(process.env.EMAIL_FROM!, user, frontendBaseUrl);
+        await this.userService.sendEmailVerificationEmail(env.EMAIL_FROM!, user, frontendBaseUrl);
 
         res.status(200).json({
             message: 'Verification email sent successfully',

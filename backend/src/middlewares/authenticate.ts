@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import UserModel, { UserDocument } from '../models/User';
 import { AuthCookieService } from '../services/AuthCookieService';
 import { JwtService } from '../services/JwtService';
+import { env } from '../config/env';
 
 // Extend Express Request interface to include userId
 declare module 'express-serve-static-core' {
@@ -23,7 +24,7 @@ const authenticate = async (req: Request, res: Response, next: NextFunction) => 
         return;
     }
 
-    const jwtService = new JwtService(process.env.JWT_SECRET!);
+    const jwtService = new JwtService(env.JWT_SECRET!);
     const decoded = jwtService.verifyAccessJwt(accessToken);
     if (decoded) {
         const user = await UserModel.findById(decoded.sub);

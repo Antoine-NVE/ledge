@@ -7,17 +7,18 @@ import { JwtService } from '../services/JwtService';
 import { EmailService } from '../services/EmailService';
 import { UserRepository } from '../repositories/UserRepository';
 import UserModel from '../models/User';
+import { env } from '../config/env';
 
 const router = express.Router();
 
-const jwtService = new JwtService(process.env.JWT_SECRET!);
+const jwtService = new JwtService(env.JWT_SECRET!);
 const emailService = new EmailService({
-    host: process.env.SMTP_HOST!,
-    port: Number(process.env.SMTP_PORT),
-    secure: process.env.SMTP_SECURE === 'true',
+    host: env.SMTP_HOST!,
+    port: Number(env.SMTP_PORT),
+    secure: env.SMTP_SECURE === 'true',
     auth: {
-        user: process.env.SMTP_USER!,
-        pass: process.env.SMTP_PASS!,
+        user: env.SMTP_USER!,
+        pass: env.SMTP_PASS!,
     },
 });
 const userRepository = new UserRepository(UserModel);
