@@ -12,10 +12,6 @@ export type RefreshTokenDocument = HydratedDocument<RefreshToken> & {
     updatedAt: Date;
 };
 
-export type RefreshTokenPopulatedDocument = Omit<RefreshTokenDocument, 'user'> & {
-    user: UserDocument;
-};
-
 const RefreshTokenSchema = new Schema<RefreshTokenDocument>(
     {
         token: {

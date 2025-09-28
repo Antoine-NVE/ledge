@@ -11,6 +11,7 @@ import { UserRepository } from '../repositories/UserRepository';
 import { RefreshTokenService } from '../services/RefreshTokenService';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { exit } from 'process';
+import { RequiredRefreshTokenError } from '../errors/UnauthorizedError';
 
 interface RegisterBody {
     email: string;
@@ -67,19 +68,18 @@ export class AuthController {
     async refresh(req: Request, res: Response) {
         const authCookieService = new AuthCookieService(req, res);
         const token = authCookieService.getRefreshTokenCookie();
+        if (!token) throw new RequiredRefreshTokenError();
 
         let rememberMe = authCookieService.getRememberMeCookie();
         if (rememberMe === undefined) rememberMe = false; // Default to false if not provided
 
-        const { accessToken, refreshTokenPopulated } = await this.authService.refresh(token);
+        const { accessToken, refreshToken } = await this.authService.refresh(token);
 
-        authCookieService.setAllAuthCookies(accessToken, refreshTokenPopulated.token, rememberMe);
+        authCookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
 
         res.status(200).json({
             message: 'Token refreshed successfully',
-            data: {
-                user: refreshTokenPopulated.user,
-            },
+            data: null,
             errors: null,
         });
     }

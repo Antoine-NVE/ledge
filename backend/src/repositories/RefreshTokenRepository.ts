@@ -1,5 +1,5 @@
 import { DeleteResult, Model, Types } from 'mongoose';
-import { RefreshToken, RefreshTokenDocument, RefreshTokenPopulatedDocument } from '../models/RefreshToken';
+import { RefreshToken, RefreshTokenDocument } from '../models/RefreshToken';
 import { UserDocument } from '../models/User';
 
 export class RefreshTokenRepository {
@@ -9,18 +9,16 @@ export class RefreshTokenRepository {
         return await this.refreshTokenModel.create(data);
     }
 
-    async findByTokenAndPopulate(token: string): Promise<RefreshTokenPopulatedDocument | null> {
-        return await this.refreshTokenModel.findOne({ token }).populate<{ user: UserDocument }>('user');
+    async findByToken(token: string): Promise<RefreshTokenDocument | null> {
+        return await this.refreshTokenModel.findOne({ token });
     }
 
-    async updateFromPopulatedDocument(
-        refreshTokenPopulated: RefreshTokenPopulatedDocument,
+    async updateFromDocument(
+        refreshToken: RefreshTokenDocument,
         data: Partial<RefreshToken>,
-    ): Promise<RefreshTokenPopulatedDocument> {
-        Object.assign(refreshTokenPopulated, data);
-
-        // The return type of save() is a bit off when using populated documents, so we cast it
-        return (await refreshTokenPopulated.save()) as unknown as RefreshTokenPopulatedDocument;
+    ): Promise<RefreshTokenDocument> {
+        Object.assign(refreshToken, data);
+        return await refreshToken.save();
     }
 
     async deleteByToken(token: string): Promise<DeleteResult> {

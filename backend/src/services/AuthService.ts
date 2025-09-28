@@ -4,7 +4,7 @@ import {
     InvalidRefreshTokenError,
     RequiredRefreshTokenError,
 } from '../errors/UnauthorizedError';
-import RefreshTokenModel, { RefreshTokenDocument, RefreshTokenPopulatedDocument } from '../models/RefreshToken';
+import RefreshTokenModel, { RefreshTokenDocument } from '../models/RefreshToken';
 import UserModel, { UserDocument } from '../models/User';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { UserRepository } from '../repositories/UserRepository';
@@ -63,18 +63,14 @@ export class AuthService {
         return { user, accessToken, refreshToken };
     }
 
-    async refresh(
-        token: string | undefined,
-    ): Promise<{ accessToken: string; refreshTokenPopulated: RefreshTokenPopulatedDocument }> {
-        if (!token) throw new RequiredRefreshTokenError();
-
-        const refreshTokenPopulated = await this.refreshTokenService.findByTokenAndPopulate(token);
-        const accessToken = this.jwtService.signAccessJwt(refreshTokenPopulated.user._id);
+    async refresh(token: string): Promise<{ accessToken: string; refreshToken: RefreshTokenDocument }> {
+        const refreshToken = await this.refreshTokenService.findByToken(token);
+        const accessToken = this.jwtService.signAccessJwt(refreshToken.user._id);
 
         // Extend the refresh token expiration each time it is used
-        const newRefreshTokenPopulated = await this.refreshTokenService.extendExpiration(refreshTokenPopulated);
+        const newRefreshToken = await this.refreshTokenService.extendExpiration(refreshToken);
 
-        return { accessToken, refreshTokenPopulated: newRefreshTokenPopulated };
+        return { accessToken, refreshToken: newRefreshToken };
     }
 
     async logout(token: string | undefined): Promise<void> {
