@@ -1,7 +1,7 @@
 import { HttpError } from './HttpError';
 
-export class TooManyRequestsError extends HttpError {
-    constructor(message: string = 'Too Many Requests') {
+class TooManyRequestsError extends HttpError {
+    constructor(message: string) {
         super(message, 429);
     }
 }

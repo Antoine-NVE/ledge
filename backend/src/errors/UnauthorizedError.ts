@@ -1,7 +1,7 @@
 import { HttpError } from './HttpError';
 
-export class UnauthorizedError extends HttpError {
-    constructor(message: string = 'Unauthorized') {
+class UnauthorizedError extends HttpError {
+    constructor(message: string) {
         super(message, 401);
     }
 }
@@ -30,6 +30,7 @@ export class RequiredRefreshTokenError extends UnauthorizedError {
     }
 }
 
+// Can be used when the refresh token doesn't exist in the database
 export class InvalidRefreshTokenError extends UnauthorizedError {
     constructor() {
         super('Invalid refresh token');
