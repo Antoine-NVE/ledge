@@ -11,3 +11,9 @@ export class UndefinedUserError extends InternalServerError {
         super('User is undefined');
     }
 }
+
+export class UndefinedTransactionError extends InternalServerError {
+    constructor() {
+        super('Transaction is undefined');
+    }
+}
