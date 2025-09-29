@@ -1,6 +1,6 @@
 import { HttpError } from './HttpError';
 
-class NotFoundError extends HttpError {
+export abstract class NotFoundError extends HttpError {
     constructor(message: string) {
         super(message, 404);
     }

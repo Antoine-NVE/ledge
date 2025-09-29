@@ -1,6 +1,6 @@
 import { HttpError } from './HttpError';
 
-class InternalServerError extends HttpError {
+export abstract class InternalServerError extends HttpError {
     constructor(message: string) {
         super(message, 500);
     }

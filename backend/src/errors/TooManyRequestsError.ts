@@ -1,6 +1,6 @@
 import { HttpError } from './HttpError';
 
-class TooManyRequestsError extends HttpError {
+export abstract class TooManyRequestsError extends HttpError {
     constructor(message: string) {
         super(message, 429);
     }

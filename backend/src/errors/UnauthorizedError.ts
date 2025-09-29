@@ -1,6 +1,6 @@
 import { HttpError } from './HttpError';
 
-class UnauthorizedError extends HttpError {
+export abstract class UnauthorizedError extends HttpError {
     constructor(message: string) {
         super(message, 401);
     }
