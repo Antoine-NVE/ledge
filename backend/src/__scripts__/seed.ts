@@ -6,7 +6,8 @@ import { UserDocument } from '../models/User';
 import { generateUsers } from './user';
 import { env } from '../config/env';
 
-export const random = (min: number, max: number) => Math.floor(Math.random() * (max - min + 1)) + min;
+export const random = (min: number, max: number) =>
+    Math.floor(Math.random() * (max - min + 1)) + min;
 
 export const pickSome = <T>(array: T[]): T[] => {
     const shuffled = [...array].sort(() => Math.random() - 0.5);

@@ -17,7 +17,12 @@ export class EmailService {
         this.transporter = createTransport({ host, port, secure, auth });
     }
 
-    private async sendEmail(from: string, to: string, subject: string, html: string): Promise<SentMessageInfo> {
+    private async sendEmail(
+        from: string,
+        to: string,
+        subject: string,
+        html: string,
+    ): Promise<SentMessageInfo> {
         return await this.transporter.sendMail({ from, to, subject, html });
     }
 

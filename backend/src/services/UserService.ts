@@ -13,9 +13,16 @@ export class UserService {
         private userRepository: UserRepository,
     ) {}
 
-    async sendEmailVerificationEmail(from: string, user: UserDocument, frontendBaseUrl: string): Promise<void> {
+    async sendEmailVerificationEmail(
+        from: string,
+        user: UserDocument,
+        frontendBaseUrl: string,
+    ): Promise<void> {
         if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
-        if (user.emailVerificationCooldownExpiresAt && user.emailVerificationCooldownExpiresAt > new Date())
+        if (
+            user.emailVerificationCooldownExpiresAt &&
+            user.emailVerificationCooldownExpiresAt > new Date()
+        )
             throw new EmailVerificationCooldownError();
 
         const jwt = this.jwtService.signEmailVerificationJwt(user._id);

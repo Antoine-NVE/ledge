@@ -34,7 +34,10 @@ export class AuthController {
         // Next time the user logs in, they can choose to be remembered
         const rememberMe = false;
 
-        const { user, accessToken, refreshToken } = await this.authService.register(email, password);
+        const { user, accessToken, refreshToken } = await this.authService.register(
+            email,
+            password,
+        );
 
         const authCookieService = new AuthCookieService(req, res);
         authCookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);

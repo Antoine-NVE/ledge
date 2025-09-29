@@ -59,15 +59,22 @@ describe('User Validators', () => {
                 }),
             };
 
-            await expect(isEmailUnique.call(fakeThis as UserDocument, 'new@example.com')).resolves.toBe(true);
-            expect(findOneMock).toHaveBeenCalledWith({ email: 'new@example.com' });
+            await expect(
+                isEmailUnique.call(fakeThis as UserDocument, 'new@example.com'),
+            ).resolves.toBe(true);
+            expect(findOneMock).toHaveBeenCalledWith({
+                email: 'new@example.com',
+            });
         });
 
         it('should return false if the email already exists and belongs to another user', async () => {
             const existingId = new Types.ObjectId();
             const differentId = new Types.ObjectId();
 
-            findOneMock.mockReturnValueOnce({ _id: existingId, email: 'exists@example.com' });
+            findOneMock.mockReturnValueOnce({
+                _id: existingId,
+                email: 'exists@example.com',
+            });
 
             const fakeThis = {
                 _id: differentId,
@@ -76,13 +83,18 @@ describe('User Validators', () => {
                 }),
             };
 
-            await expect(isEmailUnique.call(fakeThis as UserDocument, 'exists@example.com')).resolves.toBe(false);
+            await expect(
+                isEmailUnique.call(fakeThis as UserDocument, 'exists@example.com'),
+            ).resolves.toBe(false);
         });
 
         it('should return true if the email exists but belongs to the same user', async () => {
             const sameId = new Types.ObjectId();
 
-            findOneMock.mockReturnValueOnce({ _id: sameId, email: 'exists@example.com' });
+            findOneMock.mockReturnValueOnce({
+                _id: sameId,
+                email: 'exists@example.com',
+            });
 
             const fakeThis = {
                 _id: sameId,
@@ -91,7 +103,9 @@ describe('User Validators', () => {
                 }),
             };
 
-            await expect(isEmailUnique.call(fakeThis as UserDocument, 'exists@example.com')).resolves.toBe(true);
+            await expect(
+                isEmailUnique.call(fakeThis as UserDocument, 'exists@example.com'),
+            ).resolves.toBe(true);
         });
     });
 });

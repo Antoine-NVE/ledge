@@ -14,8 +14,14 @@ const transactionController = new TransactionController(
 
 router.post('/', authenticate, (req, res) => transactionController.create(req, res));
 router.get('/', authenticate, (req, res) => transactionController.findAll(req, res));
-router.get('/:id', authenticate, authorizeTransactionAccess, (req, res) => transactionController.findOne(req, res));
-router.put('/:id', authenticate, authorizeTransactionAccess, (req, res) => transactionController.update(req, res));
-router.delete('/:id', authenticate, authorizeTransactionAccess, (req, res) => transactionController.remove(req, res));
+router.get('/:id', authenticate, authorizeTransactionAccess, (req, res) =>
+    transactionController.findOne(req, res),
+);
+router.put('/:id', authenticate, authorizeTransactionAccess, (req, res) =>
+    transactionController.update(req, res),
+);
+router.delete('/:id', authenticate, authorizeTransactionAccess, (req, res) =>
+    transactionController.remove(req, res),
+);
 
 export default router;

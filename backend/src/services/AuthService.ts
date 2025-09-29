@@ -63,7 +63,9 @@ export class AuthService {
         return { user, accessToken, refreshToken };
     }
 
-    async refresh(token: string): Promise<{ accessToken: string; refreshToken: RefreshTokenDocument }> {
+    async refresh(
+        token: string,
+    ): Promise<{ accessToken: string; refreshToken: RefreshTokenDocument }> {
         const refreshToken = await this.refreshTokenService.findByToken(token);
         const accessToken = this.jwtService.signAccessJwt(refreshToken.user._id);
 

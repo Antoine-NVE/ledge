@@ -59,10 +59,18 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
 
     console.error(err);
     if (env.NODE_ENV === 'development') {
-        res.status(500).json({ message: err.message, data: null, errors: null });
+        res.status(500).json({
+            message: err.message,
+            data: null,
+            errors: null,
+        });
         return;
     }
-    res.status(500).json({ message: 'Internal server error', data: null, errors: null });
+    res.status(500).json({
+        message: 'Internal server error',
+        data: null,
+        errors: null,
+    });
 });
 
 const port = 3000;

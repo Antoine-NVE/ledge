@@ -1,7 +1,12 @@
 import { HydratedDocument, Model, model, Schema } from 'mongoose';
 import bcrypt from 'bcrypt';
 
-import { isEmailValid, isEmailUnique, isPasswordValid, isPasswordTrimmed } from '../validators/user';
+import {
+    isEmailValid,
+    isEmailUnique,
+    isPasswordValid,
+    isPasswordTrimmed,
+} from '../validators/user';
 
 export interface User {
     email: string;
