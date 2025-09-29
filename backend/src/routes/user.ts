@@ -1,7 +1,7 @@
 import express from 'express';
 
 import { UserController } from '../controllers/UserController';
-import authenticate from '../middlewares/authenticate';
+import { authenticate } from '../middlewares/authenticate';
 import { UserService } from '../services/UserService';
 import { JwtService } from '../services/JwtService';
 import { EmailService } from '../services/EmailService';

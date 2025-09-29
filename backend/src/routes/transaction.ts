@@ -1,5 +1,5 @@
 import express from 'express';
-import authenticate from '../middlewares/authenticate';
+import { authenticate } from '../middlewares/authenticate';
 import authorizeTransactionAccess from '../middlewares/authorizeTransactionAccess';
 import { TransactionController } from '../controllers/TransactionController';
 import { TransactionService } from '../services/TransactionService';

@@ -12,6 +12,12 @@ export class InvalidCredentialsError extends UnauthorizedError {
     }
 }
 
+export class RequiredAccessTokenError extends UnauthorizedError {
+    constructor() {
+        super('Access token is required');
+    }
+}
+
 export class InvalidJwtError extends UnauthorizedError {
     constructor() {
         super('Invalid JWT');

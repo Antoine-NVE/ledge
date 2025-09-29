@@ -3,6 +3,8 @@ import UserModel, { UserDocument } from '../models/User';
 import { AuthCookieService } from '../services/AuthCookieService';
 import { JwtService } from '../services/JwtService';
 import { env } from '../config/env';
+import { RequiredAccessTokenError } from '../errors/UnauthorizedError';
+import { UserNotFoundError } from '../errors/NotFoundError';
 
 // Extend Express Request interface to include userId
 declare module 'express-serve-static-core' {
@@ -11,44 +13,18 @@ declare module 'express-serve-static-core' {
     }
 }
 
-const authenticate = async (req: Request, res: Response, next: NextFunction) => {
+export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
     const authCookieService = new AuthCookieService(req, res);
     const accessToken = authCookieService.getAccessTokenCookie();
 
-    if (!accessToken) {
-        res.status(401).json({
-            message: 'Unauthorized',
-            data: null,
-            errors: null,
-        });
-        return;
-    }
+    if (!accessToken) throw new RequiredAccessTokenError();
 
     const jwtService = new JwtService(env.JWT_SECRET!);
     const decoded = jwtService.verifyAccessJwt(accessToken);
-    if (decoded) {
-        const user = await UserModel.findById(decoded.sub);
-        if (!user) {
-            authCookieService.clearAccessTokenCookie();
-            res.status(401).json({
-                message: 'Unauthorized',
-                data: null,
-                errors: null,
-            });
-            return;
-        }
 
-        req.user = user;
-        next();
-        return;
-    }
+    const user = await UserModel.findById(decoded.sub);
+    if (!user) throw new UserNotFoundError();
 
-    authCookieService.clearAccessTokenCookie();
-    res.status(401).json({
-        message: 'Unauthorized',
-        data: null,
-        errors: null,
-    });
+    req.user = user;
+    next();
 };
-
-export default authenticate;
