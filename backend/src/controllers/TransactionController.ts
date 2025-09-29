@@ -2,8 +2,11 @@ import { Request, Response } from 'express';
 import TransactionModel from '../models/Transaction';
 import { Error as MongooseError } from 'mongoose';
 import { formatMongooseValidationErrors } from '../utils/error';
+import { UndefinedTransactionError, UndefinedUserError } from '../errors/InternalServerError';
+import { TransactionService } from '../services/TransactionService';
+import { TransactionRepository } from '../repositories/TransactionRepository';
 
-interface TransactionBody {
+interface CreateTransactionBody {
     month: string;
     isIncome: boolean;
     isRecurring: boolean;
@@ -11,171 +14,96 @@ interface TransactionBody {
     value: number;
 }
 
-export const createTransaction = async (req: Request<object, object, TransactionBody>, res: Response) => {
-    const { month, isIncome, isRecurring, name, value } = req.body;
+interface UpdateTransactionBody {
+    month: string | undefined;
+    isIncome: boolean | undefined;
+    isRecurring: boolean | undefined;
+    name: string | undefined;
+    value: number | undefined;
+}
+
+export const create = async (req: Request<object, object, CreateTransactionBody>, res: Response) => {
     const user = req.user;
+    if (!user) throw new UndefinedUserError();
 
-    try {
-        const transaction = new TransactionModel({
-            month,
-            isIncome,
-            isRecurring,
-            name,
-            value,
-            user,
-        });
+    const transactionData = req.body;
 
-        // Save the transaction and populate the user field
-        await (await transaction.save()).populate('user');
+    const transactionService = new TransactionService(new TransactionRepository(TransactionModel));
+    const transaction = await transactionService.create({
+        ...transactionData,
+        user: user._id,
+    });
 
-        res.status(201).json({
-            message: 'Transaction created successfully',
-            data: {
-                transaction,
-            },
-            errors: null,
-        });
-    } catch (error: unknown) {
-        if (error instanceof MongooseError.ValidationError) {
-            res.status(400).json({
-                message: 'Validation error',
-                data: null,
-                errors: formatMongooseValidationErrors(error),
-            });
-            return;
-        }
-
-        res.status(500).json({
-            message: 'Internal server error',
-            data: null,
-            errors: null,
-        });
-    }
+    res.status(201).json({
+        message: 'Transaction created successfully',
+        data: {
+            transaction,
+        },
+        errors: null,
+    });
 };
 
-export const getTransactions = async (req: Request, res: Response) => {
+export const findAll = async (req: Request, res: Response) => {
     const user = req.user;
+    if (!user) throw new UndefinedUserError();
 
-    try {
-        const transactions = await TransactionModel.find({ user }).populate('user');
+    const transactionService = new TransactionService(new TransactionRepository(TransactionModel));
+    const transactions = await transactionService.findByUser(user);
 
-        res.status(200).json({
-            message: 'Transactions retrieved successfully',
-            data: {
-                transactions,
-            },
-            errors: null,
-        });
-    } catch (error) {
-        console.error(error);
-
-        res.status(500).json({
-            message: 'Internal server error',
-            data: null,
-            errors: null,
-        });
-    }
+    res.status(200).json({
+        message: 'Transactions retrieved successfully',
+        data: {
+            transactions,
+        },
+        errors: null,
+    });
 };
 
-export const getTransaction = async (req: Request, res: Response) => {
+export const findOne = async (req: Request, res: Response) => {
     const transaction = req.transaction;
+    if (!transaction) throw new UndefinedTransactionError();
 
-    try {
-        res.status(200).json({
-            message: 'Transaction retrieved successfully',
-            data: {
-                transaction,
-            },
-            errors: null,
-        });
-    } catch (error: unknown) {
-        if (error instanceof MongooseError.CastError) {
-            res.status(400).json({
-                message: 'Invalid transaction ID',
-                data: null,
-                errors: null,
-            });
-        }
-
-        res.status(500).json({
-            message: 'Internal server error',
-            data: null,
-            errors: null,
-        });
-    }
+    res.status(200).json({
+        message: 'Transaction retrieved successfully',
+        data: {
+            transaction,
+        },
+        errors: null,
+    });
 };
 
-export const updateTransaction = async (req: Request<object, object, TransactionBody>, res: Response) => {
-    const transaction = req.transaction!;
-    const { month, isIncome, isRecurring, name, value } = req.body;
+export const update = async (req: Request<object, object, UpdateTransactionBody>, res: Response) => {
+    const transaction = req.transaction;
+    if (!transaction) throw new UndefinedTransactionError();
 
-    try {
-        if (month !== undefined) transaction.month = month;
-        if (isIncome !== undefined) transaction.isIncome = isIncome;
-        if (isRecurring !== undefined) transaction.isRecurring = isRecurring;
-        if (name !== undefined) transaction.name = name;
-        if (value !== undefined) transaction.value = value;
+    const transactionData = req.body;
 
-        await transaction.save();
+    const transactionService = new TransactionService(new TransactionRepository(TransactionModel));
+    const updatedTransaction = await transactionService.updateFromDocument(transaction, {
+        ...transactionData,
+    });
 
-        res.status(200).json({
-            message: 'Transaction updated successfully',
-            data: {
-                transaction,
-            },
-            errors: null,
-        });
-    } catch (error: unknown) {
-        if (error instanceof MongooseError.ValidationError) {
-            res.status(400).json({
-                message: 'Validation error',
-                data: null,
-                errors: formatMongooseValidationErrors(error),
-            });
-        }
-
-        if (error instanceof MongooseError.CastError) {
-            res.status(400).json({
-                message: 'Invalid transaction ID',
-                data: null,
-                errors: null,
-            });
-        }
-
-        res.status(500).json({
-            message: 'Internal server error',
-            data: null,
-            errors: null,
-        });
-    }
+    res.status(200).json({
+        message: 'Transaction updated successfully',
+        data: {
+            transaction: updatedTransaction,
+        },
+        errors: null,
+    });
 };
 
-export const removeTransaction = async (req: Request, res: Response) => {
-    const transaction = req.transaction!;
+export const remove = async (req: Request, res: Response) => {
+    const transaction = req.transaction;
+    if (!transaction) throw new UndefinedTransactionError();
 
-    try {
-        await transaction.deleteOne();
+    const transactionService = new TransactionService(new TransactionRepository(TransactionModel));
+    await transactionService.delete(transaction._id);
 
-        res.status(200).json({
-            message: 'Transaction deleted successfully',
-            data: {
-                transaction,
-            },
-            errors: null,
-        });
-    } catch (error: unknown) {
-        if (error instanceof MongooseError.CastError) {
-            res.status(400).json({
-                message: 'Invalid transaction ID',
-                data: null,
-                errors: null,
-            });
-        }
-
-        res.status(500).json({
-            message: 'Internal server error',
-            data: null,
-            errors: null,
-        });
-    }
+    res.status(200).json({
+        message: 'Transaction deleted successfully',
+        data: {
+            transaction,
+        },
+        errors: null,
+    });
 };

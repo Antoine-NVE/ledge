@@ -1,5 +1,6 @@
 import { Model, Types } from 'mongoose';
 import { Transaction, TransactionDocument } from '../models/Transaction';
+import { UserDocument } from '../models/User';
 
 export class TransactionRepository {
     constructor(private transactionModel: Model<TransactionDocument>) {}
@@ -12,11 +13,20 @@ export class TransactionRepository {
         return await this.transactionModel.findById(id);
     }
 
-    async update(id: Types.ObjectId, data: Partial<Transaction>): Promise<TransactionDocument | null> {
-        // We do not use findByIdAndUpdate to ensure that pre-save hooks are executed
-        const transaction = await this.transactionModel.findById(id);
-        if (!transaction) return null;
-        Object.assign(transaction, data);
+    async findByUser(user: UserDocument): Promise<TransactionDocument[]> {
+        return await this.transactionModel.find({ user });
+    }
+
+    async updateFromDocument(
+        transaction: TransactionDocument,
+        data: Partial<Transaction>,
+    ): Promise<TransactionDocument> {
+        if (data.month !== undefined) transaction.month = data.month;
+        if (data.isIncome !== undefined) transaction.isIncome = data.isIncome;
+        if (data.isRecurring !== undefined) transaction.isRecurring = data.isRecurring;
+        if (data.name !== undefined) transaction.name = data.name;
+        if (data.value !== undefined) transaction.value = data.value;
+
         return await transaction.save();
     }
 

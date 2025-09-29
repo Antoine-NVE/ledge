@@ -23,7 +23,7 @@ const authorizeTransactionAccess = async (req: Request, res: Response, next: Nex
     }
 
     try {
-        const transaction = await (await TransactionModel.findById(transactionId))?.populate('user');
+        const transaction = await TransactionModel.findById(transactionId);
 
         if (!transaction) {
             res.status(404).json({
