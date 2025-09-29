@@ -22,88 +22,88 @@ interface UpdateTransactionBody {
     value: number | undefined;
 }
 
-export const create = async (req: Request<object, object, CreateTransactionBody>, res: Response) => {
-    const user = req.user;
-    if (!user) throw new UndefinedUserError();
+export class TransactionController {
+    constructor(private transactionService: TransactionService) {}
 
-    const transactionData = req.body;
+    async create(req: Request<object, object, CreateTransactionBody>, res: Response) {
+        const user = req.user;
+        if (!user) throw new UndefinedUserError();
 
-    const transactionService = new TransactionService(new TransactionRepository(TransactionModel));
-    const transaction = await transactionService.create({
-        ...transactionData,
-        user: user._id,
-    });
+        const transactionData = req.body;
 
-    res.status(201).json({
-        message: 'Transaction created successfully',
-        data: {
-            transaction,
-        },
-        errors: null,
-    });
-};
+        const transaction = await this.transactionService.create({
+            ...transactionData,
+            user: user._id,
+        });
 
-export const findAll = async (req: Request, res: Response) => {
-    const user = req.user;
-    if (!user) throw new UndefinedUserError();
+        res.status(201).json({
+            message: 'Transaction created successfully',
+            data: {
+                transaction,
+            },
+            errors: null,
+        });
+    }
 
-    const transactionService = new TransactionService(new TransactionRepository(TransactionModel));
-    const transactions = await transactionService.findByUser(user);
+    async findAll(req: Request, res: Response) {
+        const user = req.user;
+        if (!user) throw new UndefinedUserError();
 
-    res.status(200).json({
-        message: 'Transactions retrieved successfully',
-        data: {
-            transactions,
-        },
-        errors: null,
-    });
-};
+        const transactions = await this.transactionService.findByUser(user);
 
-export const findOne = async (req: Request, res: Response) => {
-    const transaction = req.transaction;
-    if (!transaction) throw new UndefinedTransactionError();
+        res.status(200).json({
+            message: 'Transactions retrieved successfully',
+            data: {
+                transactions,
+            },
+            errors: null,
+        });
+    }
 
-    res.status(200).json({
-        message: 'Transaction retrieved successfully',
-        data: {
-            transaction,
-        },
-        errors: null,
-    });
-};
+    async findOne(req: Request, res: Response) {
+        const transaction = req.transaction;
+        if (!transaction) throw new UndefinedTransactionError();
 
-export const update = async (req: Request<object, object, UpdateTransactionBody>, res: Response) => {
-    const transaction = req.transaction;
-    if (!transaction) throw new UndefinedTransactionError();
+        res.status(200).json({
+            message: 'Transaction retrieved successfully',
+            data: {
+                transaction,
+            },
+            errors: null,
+        });
+    }
 
-    const transactionData = req.body;
+    async update(req: Request<object, object, UpdateTransactionBody>, res: Response) {
+        const transaction = req.transaction;
+        if (!transaction) throw new UndefinedTransactionError();
 
-    const transactionService = new TransactionService(new TransactionRepository(TransactionModel));
-    const updatedTransaction = await transactionService.updateFromDocument(transaction, {
-        ...transactionData,
-    });
+        const transactionData = req.body;
 
-    res.status(200).json({
-        message: 'Transaction updated successfully',
-        data: {
-            transaction: updatedTransaction,
-        },
-        errors: null,
-    });
-};
+        const updatedTransaction = await this.transactionService.updateFromDocument(transaction, {
+            ...transactionData,
+        });
 
-export const remove = async (req: Request, res: Response) => {
-    const transaction = req.transaction;
-    if (!transaction) throw new UndefinedTransactionError();
+        res.status(200).json({
+            message: 'Transaction updated successfully',
+            data: {
+                transaction: updatedTransaction,
+            },
+            errors: null,
+        });
+    }
 
-    const transactionService = new TransactionService(new TransactionRepository(TransactionModel));
-    await transactionService.delete(transaction._id);
+    async remove(req: Request, res: Response) {
+        const transaction = req.transaction;
+        if (!transaction) throw new UndefinedTransactionError();
 
-    res.status(200).json({
-        message: 'Transaction deleted successfully',
-        data: {
-            transaction,
-        },
-        errors: null,
-    });
-};
+        await this.transactionService.delete(transaction._id);
+
+        res.status(200).json({
+            message: 'Transaction deleted successfully',
+            data: {
+                transaction,
+            },
+            errors: null,
+        });
+    }
+}
