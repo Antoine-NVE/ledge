@@ -6,7 +6,7 @@ import {
     getTransaction,
     removeTransaction,
     updateTransaction,
-} from '../controllers/transaction';
+} from '../controllers/TransactionController';
 import authorizeTransactionAccess from '../middlewares/authorizeTransactionAccess';
 
 const router = express.Router();
