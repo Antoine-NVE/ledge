@@ -1,7 +1,7 @@
 import { HttpError } from './HttpError';
 
 export class InternalServerError extends HttpError {
-    constructor(message: string) {
+    constructor(message: string = 'Internal Server Error') {
         super(message, 500);
     }
 }
