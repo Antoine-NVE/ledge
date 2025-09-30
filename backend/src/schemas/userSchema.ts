@@ -34,3 +34,19 @@ export const RegisterInputSchema = yup.object({
         .required('Please confirm your password')
         .oneOf([yup.ref('password')], 'Passwords must match'),
 });
+
+export const LoginInputSchema = yup.object({
+    email: yup
+        .string()
+        .trim()
+        .lowercase()
+        .required('Email is required')
+        .email('Invalid email address'),
+
+    password: yup.string().required('Password is required'),
+
+    rememberMe: yup
+        .boolean()
+        .typeError('Remember me must be a boolean')
+        .required('Remember me is required'),
+});

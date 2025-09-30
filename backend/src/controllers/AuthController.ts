@@ -12,13 +12,7 @@ import { RefreshTokenService } from '../services/RefreshTokenService';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { exit } from 'process';
 import { RequiredRefreshTokenError } from '../errors/UnauthorizedError';
-import { RegisterInputSchema } from '../schemas/userSchema';
-
-interface LoginBody {
-    email: string;
-    password: string;
-    rememberMe: boolean;
-}
+import { LoginInputSchema, RegisterInputSchema } from '../schemas/userSchema';
 
 export class AuthController {
     constructor(private authService: AuthService) {}
@@ -47,13 +41,16 @@ export class AuthController {
         });
     }
 
-    async login(req: Request<object, object, LoginBody>, res: Response) {
-        const { email, password, rememberMe } = req.body;
+    async login(req: Request, res: Response) {
+        const body = await LoginInputSchema.validate(req.body, { abortEarly: false });
 
-        const { user, accessToken, refreshToken } = await this.authService.login(email, password);
+        const { user, accessToken, refreshToken } = await this.authService.login(
+            body.email,
+            body.password,
+        );
 
         const authCookieService = new AuthCookieService(req, res);
-        authCookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
+        authCookieService.setAllAuthCookies(accessToken, refreshToken.token, body.rememberMe);
 
         res.status(200).json({
             message: 'User logged in successfully',
