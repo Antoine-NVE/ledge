@@ -1,6 +1,6 @@
 import * as yup from 'yup';
 
-export const RegisterInputSchema = yup.object({
+export const registerSchema = yup.object({
     email: yup
         .string()
         .trim()
@@ -35,7 +35,7 @@ export const RegisterInputSchema = yup.object({
         .oneOf([yup.ref('password')], 'Passwords must match'),
 });
 
-export const LoginInputSchema = yup.object({
+export const loginSchema = yup.object({
     email: yup
         .string()
         .trim()
