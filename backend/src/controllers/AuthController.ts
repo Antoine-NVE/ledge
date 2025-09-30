@@ -12,11 +12,7 @@ import { RefreshTokenService } from '../services/RefreshTokenService';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { exit } from 'process';
 import { RequiredRefreshTokenError } from '../errors/UnauthorizedError';
-
-interface RegisterBody {
-    email: string;
-    password: string;
-}
+import { RegisterInputSchema } from '../schemas/userSchema';
 
 interface LoginBody {
     email: string;
@@ -27,16 +23,16 @@ interface LoginBody {
 export class AuthController {
     constructor(private authService: AuthService) {}
 
-    async register(req: Request<object, object, RegisterBody>, res: Response) {
-        const { email, password } = req.body;
+    async register(req: Request, res: Response) {
+        const body = await RegisterInputSchema.validate(req.body, { abortEarly: false });
 
         // The user can't choose to be remembered at registration
         // Next time the user logs in, they can choose to be remembered
         const rememberMe = false;
 
         const { user, accessToken, refreshToken } = await this.authService.register(
-            email,
-            password,
+            body.email,
+            body.password,
         );
 
         const authCookieService = new AuthCookieService(req, res);

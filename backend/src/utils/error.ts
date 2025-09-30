@@ -1,7 +1,8 @@
-import { Error as MongooseError } from 'mongoose';
+import mongoose from 'mongoose';
+import * as yup from 'yup';
 
 export function formatMongooseValidationErrors(
-    error: MongooseError.ValidationError,
+    error: mongoose.Error.ValidationError,
 ): Record<string, string> {
     const errors: Record<string, string> = {};
 
@@ -11,3 +12,11 @@ export function formatMongooseValidationErrors(
 
     return errors;
 }
+
+export const formatYupValidationErrors = (error: yup.ValidationError): Record<string, string[]> => {
+    return error.inner.reduce<Record<string, string[]>>((acc, e) => {
+        const field = e.path || 'unknown';
+        (acc[field] ||= []).push(e.message);
+        return acc;
+    }, {});
+};

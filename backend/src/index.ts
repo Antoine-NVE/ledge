@@ -6,10 +6,11 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth';
 import transactionRoutes from './routes/transaction';
 import userRoutes from './routes/user';
-import { formatMongooseValidationErrors } from './utils/error';
+import { formatMongooseValidationErrors, formatYupValidationErrors } from './utils/error';
 import { UnauthorizedError } from './errors/UnauthorizedError';
 import { HttpError } from './errors/HttpError';
 import { env } from './config/env';
+import * as yup from 'yup';
 
 const app = express();
 app.use(express.json());
@@ -41,9 +42,18 @@ app.use('/users', userRoutes);
 app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
     if (err instanceof mongoose.Error.ValidationError) {
         res.status(400).json({
-            message: 'Validation Error',
+            message: 'Validation error',
             data: null,
             errors: formatMongooseValidationErrors(err),
+        });
+        return;
+    }
+
+    if (err instanceof yup.ValidationError) {
+        res.status(400).json({
+            message: 'Validation error',
+            data: null,
+            errors: formatYupValidationErrors(err),
         });
         return;
     }
