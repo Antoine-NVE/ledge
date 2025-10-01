@@ -17,8 +17,10 @@ export const registerSchema = z
     })
     .strict();
 
-export const loginSchema = z.object({
-    email: z.string().trim().toLowerCase().email('Invalid email address'),
-    password: z.string(),
-    rememberMe: z.boolean(),
-});
+export const loginSchema = z
+    .object({
+        email: z.string().trim().toLowerCase().email('Invalid email address'),
+        password: z.string(),
+        rememberMe: z.boolean(),
+    })
+    .strict();
