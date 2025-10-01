@@ -6,11 +6,15 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth';
 import transactionRoutes from './routes/transaction';
 import userRoutes from './routes/user';
-import { formatMongooseValidationErrors, formatYupValidationErrors } from './utils/error';
+import {
+    formatMongooseValidationErrors,
+    formatZodValidationErrors,
+} from './utils/error';
 import { UnauthorizedError } from './errors/UnauthorizedError';
 import { HttpError } from './errors/HttpError';
 import { env } from './config/env';
 import * as yup from 'yup';
+import z from 'zod';
 
 const app = express();
 app.use(express.json());
@@ -49,11 +53,11 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
         return;
     }
 
-    if (err instanceof yup.ValidationError) {
+    if (err instanceof z.ZodError) {
         res.status(400).json({
             message: 'Validation error',
             data: null,
-            errors: formatYupValidationErrors(err),
+            errors: formatZodValidationErrors(err),
         });
         return;
     }

@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import * as yup from 'yup';
+import z from 'zod';
 
 export function formatMongooseValidationErrors(
     error: mongoose.Error.ValidationError,
@@ -13,10 +14,24 @@ export function formatMongooseValidationErrors(
     return errors;
 }
 
-export const formatYupValidationErrors = (error: yup.ValidationError): Record<string, string[]> => {
-    return error.inner.reduce<Record<string, string[]>>((acc, e) => {
-        const field = e.path || 'unknown';
-        (acc[field] ||= []).push(e.message);
-        return acc;
-    }, {});
+export const formatZodValidationErrors = (err: z.ZodError): Record<string, string[]> => {
+    const error: {
+        errors: string[];
+        properties?: Record<string, { errors: string[] }>;
+    } = z.treeifyError(err);
+    const result: Record<string, string[]> = {};
+
+    if (error.errors.length > 0) {
+        result.other = error.errors;
+    }
+
+    if (error.properties) {
+        for (const [field, info] of Object.entries(error.properties)) {
+            if (info.errors && info.errors.length > 0) {
+                result[field] = info.errors;
+            }
+        }
+    }
+
+    return result;
 };
