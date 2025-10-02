@@ -14,7 +14,7 @@ const router = express.Router();
 
 const userModel = UserModel;
 const userRepository = new UserRepository(userModel);
-const secret = env.JWT_SECRET!;
+const secret = env.JWT_SECRET;
 const jwtService = new JwtService(secret);
 const refreshTokenModel = RefreshTokenModel;
 const refreshTokenRepository = new RefreshTokenRepository(refreshTokenModel);

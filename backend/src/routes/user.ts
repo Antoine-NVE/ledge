@@ -11,14 +11,14 @@ import { env } from '../config/env';
 
 const router = express.Router();
 
-const jwtService = new JwtService(env.JWT_SECRET!);
+const jwtService = new JwtService(env.JWT_SECRET);
 const emailService = new EmailService({
-    host: env.SMTP_HOST!,
-    port: Number(env.SMTP_PORT),
-    secure: env.SMTP_SECURE === 'true',
+    host: env.SMTP_HOST,
+    port: env.SMTP_PORT,
+    secure: env.SMTP_SECURE,
     auth: {
-        user: env.SMTP_USER!,
-        pass: env.SMTP_PASS!,
+        user: env.SMTP_USER,
+        pass: env.SMTP_PASS,
     },
 });
 const userRepository = new UserRepository(UserModel);

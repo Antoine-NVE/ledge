@@ -19,7 +19,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 
     if (!accessToken) throw new RequiredAccessTokenError();
 
-    const jwtService = new JwtService(env.JWT_SECRET!);
+    const jwtService = new JwtService(env.JWT_SECRET);
     const decoded = jwtService.verifyAccessJwt(accessToken);
 
     const user = await UserModel.findById(decoded.sub);
