@@ -5,6 +5,7 @@ export const registerSchema = z
         email: z.string().trim().toLowerCase().email('Invalid email address'),
         password: z
             .string()
+            .regex(/^\S.*\S$|^\S$/, 'Password cannot start or end with whitespace')
             .regex(
                 /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/,
                 'Password must be at least 8 characters, and include an uppercase letter, a lowercase letter, a number, and a special character',
