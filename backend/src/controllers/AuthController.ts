@@ -84,7 +84,9 @@ export class AuthController {
         const authCookieService = new AuthCookieService(req, res);
         const token = authCookieService.getRefreshTokenCookie();
 
-        await this.authService.logout(token);
+        if (token) {
+            await this.authService.logout(token);
+        }
 
         authCookieService.clearAllAuthCookies();
 
