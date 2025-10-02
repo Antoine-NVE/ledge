@@ -5,15 +5,7 @@ import { formatMongooseValidationErrors } from '../utils/error';
 import { UndefinedTransactionError, UndefinedUserError } from '../errors/InternalServerError';
 import { TransactionService } from '../services/TransactionService';
 import { TransactionRepository } from '../repositories/TransactionRepository';
-import { transactionCreateSchema } from '../schemas/transactionSchema';
-
-interface UpdateTransactionBody {
-    month: string | undefined;
-    isIncome: boolean | undefined;
-    isRecurring: boolean | undefined;
-    name: string | undefined;
-    value: number | undefined;
-}
+import { transactionCreateSchema, transactionUpdateSchema } from '../schemas/transactionSchema';
 
 export class TransactionController {
     constructor(private transactionService: TransactionService) {}
@@ -66,11 +58,11 @@ export class TransactionController {
         });
     }
 
-    async update(req: Request<object, object, UpdateTransactionBody>, res: Response) {
+    async update(req: Request, res: Response) {
+        const transactionData = transactionUpdateSchema.parse(req.body);
+
         const transaction = req.transaction;
         if (!transaction) throw new UndefinedTransactionError();
-
-        const transactionData = req.body;
 
         const updatedTransaction = await this.transactionService.updateFromDocument(transaction, {
             ...transactionData,
