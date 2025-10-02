@@ -11,13 +11,13 @@ export class TransactionController {
     constructor(private transactionService: TransactionService) {}
 
     async create(req: Request, res: Response) {
-        const transactionData = transactionCreateSchema.parse(req.body);
+        const body = transactionCreateSchema.parse(req.body);
 
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
         const transaction = await this.transactionService.create({
-            ...transactionData,
+            ...body,
             user: user._id,
         });
 
@@ -59,13 +59,13 @@ export class TransactionController {
     }
 
     async update(req: Request, res: Response) {
-        const transactionData = transactionUpdateSchema.parse(req.body);
+        const body = transactionUpdateSchema.parse(req.body);
 
         const transaction = req.transaction;
         if (!transaction) throw new UndefinedTransactionError();
 
         const updatedTransaction = await this.transactionService.updateFromDocument(transaction, {
-            ...transactionData,
+            ...body,
         });
 
         res.status(200).json({
