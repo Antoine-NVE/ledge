@@ -29,7 +29,9 @@ export class UserService {
 
         await this.emailService.sendEmailVerificationEmail(from, user.email, frontendBaseUrl, jwt);
 
-        await this.setEmailVerificationCooldown(user);
+        await this.userRepository.updateFromDocument(user, {
+            emailVerificationCooldownExpiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
+        });
     }
 
     async verifyEmail(token: string): Promise<void> {
@@ -39,16 +41,6 @@ export class UserService {
         if (!user) throw new UserNotFoundError();
         if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
 
-        await this.markEmailAsVerified(user);
-    }
-
-    async setEmailVerificationCooldown(user: UserDocument): Promise<void> {
-        await this.userRepository.updateFromDocument(user, {
-            emailVerificationCooldownExpiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
-        });
-    }
-
-    async markEmailAsVerified(user: UserDocument): Promise<void> {
         await this.userRepository.updateFromDocument(user, {
             isEmailVerified: true,
         });
