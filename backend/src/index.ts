@@ -29,16 +29,6 @@ app.use(
     }),
 );
 
-(async () => {
-    try {
-        const mongoUri = `mongodb://${env.DATABASE_SERVICE}:27017/ledge`;
-        await mongoose.connect(mongoUri);
-        console.log('Connected to MongoDB');
-    } catch (err) {
-        console.error('Error connecting to MongoDB:', err);
-    }
-})();
-
 app.use('/auth', authRoutes);
 app.use('/transactions', transactionRoutes);
 app.use('/users', userRoutes);
