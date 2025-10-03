@@ -1,14 +1,10 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import UserModel from '../models/User';
-import { removePassword } from '../utils/sanitize';
 import { AuthCookieService } from '../services/AuthCookieService';
 import { generateToken } from '../utils/token';
-import RefreshTokenModel from '../models/RefreshToken';
 import { JwtService } from '../services/JwtService';
 import { AuthService } from '../services/AuthService';
 import { UserRepository } from '../repositories/UserRepository';
-import { RefreshTokenService } from '../services/RefreshTokenService';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { exit } from 'process';
 import { RequiredRefreshTokenError } from '../errors/UnauthorizedError';
@@ -24,10 +20,10 @@ export class AuthController {
         // Next time the user logs in, they can choose to be remembered
         const rememberMe = false;
 
-        const { user, accessToken, refreshToken } = await this.authService.register(
-            body.email,
-            body.password,
-        );
+        const { user, accessToken, refreshToken } = await this.authService.register({
+            email: body.email,
+            password: body.password,
+        });
 
         const authCookieService = new AuthCookieService(req, res);
         authCookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);

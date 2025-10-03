@@ -30,8 +30,8 @@ app.use(
 );
 
 app.use('/auth', authRoutes);
-app.use('/transactions', transactionRoutes);
-app.use('/users', userRoutes);
+// app.use('/transactions', transactionRoutes);
+// app.use('/users', userRoutes);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
     if (err instanceof mongoose.Error.ValidationError) {

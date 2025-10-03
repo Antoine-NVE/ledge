@@ -25,3 +25,14 @@ export const loginSchema = z
         rememberMe: z.boolean(),
     })
     .strict();
+
+export const userSchema = z
+    .object({
+        email: z.string().trim().toLowerCase().email(),
+        passwordHash: z.string().trim().min(1),
+        isEmailVerified: z.boolean(),
+        emailVerificationCooldownExpiresAt: z.date().nullable(),
+        createdAt: z.date(),
+        updatedAt: z.date().nullable(),
+    })
+    .strict();

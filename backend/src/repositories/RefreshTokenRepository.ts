@@ -1,27 +1,16 @@
+import { Collection, WithId } from 'mongodb';
 import { DeleteResult, Model, Types } from 'mongoose';
-import { RefreshToken, RefreshTokenDocument } from '../models/RefreshToken';
-import { UserDocument } from '../models/User';
+import { RefreshToken } from '../types/refreshTokenType';
 
 export class RefreshTokenRepository {
-    constructor(private refreshTokenModel: Model<RefreshTokenDocument>) {}
+    constructor(private refreshTokenCollection: Collection<RefreshToken>) {}
 
-    async create(data: Partial<RefreshToken>): Promise<RefreshTokenDocument> {
-        return await this.refreshTokenModel.create(data);
-    }
+    async insert(refreshToken: RefreshToken): Promise<WithId<RefreshToken>> {
+        const result = await this.refreshTokenCollection.insertOne(refreshToken);
 
-    async findByToken(token: string): Promise<RefreshTokenDocument | null> {
-        return await this.refreshTokenModel.findOne({ token });
-    }
-
-    async updateFromDocument(
-        refreshToken: RefreshTokenDocument,
-        data: Partial<RefreshToken>,
-    ): Promise<RefreshTokenDocument> {
-        Object.assign(refreshToken, data);
-        return await refreshToken.save();
-    }
-
-    async deleteByToken(token: string): Promise<DeleteResult> {
-        return await this.refreshTokenModel.deleteOne({ token });
+        return {
+            ...refreshToken,
+            _id: result.insertedId,
+        };
     }
 }

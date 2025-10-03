@@ -4,41 +4,52 @@ import {
     InvalidRefreshTokenError,
     RequiredRefreshTokenError,
 } from '../errors/UnauthorizedError';
-import RefreshTokenModel, { RefreshTokenDocument } from '../models/RefreshToken';
-import UserModel, { UserDocument } from '../models/User';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { UserRepository } from '../repositories/UserRepository';
 import { generateToken } from '../utils/token';
 import bcrypt from 'bcrypt';
 import { JwtService } from './JwtService';
-import { RefreshTokenService } from './RefreshTokenService';
+import { WithId } from 'mongodb';
+import { User } from '../types/userType';
+import { userSchema } from '../schemas/userSchema';
+import { RefreshToken } from '../types/refreshTokenType';
+import { refreshTokenSchema } from '../schemas/refreshTokenSchema';
 
 export class AuthService {
     constructor(
         private userRepository: UserRepository,
         private jwtService: JwtService,
-        private refreshTokenService: RefreshTokenService,
+        private refreshTokenRepository: RefreshTokenRepository,
     ) {}
 
-    async register(
-        email: string,
-        password: string,
-    ): Promise<{
-        user: UserDocument;
+    async register({ email, password }: { email: string; password: string }): Promise<{
+        user: WithId<User>;
         accessToken: string;
-        refreshToken: RefreshTokenDocument;
+        refreshToken: WithId<RefreshToken>;
     }> {
-        // By default, new users are not email verified
-        const isEmailVerified = false;
-
-        const user = await this.userRepository.create({
+        const passwordHash = await bcrypt.hash(password, 10);
+        const newUser = userSchema.parse({
             email,
-            password,
-            isEmailVerified,
+            passwordHash,
+            isEmailVerified: false,
+            emailVerificationCooldownExpiresAt: null,
+            createdAt: new Date(),
+            updatedAt: null,
+        });
+        const user = await this.userRepository.insert({
+            ...newUser,
         });
 
         const accessToken = this.jwtService.signAccessJwt(user._id);
-        const refreshToken = await this.refreshTokenService.create(user._id);
+
+        const newRefreshToken = refreshTokenSchema.parse({
+            token: generateToken(),
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+            userId: user._id,
+        });
+        const refreshToken = await this.refreshTokenRepository.insert({
+            ...newRefreshToken,
+        });
 
         return { user, accessToken, refreshToken };
     }

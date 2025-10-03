@@ -1,27 +1,16 @@
+import { Collection, Document, InsertOneResult, ObjectId, WithId } from 'mongodb';
 import { Model, Types } from 'mongoose';
-import { User, UserDocument } from '../models/User';
+import { User } from '../types/userType';
 
 export class UserRepository {
-    constructor(private userModel: Model<UserDocument>) {}
+    constructor(private userCollection: Collection<User>) {}
 
-    async create(data: Partial<User>): Promise<UserDocument> {
-        return await this.userModel.create(data);
-    }
+    async insert(user: User): Promise<WithId<User>> {
+        const result = await this.userCollection.insertOne(user);
 
-    async findById(id: string): Promise<UserDocument | null> {
-        return await this.userModel.findById(id);
-    }
-
-    async findByEmail(email: string): Promise<UserDocument | null> {
-        return await this.userModel.findOne({ email });
-    }
-
-    async updateFromDocument(user: UserDocument, data: Partial<User>): Promise<UserDocument> {
-        Object.assign(user, data);
-        return await user.save();
-    }
-
-    async delete(id: Types.ObjectId): Promise<UserDocument | null> {
-        return await this.userModel.findByIdAndDelete(id);
+        return {
+            ...user,
+            _id: result.insertedId,
+        };
     }
 }

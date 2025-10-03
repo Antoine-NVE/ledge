@@ -4,22 +4,17 @@ import { AuthController } from '../controllers/AuthController';
 import { AuthService } from '../services/AuthService';
 import { UserRepository } from '../repositories/UserRepository';
 import { JwtService } from '../services/JwtService';
-import { RefreshTokenService } from '../services/RefreshTokenService';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
-import RefreshTokenModel from '../models/RefreshToken';
-import UserModel from '../models/User';
 import { env } from '../config/env';
+import { db } from '../config/db';
 
 const router = express.Router();
 
-const userModel = UserModel;
-const userRepository = new UserRepository(userModel);
+const userRepository = new UserRepository(db.collection('users'));
 const secret = env.JWT_SECRET;
 const jwtService = new JwtService(secret);
-const refreshTokenModel = RefreshTokenModel;
-const refreshTokenRepository = new RefreshTokenRepository(refreshTokenModel);
-const refreshTokenService = new RefreshTokenService(refreshTokenRepository);
-const authService = new AuthService(userRepository, jwtService, refreshTokenService);
+const refreshTokenRepository = new RefreshTokenRepository(db.collection('refreshtokens'));
+const authService = new AuthService(userRepository, jwtService, refreshTokenRepository);
 const authController = new AuthController(authService);
 
 router.post('/register', (req, res) => authController.register(req, res));
