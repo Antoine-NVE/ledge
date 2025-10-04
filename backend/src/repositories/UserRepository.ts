@@ -1,20 +1,20 @@
-import { Collection, Document, InsertOneResult, ObjectId, WithId } from 'mongodb';
+import { Collection, Document, InsertOneResult, ObjectId, OptionalId, WithId } from 'mongodb';
 import { Model, Types } from 'mongoose';
-import { User } from '../types/userType';
+import { User, UserData } from '../types/userType';
 
 export class UserRepository {
-    constructor(private userCollection: Collection<User>) {}
+    constructor(private userCollection: Collection<UserData>) {}
 
-    async insertOne(user: User): Promise<WithId<User>> {
-        const result = await this.userCollection.insertOne(user);
+    async insertOne(userData: UserData): Promise<User> {
+        const result = await this.userCollection.insertOne(userData);
 
         return {
             _id: result.insertedId,
-            ...user,
+            ...userData,
         };
     }
 
-    async findOneByEmail(email: string): Promise<WithId<User> | null> {
+    async findOneByEmail(email: string): Promise<User | null> {
         return this.userCollection.findOne({ email });
     }
 }

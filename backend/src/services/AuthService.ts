@@ -23,12 +23,12 @@ export class AuthService {
     ) {}
 
     async register({ email, password }: UserCredentials): Promise<{
-        user: WithId<User>;
+        user: User;
         accessToken: string;
-        refreshToken: WithId<RefreshToken>;
+        refreshToken: RefreshToken;
     }> {
         const passwordHash = await bcrypt.hash(password, 10);
-        const newUser = userSchema.parse({
+        const userData = userSchema.parse({
             email,
             passwordHash,
             isEmailVerified: false,
@@ -37,27 +37,27 @@ export class AuthService {
             updatedAt: null,
         });
         const user = await this.userRepository.insertOne({
-            ...newUser,
+            ...userData,
         });
 
         const accessToken = this.jwtService.signAccessJwt(user._id);
 
-        const newRefreshToken = refreshTokenSchema.parse({
+        const refreshTokenData = refreshTokenSchema.parse({
             token: generateToken(),
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
             userId: user._id,
         });
         const refreshToken = await this.refreshTokenRepository.insertOne({
-            ...newRefreshToken,
+            ...refreshTokenData,
         });
 
         return { user, accessToken, refreshToken };
     }
 
     async login({ email, password }: UserCredentials): Promise<{
-        user: WithId<User>;
+        user: User;
         accessToken: string;
-        refreshToken: WithId<RefreshToken>;
+        refreshToken: RefreshToken;
     }> {
         const user = await this.userRepository.findOneByEmail(email);
         if (!user) throw new InvalidCredentialsError();
@@ -67,21 +67,19 @@ export class AuthService {
 
         const accessToken = this.jwtService.signAccessJwt(user._id);
 
-        const newRefreshToken = refreshTokenSchema.parse({
+        const refreshTokenData = refreshTokenSchema.parse({
             token: generateToken(),
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
             userId: user._id,
         });
         const refreshToken = await this.refreshTokenRepository.insertOne({
-            ...newRefreshToken,
+            ...refreshTokenData,
         });
 
         return { user, accessToken, refreshToken };
     }
 
-    async refresh(
-        token: string,
-    ): Promise<{ accessToken: string; refreshToken: WithId<RefreshToken> }> {
+    async refresh(token: string): Promise<{ accessToken: string; refreshToken: RefreshToken }> {
         let refreshToken = await this.refreshTokenRepository.findOneByToken(token);
         if (!refreshToken) throw new InvalidRefreshTokenError();
         if (refreshToken.expiresAt < new Date()) throw new ExpiredRefreshTokenError();

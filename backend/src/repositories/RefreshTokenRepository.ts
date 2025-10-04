@@ -1,30 +1,30 @@
-import { Collection, ObjectId, WithId } from 'mongodb';
+import { Collection, ObjectId, OptionalId, WithId } from 'mongodb';
 import { DeleteResult, Model, Types } from 'mongoose';
-import { RefreshToken } from '../types/refreshTokenType';
+import { RefreshToken, RefreshTokenData } from '../types/refreshTokenType';
 
 export class RefreshTokenRepository {
-    constructor(private refreshTokenCollection: Collection<RefreshToken>) {}
+    constructor(private refreshTokenCollection: Collection<RefreshTokenData>) {}
 
-    async insertOne(refreshToken: RefreshToken): Promise<WithId<RefreshToken>> {
-        const result = await this.refreshTokenCollection.insertOne(refreshToken);
+    async insertOne(refreshTokenData: RefreshTokenData): Promise<RefreshToken> {
+        const result = await this.refreshTokenCollection.insertOne(refreshTokenData);
 
         return {
             _id: result.insertedId,
-            ...refreshToken,
+            ...refreshTokenData,
         };
     }
 
-    async findOneByToken(token: string): Promise<WithId<RefreshToken> | null> {
+    async findOneByToken(token: string): Promise<RefreshToken | null> {
         return this.refreshTokenCollection.findOne({ token });
     }
 
     async findOneByIdAndUpdate(
         id: ObjectId,
-        data: Partial<RefreshToken>,
-    ): Promise<WithId<RefreshToken> | null> {
+        partialRefreshTokenData: Partial<RefreshTokenData>,
+    ): Promise<RefreshToken | null> {
         return this.refreshTokenCollection.findOneAndUpdate(
             { _id: id },
-            { $set: data },
+            { $set: partialRefreshTokenData },
             { returnDocument: 'after' },
         );
     }
