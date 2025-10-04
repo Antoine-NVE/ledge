@@ -13,7 +13,7 @@ import { WithId } from 'mongodb';
 import { User, UserCredentials } from '../types/userType';
 import { userSchema } from '../schemas/userSchema';
 import { RefreshToken } from '../types/refreshTokenType';
-import { refreshTokenSchema } from '../schemas/refreshTokenSchema';
+import { partialRefreshTokenSchema, refreshTokenSchema } from '../schemas/refreshTokenSchema';
 
 export class AuthService {
     constructor(
@@ -81,14 +81,22 @@ export class AuthService {
 
     async refresh(
         token: string,
-    ): Promise<{ accessToken: string; refreshToken: RefreshTokenDocument }> {
-        const refreshToken = await this.refreshTokenService.findByToken(token);
-        const accessToken = this.jwtService.signAccessJwt(refreshToken.user._id);
+    ): Promise<{ accessToken: string; refreshToken: WithId<RefreshToken> }> {
+        let refreshToken = await this.refreshTokenRepository.findOneByToken(token);
+        if (!refreshToken) throw new InvalidRefreshTokenError();
+        if (refreshToken.expiresAt < new Date()) throw new ExpiredRefreshTokenError();
 
-        // Extend the refresh token expiration each time it is used
-        const newRefreshToken = await this.refreshTokenService.extendExpiration(refreshToken);
+        const refreshTokenData = partialRefreshTokenSchema.parse({
+            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+        });
+        refreshToken = await this.refreshTokenRepository.findOneByIdAndUpdate(refreshToken._id, {
+            ...refreshTokenData,
+        });
+        if (!refreshToken) throw new InvalidRefreshTokenError(); // Shouldn't happen
 
-        return { accessToken, refreshToken: newRefreshToken };
+        const accessToken = this.jwtService.signAccessJwt(refreshToken.userId);
+
+        return { accessToken, refreshToken };
     }
 
     async logout(token: string): Promise<void> {

@@ -8,3 +8,5 @@ export const refreshTokenSchema = z
         userId: z.custom<ObjectId>((val) => val instanceof ObjectId),
     })
     .strict();
+
+export const partialRefreshTokenSchema = refreshTokenSchema.partial();
