@@ -9,8 +9,8 @@ export class RefreshTokenRepository {
         const result = await this.refreshTokenCollection.insertOne(refreshToken);
 
         return {
-            ...refreshToken,
             _id: result.insertedId,
+            ...refreshToken,
         };
     }
 }

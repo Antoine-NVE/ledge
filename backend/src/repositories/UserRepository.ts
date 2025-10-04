@@ -9,8 +9,8 @@ export class UserRepository {
         const result = await this.userCollection.insertOne(user);
 
         return {
-            ...user,
             _id: result.insertedId,
+            ...user,
         };
     }
 }
