@@ -5,7 +5,7 @@ import { User } from '../types/userType';
 export class UserRepository {
     constructor(private userCollection: Collection<User>) {}
 
-    async insert(user: User): Promise<WithId<User>> {
+    async insertOne(user: User): Promise<WithId<User>> {
         const result = await this.userCollection.insertOne(user);
 
         return {

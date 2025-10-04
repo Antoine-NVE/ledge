@@ -36,7 +36,7 @@ export class AuthService {
             createdAt: new Date(),
             updatedAt: null,
         });
-        const user = await this.userRepository.insert({
+        const user = await this.userRepository.insertOne({
             ...newUser,
         });
 
@@ -47,7 +47,7 @@ export class AuthService {
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
             userId: user._id,
         });
-        const refreshToken = await this.refreshTokenRepository.insert({
+        const refreshToken = await this.refreshTokenRepository.insertOne({
             ...newRefreshToken,
         });
 
@@ -72,7 +72,7 @@ export class AuthService {
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
             userId: user._id,
         });
-        const refreshToken = await this.refreshTokenRepository.insert({
+        const refreshToken = await this.refreshTokenRepository.insertOne({
             ...newRefreshToken,
         });
 

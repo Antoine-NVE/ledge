@@ -5,7 +5,7 @@ import { RefreshToken } from '../types/refreshTokenType';
 export class RefreshTokenRepository {
     constructor(private refreshTokenCollection: Collection<RefreshToken>) {}
 
-    async insert(refreshToken: RefreshToken): Promise<WithId<RefreshToken>> {
+    async insertOne(refreshToken: RefreshToken): Promise<WithId<RefreshToken>> {
         const result = await this.refreshTokenCollection.insertOne(refreshToken);
 
         return {
