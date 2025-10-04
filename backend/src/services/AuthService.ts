@@ -10,7 +10,7 @@ import { generateToken } from '../utils/token';
 import bcrypt from 'bcrypt';
 import { JwtService } from './JwtService';
 import { WithId } from 'mongodb';
-import { User } from '../types/userType';
+import { User, UserCredentials } from '../types/userType';
 import { userSchema } from '../schemas/userSchema';
 import { RefreshToken } from '../types/refreshTokenType';
 import { refreshTokenSchema } from '../schemas/refreshTokenSchema';
@@ -22,7 +22,7 @@ export class AuthService {
         private refreshTokenRepository: RefreshTokenRepository,
     ) {}
 
-    async register({ email, password }: { email: string; password: string }): Promise<{
+    async register({ email, password }: UserCredentials): Promise<{
         user: WithId<User>;
         accessToken: string;
         refreshToken: WithId<RefreshToken>;
