@@ -13,4 +13,8 @@ export class UserRepository {
             ...user,
         };
     }
+
+    async findOneByEmail(email: string): Promise<WithId<User> | null> {
+        return this.userCollection.findOne({ email });
+    }
 }

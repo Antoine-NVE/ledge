@@ -40,10 +40,10 @@ export class AuthController {
     async login(req: Request, res: Response) {
         const body = loginSchema.parse(req.body);
 
-        const { user, accessToken, refreshToken } = await this.authService.login(
-            body.email,
-            body.password,
-        );
+        const { user, accessToken, refreshToken } = await this.authService.login({
+            email: body.email,
+            password: body.password,
+        });
 
         const authCookieService = new AuthCookieService(req, res);
         authCookieService.setAllAuthCookies(accessToken, refreshToken.token, body.rememberMe);
