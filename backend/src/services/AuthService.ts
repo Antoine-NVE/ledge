@@ -98,6 +98,6 @@ export class AuthService {
     }
 
     async logout(token: string): Promise<void> {
-        await this.refreshTokenService.deleteByToken(token);
+        this.refreshTokenRepository.deleteOneByToken(token);
     }
 }

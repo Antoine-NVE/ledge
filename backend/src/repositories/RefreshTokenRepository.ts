@@ -28,4 +28,8 @@ export class RefreshTokenRepository {
             { returnDocument: 'after' },
         );
     }
+
+    async deleteOneByToken(token: string): Promise<void> {
+        this.refreshTokenCollection.deleteOne({ token });
+    }
 }
