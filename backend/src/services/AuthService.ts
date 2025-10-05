@@ -40,8 +40,6 @@ export class AuthService {
             ...userData,
         });
 
-        const accessToken = this.jwtService.signAccessJwt(user._id);
-
         const refreshTokenData = refreshTokenSchema.parse({
             token: generateToken(),
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
@@ -50,6 +48,8 @@ export class AuthService {
         const refreshToken = await this.refreshTokenRepository.insertOne({
             ...refreshTokenData,
         });
+
+        const accessToken = this.jwtService.signAccessJwt(user._id);
 
         return { user, accessToken, refreshToken };
     }
@@ -65,8 +65,6 @@ export class AuthService {
         const doesMatch = await bcrypt.compare(password, user.passwordHash);
         if (!doesMatch) throw new InvalidCredentialsError();
 
-        const accessToken = this.jwtService.signAccessJwt(user._id);
-
         const refreshTokenData = refreshTokenSchema.parse({
             token: generateToken(),
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
@@ -75,6 +73,8 @@ export class AuthService {
         const refreshToken = await this.refreshTokenRepository.insertOne({
             ...refreshTokenData,
         });
+
+        const accessToken = this.jwtService.signAccessJwt(user._id);
 
         return { user, accessToken, refreshToken };
     }
