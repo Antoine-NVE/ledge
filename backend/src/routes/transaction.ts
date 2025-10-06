@@ -1,5 +1,4 @@
 import express from 'express';
-import authorizeTransactionAccess from '../middlewares/authorizeTransactionAccess';
 import { TransactionController } from '../controllers/TransactionController';
 import { TransactionRepository } from '../repositories/TransactionRepository';
 import { db } from '../config/db';
@@ -22,7 +21,12 @@ const securityMiddleware = new SecurityMiddleware(
 
 router.post('/', securityMiddleware.authenticateUser, transactionController.create);
 router.get('/', securityMiddleware.authenticateUser, transactionController.findAll);
-// router.get('/:id', authenticate, authorizeTransactionAccess, transactionController.findOne);
+router.get(
+    '/:id',
+    securityMiddleware.authenticateUser,
+    securityMiddleware.authorizeTransaction,
+    transactionController.findOne,
+);
 // router.put('/:id', authenticate, authorizeTransactionAccess, transactionController.update);
 // router.delete('/:id', authenticate, authorizeTransactionAccess, transactionController.remove);
 

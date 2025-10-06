@@ -15,6 +15,10 @@ export class TransactionRepository {
     };
 
     findAllByUserId = async (userId: ObjectId): Promise<Transaction[] | null> => {
-        return await this.transactionCollection.find({ userId }).toArray();
+        return this.transactionCollection.find({ userId }).toArray();
+    };
+
+    findOneById = async (id: ObjectId): Promise<Transaction | null> => {
+        return this.transactionCollection.findOne({ _id: id });
     };
 }

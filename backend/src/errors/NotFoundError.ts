@@ -11,3 +11,9 @@ export class UserNotFoundError extends NotFoundError {
         super('User not found');
     }
 }
+
+export class TransactionNotFoundError extends NotFoundError {
+    constructor() {
+        super('Transaction not found');
+    }
+}

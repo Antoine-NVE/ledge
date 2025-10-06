@@ -5,12 +5,21 @@ import { JwtService } from '../services/JwtService';
 import { AuthCookieService } from '../services/AuthCookieService';
 import { RequiredAccessTokenError } from '../errors/UnauthorizedError';
 import { ObjectId } from 'mongodb';
-import { UserNotFoundError } from '../errors/NotFoundError';
+import { TransactionNotFoundError, UserNotFoundError } from '../errors/NotFoundError';
 import { User } from '../types/userType';
+import { UndefinedUserError } from '../errors/InternalServerError';
+import { TransactionAccessForbiddenError } from '../errors/ForbiddenError';
+import { Transaction } from '../types/transaction';
 
 declare module 'express-serve-static-core' {
     interface Request {
         user?: User;
+    }
+}
+
+declare module 'express-serve-static-core' {
+    interface Request {
+        transaction?: Transaction;
     }
 }
 
@@ -31,6 +40,21 @@ export class SecurityMiddleware {
         if (!user) throw new UserNotFoundError();
 
         req.user = user;
+        next();
+    };
+
+    authorizeTransaction = async (req: Request, res: Response, next: NextFunction) => {
+        const user = req.user;
+        if (!user) throw new UndefinedUserError();
+
+        const transactionId = new ObjectId(req.params.id);
+
+        const transaction = await this.transactionRepository.findOneById(transactionId);
+        if (!transaction) throw new TransactionNotFoundError();
+
+        if (!user._id.equals(transaction.userId)) throw new TransactionAccessForbiddenError();
+
+        req.transaction = transaction;
         next();
     };
 }
