@@ -6,6 +6,13 @@ import { AuthCookieService } from '../services/AuthCookieService';
 import { RequiredAccessTokenError } from '../errors/UnauthorizedError';
 import { ObjectId } from 'mongodb';
 import { UserNotFoundError } from '../errors/NotFoundError';
+import { User } from '../types/userType';
+
+declare module 'express-serve-static-core' {
+    interface Request {
+        user?: User;
+    }
+}
 
 export class SecurityMiddleware {
     constructor(
@@ -20,7 +27,7 @@ export class SecurityMiddleware {
         if (!accessToken) throw new RequiredAccessTokenError();
 
         const payload = this.jwtService.verifyAccessJwt(accessToken);
-        const user = this.userRepository.findOneById(new ObjectId(payload.sub));
+        const user = await this.userRepository.findOneById(new ObjectId(payload.sub));
         if (!user) throw new UserNotFoundError();
 
         req.user = user;
