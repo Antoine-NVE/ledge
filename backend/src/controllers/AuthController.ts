@@ -13,7 +13,7 @@ import { loginSchema, registerSchema } from '../schemas/userSchema';
 export class AuthController {
     constructor(private authService: AuthService) {}
 
-    async register(req: Request, res: Response) {
+    register = async (req: Request, res: Response) => {
         const body = registerSchema.parse(req.body);
 
         // The user can't choose to be remembered at registration
@@ -37,7 +37,7 @@ export class AuthController {
         });
     }
 
-    async login(req: Request, res: Response) {
+    login = async (req: Request, res: Response) => {
         const body = loginSchema.parse(req.body);
 
         const { user, accessToken, refreshToken } = await this.authService.login({
@@ -57,7 +57,7 @@ export class AuthController {
         });
     }
 
-    async refresh(req: Request, res: Response) {
+    refresh = async (req: Request, res: Response) => {
         const authCookieService = new AuthCookieService(req, res);
         const token = authCookieService.getRefreshTokenCookie();
         if (!token) throw new RequiredRefreshTokenError();
@@ -76,7 +76,7 @@ export class AuthController {
         });
     }
 
-    async logout(req: Request, res: Response) {
+    logout = async (req: Request, res: Response) => {
         const authCookieService = new AuthCookieService(req, res);
         const token = authCookieService.getRefreshTokenCookie();
 

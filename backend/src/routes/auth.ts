@@ -17,9 +17,9 @@ const refreshTokenRepository = new RefreshTokenRepository(db.collection('refresh
 const authService = new AuthService(userRepository, jwtService, refreshTokenRepository);
 const authController = new AuthController(authService);
 
-router.post('/register', (req, res) => authController.register(req, res));
-router.post('/login', (req, res) => authController.login(req, res));
-router.post('/refresh', (req, res) => authController.refresh(req, res));
-router.post('/logout', (req, res) => authController.logout(req, res));
+router.post('/register', authController.register);
+router.post('/login', authController.login);
+router.post('/refresh', authController.refresh);
+router.post('/logout', authController.logout);
 
 export default router;

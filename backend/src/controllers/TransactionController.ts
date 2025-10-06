@@ -10,7 +10,7 @@ import { transactionCreateSchema, transactionUpdateSchema } from '../schemas/tra
 export class TransactionController {
     constructor(private transactionService: TransactionService) {}
 
-    async create(req: Request, res: Response) {
+    create = async (req: Request, res: Response) => {
         const body = transactionCreateSchema.parse(req.body);
 
         const user = req.user;
@@ -30,7 +30,7 @@ export class TransactionController {
         });
     }
 
-    async findAll(req: Request, res: Response) {
+    findAll = async (req: Request, res: Response) => {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
@@ -45,7 +45,7 @@ export class TransactionController {
         });
     }
 
-    async findOne(req: Request, res: Response) {
+    findOne = async (req: Request, res: Response) => {
         const transaction = req.transaction;
         if (!transaction) throw new UndefinedTransactionError();
 
@@ -58,7 +58,7 @@ export class TransactionController {
         });
     }
 
-    async update(req: Request, res: Response) {
+    update = async (req: Request, res: Response) => {
         const body = transactionUpdateSchema.parse(req.body);
 
         const transaction = req.transaction;
@@ -77,7 +77,7 @@ export class TransactionController {
         });
     }
 
-    async remove(req: Request, res: Response) {
+    remove = async (req: Request, res: Response) => {
         const transaction = req.transaction;
         if (!transaction) throw new UndefinedTransactionError();
 

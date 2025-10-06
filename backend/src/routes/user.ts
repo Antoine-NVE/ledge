@@ -25,10 +25,8 @@ const userRepository = new UserRepository(UserModel);
 const userService = new UserService(jwtService, emailService, userRepository);
 const userController = new UserController(userService);
 
-router.post('/send-email-verification-email', authenticate, (req, res) =>
-    userController.sendEmailVerificationEmail(req, res),
-);
-router.get('/verify-email/:token', (req, res) => userController.verifyEmail(req, res));
-router.get('/me', authenticate, (req, res) => userController.me(req, res));
+router.post('/send-email-verification-email', authenticate, userController.sendEmailVerificationEmail);
+router.get('/verify-email/:token', userController.verifyEmail);
+router.get('/me', authenticate, userController.me);
 
 export default router;

@@ -12,16 +12,10 @@ const transactionController = new TransactionController(
     new TransactionService(new TransactionRepository(TransactionModel)),
 );
 
-router.post('/', authenticate, (req, res) => transactionController.create(req, res));
-router.get('/', authenticate, (req, res) => transactionController.findAll(req, res));
-router.get('/:id', authenticate, authorizeTransactionAccess, (req, res) =>
-    transactionController.findOne(req, res),
-);
-router.put('/:id', authenticate, authorizeTransactionAccess, (req, res) =>
-    transactionController.update(req, res),
-);
-router.delete('/:id', authenticate, authorizeTransactionAccess, (req, res) =>
-    transactionController.remove(req, res),
-);
+router.post('/', authenticate, transactionController.create);
+router.get('/', authenticate, transactionController.findAll);
+router.get('/:id', authenticate, authorizeTransactionAccess, transactionController.findOne);
+router.put('/:id', authenticate, authorizeTransactionAccess, transactionController.update);
+router.delete('/:id', authenticate, authorizeTransactionAccess, transactionController.remove);
 
 export default router;

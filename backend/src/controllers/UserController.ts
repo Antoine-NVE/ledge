@@ -10,7 +10,7 @@ import { env } from '../config/env';
 export class UserController {
     constructor(private userService: UserService) {}
 
-    async me(req: Request, res: Response): Promise<void> {
+    me = async (req: Request, res: Response): Promise<void> => {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
@@ -23,10 +23,10 @@ export class UserController {
         });
     }
 
-    async sendEmailVerificationEmail(
+    sendEmailVerificationEmail = async (
         req: Request<object, object, { frontendBaseUrl: string }>,
         res: Response,
-    ): Promise<void> {
+    ): Promise<void> => {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
         const { frontendBaseUrl } = req.body;
@@ -40,7 +40,7 @@ export class UserController {
         });
     }
 
-    async verifyEmail(req: Request<{ token: string }>, res: Response): Promise<void> {
+    verifyEmail = async (req: Request<{ token: string }>, res: Response): Promise<void> => {
         const { token } = req.params;
 
         await this.userService.verifyEmail(token);
