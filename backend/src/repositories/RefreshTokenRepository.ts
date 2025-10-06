@@ -5,31 +5,31 @@ import { RefreshToken, RefreshTokenData } from '../types/refreshTokenType';
 export class RefreshTokenRepository {
     constructor(private refreshTokenCollection: Collection<RefreshTokenData>) {}
 
-    async insertOne(refreshTokenData: RefreshTokenData): Promise<RefreshToken> {
+    insertOne = async (refreshTokenData: RefreshTokenData): Promise<RefreshToken> => {
         const result = await this.refreshTokenCollection.insertOne(refreshTokenData);
 
         return {
             _id: result.insertedId,
             ...refreshTokenData,
         };
-    }
+    };
 
-    async findOneByToken(token: string): Promise<RefreshToken | null> {
+    findOneByToken = async (token: string): Promise<RefreshToken | null> => {
         return this.refreshTokenCollection.findOne({ token });
-    }
+    };
 
-    async findOneByIdAndUpdate(
+    findOneByIdAndUpdate = async (
         id: ObjectId,
         partialRefreshTokenData: Partial<RefreshTokenData>,
-    ): Promise<RefreshToken | null> {
+    ): Promise<RefreshToken | null> => {
         return this.refreshTokenCollection.findOneAndUpdate(
             { _id: id },
             { $set: partialRefreshTokenData },
             { returnDocument: 'after' },
         );
-    }
+    };
 
-    async deleteOneByToken(token: string): Promise<void> {
+    deleteOneByToken = async (token: string): Promise<void> => {
         this.refreshTokenCollection.deleteOne({ token });
-    }
+    };
 }

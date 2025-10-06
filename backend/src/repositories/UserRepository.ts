@@ -5,20 +5,20 @@ import { User, UserData } from '../types/userType';
 export class UserRepository {
     constructor(private userCollection: Collection<UserData>) {}
 
-    async insertOne(userData: UserData): Promise<User> {
+    insertOne = async (userData: UserData): Promise<User> => {
         const result = await this.userCollection.insertOne(userData);
 
         return {
             _id: result.insertedId,
             ...userData,
         };
-    }
+    };
 
-    async findOneByEmail(email: string): Promise<User | null> {
+    findOneByEmail = async (email: string): Promise<User | null> => {
         return this.userCollection.findOne({ email });
-    }
+    };
 
-    async findOneById(id: ObjectId): Promise<User | null> {
+    findOneById = async (id: ObjectId): Promise<User | null> => {
         return this.userCollection.findOne({ _id: id });
-    }
+    };
 }
