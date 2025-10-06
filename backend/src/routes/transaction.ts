@@ -20,12 +20,12 @@ const securityMiddleware = new SecurityMiddleware(
 );
 
 router.post('/', securityMiddleware.authenticateUser, transactionController.create);
-router.get('/', securityMiddleware.authenticateUser, transactionController.findAll);
+router.get('/', securityMiddleware.authenticateUser, transactionController.readAll);
 router.get(
     '/:id',
     securityMiddleware.authenticateUser,
     securityMiddleware.authorizeTransaction,
-    transactionController.findOne,
+    transactionController.readOne,
 );
 router.put(
     '/:id',
@@ -37,7 +37,7 @@ router.delete(
     '/:id',
     securityMiddleware.authenticateUser,
     securityMiddleware.authorizeTransaction,
-    transactionController.remove,
+    transactionController.delete,
 );
 
 export default router;

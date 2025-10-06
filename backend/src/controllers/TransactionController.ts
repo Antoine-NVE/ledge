@@ -38,7 +38,7 @@ export class TransactionController {
         });
     };
 
-    findAll = async (req: Request, res: Response) => {
+    readAll = async (req: Request, res: Response) => {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
@@ -53,7 +53,7 @@ export class TransactionController {
         });
     };
 
-    findOne = async (req: Request, res: Response) => {
+    readOne = async (req: Request, res: Response) => {
         const transaction = req.transaction;
         if (!transaction) throw new UndefinedTransactionError();
 
@@ -91,7 +91,7 @@ export class TransactionController {
         });
     };
 
-    remove = async (req: Request, res: Response) => {
+    delete = async (req: Request, res: Response) => {
         const transaction = req.transaction;
         if (!transaction) throw new UndefinedTransactionError();
 
