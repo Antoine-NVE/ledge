@@ -95,13 +95,11 @@ export class TransactionController {
         const transaction = req.transaction;
         if (!transaction) throw new UndefinedTransactionError();
 
-        await this.transactionService.delete(transaction._id);
+        this.transactionRepository.deleteOneById(transaction._id);
 
         res.status(200).json({
             message: 'Transaction deleted successfully',
-            data: {
-                transaction,
-            },
+            data: null,
             errors: null,
         });
     };

@@ -32,4 +32,8 @@ export class TransactionRepository {
             { returnDocument: 'after' },
         );
     };
+
+    deleteOneById = async (id: ObjectId): Promise<void> => {
+        this.transactionCollection.deleteOne({ _id: id });
+    };
 }

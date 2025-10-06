@@ -33,6 +33,11 @@ router.put(
     securityMiddleware.authorizeTransaction,
     transactionController.update,
 );
-// router.delete('/:id', authenticate, authorizeTransactionAccess, transactionController.remove);
+router.delete(
+    '/:id',
+    securityMiddleware.authenticateUser,
+    securityMiddleware.authorizeTransaction,
+    transactionController.remove,
+);
 
 export default router;
