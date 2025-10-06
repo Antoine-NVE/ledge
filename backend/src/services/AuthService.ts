@@ -44,6 +44,8 @@ export class AuthService {
             token: generateToken(),
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
             userId: user._id,
+            createdAt: new Date(),
+            updatedAt: null,
         });
         const refreshToken = await this.refreshTokenRepository.insertOne({
             ...refreshTokenData,
@@ -69,6 +71,8 @@ export class AuthService {
             token: generateToken(),
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
             userId: user._id,
+            createdAt: new Date(),
+            updatedAt: null,
         });
         const refreshToken = await this.refreshTokenRepository.insertOne({
             ...refreshTokenData,
@@ -86,6 +90,7 @@ export class AuthService {
 
         const refreshTokenData = partialRefreshTokenSchema.parse({
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
+            updatedAt: new Date(),
         });
         refreshToken = await this.refreshTokenRepository.findOneByIdAndUpdate(refreshToken._id, {
             ...refreshTokenData,
