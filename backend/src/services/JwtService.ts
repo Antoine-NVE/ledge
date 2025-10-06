@@ -20,15 +20,20 @@ export class JwtService {
     }
 
     private verifyJwt(jwt: string, options?: VerifyOptions): VerifiedJwtPayload {
-        // Jwt can only be returned if we use 'complete: true' option, otherwise it's JwtPayload | string
-        const decoded = verify(jwt, this.secret, options) as JwtPayload | string;
+        try {
+            // Jwt can only be returned if we use 'complete: true' option, otherwise it's JwtPayload | string
+            // TODO: create a real verification
+            const decoded = verify(jwt, this.secret, options) as JwtPayload | string;
 
-        // If the token is valid but does not contain a 'sub' claim, we consider it invalid
-        if (typeof decoded !== 'object' || !decoded.sub) {
+            // If the token is valid but does not contain a 'sub' claim, we consider it invalid
+            if (typeof decoded !== 'object' || !decoded.sub) {
+                throw new InvalidJwtError();
+            }
+
+            return decoded as VerifiedJwtPayload;
+        } catch (error) {
             throw new InvalidJwtError();
         }
-
-        return decoded as VerifiedJwtPayload;
     }
 
     verifyAccessJwt(jwt: string): VerifiedJwtPayload {
