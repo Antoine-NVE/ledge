@@ -4,10 +4,13 @@ import { formatMongooseValidationErrors } from '../utils/error';
 import { UndefinedTransactionError, UndefinedUserError } from '../errors/InternalServerError';
 import { TransactionRepository } from '../repositories/TransactionRepository';
 import {
+    partialTransactionSchema,
     transactionCreateSchema,
     transactionSchema,
     transactionUpdateSchema,
 } from '../schemas/transactionSchema';
+import { Transaction } from '../types/transaction';
+import { TransactionNotFoundError } from '../errors/NotFoundError';
 
 export class TransactionController {
     constructor(private transactionRepository: TransactionRepository) {}
@@ -64,19 +67,25 @@ export class TransactionController {
     };
 
     update = async (req: Request, res: Response) => {
-        const body = transactionUpdateSchema.parse(req.body);
-
-        const transaction = req.transaction;
+        let transaction: Transaction | null | undefined = req.transaction;
         if (!transaction) throw new UndefinedTransactionError();
 
-        const updatedTransaction = await this.transactionService.updateFromDocument(transaction, {
+        const body = transactionUpdateSchema.parse(req.body);
+
+        const transactionData = partialTransactionSchema.parse({
             ...body,
+            updatedAt: new Date(),
         });
+        transaction = await this.transactionRepository.findOneByIdAndUpdate(
+            transaction._id,
+            transactionData,
+        );
+        if (!transaction) throw new TransactionNotFoundError(); // Shouldn't happen
 
         res.status(200).json({
             message: 'Transaction updated successfully',
             data: {
-                transaction: updatedTransaction,
+                transaction,
             },
             errors: null,
         });

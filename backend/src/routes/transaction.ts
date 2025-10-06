@@ -27,7 +27,12 @@ router.get(
     securityMiddleware.authorizeTransaction,
     transactionController.findOne,
 );
-// router.put('/:id', authenticate, authorizeTransactionAccess, transactionController.update);
+router.put(
+    '/:id',
+    securityMiddleware.authenticateUser,
+    securityMiddleware.authorizeTransaction,
+    transactionController.update,
+);
 // router.delete('/:id', authenticate, authorizeTransactionAccess, transactionController.remove);
 
 export default router;

@@ -1,6 +1,6 @@
 import { Collection, ObjectId } from 'mongodb';
 import { Model, Types } from 'mongoose';
-import { Transaction, TransactionData } from '../types/transaction';
+import { PartialTransactionData, Transaction, TransactionData } from '../types/transaction';
 
 export class TransactionRepository {
     constructor(private transactionCollection: Collection<TransactionData>) {}
@@ -20,5 +20,16 @@ export class TransactionRepository {
 
     findOneById = async (id: ObjectId): Promise<Transaction | null> => {
         return this.transactionCollection.findOne({ _id: id });
+    };
+
+    findOneByIdAndUpdate = async (
+        id: ObjectId,
+        partialTransactionData: PartialTransactionData,
+    ): Promise<Transaction | null> => {
+        return this.transactionCollection.findOneAndUpdate(
+            { _id: id },
+            { $set: partialTransactionData },
+            { returnDocument: 'after' },
+        );
     };
 }

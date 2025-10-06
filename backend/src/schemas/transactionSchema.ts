@@ -50,3 +50,5 @@ export const transactionSchema = z
         updatedAt: z.date().nullable(),
     })
     .strict();
+
+export const partialTransactionSchema = transactionSchema.partial();
