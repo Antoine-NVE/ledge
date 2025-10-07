@@ -70,7 +70,7 @@ export class AuthController {
         authCookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
 
         res.status(200).json({
-            message: 'Token refreshed successfully',
+            message: 'Tokens refreshed successfully',
             data: null,
             errors: null,
         });
