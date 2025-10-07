@@ -1,5 +1,4 @@
 import { Collection, ObjectId } from 'mongodb';
-import { Model, Types } from 'mongoose';
 import { PartialTransactionData, Transaction, TransactionData } from '../types/transaction';
 
 export class TransactionRepository {

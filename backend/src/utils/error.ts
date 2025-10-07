@@ -1,18 +1,5 @@
-import mongoose from 'mongoose';
 import * as yup from 'yup';
 import z from 'zod';
-
-export function formatMongooseValidationErrors(
-    error: mongoose.Error.ValidationError,
-): Record<string, string> {
-    const errors: Record<string, string> = {};
-
-    for (const [key, err] of Object.entries(error.errors)) {
-        errors[key] = err.message;
-    }
-
-    return errors;
-}
 
 export const formatZodValidationErrors = (err: z.ZodError): Record<string, string[]> => {
     const error: {

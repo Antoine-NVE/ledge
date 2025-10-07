@@ -1,6 +1,6 @@
 import { sign, verify, Secret, JwtPayload, SignOptions, VerifyOptions } from 'jsonwebtoken';
 import { InvalidJwtError } from '../errors/UnauthorizedError';
-import { Types } from 'mongoose';
+import { ObjectId } from 'mongodb';
 
 type VerifiedJwtPayload = Omit<JwtPayload, 'sub'> & { sub: string };
 
@@ -11,11 +11,11 @@ export class JwtService {
         return sign(payload, this.secret, options);
     }
 
-    signAccessJwt(userId: Types.ObjectId): string {
+    signAccessJwt(userId: ObjectId): string {
         return this.signJwt({ sub: userId, aud: 'access' }, { expiresIn: '15m' });
     }
 
-    signEmailVerificationJwt(userId: Types.ObjectId): string {
+    signEmailVerificationJwt(userId: ObjectId): string {
         return this.signJwt({ sub: userId, aud: 'email-verification' }, { expiresIn: '1h' });
     }
 

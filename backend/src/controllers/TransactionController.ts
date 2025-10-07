@@ -1,6 +1,4 @@
 import { Request, Response } from 'express';
-import { Error as MongooseError } from 'mongoose';
-import { formatMongooseValidationErrors } from '../utils/error';
 import { UndefinedTransactionError, UndefinedUserError } from '../errors/InternalServerError';
 import { TransactionRepository } from '../repositories/TransactionRepository';
 import {

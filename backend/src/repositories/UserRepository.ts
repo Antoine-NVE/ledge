@@ -1,5 +1,4 @@
 import { Collection, Document, InsertOneResult, ObjectId, OptionalId, WithId } from 'mongodb';
-import { Model, Types } from 'mongoose';
 import { User, UserData } from '../types/userType';
 
 export class UserRepository {

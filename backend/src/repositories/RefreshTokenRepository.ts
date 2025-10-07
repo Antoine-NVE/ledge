@@ -1,5 +1,4 @@
 import { Collection, ObjectId, OptionalId, WithId } from 'mongodb';
-import { DeleteResult, Model, Types } from 'mongoose';
 import { RefreshToken, RefreshTokenData } from '../types/refreshTokenType';
 
 export class RefreshTokenRepository {
