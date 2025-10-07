@@ -7,7 +7,7 @@ import {
     transactionSchema,
     transactionUpdateSchema,
 } from '../schemas/transactionSchema';
-import { Transaction } from '../types/transaction';
+import { Transaction } from '../types/transactionType';
 import { TransactionNotFoundError } from '../errors/NotFoundError';
 
 export class TransactionController {

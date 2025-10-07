@@ -9,7 +9,7 @@ import { TransactionNotFoundError, UserNotFoundError } from '../errors/NotFoundE
 import { User } from '../types/userType';
 import { UndefinedUserError } from '../errors/InternalServerError';
 import { TransactionAccessForbiddenError } from '../errors/ForbiddenError';
-import { Transaction } from '../types/transaction';
+import { Transaction } from '../types/transactionType';
 
 declare module 'express-serve-static-core' {
     interface Request {
