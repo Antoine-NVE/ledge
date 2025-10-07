@@ -2,7 +2,7 @@ import { Collection, ObjectId, OptionalId, WithId } from 'mongodb';
 import { RefreshToken, RefreshTokenData } from '../types/refreshTokenType';
 
 export class RefreshTokenRepository {
-    constructor(private refreshTokenCollection: Collection<RefreshTokenData>) {}
+    constructor(private refreshTokenCollection: Collection<OptionalId<RefreshToken>>) {}
 
     insertOne = async (refreshTokenData: RefreshTokenData): Promise<RefreshToken> => {
         const result = await this.refreshTokenCollection.insertOne(refreshTokenData);

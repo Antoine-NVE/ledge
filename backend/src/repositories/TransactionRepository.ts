@@ -1,8 +1,8 @@
-import { Collection, ObjectId } from 'mongodb';
+import { Collection, ObjectId, OptionalId } from 'mongodb';
 import { PartialTransactionData, Transaction, TransactionData } from '../types/transactionType';
 
 export class TransactionRepository {
-    constructor(private transactionCollection: Collection<TransactionData>) {}
+    constructor(private transactionCollection: Collection<OptionalId<Transaction>>) {}
 
     insertOne = async (transactionData: TransactionData): Promise<Transaction> => {
         const result = await this.transactionCollection.insertOne(transactionData);

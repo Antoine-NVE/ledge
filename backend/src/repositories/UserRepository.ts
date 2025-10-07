@@ -2,7 +2,7 @@ import { Collection, Document, InsertOneResult, ObjectId, OptionalId, WithId } f
 import { PartialUserData, User, UserData } from '../types/userType';
 
 export class UserRepository {
-    constructor(private userCollection: Collection<UserData>) {}
+    constructor(private userCollection: Collection<OptionalId<User>>) {}
 
     insertOne = async (userData: UserData): Promise<User> => {
         const result = await this.userCollection.insertOne(userData);
