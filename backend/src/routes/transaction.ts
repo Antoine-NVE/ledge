@@ -25,7 +25,7 @@ router.get(
     '/:id',
     securityMiddleware.authenticateUser,
     securityMiddleware.authorizeTransaction,
-    transactionController.readOne,
+    transactionController.read,
 );
 router.put(
     '/:id',

@@ -53,7 +53,7 @@ export class TransactionController {
         });
     };
 
-    readOne = async (req: Request, res: Response) => {
+    read = async (req: Request, res: Response) => {
         const transaction = req.transaction;
         if (!transaction) throw new UndefinedTransactionError();
 
