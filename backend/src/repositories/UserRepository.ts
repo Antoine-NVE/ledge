@@ -21,4 +21,8 @@ export class UserRepository {
     findOneById = async (id: ObjectId): Promise<User | null> => {
         return this.userCollection.findOne({ _id: id });
     };
+
+    updateOne = async (id: ObjectId, partialUserData: Partial<UserData>) => {
+        return this.userCollection.updateOne({ _id: id }, { $set: partialUserData });
+    };
 }

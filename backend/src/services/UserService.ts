@@ -1,10 +1,11 @@
 import { EmailAlreadyVerifiedError } from '../errors/ConflictError';
 import { UserNotFoundError } from '../errors/NotFoundError';
 import { EmailVerificationCooldownError } from '../errors/TooManyRequestsError';
-import { UserDocument } from '../models/User';
 import { UserRepository } from '../repositories/UserRepository';
+import { User } from '../types/userType';
 import { EmailService } from './EmailService';
 import { JwtService } from './JwtService';
+import { ObjectId } from 'mongodb';
 
 export class UserService {
     constructor(
@@ -13,11 +14,7 @@ export class UserService {
         private userRepository: UserRepository,
     ) {}
 
-    async sendEmailVerificationEmail(
-        from: string,
-        user: UserDocument,
-        frontendBaseUrl: string,
-    ): Promise<void> {
+    sendEmailVerificationEmail = async (user: User, frontendBaseUrl: string): Promise<void> => {
         if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
         if (
             user.emailVerificationCooldownExpiresAt &&
@@ -27,22 +24,22 @@ export class UserService {
 
         const jwt = this.jwtService.signEmailVerificationJwt(user._id);
 
-        await this.emailService.sendEmailVerificationEmail(from, user.email, frontendBaseUrl, jwt);
+        this.emailService.sendEmailVerificationEmail(user.email, frontendBaseUrl, jwt);
 
-        await this.userRepository.updateFromDocument(user, {
+        this.userRepository.updateOne(user._id, {
             emailVerificationCooldownExpiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
         });
-    }
+    };
 
-    async verifyEmail(token: string): Promise<void> {
+    verifyEmail = async (token: string): Promise<void> => {
         const decoded = this.jwtService.verifyEmailVerificationJwt(token);
-        const user = await this.userRepository.findById(decoded.sub);
+        const user = await this.userRepository.findOneById(new ObjectId(decoded.sub));
 
         if (!user) throw new UserNotFoundError();
         if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
 
-        await this.userRepository.updateFromDocument(user, {
+        this.userRepository.updateOne(user._id, {
             isEmailVerified: true,
         });
-    }
+    };
 }

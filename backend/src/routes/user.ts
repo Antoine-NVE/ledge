@@ -1,13 +1,14 @@
 import express from 'express';
 
 import { UserController } from '../controllers/UserController';
-import { authenticate } from '../middlewares/authenticate';
 import { UserService } from '../services/UserService';
 import { JwtService } from '../services/JwtService';
 import { EmailService } from '../services/EmailService';
 import { UserRepository } from '../repositories/UserRepository';
-import UserModel from '../models/User';
 import { env } from '../config/env';
+import { db } from '../config/db';
+import { TransactionRepository } from '../repositories/TransactionRepository';
+import { SecurityMiddleware } from '../middlewares/SecurityMiddleware';
 
 const router = express.Router();
 
@@ -20,13 +21,24 @@ const emailService = new EmailService({
         user: env.SMTP_USER,
         pass: env.SMTP_PASS,
     },
+    from: env.EMAIL_FROM,
 });
-const userRepository = new UserRepository(UserModel);
+const userRepository = new UserRepository(db.collection('users'));
 const userService = new UserService(jwtService, emailService, userRepository);
 const userController = new UserController(userService);
+const transactionRepository = new TransactionRepository(db.collection('transactions'));
+const securityMiddleware = new SecurityMiddleware(
+    userRepository,
+    jwtService,
+    transactionRepository,
+);
 
-router.post('/send-email-verification-email', authenticate, userController.sendEmailVerificationEmail);
+router.post(
+    '/send-email-verification-email',
+    securityMiddleware.authenticateUser,
+    userController.sendEmailVerificationEmail,
+);
 router.get('/verify-email/:token', userController.verifyEmail);
-router.get('/me', authenticate, userController.me);
+router.get('/me', securityMiddleware.authenticateUser, userController.me);
 
 export default router;
