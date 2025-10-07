@@ -1,5 +1,5 @@
 import { Collection, Document, InsertOneResult, ObjectId, OptionalId, WithId } from 'mongodb';
-import { User, UserData } from '../types/userType';
+import { PartialUserData, User, UserData } from '../types/userType';
 
 export class UserRepository {
     constructor(private userCollection: Collection<UserData>) {}
@@ -21,7 +21,7 @@ export class UserRepository {
         return await this.userCollection.findOne({ _id: id });
     };
 
-    updateOne = async (id: ObjectId, partialUserData: Partial<UserData>) => {
-        return await this.userCollection.updateOne({ _id: id }, { $set: partialUserData });
+    updateOne = async (id: ObjectId, partialUserData: PartialUserData): Promise<void> => {
+        await this.userCollection.updateOne({ _id: id }, { $set: partialUserData });
     };
 }

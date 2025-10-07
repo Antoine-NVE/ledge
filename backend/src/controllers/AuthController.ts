@@ -8,13 +8,13 @@ import { UserRepository } from '../repositories/UserRepository';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { exit } from 'process';
 import { RequiredRefreshTokenError } from '../errors/UnauthorizedError';
-import { loginSchema, registerSchema } from '../schemas/userSchema';
+import { userLoginInputSchema, userRegisterInputSchema } from '../schemas/userSchema';
 
 export class AuthController {
     constructor(private authService: AuthService) {}
 
     register = async (req: Request, res: Response) => {
-        const body = registerSchema.parse(req.body);
+        const body = userRegisterInputSchema.parse(req.body);
 
         // The user can't choose to be remembered at registration
         // Next time the user logs in, they can choose to be remembered
@@ -35,10 +35,10 @@ export class AuthController {
             },
             errors: null,
         });
-    }
+    };
 
     login = async (req: Request, res: Response) => {
-        const body = loginSchema.parse(req.body);
+        const body = userLoginInputSchema.parse(req.body);
 
         const { user, accessToken, refreshToken } = await this.authService.login({
             email: body.email,
@@ -55,7 +55,7 @@ export class AuthController {
             },
             errors: null,
         });
-    }
+    };
 
     refresh = async (req: Request, res: Response) => {
         const authCookieService = new AuthCookieService(req, res);
@@ -74,7 +74,7 @@ export class AuthController {
             data: null,
             errors: null,
         });
-    }
+    };
 
     logout = async (req: Request, res: Response) => {
         const authCookieService = new AuthCookieService(req, res);
@@ -89,5 +89,5 @@ export class AuthController {
             data: null,
             errors: null,
         });
-    }
+    };
 }

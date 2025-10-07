@@ -2,6 +2,7 @@ import { EmailAlreadyVerifiedError } from '../errors/ConflictError';
 import { UserNotFoundError } from '../errors/NotFoundError';
 import { EmailVerificationCooldownError } from '../errors/TooManyRequestsError';
 import { UserRepository } from '../repositories/UserRepository';
+import { partialUserDataSchema } from '../schemas/userSchema';
 import { User } from '../types/userType';
 import { EmailService } from './EmailService';
 import { JwtService } from './JwtService';
@@ -26,9 +27,10 @@ export class UserService {
 
         await this.emailService.sendEmailVerificationEmail(user.email, frontendBaseUrl, jwt);
 
-        await this.userRepository.updateOne(user._id, {
+        const partialUserData = partialUserDataSchema.parse({
             emailVerificationCooldownExpiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
         });
+        await this.userRepository.updateOne(user._id, partialUserData);
     };
 
     verifyEmail = async (token: string): Promise<void> => {
@@ -38,8 +40,9 @@ export class UserService {
         if (!user) throw new UserNotFoundError();
         if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
 
-        await this.userRepository.updateOne(user._id, {
+        const partialUserData = partialUserDataSchema.parse({
             isEmailVerified: true,
         });
+        await this.userRepository.updateOne(user._id, partialUserData);
     };
 }
