@@ -36,9 +36,7 @@ export class AuthService {
             createdAt: new Date(),
             updatedAt: null,
         });
-        const user = await this.userRepository.insertOne({
-            ...userData,
-        });
+        const user = await this.userRepository.insertOne(userData);
 
         const refreshTokenData = refreshTokenSchema.parse({
             token: generateToken(),
@@ -47,9 +45,7 @@ export class AuthService {
             createdAt: new Date(),
             updatedAt: null,
         });
-        const refreshToken = await this.refreshTokenRepository.insertOne({
-            ...refreshTokenData,
-        });
+        const refreshToken = await this.refreshTokenRepository.insertOne(refreshTokenData);
 
         const accessToken = this.jwtService.signAccessJwt(user._id);
 
@@ -74,9 +70,7 @@ export class AuthService {
             createdAt: new Date(),
             updatedAt: null,
         });
-        const refreshToken = await this.refreshTokenRepository.insertOne({
-            ...refreshTokenData,
-        });
+        const refreshToken = await this.refreshTokenRepository.insertOne(refreshTokenData);
 
         const accessToken = this.jwtService.signAccessJwt(user._id);
 
@@ -92,9 +86,10 @@ export class AuthService {
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
             updatedAt: new Date(),
         });
-        refreshToken = await this.refreshTokenRepository.findOneByIdAndUpdate(refreshToken._id, {
-            ...refreshTokenData,
-        });
+        refreshToken = await this.refreshTokenRepository.findOneByIdAndUpdate(
+            refreshToken._id,
+            refreshTokenData,
+        );
         if (!refreshToken) throw new InvalidRefreshTokenError(); // Shouldn't happen
 
         const accessToken = this.jwtService.signAccessJwt(refreshToken.userId);
