@@ -15,14 +15,14 @@ export class RefreshTokenRepository {
     };
 
     findOneByToken = async (token: string): Promise<RefreshToken | null> => {
-        return this.refreshTokenCollection.findOne({ token });
+        return await this.refreshTokenCollection.findOne({ token });
     };
 
     findOneByIdAndUpdate = async (
         id: ObjectId,
         partialRefreshTokenData: Partial<RefreshTokenData>,
     ): Promise<RefreshToken | null> => {
-        return this.refreshTokenCollection.findOneAndUpdate(
+        return await this.refreshTokenCollection.findOneAndUpdate(
             { _id: id },
             { $set: partialRefreshTokenData },
             { returnDocument: 'after' },
@@ -30,6 +30,6 @@ export class RefreshTokenRepository {
     };
 
     deleteOneByToken = async (token: string): Promise<void> => {
-        this.refreshTokenCollection.deleteOne({ token });
+        await this.refreshTokenCollection.deleteOne({ token });
     };
 }

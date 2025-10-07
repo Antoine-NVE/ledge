@@ -15,18 +15,18 @@ export class TransactionRepository {
     };
 
     findAllByUserId = async (userId: ObjectId): Promise<Transaction[] | null> => {
-        return this.transactionCollection.find({ userId }).toArray();
+        return await this.transactionCollection.find({ userId }).toArray();
     };
 
     findOneById = async (id: ObjectId): Promise<Transaction | null> => {
-        return this.transactionCollection.findOne({ _id: id });
+        return await this.transactionCollection.findOne({ _id: id });
     };
 
     findOneByIdAndUpdate = async (
         id: ObjectId,
         partialTransactionData: PartialTransactionData,
     ): Promise<Transaction | null> => {
-        return this.transactionCollection.findOneAndUpdate(
+        return await this.transactionCollection.findOneAndUpdate(
             { _id: id },
             { $set: partialTransactionData },
             { returnDocument: 'after' },
@@ -34,6 +34,6 @@ export class TransactionRepository {
     };
 
     deleteOneById = async (id: ObjectId): Promise<void> => {
-        this.transactionCollection.deleteOne({ _id: id });
+        await this.transactionCollection.deleteOne({ _id: id });
     };
 }

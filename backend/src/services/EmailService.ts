@@ -22,7 +22,7 @@ export class EmailService {
     }
 
     private async sendEmail(to: string, subject: string, html: string): Promise<void> {
-        this.transporter.sendMail({ from: this.from, to, subject, html });
+        await this.transporter.sendMail({ from: this.from, to, subject, html });
     }
 
     async sendEmailVerificationEmail(
@@ -33,6 +33,6 @@ export class EmailService {
         const subject = 'Please verify your email address';
         const html = `Click here to verify your email address: <a href="${frontendBaseUrl}/verify-email/${jwt}">verify email</a>. This link will expire in 1 hour.`;
 
-        this.sendEmail(to, subject, html);
+        await this.sendEmail(to, subject, html);
     }
 }

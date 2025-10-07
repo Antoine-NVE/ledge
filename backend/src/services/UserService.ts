@@ -24,9 +24,9 @@ export class UserService {
 
         const jwt = this.jwtService.signEmailVerificationJwt(user._id);
 
-        this.emailService.sendEmailVerificationEmail(user.email, frontendBaseUrl, jwt);
+        await this.emailService.sendEmailVerificationEmail(user.email, frontendBaseUrl, jwt);
 
-        this.userRepository.updateOne(user._id, {
+        await this.userRepository.updateOne(user._id, {
             emailVerificationCooldownExpiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
         });
     };
@@ -38,7 +38,7 @@ export class UserService {
         if (!user) throw new UserNotFoundError();
         if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
 
-        this.userRepository.updateOne(user._id, {
+        await this.userRepository.updateOne(user._id, {
             isEmailVerified: true,
         });
     };

@@ -15,14 +15,14 @@ export class UserRepository {
     };
 
     findOneByEmail = async (email: string): Promise<User | null> => {
-        return this.userCollection.findOne({ email });
+        return await this.userCollection.findOne({ email });
     };
 
     findOneById = async (id: ObjectId): Promise<User | null> => {
-        return this.userCollection.findOne({ _id: id });
+        return await this.userCollection.findOne({ _id: id });
     };
 
     updateOne = async (id: ObjectId, partialUserData: Partial<UserData>) => {
-        return this.userCollection.updateOne({ _id: id }, { $set: partialUserData });
+        return await this.userCollection.updateOne({ _id: id }, { $set: partialUserData });
     };
 }
