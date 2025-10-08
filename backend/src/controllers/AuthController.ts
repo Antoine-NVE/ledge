@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import { AuthCookieService } from '../services/CookieService';
+import { CookieService } from '../services/CookieService';
 import { generateToken } from '../utils/token';
 import { JwtService } from '../services/JwtService';
 import { AuthService } from '../services/AuthService';
@@ -25,8 +25,8 @@ export class AuthController {
             password,
         );
 
-        const authCookieService = new AuthCookieService(req, res);
-        authCookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
+        const cookieService = new CookieService(req, res);
+        cookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
 
         res.status(201).json({
             message: 'User registered successfully',
@@ -42,8 +42,8 @@ export class AuthController {
 
         const { user, accessToken, refreshToken } = await this.authService.login(email, password);
 
-        const authCookieService = new AuthCookieService(req, res);
-        authCookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
+        const cookieService = new CookieService(req, res);
+        cookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
 
         res.status(200).json({
             message: 'User logged in successfully',
@@ -55,16 +55,16 @@ export class AuthController {
     };
 
     refresh = async (req: Request, res: Response) => {
-        const authCookieService = new AuthCookieService(req, res);
-        const token = authCookieService.getRefreshTokenCookie();
+        const cookieService = new CookieService(req, res);
+        const token = cookieService.getRefreshTokenCookie();
         if (!token) throw new RequiredRefreshTokenError();
 
-        let rememberMe = authCookieService.getRememberMeCookie();
+        let rememberMe = cookieService.getRememberMeCookie();
         if (rememberMe === undefined) rememberMe = false; // Default to false if not provided
 
         const { accessToken, refreshToken } = await this.authService.refresh(token);
 
-        authCookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
+        cookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
 
         res.status(200).json({
             message: 'Tokens refreshed successfully',
@@ -74,12 +74,12 @@ export class AuthController {
     };
 
     logout = async (req: Request, res: Response) => {
-        const authCookieService = new AuthCookieService(req, res);
-        const token = authCookieService.getRefreshTokenCookie();
+        const cookieService = new CookieService(req, res);
+        const token = cookieService.getRefreshTokenCookie();
 
         if (token) await this.authService.logout(token);
 
-        authCookieService.clearAllAuthCookies();
+        cookieService.clearAllAuthCookies();
 
         res.status(200).json({
             message: 'User logged out successfully',

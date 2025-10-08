@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { TransactionRepository } from '../repositories/TransactionRepository';
 import { UserRepository } from '../repositories/UserRepository';
 import { JwtService } from '../services/JwtService';
-import { AuthCookieService } from '../services/CookieService';
+import { CookieService } from '../services/CookieService';
 import { RequiredAccessTokenError } from '../errors/UnauthorizedError';
 import { ObjectId } from 'mongodb';
 import { TransactionNotFoundError, UserNotFoundError } from '../errors/NotFoundError';
@@ -33,8 +33,8 @@ export class SecurityMiddleware {
     ) {}
 
     authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
-        const authCookieService = new AuthCookieService(req, res);
-        const accessToken = authCookieService.getAccessTokenCookie();
+        const cookieService = new CookieService(req, res);
+        const accessToken = cookieService.getAccessTokenCookie();
         if (!accessToken) throw new RequiredAccessTokenError();
 
         const payload = this.jwtService.verifyAccessJwt(accessToken);
