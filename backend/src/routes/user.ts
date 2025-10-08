@@ -9,6 +9,7 @@ import { env } from '../config/env';
 import { db } from '../config/db';
 import { TransactionRepository } from '../repositories/TransactionRepository';
 import { SecurityMiddleware } from '../middlewares/SecurityMiddleware';
+import { TransactionService } from '../services/TransactionService';
 
 const router = express.Router();
 
@@ -27,7 +28,8 @@ const userRepository = new UserRepository(db.collection('users'));
 const userService = new UserService(jwtService, emailService, userRepository);
 const userController = new UserController(userService);
 const transactionRepository = new TransactionRepository(db.collection('transactions'));
-const securityMiddleware = new SecurityMiddleware(userService, jwtService, transactionRepository);
+const transactionService = new TransactionService(transactionRepository);
+const securityMiddleware = new SecurityMiddleware(userService, transactionService, jwtService);
 
 router.post(
     '/send-email-verification-email',

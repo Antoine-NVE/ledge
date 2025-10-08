@@ -8,11 +8,13 @@ import { JwtService } from '../services/JwtService';
 import { env } from '../config/env';
 import { EmailService } from '../services/EmailService';
 import { UserService } from '../services/UserService';
+import { TransactionService } from '../services/TransactionService';
 
 const router = express.Router();
 
 const transactionRepository = new TransactionRepository(db.collection('transactions'));
-const transactionController = new TransactionController(transactionRepository);
+const transactionService = new TransactionService(transactionRepository);
+const transactionController = new TransactionController(transactionService);
 const userRepository = new UserRepository(db.collection('users'));
 const jwtService = new JwtService(env.JWT_SECRET);
 const emailService = new EmailService({
@@ -26,14 +28,10 @@ const emailService = new EmailService({
     from: env.EMAIL_FROM,
 });
 const userService = new UserService(jwtService, emailService, userRepository);
-const securityMiddleware = new SecurityMiddleware(
-    userService,
-    jwtService,
-    transactionRepository,
-);
+const securityMiddleware = new SecurityMiddleware(userService, transactionService, jwtService);
 
 router.post('/', securityMiddleware.authenticateUser, transactionController.create);
-router.get('/', securityMiddleware.authenticateUser, transactionController.readAll);
+router.get('/', securityMiddleware.authenticateUser, transactionController.readMany);
 router.get(
     '/:id',
     securityMiddleware.authenticateUser,

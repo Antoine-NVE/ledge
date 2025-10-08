@@ -11,6 +11,7 @@ import { UndefinedUserError } from '../errors/InternalServerError';
 import { TransactionAccessForbiddenError } from '../errors/ForbiddenError';
 import { Transaction } from '../types/transactionType';
 import { UserService } from '../services/UserService';
+import { TransactionService } from '../services/TransactionService';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -27,8 +28,8 @@ declare module 'express-serve-static-core' {
 export class SecurityMiddleware {
     constructor(
         private userService: UserService,
+        private transactionService: TransactionService,
         private jwtService: JwtService,
-        private transactionRepository: TransactionRepository,
     ) {}
 
     authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -50,7 +51,7 @@ export class SecurityMiddleware {
 
         const transactionId = new ObjectId(req.params.id);
 
-        const transaction = await this.transactionRepository.findOneById(transactionId);
+        const transaction = await this.transactionService.findOneById(transactionId);
         if (!transaction) throw new TransactionNotFoundError();
 
         if (!user._id.equals(transaction.userId)) throw new TransactionAccessForbiddenError();
