@@ -10,19 +10,6 @@ import { userVerifyEmailInputSchema } from '../schemas/userSchema';
 export class UserController {
     constructor(private userService: UserService) {}
 
-    me = async (req: Request, res: Response): Promise<void> => {
-        const user = req.user;
-        if (!user) throw new UndefinedUserError();
-
-        res.status(200).json({
-            message: 'User retrieved successfully',
-            data: {
-                user,
-            },
-            errors: null,
-        });
-    };
-
     sendEmailVerificationEmail = async (req: Request, res: Response): Promise<void> => {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
@@ -46,6 +33,19 @@ export class UserController {
         res.status(200).json({
             message: 'Email verified successfully',
             data: null,
+            errors: null,
+        });
+    };
+
+    me = async (req: Request, res: Response): Promise<void> => {
+        const user = req.user;
+        if (!user) throw new UndefinedUserError();
+
+        res.status(200).json({
+            message: 'User retrieved successfully',
+            data: {
+                user,
+            },
             errors: null,
         });
     };
