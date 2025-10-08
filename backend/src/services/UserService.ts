@@ -31,9 +31,9 @@ export class UserService {
     };
 
     verifyEmail = async (token: string): Promise<void> => {
-        const decoded = this.jwtService.verifyEmailVerificationJwt(token);
+        const payload = this.jwtService.verifyEmailVerificationJwt(token);
 
-        const user = await this.findOneById(new ObjectId(decoded.sub));
+        const user = await this.findOneById(new ObjectId(payload.sub));
         if (!user) throw new UserNotFoundError();
         if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
 
