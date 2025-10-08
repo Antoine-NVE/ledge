@@ -3,9 +3,9 @@ import { UndefinedTransactionError, UndefinedUserError } from '../errors/Interna
 import { TransactionRepository } from '../repositories/TransactionRepository';
 import {
     partialTransactionSchema,
-    transactionCreateSchema,
+    transactionCreateInputSchema,
     transactionSchema,
-    transactionUpdateSchema,
+    transactionUpdateInputSchema,
 } from '../schemas/transactionSchema';
 import { Transaction } from '../types/transactionType';
 import { TransactionNotFoundError } from '../errors/NotFoundError';
@@ -17,7 +17,7 @@ export class TransactionController {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const body = transactionCreateSchema.parse(req.body);
+        const body = transactionCreateInputSchema.parse(req.body);
 
         const transactionData = transactionSchema.parse({
             ...body,
@@ -68,7 +68,7 @@ export class TransactionController {
         let transaction: Transaction | null | undefined = req.transaction;
         if (!transaction) throw new UndefinedTransactionError();
 
-        const body = transactionUpdateSchema.parse(req.body);
+        const body = transactionUpdateInputSchema.parse(req.body);
 
         const transactionData = partialTransactionSchema.parse({
             ...body,
