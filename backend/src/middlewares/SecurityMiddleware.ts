@@ -2,7 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { TransactionRepository } from '../repositories/TransactionRepository';
 import { UserRepository } from '../repositories/UserRepository';
 import { JwtService } from '../services/JwtService';
-import { AuthCookieService } from '../services/AuthCookieService';
+import { AuthCookieService } from '../services/CookieService';
 import { RequiredAccessTokenError } from '../errors/UnauthorizedError';
 import { ObjectId } from 'mongodb';
 import { TransactionNotFoundError, UserNotFoundError } from '../errors/NotFoundError';

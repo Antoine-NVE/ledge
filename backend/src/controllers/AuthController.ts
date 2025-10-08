@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
-import { AuthCookieService } from '../services/AuthCookieService';
+import { AuthCookieService } from '../services/CookieService';
 import { generateToken } from '../utils/token';
 import { JwtService } from '../services/JwtService';
 import { AuthService } from '../services/AuthService';
