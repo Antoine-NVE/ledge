@@ -2,7 +2,6 @@ import { EmailAlreadyVerifiedError } from '../errors/ConflictError';
 import { UserNotFoundError } from '../errors/NotFoundError';
 import { EmailVerificationCooldownError } from '../errors/TooManyRequestsError';
 import { UserRepository } from '../repositories/UserRepository';
-import { partialUserDataSchema } from '../schemas/userSchema';
 import { User } from '../types/userType';
 import { EmailService } from './EmailService';
 import { JwtService } from './JwtService';

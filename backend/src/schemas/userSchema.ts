@@ -18,13 +18,8 @@ export const userSchema = z
     })
     .strict();
 
-export const userDataSchema = userSchema.omit({
+export const userBaseInputSchema = userSchema.omit({
     _id: true,
-});
-
-export const partialUserDataSchema = userDataSchema.partial();
-
-export const userBaseInputSchema = userDataSchema.omit({
     passwordHash: true,
     isEmailVerified: true,
     emailVerificationCooldownExpiresAt: true,

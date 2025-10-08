@@ -1,5 +1,5 @@
 import { Collection, Document, InsertOneResult, ObjectId, OptionalId, WithId } from 'mongodb';
-import { PartialUserData, User, UserData } from '../types/userType';
+import { User } from '../types/userType';
 
 export class UserRepository {
     constructor(private userCollection: Collection<User>) {}
