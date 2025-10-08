@@ -14,16 +14,16 @@ export class AuthController {
     constructor(private authService: AuthService) {}
 
     register = async (req: Request, res: Response) => {
-        const body = userRegisterInputSchema.parse(req.body);
+        const { email, password } = userRegisterInputSchema.parse(req.body);
 
         // The user can't choose to be remembered at registration
         // Next time the user logs in, they can choose to be remembered
         const rememberMe = false;
 
-        const { user, accessToken, refreshToken } = await this.authService.register({
-            email: body.email,
-            password: body.password,
-        });
+        const { user, accessToken, refreshToken } = await this.authService.register(
+            email,
+            password,
+        );
 
         const authCookieService = new AuthCookieService(req, res);
         authCookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
@@ -38,15 +38,12 @@ export class AuthController {
     };
 
     login = async (req: Request, res: Response) => {
-        const body = userLoginInputSchema.parse(req.body);
+        const { email, password, rememberMe } = userLoginInputSchema.parse(req.body);
 
-        const { user, accessToken, refreshToken } = await this.authService.login({
-            email: body.email,
-            password: body.password,
-        });
+        const { user, accessToken, refreshToken } = await this.authService.login(email, password);
 
         const authCookieService = new AuthCookieService(req, res);
-        authCookieService.setAllAuthCookies(accessToken, refreshToken.token, body.rememberMe);
+        authCookieService.setAllAuthCookies(accessToken, refreshToken.token, rememberMe);
 
         res.status(200).json({
             message: 'User logged in successfully',
