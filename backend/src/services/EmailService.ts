@@ -1,18 +1,16 @@
 import { Transporter, SentMessageInfo, createTransport } from 'nodemailer';
 
-type EmailConfig = {
-    host: string;
-    port: number;
-    secure: boolean;
-    auth: { user: string; pass: string };
-    from: string;
-};
-
 export class EmailService {
     private transporter: Transporter;
     private from: string;
 
-    constructor({ host, port, secure, auth, from }: EmailConfig) {
+    constructor(
+        host: string,
+        port: number,
+        secure: boolean,
+        auth: { user: string; pass: string },
+        from: string,
+    ) {
         this.transporter = createTransport({ host, port, secure, auth });
         this.from = from;
     }

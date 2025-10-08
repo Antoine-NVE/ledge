@@ -15,16 +15,16 @@ const router = express.Router();
 const userRepository = new UserRepository(db.collection('users'));
 const secret = env.JWT_SECRET;
 const jwtService = new JwtService(secret);
-const emailService = new EmailService({
-    host: env.SMTP_HOST,
-    port: env.SMTP_PORT,
-    secure: env.SMTP_SECURE,
-    auth: {
+const emailService = new EmailService(
+    env.SMTP_HOST,
+    env.SMTP_PORT,
+    env.SMTP_SECURE,
+    {
         user: env.SMTP_USER,
         pass: env.SMTP_PASS,
     },
-    from: env.EMAIL_FROM,
-});
+    env.EMAIL_FROM,
+);
 const userService = new UserService(jwtService, emailService, userRepository);
 const refreshTokenRepository = new RefreshTokenRepository(db.collection('refreshtokens'));
 const authService = new AuthService(userService, jwtService, refreshTokenRepository);

@@ -17,16 +17,16 @@ const transactionService = new TransactionService(transactionRepository);
 const transactionController = new TransactionController(transactionService);
 const userRepository = new UserRepository(db.collection('users'));
 const jwtService = new JwtService(env.JWT_SECRET);
-const emailService = new EmailService({
-    host: env.SMTP_HOST,
-    port: env.SMTP_PORT,
-    secure: env.SMTP_SECURE,
-    auth: {
+const emailService = new EmailService(
+    env.SMTP_HOST,
+    env.SMTP_PORT,
+    env.SMTP_SECURE,
+    {
         user: env.SMTP_USER,
         pass: env.SMTP_PASS,
     },
-    from: env.EMAIL_FROM,
-});
+    env.EMAIL_FROM,
+);
 const userService = new UserService(jwtService, emailService, userRepository);
 const securityMiddleware = new SecurityMiddleware(userService, transactionService, jwtService);
 
