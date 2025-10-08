@@ -7,14 +7,27 @@ import { JwtService } from '../services/JwtService';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { env } from '../config/env';
 import { db } from '../config/db';
+import { UserService } from '../services/UserService';
+import { EmailService } from '../services/EmailService';
 
 const router = express.Router();
 
 const userRepository = new UserRepository(db.collection('users'));
 const secret = env.JWT_SECRET;
 const jwtService = new JwtService(secret);
+const emailService = new EmailService({
+    host: env.SMTP_HOST,
+    port: env.SMTP_PORT,
+    secure: env.SMTP_SECURE,
+    auth: {
+        user: env.SMTP_USER,
+        pass: env.SMTP_PASS,
+    },
+    from: env.EMAIL_FROM,
+});
+const userService = new UserService(jwtService, emailService, userRepository);
 const refreshTokenRepository = new RefreshTokenRepository(db.collection('refreshtokens'));
-const authService = new AuthService(userRepository, jwtService, refreshTokenRepository);
+const authService = new AuthService(userService, jwtService, refreshTokenRepository);
 const authController = new AuthController(authService);
 
 router.post('/register', authController.register);

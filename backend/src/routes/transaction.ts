@@ -6,6 +6,8 @@ import { SecurityMiddleware } from '../middlewares/SecurityMiddleware';
 import { UserRepository } from '../repositories/UserRepository';
 import { JwtService } from '../services/JwtService';
 import { env } from '../config/env';
+import { EmailService } from '../services/EmailService';
+import { UserService } from '../services/UserService';
 
 const router = express.Router();
 
@@ -13,8 +15,19 @@ const transactionRepository = new TransactionRepository(db.collection('transacti
 const transactionController = new TransactionController(transactionRepository);
 const userRepository = new UserRepository(db.collection('users'));
 const jwtService = new JwtService(env.JWT_SECRET);
+const emailService = new EmailService({
+    host: env.SMTP_HOST,
+    port: env.SMTP_PORT,
+    secure: env.SMTP_SECURE,
+    auth: {
+        user: env.SMTP_USER,
+        pass: env.SMTP_PASS,
+    },
+    from: env.EMAIL_FROM,
+});
+const userService = new UserService(jwtService, emailService, userRepository);
 const securityMiddleware = new SecurityMiddleware(
-    userRepository,
+    userService,
     jwtService,
     transactionRepository,
 );

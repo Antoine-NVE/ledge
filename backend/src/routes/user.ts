@@ -27,11 +27,7 @@ const userRepository = new UserRepository(db.collection('users'));
 const userService = new UserService(jwtService, emailService, userRepository);
 const userController = new UserController(userService);
 const transactionRepository = new TransactionRepository(db.collection('transactions'));
-const securityMiddleware = new SecurityMiddleware(
-    userRepository,
-    jwtService,
-    transactionRepository,
-);
+const securityMiddleware = new SecurityMiddleware(userService, jwtService, transactionRepository);
 
 router.post(
     '/send-email-verification-email',
