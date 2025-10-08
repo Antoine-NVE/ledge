@@ -17,7 +17,8 @@ export class UserRepository {
         return await this.userCollection.findOne({ [key]: value });
     };
 
-    updateOne = async (id: ObjectId, partialUserData: PartialUserData): Promise<void> => {
-        await this.userCollection.updateOne({ _id: id }, { $set: partialUserData });
+    updateOne = async (user: User): Promise<void> => {
+        const { _id, ...rest } = user;
+        await this.userCollection.updateOne({ _id }, { $set: rest });
     };
 }

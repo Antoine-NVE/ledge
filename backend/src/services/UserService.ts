@@ -27,10 +27,8 @@ export class UserService {
 
         await this.emailService.sendEmailVerificationEmail(user.email, frontendBaseUrl, jwt);
 
-        const partialUserData = partialUserDataSchema.parse({
-            emailVerificationCooldownExpiresAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
-        });
-        await this.userRepository.updateOne(user._id, partialUserData);
+        user.emailVerificationCooldownExpiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+        await this.updateOne(user);
     };
 
     verifyEmail = async (token: string): Promise<void> => {
@@ -40,10 +38,8 @@ export class UserService {
         if (!user) throw new UserNotFoundError();
         if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
 
-        const partialUserData = partialUserDataSchema.parse({
-            isEmailVerified: true,
-        });
-        await this.userRepository.updateOne(user._id, partialUserData);
+        user.isEmailVerified = true;
+        await this.updateOne(user);
     };
 
     findOneById = async (id: ObjectId): Promise<User | null> => {
@@ -52,5 +48,13 @@ export class UserService {
 
     findOneByEmail = async (email: string): Promise<User | null> => {
         return await this.userRepository.findOne('email', email);
+    };
+
+    updateOne = async (user: User): Promise<User> => {
+        user.updatedAt = new Date();
+
+        await this.userRepository.updateOne(user);
+
+        return user;
     };
 }
