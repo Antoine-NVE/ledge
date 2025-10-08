@@ -56,7 +56,7 @@ export const userLoginInputSchema = userBaseInputSchema.extend({
 
 export const userVerifyEmailInputSchema = z
     .object({
-        token: z.string().min(1).jwt(),
+        token: z.string().jwt(),
     })
     .strict();
 
