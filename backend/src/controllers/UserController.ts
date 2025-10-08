@@ -5,7 +5,10 @@ import { UserService } from '../services/UserService';
 import { UserRepository } from '../repositories/UserRepository';
 import { UndefinedUserError } from '../errors/InternalServerError';
 import { env } from '../config/env';
-import { userVerifyEmailInputSchema } from '../schemas/userSchema';
+import {
+    userSendEmailVerificationEmailInputSchema,
+    userVerifyEmailInputSchema,
+} from '../schemas/userSchema';
 
 export class UserController {
     constructor(private userService: UserService) {}
@@ -14,7 +17,7 @@ export class UserController {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const { frontendBaseUrl } = req.body;
+        const { frontendBaseUrl } = userSendEmailVerificationEmailInputSchema.parse(req.body);
 
         await this.userService.sendEmailVerificationEmail(user, frontendBaseUrl);
 

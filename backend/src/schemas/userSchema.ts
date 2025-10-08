@@ -60,6 +60,12 @@ export const userVerifyEmailInputSchema = z
     })
     .strict();
 
+export const userSendEmailVerificationEmailInputSchema = z
+    .object({
+        frontendBaseUrl: z.string().url(),
+    })
+    .strict();
+
 export const userOuputSchema = userSchema.omit({
     passwordHash: true,
 });
