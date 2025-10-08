@@ -36,3 +36,12 @@ export const transactionUpdateInputSchema = transactionSchema.omit({
     createdAt: true,
     updatedAt: true,
 });
+
+export const authorizeTransactionInputSchema = z
+    .object({
+        transactionId: z
+            .string()
+            .refine((val) => ObjectId.isValid(val))
+            .transform((val) => new ObjectId(val)),
+    })
+    .strict();

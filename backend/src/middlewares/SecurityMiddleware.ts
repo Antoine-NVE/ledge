@@ -12,6 +12,7 @@ import { TransactionAccessForbiddenError } from '../errors/ForbiddenError';
 import { Transaction } from '../types/transactionType';
 import { UserService } from '../services/UserService';
 import { TransactionService } from '../services/TransactionService';
+import { authorizeTransactionInputSchema } from '../schemas/transactionSchema';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -49,7 +50,7 @@ export class SecurityMiddleware {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const transactionId = new ObjectId(req.params.id);
+        const { transactionId } = authorizeTransactionInputSchema.parse(req.params.id);
 
         const transaction = await this.transactionService.findOneById(transactionId);
         if (!transaction) throw new TransactionNotFoundError();
