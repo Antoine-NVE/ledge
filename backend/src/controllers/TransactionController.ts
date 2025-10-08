@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { UndefinedTransactionError, UndefinedUserError } from '../errors/InternalServerError';
 import { TransactionRepository } from '../repositories/TransactionRepository';
 import {
-    partialTransactionSchema,
     transactionCreateInputSchema,
     transactionSchema,
     transactionUpdateInputSchema,

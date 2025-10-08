@@ -36,5 +36,3 @@ export const transactionUpdateInputSchema = transactionSchema.omit({
     createdAt: true,
     updatedAt: true,
 });
-
-export const partialTransactionSchema = transactionSchema.partial();
