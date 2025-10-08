@@ -14,12 +14,14 @@ import { User, UserCredentials } from '../types/userType';
 import { userSchema } from '../schemas/userSchema';
 import { RefreshToken } from '../types/refreshTokenType';
 import { partialRefreshTokenSchema, refreshTokenSchema } from '../schemas/refreshTokenSchema';
+import { UserService } from './UserService';
 
 export class AuthService {
     constructor(
         private userRepository: UserRepository,
         private jwtService: JwtService,
         private refreshTokenRepository: RefreshTokenRepository,
+        private userService: UserService,
     ) {}
 
     async register({ email, password }: UserCredentials): Promise<{
@@ -57,7 +59,7 @@ export class AuthService {
         accessToken: string;
         refreshToken: RefreshToken;
     }> {
-        const user = await this.userRepository.findOneByEmail(email);
+        const user = await this.userService.findOneByEmail(email);
         if (!user) throw new InvalidCredentialsError();
 
         const doesMatch = await bcrypt.compare(password, user.passwordHash);

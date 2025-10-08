@@ -10,6 +10,7 @@ import { User } from '../types/userType';
 import { UndefinedUserError } from '../errors/InternalServerError';
 import { TransactionAccessForbiddenError } from '../errors/ForbiddenError';
 import { Transaction } from '../types/transactionType';
+import { UserService } from '../services/UserService';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -25,7 +26,7 @@ declare module 'express-serve-static-core' {
 
 export class SecurityMiddleware {
     constructor(
-        private userRepository: UserRepository,
+        private userService: UserService,
         private jwtService: JwtService,
         private transactionRepository: TransactionRepository,
     ) {}
@@ -36,7 +37,7 @@ export class SecurityMiddleware {
         if (!accessToken) throw new RequiredAccessTokenError();
 
         const payload = this.jwtService.verifyAccessJwt(accessToken);
-        const user = await this.userRepository.findOneById(new ObjectId(payload.sub));
+        const user = await this.userService.findOneById(new ObjectId(payload.sub));
         if (!user) throw new UserNotFoundError();
 
         req.user = user;

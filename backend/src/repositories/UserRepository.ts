@@ -13,12 +13,8 @@ export class UserRepository {
         };
     };
 
-    findOneByEmail = async (email: string): Promise<User | null> => {
-        return await this.userCollection.findOne({ email });
-    };
-
-    findOneById = async (id: ObjectId): Promise<User | null> => {
-        return await this.userCollection.findOne({ _id: id });
+    findOne = async <K extends keyof User>(key: K, value: User[K]): Promise<User | null> => {
+        return await this.userCollection.findOne({ [key]: value });
     };
 
     updateOne = async (id: ObjectId, partialUserData: PartialUserData): Promise<void> => {

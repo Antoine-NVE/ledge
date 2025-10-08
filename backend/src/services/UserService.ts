@@ -35,8 +35,8 @@ export class UserService {
 
     verifyEmail = async (token: string): Promise<void> => {
         const decoded = this.jwtService.verifyEmailVerificationJwt(token);
-        const user = await this.userRepository.findOneById(new ObjectId(decoded.sub));
 
+        const user = await this.findOneById(new ObjectId(decoded.sub));
         if (!user) throw new UserNotFoundError();
         if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
 
@@ -44,5 +44,13 @@ export class UserService {
             isEmailVerified: true,
         });
         await this.userRepository.updateOne(user._id, partialUserData);
+    };
+
+    findOneById = async (id: ObjectId): Promise<User | null> => {
+        return await this.userRepository.findOne('_id', id);
+    };
+
+    findOneByEmail = async (email: string): Promise<User | null> => {
+        return await this.userRepository.findOne('email', email);
     };
 }
