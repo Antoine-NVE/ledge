@@ -2,15 +2,10 @@ import { Collection, Document, InsertOneResult, ObjectId, OptionalId, WithId } f
 import { PartialUserData, User, UserData } from '../types/userType';
 
 export class UserRepository {
-    constructor(private userCollection: Collection<OptionalId<User>>) {}
+    constructor(private userCollection: Collection<User>) {}
 
-    insertOne = async (userData: UserData): Promise<User> => {
-        const result = await this.userCollection.insertOne(userData);
-
-        return {
-            _id: result.insertedId,
-            ...userData,
-        };
+    insertOne = async (user: User): Promise<void> => {
+        await this.userCollection.insertOne(user);
     };
 
     findOne = async <K extends keyof User>(key: K, value: User[K]): Promise<User | null> => {

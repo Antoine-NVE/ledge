@@ -42,6 +42,22 @@ export class UserService {
         await this.updateOne(user);
     };
 
+    insertOne = async (email: string, passwordHash: string): Promise<User> => {
+        const user: User = {
+            _id: new ObjectId(),
+            email,
+            passwordHash,
+            isEmailVerified: false,
+            emailVerificationCooldownExpiresAt: null,
+            createdAt: new Date(),
+            updatedAt: null,
+        };
+
+        await this.userRepository.insertOne(user);
+
+        return user;
+    };
+
     findOneById = async (id: ObjectId): Promise<User | null> => {
         return await this.userRepository.findOne('_id', id);
     };

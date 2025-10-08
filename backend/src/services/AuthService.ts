@@ -18,10 +18,9 @@ import { UserService } from './UserService';
 
 export class AuthService {
     constructor(
-        private userRepository: UserRepository,
+        private userService: UserService,
         private jwtService: JwtService,
         private refreshTokenRepository: RefreshTokenRepository,
-        private userService: UserService,
     ) {}
 
     async register({ email, password }: UserCredentials): Promise<{
@@ -30,15 +29,7 @@ export class AuthService {
         refreshToken: RefreshToken;
     }> {
         const passwordHash = await bcrypt.hash(password, 10);
-        const userData = userSchema.parse({
-            email,
-            passwordHash,
-            isEmailVerified: false,
-            emailVerificationCooldownExpiresAt: null,
-            createdAt: new Date(),
-            updatedAt: null,
-        });
-        const user = await this.userRepository.insertOne(userData);
+        const user = await this.userService.insertOne(email, passwordHash);
 
         const refreshTokenData = refreshTokenSchema.parse({
             token: generateToken(),
