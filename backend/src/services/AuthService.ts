@@ -10,7 +10,7 @@ import { generateToken } from '../utils/token';
 import bcrypt from 'bcrypt';
 import { JwtService } from './JwtService';
 import { WithId } from 'mongodb';
-import { User, UserCredentials } from '../types/userType';
+import { User } from '../types/userType';
 import { userSchema } from '../schemas/userSchema';
 import { RefreshToken } from '../types/refreshTokenType';
 import { partialRefreshTokenSchema, refreshTokenSchema } from '../schemas/refreshTokenSchema';
@@ -23,7 +23,10 @@ export class AuthService {
         private refreshTokenRepository: RefreshTokenRepository,
     ) {}
 
-    async register({ email, password }: UserCredentials): Promise<{
+    async register(
+        email: string,
+        password: string,
+    ): Promise<{
         user: User;
         accessToken: string;
         refreshToken: RefreshToken;
@@ -45,7 +48,10 @@ export class AuthService {
         return { user, accessToken, refreshToken };
     }
 
-    async login({ email, password }: UserCredentials): Promise<{
+    async login(
+        email: string,
+        password: string,
+    ): Promise<{
         user: User;
         accessToken: string;
         refreshToken: RefreshToken;
