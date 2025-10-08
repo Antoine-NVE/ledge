@@ -54,6 +54,12 @@ export const userLoginInputSchema = userBaseInputSchema.extend({
     rememberMe: z.boolean(),
 });
 
+export const userVerifyEmailInputSchema = z
+    .object({
+        token: z.string().min(1).jwt(),
+    })
+    .strict();
+
 export const userOuputSchema = userSchema.omit({
     passwordHash: true,
 });

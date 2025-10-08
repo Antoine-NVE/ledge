@@ -5,6 +5,7 @@ import { UserService } from '../services/UserService';
 import { UserRepository } from '../repositories/UserRepository';
 import { UndefinedUserError } from '../errors/InternalServerError';
 import { env } from '../config/env';
+import { userVerifyEmailInputSchema } from '../schemas/userSchema';
 
 export class UserController {
     constructor(private userService: UserService) {}
@@ -38,7 +39,7 @@ export class UserController {
     };
 
     verifyEmail = async (req: Request<{ token: string }>, res: Response): Promise<void> => {
-        const { token } = req.params;
+        const { token } = userVerifyEmailInputSchema.parse(req.body);
 
         await this.userService.verifyEmail(token);
 

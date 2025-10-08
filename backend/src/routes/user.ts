@@ -38,7 +38,7 @@ router.post(
     securityMiddleware.authenticateUser,
     userController.sendEmailVerificationEmail,
 );
-router.get('/verify-email/:token', userController.verifyEmail);
+router.post('/verify-email', userController.verifyEmail);
 router.get('/me', securityMiddleware.authenticateUser, userController.me);
 
 export default router;
