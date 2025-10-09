@@ -22,19 +22,19 @@ export const transactionSchema = z
     })
     .strict();
 
-export const createTransactionInputSchema = transactionSchema.omit({
-    _id: true,
-    userId: true,
-    createdAt: true,
-    updatedAt: true,
+export const createTransactionInputSchema = transactionSchema.pick({
+    month: true,
+    name: true,
+    value: true,
+    isIncome: true,
+    isRecurring: true,
 });
 
-export const updateTransactionInputSchema = transactionSchema.omit({
-    _id: true,
-    month: true,
-    userId: true,
-    createdAt: true,
-    updatedAt: true,
+export const updateTransactionInputSchema = transactionSchema.pick({
+    name: true,
+    value: true,
+    isIncome: true,
+    isRecurring: true,
 });
 
 export const authorizeTransactionInputSchema = z
