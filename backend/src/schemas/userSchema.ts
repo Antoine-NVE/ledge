@@ -18,6 +18,15 @@ export const userSchema = z
     })
     .strict();
 
+export const authenticateUserInputSchema = z
+    .object({
+        userId: z
+            .string()
+            .refine((val) => ObjectId.isValid(val))
+            .transform((val) => new ObjectId(val)),
+    })
+    .strict();
+
 export const sendVerificationEmailInputSchema = z
     .object({
         frontendBaseUrl: z.string().url(),

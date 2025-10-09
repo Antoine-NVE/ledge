@@ -13,6 +13,7 @@ import { Transaction } from '../types/transactionType';
 import { UserService } from '../services/UserService';
 import { TransactionService } from '../services/TransactionService';
 import { authorizeTransactionInputSchema } from '../schemas/transactionSchema';
+import { authenticateUserInputSchema } from '../schemas/userSchema';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -39,7 +40,8 @@ export class SecurityMiddleware {
         if (!accessToken) throw new RequiredAccessTokenError();
 
         const payload = this.jwtService.verifyAccessJwt(accessToken);
-        const user = await this.userService.findOneById(new ObjectId(payload.sub));
+        const { userId } = authenticateUserInputSchema.parse(payload);
+        const user = await this.userService.findOneById(userId);
         if (!user) throw new UserNotFoundError();
 
         req.user = user;
