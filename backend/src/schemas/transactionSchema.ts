@@ -22,14 +22,14 @@ export const transactionSchema = z
     })
     .strict();
 
-export const transactionCreateInputSchema = transactionSchema.omit({
+export const createTransactionInputSchema = transactionSchema.omit({
     _id: true,
     userId: true,
     createdAt: true,
     updatedAt: true,
 });
 
-export const transactionUpdateInputSchema = transactionSchema.omit({
+export const updateTransactionInputSchema = transactionSchema.omit({
     _id: true,
     month: true,
     userId: true,

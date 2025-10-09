@@ -2,9 +2,9 @@ import { Request, Response } from 'express';
 import { UndefinedTransactionError, UndefinedUserError } from '../errors/InternalServerError';
 import { TransactionRepository } from '../repositories/TransactionRepository';
 import {
-    transactionCreateInputSchema,
+    createTransactionInputSchema,
     transactionSchema,
-    transactionUpdateInputSchema,
+    updateTransactionInputSchema,
 } from '../schemas/transactionSchema';
 import { Transaction } from '../types/transactionType';
 import { TransactionNotFoundError } from '../errors/NotFoundError';
@@ -17,7 +17,7 @@ export class TransactionController {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const { month, name, value, isIncome, isRecurring } = transactionCreateInputSchema.parse(
+        const { month, name, value, isIncome, isRecurring } = createTransactionInputSchema.parse(
             req.body,
         );
 
@@ -71,7 +71,7 @@ export class TransactionController {
         let transaction: Transaction | undefined = req.transaction;
         if (!transaction) throw new UndefinedTransactionError();
 
-        const { name, value, isIncome, isRecurring } = transactionUpdateInputSchema.parse(req.body);
+        const { name, value, isIncome, isRecurring } = updateTransactionInputSchema.parse(req.body);
         transaction.name = name;
         transaction.value = value;
         transaction.isIncome = isIncome;
