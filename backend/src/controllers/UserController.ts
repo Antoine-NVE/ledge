@@ -5,21 +5,18 @@ import { UserService } from '../services/UserService';
 import { UserRepository } from '../repositories/UserRepository';
 import { UndefinedUserError } from '../errors/InternalServerError';
 import { env } from '../config/env';
-import {
-    userSendEmailVerificationEmailInputSchema,
-    userVerifyEmailInputSchema,
-} from '../schemas/userSchema';
+import { sendVerificationEmailInputSchema, verifyEmailInputSchema } from '../schemas/userSchema';
 
 export class UserController {
     constructor(private userService: UserService) {}
 
-    sendEmailVerificationEmail = async (req: Request, res: Response): Promise<void> => {
+    sendVerificationEmail = async (req: Request, res: Response): Promise<void> => {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const { frontendBaseUrl } = userSendEmailVerificationEmailInputSchema.parse(req.body);
+        const { frontendBaseUrl } = sendVerificationEmailInputSchema.parse(req.body);
 
-        await this.userService.sendEmailVerificationEmail(user, frontendBaseUrl);
+        await this.userService.sendVerificationEmail(user, frontendBaseUrl);
 
         res.status(200).json({
             message: 'Verification email sent successfully',
@@ -29,7 +26,7 @@ export class UserController {
     };
 
     verifyEmail = async (req: Request<{ token: string }>, res: Response): Promise<void> => {
-        const { token } = userVerifyEmailInputSchema.parse(req.body);
+        const { token } = verifyEmailInputSchema.parse(req.body);
 
         await this.userService.verifyEmail(token);
 

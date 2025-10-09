@@ -14,7 +14,7 @@ export class UserService {
         private userRepository: UserRepository,
     ) {}
 
-    sendEmailVerificationEmail = async (user: User, frontendBaseUrl: string): Promise<void> => {
+    sendVerificationEmail = async (user: User, frontendBaseUrl: string): Promise<void> => {
         if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
         if (
             user.emailVerificationCooldownExpiresAt &&
@@ -24,7 +24,7 @@ export class UserService {
 
         const jwt = this.jwtService.signEmailVerificationJwt(user._id);
 
-        await this.emailService.sendEmailVerificationEmail(user.email, frontendBaseUrl, jwt);
+        await this.emailService.sendVerificationEmail(user.email, frontendBaseUrl, jwt);
 
         user.emailVerificationCooldownExpiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
         await this.updateOne(user);

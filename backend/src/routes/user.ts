@@ -32,9 +32,9 @@ const transactionService = new TransactionService(transactionRepository);
 const securityMiddleware = new SecurityMiddleware(userService, transactionService, jwtService);
 
 router.post(
-    '/send-email-verification-email',
+    '/send-verification-email',
     securityMiddleware.authenticateUser,
-    userController.sendEmailVerificationEmail,
+    userController.sendVerificationEmail,
 );
 router.post('/verify-email', userController.verifyEmail);
 router.get('/me', securityMiddleware.authenticateUser, userController.me);

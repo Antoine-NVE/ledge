@@ -8,13 +8,13 @@ import { UserRepository } from '../repositories/UserRepository';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { exit } from 'process';
 import { RequiredRefreshTokenError } from '../errors/UnauthorizedError';
-import { userLoginInputSchema, userRegisterInputSchema } from '../schemas/userSchema';
+import { loginInputSchema, registerInputSchema } from '../schemas/authSchema';
 
 export class AuthController {
     constructor(private authService: AuthService) {}
 
     register = async (req: Request, res: Response) => {
-        const { email, password } = userRegisterInputSchema.parse(req.body);
+        const { email, password } = registerInputSchema.parse(req.body);
 
         // The user can't choose to be remembered at registration
         // Next time the user logs in, they can choose to be remembered
@@ -38,7 +38,7 @@ export class AuthController {
     };
 
     login = async (req: Request, res: Response) => {
-        const { email, password, rememberMe } = userLoginInputSchema.parse(req.body);
+        const { email, password, rememberMe } = loginInputSchema.parse(req.body);
 
         const { user, accessToken, refreshToken } = await this.authService.login(email, password);
 

@@ -19,11 +19,7 @@ export class EmailService {
         await this.transporter.sendMail({ from: this.from, to, subject, html });
     }
 
-    async sendEmailVerificationEmail(
-        to: string,
-        frontendBaseUrl: string,
-        jwt: string,
-    ): Promise<void> {
+    async sendVerificationEmail(to: string, frontendBaseUrl: string, jwt: string): Promise<void> {
         const subject = 'Please verify your email address';
         const html = `Click here to verify your email address: <a href="${frontendBaseUrl}/verify-email/${jwt}">verify email</a>. This link will expire in 1 hour.`;
 
