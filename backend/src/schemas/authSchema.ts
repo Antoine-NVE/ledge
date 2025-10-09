@@ -1,16 +1,10 @@
 import z from 'zod';
 import { userSchema } from './userSchema';
 
-export const authBaseInputSchema = userSchema.omit({
-    _id: true,
-    passwordHash: true,
-    isEmailVerified: true,
-    emailVerificationCooldownExpiresAt: true,
-    createdAt: true,
-    updatedAt: true,
-});
-
-export const registerInputSchema = authBaseInputSchema
+export const registerInputSchema = userSchema
+    .pick({
+        email: true,
+    })
     .extend({
         password: z
             .string()
@@ -27,7 +21,11 @@ export const registerInputSchema = authBaseInputSchema
         path: ['confirmPassword'],
     });
 
-export const loginInputSchema = authBaseInputSchema.extend({
-    password: z.string().min(1, 'Password is required'),
-    rememberMe: z.boolean(),
-});
+export const loginInputSchema = userSchema
+    .pick({
+        email: true,
+    })
+    .extend({
+        password: z.string().min(1, 'Password is required'),
+        rememberMe: z.boolean(),
+    });
