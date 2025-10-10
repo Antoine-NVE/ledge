@@ -1,34 +1,29 @@
 import { Collection, ObjectId, OptionalId, WithId } from 'mongodb';
-import { RefreshToken, RefreshTokenData } from '../types/refreshTokenType';
+import { RefreshToken } from '../types/refreshTokenType';
 
 export class RefreshTokenRepository {
-    constructor(private refreshTokenCollection: Collection<OptionalId<RefreshToken>>) {}
+    constructor(private refreshTokenCollection: Collection<RefreshToken>) {}
 
-    insertOne = async (refreshTokenData: RefreshTokenData): Promise<RefreshToken> => {
-        const result = await this.refreshTokenCollection.insertOne(refreshTokenData);
-
-        return {
-            _id: result.insertedId,
-            ...refreshTokenData,
-        };
+    insertOne = async (refreshToken: RefreshToken): Promise<void> => {
+        await this.refreshTokenCollection.insertOne(refreshToken);
     };
 
-    findOneByToken = async (token: string): Promise<RefreshToken | null> => {
-        return await this.refreshTokenCollection.findOne({ token });
-    };
-
-    findOneByIdAndUpdate = async (
-        id: ObjectId,
-        partialRefreshTokenData: Partial<RefreshTokenData>,
+    findOne = async <K extends keyof RefreshToken>(
+        key: K,
+        value: RefreshToken[K],
     ): Promise<RefreshToken | null> => {
-        return await this.refreshTokenCollection.findOneAndUpdate(
-            { _id: id },
-            { $set: partialRefreshTokenData },
-            { returnDocument: 'after' },
-        );
+        return await this.refreshTokenCollection.findOne({ [key]: value });
     };
 
-    deleteOneByToken = async (token: string): Promise<void> => {
-        await this.refreshTokenCollection.deleteOne({ token });
+    updateOne = async (refreshToken: RefreshToken): Promise<void> => {
+        const { _id, ...rest } = refreshToken;
+        await this.refreshTokenCollection.updateOne({ _id }, { $set: rest });
+    };
+
+    deleteOne = async <K extends keyof RefreshToken>(
+        key: K,
+        value: RefreshToken[K],
+    ): Promise<void> => {
+        await this.refreshTokenCollection.deleteOne({ [key]: value });
     };
 }

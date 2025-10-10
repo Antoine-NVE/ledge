@@ -9,6 +9,7 @@ import { env } from '../config/env';
 import { db } from '../config/db';
 import { UserService } from '../services/UserService';
 import { EmailService } from '../services/EmailService';
+import { RefreshTokenService } from '../services/RefreshTokenService';
 
 const router = express.Router();
 
@@ -27,7 +28,8 @@ const emailService = new EmailService(
 );
 const userService = new UserService(jwtService, emailService, userRepository);
 const refreshTokenRepository = new RefreshTokenRepository(db.collection('refreshtokens'));
-const authService = new AuthService(userService, jwtService, refreshTokenRepository);
+const refreshTokenService = new RefreshTokenService(refreshTokenRepository);
+const authService = new AuthService(userService, jwtService, refreshTokenService);
 const authController = new AuthController(authService);
 
 router.post('/register', authController.register);

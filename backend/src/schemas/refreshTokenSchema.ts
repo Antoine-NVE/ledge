@@ -3,6 +3,7 @@ import { ObjectId } from 'mongodb';
 
 export const refreshTokenSchema = z
     .object({
+        _id: z.custom<ObjectId>((val) => val instanceof ObjectId),
         token: z.string().length(64),
         expiresAt: z.date(),
         userId: z.custom<ObjectId>((val) => val instanceof ObjectId),
@@ -10,5 +11,3 @@ export const refreshTokenSchema = z
         updatedAt: z.date().nullable(),
     })
     .strict();
-
-export const partialRefreshTokenSchema = refreshTokenSchema.partial();

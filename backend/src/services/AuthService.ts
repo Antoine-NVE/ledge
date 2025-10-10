@@ -13,14 +13,15 @@ import { WithId } from 'mongodb';
 import { User } from '../types/userType';
 import { userSchema } from '../schemas/userSchema';
 import { RefreshToken } from '../types/refreshTokenType';
-import { partialRefreshTokenSchema, refreshTokenSchema } from '../schemas/refreshTokenSchema';
+import { refreshTokenSchema } from '../schemas/refreshTokenSchema';
 import { UserService } from './UserService';
+import { RefreshTokenService } from './RefreshTokenService';
 
 export class AuthService {
     constructor(
         private userService: UserService,
         private jwtService: JwtService,
-        private refreshTokenRepository: RefreshTokenRepository,
+        private refreshTokenService: RefreshTokenService,
     ) {}
 
     async register(
@@ -34,14 +35,7 @@ export class AuthService {
         const passwordHash = await bcrypt.hash(password, 10);
         const user = await this.userService.insertOne(email, passwordHash);
 
-        const refreshTokenData = refreshTokenSchema.parse({
-            token: generateToken(),
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-            userId: user._id,
-            createdAt: new Date(),
-            updatedAt: null,
-        });
-        const refreshToken = await this.refreshTokenRepository.insertOne(refreshTokenData);
+        const refreshToken = await this.refreshTokenService.insertOne(user._id);
 
         const accessToken = this.jwtService.signAccessJwt(user._id);
 
@@ -62,14 +56,7 @@ export class AuthService {
         const doesMatch = await bcrypt.compare(password, user.passwordHash);
         if (!doesMatch) throw new InvalidCredentialsError();
 
-        const refreshTokenData = refreshTokenSchema.parse({
-            token: generateToken(),
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-            userId: user._id,
-            createdAt: new Date(),
-            updatedAt: null,
-        });
-        const refreshToken = await this.refreshTokenRepository.insertOne(refreshTokenData);
+        const refreshToken = await this.refreshTokenService.insertOne(user._id);
 
         const accessToken = this.jwtService.signAccessJwt(user._id);
 
@@ -77,19 +64,12 @@ export class AuthService {
     }
 
     async refresh(token: string): Promise<{ accessToken: string; refreshToken: RefreshToken }> {
-        let refreshToken = await this.refreshTokenRepository.findOneByToken(token);
+        let refreshToken = await this.refreshTokenService.findOneByToken(token);
         if (!refreshToken) throw new InvalidRefreshTokenError();
         if (refreshToken.expiresAt < new Date()) throw new ExpiredRefreshTokenError();
 
-        const refreshTokenData = partialRefreshTokenSchema.parse({
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days
-            updatedAt: new Date(),
-        });
-        refreshToken = await this.refreshTokenRepository.findOneByIdAndUpdate(
-            refreshToken._id,
-            refreshTokenData,
-        );
-        if (!refreshToken) throw new InvalidRefreshTokenError(); // Shouldn't happen
+        refreshToken.expiresAt = new Date(Date.now() + RefreshTokenService.TTL);
+        refreshToken = await this.refreshTokenService.updateOne(refreshToken);
 
         const accessToken = this.jwtService.signAccessJwt(refreshToken.userId);
 
@@ -97,6 +77,6 @@ export class AuthService {
     }
 
     async logout(token: string): Promise<void> {
-        await this.refreshTokenRepository.deleteOneByToken(token);
+        await this.refreshTokenService.deleteOneByToken(token);
     }
 }
