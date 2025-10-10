@@ -15,22 +15,22 @@ import { Payload } from '../types/Payload';
 export class JwtService {
     constructor(private secret: Secret) {}
 
-    private signJwt = (payload: object, options?: SignOptions): string => {
+    private sign = (payload: object, options?: SignOptions): string => {
         return sign(payload, this.secret, options);
     };
 
-    signAccessJwt = (userId: ObjectId): string => {
-        return this.signJwt({ aud: 'access', sub: userId.toString() }, { expiresIn: '15m' });
+    signAccess = (userId: ObjectId): string => {
+        return this.sign({ aud: 'access', sub: userId.toString() }, { expiresIn: '15m' });
     };
 
-    signEmailVerificationJwt = (userId: ObjectId): string => {
-        return this.signJwt(
+    signEmailVerification = (userId: ObjectId): string => {
+        return this.sign(
             { aud: 'email-verification', sub: userId.toString() },
             { expiresIn: '1h' },
         );
     };
 
-    private verifyJwt = (jwt: string, options?: VerifyOptions): Payload => {
+    private verify = (jwt: string, options?: VerifyOptions): Payload => {
         try {
             // TODO: create a real verification
             return verify(jwt, this.secret, options) as Payload;
@@ -42,9 +42,9 @@ export class JwtService {
         }
     };
 
-    verifyAccessJwt = (jwt: string): Payload => {
+    verifyAccess = (jwt: string): Payload => {
         try {
-            return this.verifyJwt(jwt, { audience: 'access' });
+            return this.verify(jwt, { audience: 'access' });
         } catch (error: unknown) {
             if (error instanceof ExpiredJwtError) throw new ExpiredJwtError('refresh');
 
@@ -52,7 +52,7 @@ export class JwtService {
         }
     };
 
-    verifyEmailVerificationJwt = (jwt: string): Payload => {
-        return this.verifyJwt(jwt, { audience: 'email-verification' });
+    verifyEmailVerification = (jwt: string): Payload => {
+        return this.verify(jwt, { audience: 'email-verification' });
     };
 }

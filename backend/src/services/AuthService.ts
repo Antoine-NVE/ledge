@@ -37,7 +37,7 @@ export class AuthService {
 
         const refreshToken = await this.refreshTokenService.insertOne(user._id);
 
-        const accessToken = this.jwtService.signAccessJwt(user._id);
+        const accessToken = this.jwtService.signAccess(user._id);
 
         return { user, accessToken, refreshToken };
     };
@@ -58,7 +58,7 @@ export class AuthService {
 
         const refreshToken = await this.refreshTokenService.insertOne(user._id);
 
-        const accessToken = this.jwtService.signAccessJwt(user._id);
+        const accessToken = this.jwtService.signAccess(user._id);
 
         return { user, accessToken, refreshToken };
     };
@@ -73,7 +73,7 @@ export class AuthService {
         refreshToken.expiresAt = new Date(Date.now() + RefreshTokenService.TTL);
         refreshToken = await this.refreshTokenService.updateOne(refreshToken);
 
-        const accessToken = this.jwtService.signAccessJwt(refreshToken.userId);
+        const accessToken = this.jwtService.signAccess(refreshToken.userId);
 
         return { accessToken, refreshToken };
     };

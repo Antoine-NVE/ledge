@@ -15,18 +15,14 @@ export class EmailService {
         this.from = from;
     }
 
-    private sendEmail = async (to: string, subject: string, html: string): Promise<void> => {
+    private send = async (to: string, subject: string, html: string): Promise<void> => {
         await this.transporter.sendMail({ from: this.from, to, subject, html });
     };
 
-    sendVerificationEmail = async (
-        to: string,
-        frontendBaseUrl: string,
-        jwt: string,
-    ): Promise<void> => {
+    sendVerification = async (to: string, frontendBaseUrl: string, jwt: string): Promise<void> => {
         const subject = 'Please verify your email address';
         const html = `Click here to verify your email address: <a href="${frontendBaseUrl}/verify-email/${jwt}">verify email</a>. This link will expire in 1 hour.`;
 
-        await this.sendEmail(to, subject, html);
+        await this.send(to, subject, html);
     };
 }

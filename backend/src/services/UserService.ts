@@ -22,16 +22,16 @@ export class UserService {
         )
             throw new EmailVerificationCooldownError();
 
-        const jwt = this.jwtService.signEmailVerificationJwt(user._id);
+        const jwt = this.jwtService.signEmailVerification(user._id);
 
-        await this.emailService.sendVerificationEmail(user.email, frontendBaseUrl, jwt);
+        await this.emailService.sendVerification(user.email, frontendBaseUrl, jwt);
 
         user.emailVerificationCooldownExpiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
         await this.updateOne(user);
     };
 
     verifyEmail = async (token: string): Promise<void> => {
-        const payload = this.jwtService.verifyEmailVerificationJwt(token);
+        const payload = this.jwtService.verifyEmailVerification(token);
 
         const user = await this.findOneById(new ObjectId(payload.sub));
         if (!user) throw new UserNotFoundError();

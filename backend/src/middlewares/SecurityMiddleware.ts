@@ -36,10 +36,10 @@ export class SecurityMiddleware {
 
     authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
         const cookieService = new CookieService(req, res);
-        const accessToken = cookieService.getAccessTokenCookie();
+        const accessToken = cookieService.getAccessToken();
         if (!accessToken) throw new RequiredAccessTokenError('refresh');
 
-        const payload = this.jwtService.verifyAccessJwt(accessToken);
+        const payload = this.jwtService.verifyAccess(accessToken);
         const { userId } = authenticateUserInputSchema.parse({ userId: payload.sub });
         const user = await this.userService.findOneById(userId);
         if (!user) throw new UserNotFoundError();

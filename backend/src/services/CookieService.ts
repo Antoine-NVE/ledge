@@ -6,14 +6,14 @@ export class CookieService {
         private res: Response,
     ) {}
 
-    private setCookie = (name: string, value: string, options: CookieOptions): void => {
+    private set = (name: string, value: string, options: CookieOptions): void => {
         this.res.cookie(name, value, options);
     };
 
-    setAccessTokenCookie = (token: string, rememberMe: boolean): void => {
+    setAccessToken = (token: string, rememberMe: boolean): void => {
         const maxAge = rememberMe ? 15 * 60 * 1000 : undefined; // 15 minutes
 
-        this.setCookie('access_token', token, {
+        this.set('access_token', token, {
             maxAge,
             httpOnly: true,
             secure: true,
@@ -21,10 +21,10 @@ export class CookieService {
         });
     };
 
-    setRefreshTokenCookie = (token: string, rememberMe: boolean): void => {
+    setRefreshToken = (token: string, rememberMe: boolean): void => {
         const maxAge = rememberMe ? 7 * 24 * 60 * 60 * 1000 : undefined; // 7 days
 
-        this.setCookie('refresh_token', token, {
+        this.set('refresh_token', token, {
             maxAge,
             httpOnly: true,
             secure: true,
@@ -32,10 +32,10 @@ export class CookieService {
         });
     };
 
-    setRememberMeCookie = (rememberMe: boolean): void => {
+    setRememberMe = (rememberMe: boolean): void => {
         const maxAge = rememberMe ? 7 * 24 * 60 * 60 * 1000 : undefined; // 7 days
 
-        this.setCookie('remember_me', rememberMe.toString(), {
+        this.set('remember_me', rememberMe.toString(), {
             maxAge,
             httpOnly: false,
             secure: true,
@@ -43,48 +43,48 @@ export class CookieService {
         });
     };
 
-    setAllAuthCookies = (accessToken: string, refreshToken: string, rememberMe: boolean): void => {
-        this.setAccessTokenCookie(accessToken, rememberMe);
-        this.setRefreshTokenCookie(refreshToken, rememberMe);
-        this.setRememberMeCookie(rememberMe);
+    setAllAuth = (accessToken: string, refreshToken: string, rememberMe: boolean): void => {
+        this.setAccessToken(accessToken, rememberMe);
+        this.setRefreshToken(refreshToken, rememberMe);
+        this.setRememberMe(rememberMe);
     };
 
-    private getCookie = (name: string): string | undefined => {
+    private get = (name: string): string | undefined => {
         return this.req.cookies[name];
     };
 
-    getAccessTokenCookie = (): string | undefined => {
-        return this.getCookie('access_token');
+    getAccessToken = (): string | undefined => {
+        return this.get('access_token');
     };
 
-    getRefreshTokenCookie = (): string | undefined => {
-        return this.getCookie('refresh_token');
+    getRefreshToken = (): string | undefined => {
+        return this.get('refresh_token');
     };
 
-    getRememberMeCookie = (): boolean | undefined => {
-        const value = this.getCookie('remember_me');
+    getRememberMe = (): boolean | undefined => {
+        const value = this.get('remember_me');
         return value === 'true' ? true : value === 'false' ? false : undefined;
     };
 
-    private clearCookie = (name: string): void => {
+    private clear = (name: string): void => {
         this.res.clearCookie(name);
     };
 
-    clearAccessTokenCookie = (): void => {
-        this.clearCookie('access_token');
+    clearAccessToken = (): void => {
+        this.clear('access_token');
     };
 
-    clearRefreshTokenCookie = (): void => {
-        this.clearCookie('refresh_token');
+    clearRefreshToken = (): void => {
+        this.clear('refresh_token');
     };
 
-    clearRememberMeCookie = (): void => {
-        this.clearCookie('remember_me');
+    clearRememberMe = (): void => {
+        this.clear('remember_me');
     };
 
-    clearAllAuthCookies = (): void => {
-        this.clearAccessTokenCookie();
-        this.clearRefreshTokenCookie();
-        this.clearRememberMeCookie();
+    clearAllAuth = (): void => {
+        this.clearAccessToken();
+        this.clearRefreshToken();
+        this.clearRememberMe();
     };
 }

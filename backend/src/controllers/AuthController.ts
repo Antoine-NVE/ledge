@@ -56,10 +56,10 @@ export class AuthController {
 
     refresh = async (req: Request, res: Response) => {
         const cookieService = new CookieService(req, res);
-        const token = cookieService.getRefreshTokenCookie();
+        const token = cookieService.getRefreshToken();
         if (!token) throw new RequiredRefreshTokenError();
 
-        let rememberMe = cookieService.getRememberMeCookie();
+        let rememberMe = cookieService.getRememberMe();
         if (rememberMe === undefined) rememberMe = false; // Default to false if not provided
 
         const { accessToken, refreshToken } = await this.authService.refresh(token);
@@ -75,7 +75,7 @@ export class AuthController {
 
     logout = async (req: Request, res: Response) => {
         const cookieService = new CookieService(req, res);
-        const token = cookieService.getRefreshTokenCookie();
+        const token = cookieService.getRefreshToken();
 
         if (token) await this.authService.logout(token);
 
