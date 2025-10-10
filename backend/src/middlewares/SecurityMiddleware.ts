@@ -18,11 +18,6 @@ import { authenticateUserInputSchema } from '../schemas/userSchema';
 declare module 'express-serve-static-core' {
     interface Request {
         user?: User;
-    }
-}
-
-declare module 'express-serve-static-core' {
-    interface Request {
         transaction?: Transaction;
     }
 }
