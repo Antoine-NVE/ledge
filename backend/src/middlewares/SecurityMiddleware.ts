@@ -40,7 +40,7 @@ export class SecurityMiddleware {
         if (!accessToken) throw new RequiredAccessTokenError();
 
         const payload = this.jwtService.verifyAccessJwt(accessToken);
-        const { userId } = authenticateUserInputSchema.parse(payload);
+        const { userId } = authenticateUserInputSchema.parse({ userId: payload.sub });
         const user = await this.userService.findOneById(userId);
         if (!user) throw new UserNotFoundError();
 
