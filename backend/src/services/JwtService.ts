@@ -12,11 +12,11 @@ export class JwtService {
     };
 
     signAccessJwt = (userId: ObjectId): string => {
-        return this.signJwt({ sub: userId, aud: 'access' }, { expiresIn: '15m' });
+        return this.signJwt({ aud: 'access', sub: userId }, { expiresIn: '15m' });
     };
 
     signEmailVerificationJwt = (userId: ObjectId): string => {
-        return this.signJwt({ sub: userId, aud: 'email-verification' }, { expiresIn: '1h' });
+        return this.signJwt({ aud: 'email-verification', sub: userId }, { expiresIn: '1h' });
     };
 
     private verifyJwt = (jwt: string, options?: VerifyOptions): VerifiedJwtPayload => {
