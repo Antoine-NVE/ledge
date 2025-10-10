@@ -52,7 +52,9 @@ export class SecurityMiddleware {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const { transactionId } = authorizeTransactionInputSchema.parse(req.params.id);
+        const { transactionId } = authorizeTransactionInputSchema.parse({
+            transactionId: req.params.id,
+        });
 
         const transaction = await this.transactionService.findOneById(transactionId);
         if (!transaction) throw new TransactionNotFoundError();
