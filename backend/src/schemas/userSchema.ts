@@ -1,5 +1,6 @@
 import { ObjectId } from 'mongodb';
 import z from 'zod';
+import { env } from '../config/env';
 
 export const userSchema = z
     .object({
@@ -29,7 +30,10 @@ export const authenticateUserInputSchema = z
 
 export const sendVerificationEmailInputSchema = z
     .object({
-        frontendBaseUrl: z.string().url(),
+        frontendBaseUrl: z
+            .string()
+            .url()
+            .refine((val) => env.ALLOWED_ORIGINS.includes(val)),
     })
     .strict();
 
