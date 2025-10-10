@@ -42,8 +42,8 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
     if (err instanceof HttpError) {
         res.status(err.statusCode).json({
             message: err.message,
-            data: null,
-            errors: null,
+            errors: err.errors,
+            action: err.action,
         });
         return;
     }

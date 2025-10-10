@@ -1,8 +1,8 @@
 import { HttpError } from './HttpError';
 
 export abstract class UnauthorizedError extends HttpError {
-    constructor(message: string) {
-        super(message, 401);
+    constructor(message: string, action?: string) {
+        super(message, 401, undefined, action);
     }
 }
 
@@ -13,14 +13,26 @@ export class InvalidCredentialsError extends UnauthorizedError {
 }
 
 export class RequiredAccessTokenError extends UnauthorizedError {
-    constructor() {
-        super('Access token is required');
+    constructor(action?: string) {
+        super('Access token is required', action);
     }
 }
 
 export class InvalidJwtError extends UnauthorizedError {
     constructor() {
         super('Invalid JWT');
+    }
+}
+
+export class InactiveJwtError extends UnauthorizedError {
+    constructor() {
+        super('JWT is not active');
+    }
+}
+
+export class ExpiredJwtError extends UnauthorizedError {
+    constructor(action?: string) {
+        super('JWT has expired', action);
     }
 }
 

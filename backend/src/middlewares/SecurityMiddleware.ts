@@ -37,7 +37,7 @@ export class SecurityMiddleware {
     authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
         const cookieService = new CookieService(req, res);
         const accessToken = cookieService.getAccessTokenCookie();
-        if (!accessToken) throw new RequiredAccessTokenError();
+        if (!accessToken) throw new RequiredAccessTokenError('refresh');
 
         const payload = this.jwtService.verifyAccessJwt(accessToken);
         const { userId } = authenticateUserInputSchema.parse({ userId: payload.sub });

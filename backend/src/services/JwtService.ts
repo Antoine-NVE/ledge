@@ -1,8 +1,16 @@
-import { sign, verify, Secret, JwtPayload, SignOptions, VerifyOptions } from 'jsonwebtoken';
-import { InvalidJwtError } from '../errors/UnauthorizedError';
+import {
+    sign,
+    verify,
+    Secret,
+    JwtPayload,
+    SignOptions,
+    VerifyOptions,
+    TokenExpiredError,
+    NotBeforeError,
+} from 'jsonwebtoken';
+import { ExpiredJwtError, InactiveJwtError, InvalidJwtError } from '../errors/UnauthorizedError';
 import { ObjectId } from 'mongodb';
-
-type VerifiedJwtPayload = Omit<JwtPayload, 'sub'> & { sub: string };
+import { Payload } from '../types/Payload';
 
 export class JwtService {
     constructor(private secret: Secret) {}
@@ -12,35 +20,39 @@ export class JwtService {
     };
 
     signAccessJwt = (userId: ObjectId): string => {
-        return this.signJwt({ aud: 'access', sub: userId }, { expiresIn: '15m' });
+        return this.signJwt({ aud: 'access', sub: userId.toString() }, { expiresIn: '15m' });
     };
 
     signEmailVerificationJwt = (userId: ObjectId): string => {
-        return this.signJwt({ aud: 'email-verification', sub: userId }, { expiresIn: '1h' });
+        return this.signJwt(
+            { aud: 'email-verification', sub: userId.toString() },
+            { expiresIn: '1h' },
+        );
     };
 
-    private verifyJwt = (jwt: string, options?: VerifyOptions): VerifiedJwtPayload => {
+    private verifyJwt = (jwt: string, options?: VerifyOptions): Payload => {
         try {
-            // Jwt can only be returned if we use 'complete: true' option, otherwise it's JwtPayload | string
             // TODO: create a real verification
-            const decoded = verify(jwt, this.secret, options) as JwtPayload | string;
+            return verify(jwt, this.secret, options) as Payload;
+        } catch (error: unknown) {
+            if (error instanceof NotBeforeError) throw new InactiveJwtError();
+            if (error instanceof TokenExpiredError) throw new ExpiredJwtError();
 
-            // If the token is valid but does not contain a 'sub' claim, we consider it invalid
-            if (typeof decoded !== 'object' || !decoded.sub) {
-                throw new InvalidJwtError();
-            }
-
-            return decoded as VerifiedJwtPayload;
-        } catch (error) {
             throw new InvalidJwtError();
         }
     };
 
-    verifyAccessJwt = (jwt: string): VerifiedJwtPayload => {
-        return this.verifyJwt(jwt, { audience: 'access' });
+    verifyAccessJwt = (jwt: string): Payload => {
+        try {
+            return this.verifyJwt(jwt, { audience: 'access' });
+        } catch (error: unknown) {
+            if (error instanceof ExpiredJwtError) throw new ExpiredJwtError('refresh');
+
+            throw error;
+        }
     };
 
-    verifyEmailVerificationJwt = (jwt: string): VerifiedJwtPayload => {
+    verifyEmailVerificationJwt = (jwt: string): Payload => {
         return this.verifyJwt(jwt, { audience: 'email-verification' });
     };
 }
