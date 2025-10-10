@@ -24,14 +24,14 @@ export class AuthService {
         private refreshTokenService: RefreshTokenService,
     ) {}
 
-    async register(
+    register = async (
         email: string,
         password: string,
     ): Promise<{
         user: User;
         accessToken: string;
         refreshToken: RefreshToken;
-    }> {
+    }> => {
         const passwordHash = await bcrypt.hash(password, 10);
         const user = await this.userService.insertOne(email, passwordHash);
 
@@ -40,16 +40,16 @@ export class AuthService {
         const accessToken = this.jwtService.signAccessJwt(user._id);
 
         return { user, accessToken, refreshToken };
-    }
+    };
 
-    async login(
+    login = async (
         email: string,
         password: string,
     ): Promise<{
         user: User;
         accessToken: string;
         refreshToken: RefreshToken;
-    }> {
+    }> => {
         const user = await this.userService.findOneByEmail(email);
         if (!user) throw new InvalidCredentialsError();
 
@@ -61,9 +61,11 @@ export class AuthService {
         const accessToken = this.jwtService.signAccessJwt(user._id);
 
         return { user, accessToken, refreshToken };
-    }
+    };
 
-    async refresh(token: string): Promise<{ accessToken: string; refreshToken: RefreshToken }> {
+    refresh = async (
+        token: string,
+    ): Promise<{ accessToken: string; refreshToken: RefreshToken }> => {
         let refreshToken = await this.refreshTokenService.findOneByToken(token);
         if (!refreshToken) throw new InvalidRefreshTokenError();
         if (refreshToken.expiresAt < new Date()) throw new ExpiredRefreshTokenError();
@@ -74,9 +76,9 @@ export class AuthService {
         const accessToken = this.jwtService.signAccessJwt(refreshToken.userId);
 
         return { accessToken, refreshToken };
-    }
+    };
 
-    async logout(token: string): Promise<void> {
+    logout = async (token: string): Promise<void> => {
         await this.refreshTokenService.deleteOneByToken(token);
-    }
+    };
 }

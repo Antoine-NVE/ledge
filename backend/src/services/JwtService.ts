@@ -7,19 +7,19 @@ type VerifiedJwtPayload = Omit<JwtPayload, 'sub'> & { sub: string };
 export class JwtService {
     constructor(private secret: Secret) {}
 
-    private signJwt(payload: object, options?: SignOptions): string {
+    private signJwt = (payload: object, options?: SignOptions): string => {
         return sign(payload, this.secret, options);
-    }
+    };
 
-    signAccessJwt(userId: ObjectId): string {
+    signAccessJwt = (userId: ObjectId): string => {
         return this.signJwt({ sub: userId, aud: 'access' }, { expiresIn: '15m' });
-    }
+    };
 
-    signEmailVerificationJwt(userId: ObjectId): string {
+    signEmailVerificationJwt = (userId: ObjectId): string => {
         return this.signJwt({ sub: userId, aud: 'email-verification' }, { expiresIn: '1h' });
-    }
+    };
 
-    private verifyJwt(jwt: string, options?: VerifyOptions): VerifiedJwtPayload {
+    private verifyJwt = (jwt: string, options?: VerifyOptions): VerifiedJwtPayload => {
         try {
             // Jwt can only be returned if we use 'complete: true' option, otherwise it's JwtPayload | string
             // TODO: create a real verification
@@ -34,13 +34,13 @@ export class JwtService {
         } catch (error) {
             throw new InvalidJwtError();
         }
-    }
+    };
 
-    verifyAccessJwt(jwt: string): VerifiedJwtPayload {
+    verifyAccessJwt = (jwt: string): VerifiedJwtPayload => {
         return this.verifyJwt(jwt, { audience: 'access' });
-    }
+    };
 
-    verifyEmailVerificationJwt(jwt: string): VerifiedJwtPayload {
+    verifyEmailVerificationJwt = (jwt: string): VerifiedJwtPayload => {
         return this.verifyJwt(jwt, { audience: 'email-verification' });
-    }
+    };
 }
