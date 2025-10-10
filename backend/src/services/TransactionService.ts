@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { TransactionRepository } from '../repositories/TransactionRepository';
-import { Transaction } from '../types/transactionType';
+import { Transaction } from '../types/Transaction';
 
 export class TransactionService {
     constructor(private transactionRepository: TransactionRepository) {}

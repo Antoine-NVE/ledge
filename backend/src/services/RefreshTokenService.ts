@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
-import { RefreshToken } from '../types/refreshTokenType';
+import { RefreshToken } from '../types/RefreshToken';
 import { generateToken } from '../utils/token';
 
 export class RefreshTokenService {

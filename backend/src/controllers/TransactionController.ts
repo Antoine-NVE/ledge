@@ -6,7 +6,7 @@ import {
     transactionSchema,
     updateTransactionInputSchema,
 } from '../schemas/transactionSchema';
-import { Transaction } from '../types/transactionType';
+import { Transaction } from '../types/Transaction';
 import { TransactionNotFoundError } from '../errors/NotFoundError';
 import { TransactionService } from '../services/TransactionService';
 

@@ -2,7 +2,7 @@ import { EmailAlreadyVerifiedError } from '../errors/ConflictError';
 import { UserNotFoundError } from '../errors/NotFoundError';
 import { EmailVerificationCooldownError } from '../errors/TooManyRequestsError';
 import { UserRepository } from '../repositories/UserRepository';
-import { User } from '../types/userType';
+import { User } from '../types/User';
 import { EmailService } from './EmailService';
 import { JwtService } from './JwtService';
 import { ObjectId } from 'mongodb';
