@@ -10,31 +10,15 @@ import { db } from '../config/db';
 import { UserService } from '../services/UserService';
 import { EmailService } from '../services/EmailService';
 import { RefreshTokenService } from '../services/RefreshTokenService';
+import { container } from '../config/container';
 
 const router = express.Router();
 
-const userRepository = new UserRepository(db.collection('users'));
-const secret = env.JWT_SECRET;
-const jwtService = new JwtService(secret);
-const emailService = new EmailService(
-    env.SMTP_HOST,
-    env.SMTP_PORT,
-    env.SMTP_SECURE,
-    {
-        user: env.SMTP_USER,
-        pass: env.SMTP_PASS,
-    },
-    env.EMAIL_FROM,
-);
-const userService = new UserService(jwtService, emailService, userRepository);
-const refreshTokenRepository = new RefreshTokenRepository(db.collection('refreshtokens'));
-const refreshTokenService = new RefreshTokenService(refreshTokenRepository);
-const authService = new AuthService(userService, jwtService, refreshTokenService);
-const authController = new AuthController(authService);
+const { register, login, refresh, logout } = container.authController;
 
-router.post('/register', authController.register);
-router.post('/login', authController.login);
-router.post('/refresh', authController.refresh);
-router.post('/logout', authController.logout);
+router.post('/register', register);
+router.post('/login', login);
+router.post('/refresh', refresh);
+router.post('/logout', logout);
 
 export default router;
