@@ -6,7 +6,6 @@ import {
 } from '../errors/UnauthorizedError';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { UserRepository } from '../repositories/UserRepository';
-import { generateToken } from '../utils/token';
 import bcrypt from 'bcrypt';
 import { JwtService } from './JwtService';
 import { WithId } from 'mongodb';

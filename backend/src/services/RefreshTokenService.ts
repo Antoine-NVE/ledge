@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { RefreshToken } from '../types/RefreshToken';
-import { generateToken } from '../utils/token';
+import { TokenUtils } from '../utils/TokenUtils';
 
 export class RefreshTokenService {
     static readonly TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -11,7 +11,7 @@ export class RefreshTokenService {
     insertOne = async (userId: ObjectId): Promise<RefreshToken> => {
         const refreshToken: RefreshToken = {
             _id: new ObjectId(),
-            token: generateToken(),
+            token: TokenUtils.generateToken(),
             expiresAt: new Date(Date.now() + RefreshTokenService.TTL),
             userId,
             createdAt: new Date(),
