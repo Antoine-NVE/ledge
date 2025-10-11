@@ -5,12 +5,12 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './routes/auth';
 import transactionRoutes from './routes/transaction';
 import userRoutes from './routes/user';
-import { formatZodValidationErrors } from './utils/error';
 import { UnauthorizedError } from './errors/UnauthorizedError';
 import { HttpError } from './errors/HttpError';
 import { env } from './config/env';
 import * as yup from 'yup';
 import z from 'zod';
+import { FormatUtils } from './utils/FormatUtils';
 
 const app = express();
 app.use(express.json());
@@ -32,7 +32,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
         res.status(400).json({
             message: 'Validation error',
             data: null,
-            errors: formatZodValidationErrors(err),
+            errors: FormatUtils.formatZodError(err as z.ZodError<object>),
         });
         return;
     }
