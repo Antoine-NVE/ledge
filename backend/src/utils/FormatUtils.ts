@@ -10,9 +10,7 @@ export class FormatUtils {
 
         if (properties) {
             for (const [field, { errors: fieldErrors }] of Object.entries(properties)) {
-                if (fieldErrors?.length) {
-                    result[field] = [...fieldErrors];
-                }
+                result[field] = [...fieldErrors];
             }
         }
 
