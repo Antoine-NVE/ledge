@@ -26,7 +26,7 @@ export class AuthController {
         );
 
         const cookieService = new CookieService(req, res);
-        cookieService.setAllAuth(accessToken, refreshToken.token, rememberMe);
+        cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
 
         res.status(201).json({
             message: 'User registered successfully',
@@ -43,7 +43,7 @@ export class AuthController {
         const { user, accessToken, refreshToken } = await this.authService.login(email, password);
 
         const cookieService = new CookieService(req, res);
-        cookieService.setAllAuth(accessToken, refreshToken.token, rememberMe);
+        cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
 
         res.status(200).json({
             message: 'User logged in successfully',
@@ -64,7 +64,7 @@ export class AuthController {
 
         const { accessToken, refreshToken } = await this.authService.refresh(token);
 
-        cookieService.setAllAuth(accessToken, refreshToken.token, rememberMe);
+        cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
 
         res.status(200).json({
             message: 'Tokens refreshed successfully',
@@ -79,7 +79,7 @@ export class AuthController {
 
         if (token) await this.authService.logout(token);
 
-        cookieService.clearAllAuth();
+        cookieService.clearAuth();
 
         res.status(200).json({
             message: 'User logged out successfully',

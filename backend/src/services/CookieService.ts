@@ -44,7 +44,7 @@ export class CookieService {
         });
     };
 
-    setAllAuth = (accessToken: string, refreshToken: string, rememberMe: boolean): void => {
+    setAuth = (accessToken: string, refreshToken: string, rememberMe: boolean): void => {
         this.setAccessToken(accessToken, rememberMe);
         this.setRefreshToken(refreshToken, rememberMe);
         this.setRememberMe(rememberMe);
@@ -83,7 +83,7 @@ export class CookieService {
         this.clear('remember_me');
     };
 
-    clearAllAuth = (): void => {
+    clearAuth = (): void => {
         this.clearAccessToken();
         this.clearRefreshToken();
         this.clearRememberMe();
