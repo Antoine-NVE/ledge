@@ -8,7 +8,6 @@ import userRoutes from './routes/user';
 import { UnauthorizedError } from './errors/UnauthorizedError';
 import { HttpError } from './errors/HttpError';
 import { env } from './config/env';
-import * as yup from 'yup';
 import z from 'zod';
 import { FormatUtils } from './utils/FormatUtils';
 
