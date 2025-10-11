@@ -8,10 +8,7 @@ export const envSchema = z
 
         JWT_SECRET: z.string(),
 
-        ALLOWED_ORIGINS: z
-            .string()
-            .transform((val) => val.split(','))
-            .pipe(z.array(z.string().url())),
+        ALLOWED_ORIGINS: z.array(z.string().url()),
 
         SMTP_HOST: z.string(),
         SMTP_PORT: z.number(),

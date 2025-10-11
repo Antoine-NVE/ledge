@@ -1,4 +1,5 @@
 import { CookieOptions, Request, Response } from 'express';
+import { ParseUtils } from '../utils/ParseUtils';
 
 export class CookieService {
     constructor(
@@ -63,7 +64,7 @@ export class CookieService {
 
     getRememberMe = (): boolean | undefined => {
         const value = this.get('remember_me');
-        return value === 'true' ? true : value === 'false' ? false : undefined;
+        return ParseUtils.parseBoolean(value);
     };
 
     private clear = (name: string): void => {
