@@ -5,6 +5,9 @@ import { SecurityMiddleware } from '../middlewares/SecurityMiddleware';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { TransactionRepository } from '../repositories/TransactionRepository';
 import { UserRepository } from '../repositories/UserRepository';
+import { RefreshTokenSchema } from '../schemas/RefreshTokenSchema';
+import { TransactionSchema } from '../schemas/TransactionSchema';
+import { UserSchema } from '../schemas/UserSchema';
 import { AuthService } from '../services/AuthService';
 import { EmailService } from '../services/EmailService';
 import { JwtService } from '../services/JwtService';
@@ -15,6 +18,7 @@ import { db } from './db';
 import { env } from './env';
 
 const secret = env.JWT_SECRET;
+const allowedOrigins = env.ALLOWED_ORIGINS;
 const host = env.SMTP_HOST;
 const port = env.SMTP_PORT;
 const secure = env.SMTP_SECURE;
@@ -29,17 +33,27 @@ const userRepository = new UserRepository(db.collection('users'));
 const refreshTokenRepository = new RefreshTokenRepository(db.collection('refreshtokens'));
 const transactionRepository = new TransactionRepository(db.collection('transactions'));
 
+const userSchema = new UserSchema(allowedOrigins);
+const refreshTokenSchema = new RefreshTokenSchema();
+const transactionSchema = new TransactionSchema();
+
 const userService = new UserService(jwtService, emailService, userRepository);
 const refreshTokenService = new RefreshTokenService(refreshTokenRepository);
 const transactionService = new TransactionService(transactionRepository);
 
 const authService = new AuthService(userService, jwtService, refreshTokenService);
 
-const authController = new AuthController(authService);
-const userController = new UserController(userService);
-const transactionController = new TransactionController(transactionService);
+const authController = new AuthController(authService, userSchema);
+const userController = new UserController(userService, userSchema);
+const transactionController = new TransactionController(transactionService, transactionSchema);
 
-const securityMiddleware = new SecurityMiddleware(userService, transactionService, jwtService);
+const securityMiddleware = new SecurityMiddleware(
+    userService,
+    transactionService,
+    jwtService,
+    userSchema,
+    transactionSchema,
+);
 
 export const container = {
     authController,
