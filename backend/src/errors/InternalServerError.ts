@@ -1,4 +1,6 @@
+import z from 'zod';
 import { HttpError } from './HttpError';
+import { FormatUtils } from '../utils/FormatUtils';
 
 export abstract class InternalServerError extends HttpError {
     constructor(message: string, errors?: object) {
@@ -19,7 +21,7 @@ export class UndefinedTransactionError extends InternalServerError {
 }
 
 export class InvalidDataError extends InternalServerError {
-    constructor(errors: object) {
-        super('Invalid data', errors);
+    constructor(errors: z.ZodError<object>) {
+        super('Invalid data', FormatUtils.formatZodError(errors));
     }
 }

@@ -39,7 +39,7 @@ export class SecurityMiddleware {
 
         const payload = this.jwtService.verifyAccess(accessToken);
         const result = this.securitySchema.authenticate.safeParse({ userId: payload.sub });
-        if (!result.success) throw new InvalidDataError(FormatUtils.formatZodError(result.error));
+        if (!result.success) throw new InvalidDataError(result.error);
         const { userId } = result.data;
         const user = await this.userService.findOneById(userId);
 
@@ -52,7 +52,7 @@ export class SecurityMiddleware {
         if (!user) throw new UndefinedUserError();
 
         const result = this.securitySchema.authorize.safeParse({ transactionId: req.params.id });
-        if (!result.success) throw new InvalidDataError(FormatUtils.formatZodError(result.error));
+        if (!result.success) throw new InvalidDataError(result.error);
         const { transactionId } = result.data;
 
         const transaction = await this.transactionService.findOneById(transactionId);

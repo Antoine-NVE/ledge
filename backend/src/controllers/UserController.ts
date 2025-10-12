@@ -20,7 +20,7 @@ export class UserController {
         if (!user) throw new UndefinedUserError();
 
         const result = this.securitySchema.sendVerificationEmail.safeParse(req.body);
-        if (!result.success) throw new InvalidDataError(FormatUtils.formatZodError(result.error));
+        if (!result.success) throw new InvalidDataError(result.error);
         const { frontendBaseUrl } = result.data;
 
         await this.userService.sendVerificationEmail(user, frontendBaseUrl);
@@ -34,7 +34,7 @@ export class UserController {
 
     verifyEmail = async (req: Request<{ token: string }>, res: Response): Promise<void> => {
         const result = this.securitySchema.verifyEmail.safeParse(req.body);
-        if (!result.success) throw new InvalidDataError(FormatUtils.formatZodError(result.error));
+        if (!result.success) throw new InvalidDataError(result.error);
         const { token } = result.data;
 
         await this.userService.verifyEmail(token);

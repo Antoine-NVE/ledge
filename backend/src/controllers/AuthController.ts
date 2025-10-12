@@ -19,7 +19,7 @@ export class AuthController {
 
     register = async (req: Request, res: Response) => {
         const result = this.userSchema.register.safeParse(req.body);
-        if (!result.success) throw new ValidationError(FormatUtils.formatZodError(result.error));
+        if (!result.success) throw new ValidationError(result.error);
         const { email, password } = result.data;
 
         // The user can't choose to be remembered at registration
@@ -45,7 +45,7 @@ export class AuthController {
 
     login = async (req: Request, res: Response) => {
         const result = this.userSchema.login.safeParse(req.body);
-        if (!result.success) throw new ValidationError(FormatUtils.formatZodError(result.error));
+        if (!result.success) throw new ValidationError(result.error);
         const { email, password, rememberMe } = result.data;
 
         const { user, accessToken, refreshToken } = await this.authService.login(email, password);

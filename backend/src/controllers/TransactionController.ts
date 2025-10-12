@@ -19,7 +19,7 @@ export class TransactionController {
         if (!user) throw new UndefinedUserError();
 
         const result = this.transactionSchema.create.safeParse(req.body);
-        if (!result.success) throw new ValidationError(FormatUtils.formatZodError(result.error));
+        if (!result.success) throw new ValidationError(result.error);
         const { month, name, value, isIncome, isRecurring } = result.data;
 
         const transaction = await this.transactionService.insertOne(
@@ -73,7 +73,7 @@ export class TransactionController {
         if (!transaction) throw new UndefinedTransactionError();
 
         const result = this.transactionSchema.update.safeParse(req.body);
-        if (!result.success) throw new ValidationError(FormatUtils.formatZodError(result.error));
+        if (!result.success) throw new ValidationError(result.error);
         const { name, value, isIncome, isRecurring } = result.data;
 
         transaction.name = name;
