@@ -5,7 +5,7 @@ import {
     createTransactionInputSchema,
     transactionSchema,
     updateTransactionInputSchema,
-} from '../schemas/transactionSchema';
+} from '../schemas/TransactionSchema';
 import { Transaction } from '../types/Transaction';
 import { TransactionNotFoundError } from '../errors/NotFoundError';
 import { TransactionService } from '../services/TransactionService';

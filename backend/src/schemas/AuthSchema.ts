@@ -1,5 +1,5 @@
 import z from 'zod';
-import { userSchema } from './userSchema';
+import { userSchema } from './UserSchema';
 
 export const registerInputSchema = userSchema
     .pick({

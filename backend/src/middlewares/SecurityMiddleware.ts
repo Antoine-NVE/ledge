@@ -12,8 +12,8 @@ import { TransactionAccessForbiddenError } from '../errors/ForbiddenError';
 import { Transaction } from '../types/Transaction';
 import { UserService } from '../services/UserService';
 import { TransactionService } from '../services/TransactionService';
-import { authorizeTransactionInputSchema } from '../schemas/transactionSchema';
-import { authenticateUserInputSchema } from '../schemas/userSchema';
+import { authorizeTransactionInputSchema } from '../schemas/TransactionSchema';
+import { authenticateUserInputSchema } from '../schemas/UserSchema';
 
 declare module 'express-serve-static-core' {
     interface Request {

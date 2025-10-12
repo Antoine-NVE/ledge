@@ -7,7 +7,7 @@ import { UserRepository } from '../repositories/UserRepository';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { exit } from 'process';
 import { RequiredRefreshTokenError } from '../errors/UnauthorizedError';
-import { loginInputSchema, registerInputSchema } from '../schemas/authSchema';
+import { loginInputSchema, registerInputSchema } from '../schemas/AuthSchema';
 
 export class AuthController {
     constructor(private authService: AuthService) {}

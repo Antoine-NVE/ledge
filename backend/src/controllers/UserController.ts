@@ -5,7 +5,7 @@ import { UserService } from '../services/UserService';
 import { UserRepository } from '../repositories/UserRepository';
 import { UndefinedUserError } from '../errors/InternalServerError';
 import { env } from '../config/env';
-import { sendVerificationEmailInputSchema, verifyEmailInputSchema } from '../schemas/userSchema';
+import { sendVerificationEmailInputSchema, verifyEmailInputSchema } from '../schemas/UserSchema';
 
 export class UserController {
     constructor(private userService: UserService) {}
