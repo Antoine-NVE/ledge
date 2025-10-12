@@ -6,6 +6,7 @@ import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { TransactionRepository } from '../repositories/TransactionRepository';
 import { UserRepository } from '../repositories/UserRepository';
 import { RefreshTokenSchema } from '../schemas/RefreshTokenSchema';
+import { SecuritySchema } from '../schemas/SecuritySchema';
 import { TransactionSchema } from '../schemas/TransactionSchema';
 import { UserSchema } from '../schemas/UserSchema';
 import { AuthService } from '../services/AuthService';
@@ -33,9 +34,10 @@ const userRepository = new UserRepository(db.collection('users'));
 const refreshTokenRepository = new RefreshTokenRepository(db.collection('refreshtokens'));
 const transactionRepository = new TransactionRepository(db.collection('transactions'));
 
-const userSchema = new UserSchema(allowedOrigins);
+const userSchema = new UserSchema();
 const refreshTokenSchema = new RefreshTokenSchema();
 const transactionSchema = new TransactionSchema();
+const securitySchema = new SecuritySchema(allowedOrigins);
 
 const userService = new UserService(jwtService, emailService, userRepository);
 const refreshTokenService = new RefreshTokenService(refreshTokenRepository);
@@ -44,15 +46,14 @@ const transactionService = new TransactionService(transactionRepository);
 const authService = new AuthService(userService, jwtService, refreshTokenService);
 
 const authController = new AuthController(authService, userSchema);
-const userController = new UserController(userService, userSchema);
+const userController = new UserController(userService, securitySchema);
 const transactionController = new TransactionController(transactionService, transactionSchema);
 
 const securityMiddleware = new SecurityMiddleware(
     userService,
     transactionService,
     jwtService,
-    userSchema,
-    transactionSchema,
+    securitySchema,
 );
 
 export const container = {

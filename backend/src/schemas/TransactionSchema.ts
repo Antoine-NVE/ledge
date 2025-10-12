@@ -37,13 +37,4 @@ export class TransactionSchema {
         isIncome: true,
         isRecurring: true,
     });
-
-    authorize = z
-        .object({
-            transactionId: z
-                .string()
-                .refine((val) => ObjectId.isValid(val))
-                .transform((val) => new ObjectId(val)),
-        })
-        .strict();
 }

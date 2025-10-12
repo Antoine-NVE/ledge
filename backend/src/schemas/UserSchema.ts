@@ -3,8 +3,6 @@ import z from 'zod';
 import { env } from '../config/env';
 
 export class UserSchema {
-    constructor(private allowedOrigins: string[]) {}
-
     base = z
         .object({
             _id: z.custom<ObjectId>((val) => val instanceof ObjectId),
@@ -50,30 +48,6 @@ export class UserSchema {
             password: z.string().min(1, 'Password is required'),
             rememberMe: z.boolean(),
         });
-
-    authenticate = z
-        .object({
-            userId: z
-                .string()
-                .refine((val) => ObjectId.isValid(val))
-                .transform((val) => new ObjectId(val)),
-        })
-        .strict();
-
-    sendVerificationEmail = z
-        .object({
-            frontendBaseUrl: z
-                .string()
-                .url()
-                .refine((val) => this.allowedOrigins.includes(val)),
-        })
-        .strict();
-
-    verifyEmail = z
-        .object({
-            token: z.string().jwt(),
-        })
-        .strict();
 
     safe = this.base.omit({
         passwordHash: true,
