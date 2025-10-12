@@ -1,7 +1,8 @@
-import z from 'zod';
+import z, { flattenError } from 'zod';
+import { InvalidDataError } from '../errors/InternalServerError';
 
 export class ConfigSchema {
-    env = z.strictObject({
+    private env = z.strictObject({
         NODE_ENV: z.enum(['development', 'production']),
 
         DATABASE_SERVICE: z.string(),
@@ -17,4 +18,10 @@ export class ConfigSchema {
         SMTP_PASS: z.string(),
         EMAIL_FROM: z.string(),
     });
+
+    parseEnv = (data: object) => {
+        const result = this.env.safeParse(data);
+        if (!result.success) throw new InvalidDataError(flattenError(result.error));
+        return result.data;
+    };
 }

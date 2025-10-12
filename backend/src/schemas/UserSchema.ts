@@ -1,9 +1,11 @@
 import { ObjectId } from 'mongodb';
-import z from 'zod';
+import z, { flattenError } from 'zod';
 import { env } from '../config/env';
+import { ValidationError } from '../errors/BadRequestError';
+import { InvalidDataError } from '../errors/InternalServerError';
 
 export class UserSchema {
-    base = z.strictObject({
+    private base = z.strictObject({
         _id: z.custom<ObjectId>((val) => val instanceof ObjectId),
         email: z
             .string()
@@ -18,7 +20,7 @@ export class UserSchema {
         updatedAt: z.date().nullable(),
     });
 
-    register = this.base
+    private register = this.base
         .pick({
             email: true,
         })
@@ -38,7 +40,7 @@ export class UserSchema {
             path: ['confirmPassword'],
         });
 
-    login = this.base
+    private login = this.base
         .pick({
             email: true,
         })
@@ -46,4 +48,22 @@ export class UserSchema {
             password: z.string().min(1, 'Password is required'),
             rememberMe: z.boolean(),
         });
+
+    parseBase = (data: object) => {
+        const result = this.base.safeParse(data);
+        if (!result.success) throw new InvalidDataError(flattenError(result.error));
+        return result.data;
+    };
+
+    parseRegister = (data: object) => {
+        const result = this.register.safeParse(data);
+        if (!result.success) throw new ValidationError(flattenError(result.error));
+        return result.data;
+    };
+
+    parseLogin = (data: object) => {
+        const result = this.login.safeParse(data);
+        if (!result.success) throw new ValidationError(flattenError(result.error));
+        return result.data;
+    };
 }

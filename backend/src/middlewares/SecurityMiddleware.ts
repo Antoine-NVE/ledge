@@ -39,9 +39,7 @@ export class SecurityMiddleware {
         if (!accessToken) throw new RequiredAccessTokenError('refresh');
 
         const payload = this.jwtService.verifyAccess(accessToken);
-        const { success, data, error } = this.securitySchema.objectId.safeParse(payload.sub);
-        if (!success) throw new InvalidDataError(z.flattenError(error));
-        const userId = data;
+        const userId = this.securitySchema.parseObjectId(payload.sub);
         const user = await this.userService.findOneById(userId);
 
         req.user = user;
@@ -52,10 +50,7 @@ export class SecurityMiddleware {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const { success, data, error } = this.securitySchema.objectId.safeParse(req.params.id);
-        if (!success) throw new InvalidDataError(z.flattenError(error));
-        const transactionId = data;
-
+        const transactionId = this.securitySchema.parseObjectId(req.params.id);
         const transaction = await this.transactionService.findOneById(transactionId);
 
         if (!user._id.equals(transaction.userId)) throw new TransactionAccessForbiddenError();

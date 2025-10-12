@@ -6,7 +6,7 @@ dotenv.config();
 
 const configSchema = new ConfigSchema();
 
-export const env = configSchema.env.parse({
+export const env = configSchema.parseEnv({
     NODE_ENV: process.env.NODE_ENV,
 
     DATABASE_SERVICE: process.env.DATABASE_SERVICE,

@@ -39,10 +39,7 @@ export class UserService {
     verifyEmail = async (jwt: string): Promise<void> => {
         const payload = this.jwtService.verifyEmailVerification(jwt);
 
-        const { success, data, error } = this.securitySchema.objectId.safeParse(payload.sub);
-        if (!success) throw new InvalidDataError(z.flattenError(error));
-        const userId = data;
-
+        const userId = this.securitySchema.parseObjectId(payload.sub);
         const user = await this.findOneById(userId);
         if (!user) throw new UserNotFoundError();
         if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
@@ -52,7 +49,7 @@ export class UserService {
     };
 
     insertOne = async (email: string, passwordHash: string): Promise<User> => {
-        const { success, data, error } = this.userSchema.base.safeParse({
+        const user = this.userSchema.parseBase({
             _id: new ObjectId(),
             email,
             passwordHash,
@@ -61,8 +58,6 @@ export class UserService {
             createdAt: new Date(),
             updatedAt: null,
         });
-        if (!success) throw new InvalidDataError(z.flattenError(error));
-        const user = data;
 
         await this.userRepository.insertOne(user);
 
@@ -86,9 +81,7 @@ export class UserService {
     updateOne = async (user: User): Promise<User> => {
         user.updatedAt = new Date();
 
-        const { success, data, error } = this.userSchema.base.safeParse(user);
-        if (!success) throw new InvalidDataError(z.flattenError(error));
-        user = data;
+        user = this.userSchema.parseBase(user);
 
         await this.userRepository.updateOne(user);
 

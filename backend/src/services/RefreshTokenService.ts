@@ -16,7 +16,7 @@ export class RefreshTokenService {
     ) {}
 
     insertOne = async (userId: ObjectId): Promise<RefreshToken> => {
-        const { success, data, error } = this.refreshTokenSchema.base.safeParse({
+        const refreshToken = this.refreshTokenSchema.parseBase({
             _id: new ObjectId(),
             token: TokenUtils.generateToken(),
             expiresAt: new Date(Date.now() + RefreshTokenService.TTL),
@@ -24,8 +24,6 @@ export class RefreshTokenService {
             createdAt: new Date(),
             updatedAt: null,
         });
-        if (!success) throw new InvalidDataError(z.flattenError(error));
-        const refreshToken = data;
 
         await this.refreshTokenRepository.insertOne(refreshToken);
 
@@ -42,9 +40,7 @@ export class RefreshTokenService {
     updateOne = async (refreshToken: RefreshToken): Promise<RefreshToken> => {
         refreshToken.updatedAt = new Date();
 
-        const { success, data, error } = this.refreshTokenSchema.base.safeParse(refreshToken);
-        if (!success) throw new InvalidDataError(z.flattenError(error));
-        refreshToken = data;
+        refreshToken = this.refreshTokenSchema.parseBase(refreshToken);
 
         await this.refreshTokenRepository.updateOne(refreshToken);
 

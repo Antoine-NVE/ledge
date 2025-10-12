@@ -20,7 +20,7 @@ export class TransactionService {
         isRecurring: boolean,
         userId: ObjectId,
     ): Promise<Transaction> => {
-        const { success, data, error } = this.transactionSchema.base.safeParse({
+        const transaction = this.transactionSchema.parseBase({
             _id: new ObjectId(),
             month,
             name,
@@ -31,8 +31,6 @@ export class TransactionService {
             createdAt: new Date(),
             updatedAt: null,
         });
-        if (!success) throw new InvalidDataError(z.flattenError(error));
-        const transaction = data;
 
         await this.transactionRepository.insertOne(transaction);
 
@@ -53,9 +51,7 @@ export class TransactionService {
     updateOne = async (transaction: Transaction): Promise<Transaction> => {
         transaction.updatedAt = new Date();
 
-        const { success, data, error } = this.transactionSchema.base.safeParse(transaction);
-        if (!success) throw new InvalidDataError(z.flattenError(error));
-        transaction = data;
+        transaction = this.transactionSchema.parseBase(transaction);
 
         await this.transactionRepository.updateOne(transaction);
 

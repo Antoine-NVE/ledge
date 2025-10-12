@@ -20,9 +20,7 @@ export class UserController {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const { success, data, error } = this.securitySchema.allowedOrigin.safeParse(req.body);
-        if (!success) throw new InvalidDataError(z.flattenError(error));
-        const frontendBaseUrl = data;
+        const frontendBaseUrl = this.securitySchema.parseAllowedOrigin(req.body);
 
         await this.userService.sendVerificationEmail(user, frontendBaseUrl);
 
@@ -32,8 +30,7 @@ export class UserController {
     };
 
     verifyEmail = async (req: Request, res: Response): Promise<void> => {
-        const { success, data: jwt, error } = this.securitySchema.jwt.safeParse(req.body);
-        if (!success) throw new InvalidDataError(z.flattenError(error));
+        const jwt = this.securitySchema.parseJwt(req.body);
 
         await this.userService.verifyEmail(jwt);
 
