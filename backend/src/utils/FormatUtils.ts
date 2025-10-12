@@ -1,4 +1,5 @@
 import z from 'zod';
+import { User } from '../types/User';
 
 export class FormatUtils {
     static formatZodError = (err: z.ZodError<object>): Record<string, string[]> => {
@@ -14,5 +15,11 @@ export class FormatUtils {
         }
 
         return result;
+    };
+
+    static formatSafeUser = (user: User): Omit<User, 'passwordHash'> => {
+        const { passwordHash, ...safeUser } = user;
+
+        return safeUser;
     };
 }
