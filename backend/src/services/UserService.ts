@@ -41,7 +41,6 @@ export class UserService {
 
         const userId = this.securitySchema.parseObjectId(payload.sub);
         const user = await this.findOneById(userId);
-        if (!user) throw new UserNotFoundError();
         if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
 
         user.isEmailVerified = true;
