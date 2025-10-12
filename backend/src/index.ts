@@ -10,6 +10,7 @@ import { HttpError } from './errors/HttpError';
 import { env } from './config/env';
 import z from 'zod';
 import { FormatUtils } from './utils/FormatUtils';
+import { RouteNotFoundError } from './errors/NotFoundError';
 
 const app = express();
 app.use(express.json());
@@ -25,6 +26,9 @@ app.use(
 app.use('/auth', authRoutes);
 app.use('/transactions', transactionRoutes);
 app.use('/users', userRoutes);
+app.all(/.*/, () => {
+    throw new RouteNotFoundError();
+});
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
     if (err instanceof HttpError && err.statusCode !== 500) {

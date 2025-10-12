@@ -23,3 +23,9 @@ export class RefreshTokenNotFoundError extends NotFoundError {
         super('Refresh token not found');
     }
 }
+
+export class RouteNotFoundError extends NotFoundError {
+    constructor() {
+        super('Route not found');
+    }
+}
