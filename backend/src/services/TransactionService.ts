@@ -4,6 +4,7 @@ import { Transaction } from '../types/Transaction';
 import { TransactionNotFoundError } from '../errors/NotFoundError';
 import { InvalidDataError } from '../errors/InternalServerError';
 import { TransactionSchema } from '../schemas/TransactionSchema';
+import z from 'zod';
 
 export class TransactionService {
     constructor(
@@ -30,7 +31,7 @@ export class TransactionService {
             createdAt: new Date(),
             updatedAt: null,
         });
-        if (!success) throw new InvalidDataError(error);
+        if (!success) throw new InvalidDataError(z.flattenError(error));
         const transaction = data;
 
         await this.transactionRepository.insertOne(transaction);
@@ -53,7 +54,7 @@ export class TransactionService {
         transaction.updatedAt = new Date();
 
         const { success, data, error } = this.transactionSchema.base.safeParse(transaction);
-        if (!success) throw new InvalidDataError(error);
+        if (!success) throw new InvalidDataError(z.flattenError(error));
         transaction = data;
 
         await this.transactionRepository.updateOne(transaction);

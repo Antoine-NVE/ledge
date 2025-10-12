@@ -5,6 +5,7 @@ import { TokenUtils } from '../utils/TokenUtils';
 import { RefreshTokenNotFoundError } from '../errors/NotFoundError';
 import { RefreshTokenSchema } from '../schemas/RefreshTokenSchema';
 import { InvalidDataError } from '../errors/InternalServerError';
+import z from 'zod';
 
 export class RefreshTokenService {
     static readonly TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -23,7 +24,7 @@ export class RefreshTokenService {
             createdAt: new Date(),
             updatedAt: null,
         });
-        if (!success) throw new InvalidDataError(error);
+        if (!success) throw new InvalidDataError(z.flattenError(error));
         const refreshToken = data;
 
         await this.refreshTokenRepository.insertOne(refreshToken);
@@ -42,7 +43,7 @@ export class RefreshTokenService {
         refreshToken.updatedAt = new Date();
 
         const { success, data, error } = this.refreshTokenSchema.base.safeParse(refreshToken);
-        if (!success) throw new InvalidDataError(error);
+        if (!success) throw new InvalidDataError(z.flattenError(error));
         refreshToken = data;
 
         await this.refreshTokenRepository.updateOne(refreshToken);

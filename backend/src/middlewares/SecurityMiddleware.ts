@@ -16,6 +16,7 @@ import { UserSchema } from '../schemas/UserSchema';
 import { TransactionSchema } from '../schemas/TransactionSchema';
 import { SecuritySchema } from '../schemas/SecuritySchema';
 import { FormatUtils } from '../utils/FormatUtils';
+import z from 'zod';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -38,11 +39,9 @@ export class SecurityMiddleware {
         if (!accessToken) throw new RequiredAccessTokenError('refresh');
 
         const payload = this.jwtService.verifyAccess(accessToken);
-        const { success, data, error } = this.securitySchema.authenticate.safeParse({
-            userId: payload.sub,
-        });
-        if (!success) throw new InvalidDataError(error);
-        const { userId } = data;
+        const { success, data, error } = this.securitySchema.objectId.safeParse(payload.sub);
+        if (!success) throw new InvalidDataError(z.flattenError(error));
+        const userId = data;
         const user = await this.userService.findOneById(userId);
 
         req.user = user;
@@ -53,11 +52,9 @@ export class SecurityMiddleware {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const { success, data, error } = this.securitySchema.authorize.safeParse({
-            transactionId: req.params.id,
-        });
-        if (!success) throw new InvalidDataError(error);
-        const { transactionId } = data;
+        const { success, data, error } = this.securitySchema.objectId.safeParse(req.params.id);
+        if (!success) throw new InvalidDataError(z.flattenError(error));
+        const transactionId = data;
 
         const transaction = await this.transactionService.findOneById(transactionId);
 

@@ -9,7 +9,7 @@ export abstract class BadRequestError extends HttpError {
 }
 
 export class ValidationError extends BadRequestError {
-    constructor(errors: z.ZodError<object>) {
-        super('Validation error', FormatUtils.formatZodError(errors));
+    constructor(errors: object) {
+        super('Validation error', errors);
     }
 }

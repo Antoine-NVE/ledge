@@ -8,6 +8,7 @@ import { env } from '../config/env';
 import { UserSchema } from '../schemas/UserSchema';
 import { SecuritySchema } from '../schemas/SecuritySchema';
 import { FormatUtils } from '../utils/FormatUtils';
+import z from 'zod';
 
 export class UserController {
     constructor(
@@ -19,11 +20,9 @@ export class UserController {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const { success, data, error } = this.securitySchema.sendVerificationEmail.safeParse(
-            req.body,
-        );
-        if (!success) throw new InvalidDataError(error);
-        const { frontendBaseUrl } = data;
+        const { success, data, error } = this.securitySchema.allowedOrigin.safeParse(req.body);
+        if (!success) throw new InvalidDataError(z.flattenError(error));
+        const frontendBaseUrl = data;
 
         await this.userService.sendVerificationEmail(user, frontendBaseUrl);
 
@@ -33,9 +32,8 @@ export class UserController {
     };
 
     verifyEmail = async (req: Request, res: Response): Promise<void> => {
-        const { success, data, error } = this.securitySchema.verifyEmail.safeParse(req.body);
-        if (!success) throw new InvalidDataError(error);
-        const { jwt } = data;
+        const { success, data: jwt, error } = this.securitySchema.jwt.safeParse(req.body);
+        if (!success) throw new InvalidDataError(z.flattenError(error));
 
         await this.userService.verifyEmail(jwt);
 

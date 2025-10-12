@@ -1,3 +1,4 @@
+import z from 'zod';
 import { EmailAlreadyVerifiedError } from '../errors/ConflictError';
 import { InvalidDataError } from '../errors/InternalServerError';
 import { UserNotFoundError } from '../errors/NotFoundError';
@@ -38,11 +39,9 @@ export class UserService {
     verifyEmail = async (jwt: string): Promise<void> => {
         const payload = this.jwtService.verifyEmailVerification(jwt);
 
-        const { success, data, error } = this.securitySchema.authenticate.safeParse({
-            userId: payload.sub,
-        });
-        if (!success) throw new InvalidDataError(error);
-        const { userId } = data;
+        const { success, data, error } = this.securitySchema.objectId.safeParse(payload.sub);
+        if (!success) throw new InvalidDataError(z.flattenError(error));
+        const userId = data;
 
         const user = await this.findOneById(userId);
         if (!user) throw new UserNotFoundError();
@@ -62,7 +61,7 @@ export class UserService {
             createdAt: new Date(),
             updatedAt: null,
         });
-        if (!success) throw new InvalidDataError(error);
+        if (!success) throw new InvalidDataError(z.flattenError(error));
         const user = data;
 
         await this.userRepository.insertOne(user);
@@ -88,7 +87,7 @@ export class UserService {
         user.updatedAt = new Date();
 
         const { success, data, error } = this.userSchema.base.safeParse(user);
-        if (!success) throw new InvalidDataError(error);
+        if (!success) throw new InvalidDataError(z.flattenError(error));
         user = data;
 
         await this.userRepository.updateOne(user);

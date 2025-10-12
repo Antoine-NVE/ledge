@@ -7,6 +7,7 @@ import { TransactionService } from '../services/TransactionService';
 import { TransactionSchema } from '../schemas/TransactionSchema';
 import { ValidationError } from '../errors/BadRequestError';
 import { FormatUtils } from '../utils/FormatUtils';
+import z from 'zod';
 
 export class TransactionController {
     constructor(
@@ -19,7 +20,7 @@ export class TransactionController {
         if (!user) throw new UndefinedUserError();
 
         const { success, data, error } = this.transactionSchema.create.safeParse(req.body);
-        if (!success) throw new ValidationError(error);
+        if (!success) throw new ValidationError(z.flattenError(error));
         const { month, name, value, isIncome, isRecurring } = data;
 
         const transaction = await this.transactionService.insertOne(
@@ -70,7 +71,7 @@ export class TransactionController {
         if (!transaction) throw new UndefinedTransactionError();
 
         const { success, data, error } = this.transactionSchema.update.safeParse(req.body);
-        if (!success) throw new ValidationError(error);
+        if (!success) throw new ValidationError(z.flattenError(error));
         const { name, value, isIncome, isRecurring } = data;
 
         transaction.name = name;

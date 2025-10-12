@@ -21,7 +21,7 @@ export class UndefinedTransactionError extends InternalServerError {
 }
 
 export class InvalidDataError extends InternalServerError {
-    constructor(errors: z.ZodError<object>) {
-        super('Invalid data', FormatUtils.formatZodError(errors));
+    constructor(errors: object) {
+        super('Invalid data', errors);
     }
 }
