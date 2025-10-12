@@ -27,16 +27,7 @@ app.use('/transactions', transactionRoutes);
 app.use('/users', userRoutes);
 
 app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
-    if (err instanceof z.ZodError) {
-        res.status(400).json({
-            message: 'Validation error',
-            data: null,
-            errors: FormatUtils.formatZodError(err as z.ZodError<object>),
-        });
-        return;
-    }
-
-    if (err instanceof HttpError) {
+    if (err instanceof HttpError && err.statusCode !== 500) {
         res.status(err.statusCode).json({
             message: err.message,
             errors: err.errors,
@@ -49,15 +40,12 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
     if (env.NODE_ENV === 'development') {
         res.status(500).json({
             message: err.message,
-            data: null,
-            errors: null,
+            errors: (err instanceof HttpError && err.errors) ?? undefined,
         });
         return;
     }
     res.status(500).json({
         message: 'Internal server error',
-        data: null,
-        errors: null,
     });
 });
 

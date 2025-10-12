@@ -5,6 +5,8 @@ import { Transaction } from '../types/Transaction';
 import { TransactionNotFoundError } from '../errors/NotFoundError';
 import { TransactionService } from '../services/TransactionService';
 import { TransactionSchema } from '../schemas/TransactionSchema';
+import { ValidationError } from '../errors/BadRequestError';
+import { FormatUtils } from '../utils/FormatUtils';
 
 export class TransactionController {
     constructor(
@@ -16,9 +18,9 @@ export class TransactionController {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const { month, name, value, isIncome, isRecurring } = this.transactionSchema.create.parse(
-            req.body,
-        );
+        const result = this.transactionSchema.create.safeParse(req.body);
+        if (!result.success) throw new ValidationError(FormatUtils.formatZodError(result.error));
+        const { month, name, value, isIncome, isRecurring } = result.data;
 
         const transaction = await this.transactionService.insertOne(
             month,
@@ -70,9 +72,10 @@ export class TransactionController {
         let transaction: Transaction | undefined = req.transaction;
         if (!transaction) throw new UndefinedTransactionError();
 
-        const { name, value, isIncome, isRecurring } = this.transactionSchema.update.parse(
-            req.body,
-        );
+        const result = this.transactionSchema.update.safeParse(req.body);
+        if (!result.success) throw new ValidationError(FormatUtils.formatZodError(result.error));
+        const { name, value, isIncome, isRecurring } = result.data;
+
         transaction.name = name;
         transaction.value = value;
         transaction.isIncome = isIncome;

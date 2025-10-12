@@ -3,10 +3,11 @@ import { JwtService } from '../services/JwtService';
 import { EmailService } from '../services/EmailService';
 import { UserService } from '../services/UserService';
 import { UserRepository } from '../repositories/UserRepository';
-import { UndefinedUserError } from '../errors/InternalServerError';
+import { InvalidDataError, UndefinedUserError } from '../errors/InternalServerError';
 import { env } from '../config/env';
 import { UserSchema } from '../schemas/UserSchema';
 import { SecuritySchema } from '../schemas/SecuritySchema';
+import { FormatUtils } from '../utils/FormatUtils';
 
 export class UserController {
     constructor(
@@ -18,7 +19,9 @@ export class UserController {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const { frontendBaseUrl } = this.securitySchema.sendVerificationEmail.parse(req.body);
+        const result = this.securitySchema.sendVerificationEmail.safeParse(req.body);
+        if (!result.success) throw new InvalidDataError(FormatUtils.formatZodError(result.error));
+        const { frontendBaseUrl } = result.data;
 
         await this.userService.sendVerificationEmail(user, frontendBaseUrl);
 
@@ -30,7 +33,9 @@ export class UserController {
     };
 
     verifyEmail = async (req: Request<{ token: string }>, res: Response): Promise<void> => {
-        const { token } = this.securitySchema.verifyEmail.parse(req.body);
+        const result = this.securitySchema.verifyEmail.safeParse(req.body);
+        if (!result.success) throw new InvalidDataError(FormatUtils.formatZodError(result.error));
+        const { token } = result.data;
 
         await this.userService.verifyEmail(token);
 

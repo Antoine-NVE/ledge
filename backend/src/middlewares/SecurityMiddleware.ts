@@ -7,7 +7,7 @@ import { RequiredAccessTokenError } from '../errors/UnauthorizedError';
 import { ObjectId } from 'mongodb';
 import { TransactionNotFoundError, UserNotFoundError } from '../errors/NotFoundError';
 import { User } from '../types/User';
-import { UndefinedUserError } from '../errors/InternalServerError';
+import { InvalidDataError, UndefinedUserError } from '../errors/InternalServerError';
 import { TransactionAccessForbiddenError } from '../errors/ForbiddenError';
 import { Transaction } from '../types/Transaction';
 import { UserService } from '../services/UserService';
@@ -15,6 +15,7 @@ import { TransactionService } from '../services/TransactionService';
 import { UserSchema } from '../schemas/UserSchema';
 import { TransactionSchema } from '../schemas/TransactionSchema';
 import { SecuritySchema } from '../schemas/SecuritySchema';
+import { FormatUtils } from '../utils/FormatUtils';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -37,7 +38,9 @@ export class SecurityMiddleware {
         if (!accessToken) throw new RequiredAccessTokenError('refresh');
 
         const payload = this.jwtService.verifyAccess(accessToken);
-        const { userId } = this.securitySchema.authenticate.parse({ userId: payload.sub });
+        const result = this.securitySchema.authenticate.safeParse({ userId: payload.sub });
+        if (!result.success) throw new InvalidDataError(FormatUtils.formatZodError(result.error));
+        const { userId } = result.data;
         const user = await this.userService.findOneById(userId);
 
         req.user = user;
@@ -48,9 +51,9 @@ export class SecurityMiddleware {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const { transactionId } = this.securitySchema.authorize.parse({
-            transactionId: req.params.id,
-        });
+        const result = this.securitySchema.authorize.safeParse({ transactionId: req.params.id });
+        if (!result.success) throw new InvalidDataError(FormatUtils.formatZodError(result.error));
+        const { transactionId } = result.data;
 
         const transaction = await this.transactionService.findOneById(transactionId);
 

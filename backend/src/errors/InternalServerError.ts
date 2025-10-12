@@ -1,8 +1,8 @@
 import { HttpError } from './HttpError';
 
 export abstract class InternalServerError extends HttpError {
-    constructor(message: string) {
-        super(message, 500);
+    constructor(message: string, errors?: object) {
+        super(message, 500, errors);
     }
 }
 
@@ -15,5 +15,11 @@ export class UndefinedUserError extends InternalServerError {
 export class UndefinedTransactionError extends InternalServerError {
     constructor() {
         super('Transaction is undefined');
+    }
+}
+
+export class InvalidDataError extends InternalServerError {
+    constructor(errors: object) {
+        super('Invalid data', errors);
     }
 }
