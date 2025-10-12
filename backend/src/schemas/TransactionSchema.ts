@@ -38,19 +38,19 @@ export class TransactionSchema {
         isRecurring: true,
     });
 
-    parseBase = (data: object) => {
+    parseBase = (data: unknown) => {
         const result = this.base.safeParse(data);
         if (!result.success) throw new InvalidDataError(flattenError(result.error));
         return result.data;
     };
 
-    parseCreate = (data: object) => {
+    parseCreate = (data: unknown) => {
         const result = this.create.safeParse(data);
         if (!result.success) throw new ValidationError(flattenError(result.error));
         return result.data;
     };
 
-    parseUpdate = (data: object) => {
+    parseUpdate = (data: unknown) => {
         const result = this.update.safeParse(data);
         if (!result.success) throw new ValidationError(flattenError(result.error));
         return result.data;

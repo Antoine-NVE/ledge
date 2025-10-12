@@ -49,19 +49,19 @@ export class UserSchema {
             rememberMe: z.boolean(),
         });
 
-    parseBase = (data: object) => {
+    parseBase = (data: unknown) => {
         const result = this.base.safeParse(data);
         if (!result.success) throw new InvalidDataError(flattenError(result.error));
         return result.data;
     };
 
-    parseRegister = (data: object) => {
+    parseRegister = (data: unknown) => {
         const result = this.register.safeParse(data);
         if (!result.success) throw new ValidationError(flattenError(result.error));
         return result.data;
     };
 
-    parseLogin = (data: object) => {
+    parseLogin = (data: unknown) => {
         const result = this.login.safeParse(data);
         if (!result.success) throw new ValidationError(flattenError(result.error));
         return result.data;

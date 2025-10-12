@@ -19,7 +19,7 @@ export class ConfigSchema {
         EMAIL_FROM: z.string(),
     });
 
-    parseEnv = (data: object) => {
+    parseEnv = (data: unknown) => {
         const result = this.env.safeParse(data);
         if (!result.success) throw new InvalidDataError(flattenError(result.error));
         return result.data;

@@ -12,7 +12,7 @@ export class RefreshTokenSchema {
         updatedAt: z.date().nullable(),
     });
 
-    parseBase = (data: object) => {
+    parseBase = (data: unknown) => {
         const result = this.base.safeParse(data);
         if (!result.success) throw new InvalidDataError(flattenError(result.error));
         return result.data;
