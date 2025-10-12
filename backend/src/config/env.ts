@@ -1,10 +1,12 @@
 import dotenv from 'dotenv';
-import { envSchema } from '../schemas/ConfigSchema';
 import { ParseUtils } from '../utils/ParseUtils';
+import { ConfigSchema } from '../schemas/ConfigSchema';
 
 dotenv.config();
 
-export const env = envSchema.parse({
+const configSchema = new ConfigSchema();
+
+export const env = configSchema.env.parse({
     NODE_ENV: process.env.NODE_ENV,
 
     DATABASE_SERVICE: process.env.DATABASE_SERVICE,
