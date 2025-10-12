@@ -15,6 +15,7 @@ import { RefreshToken } from '../types/RefreshToken';
 import { refreshTokenSchema } from '../schemas/refreshTokenSchema';
 import { UserService } from './UserService';
 import { RefreshTokenService } from './RefreshTokenService';
+import { RefreshTokenNotFoundError, UserNotFoundError } from '../errors/NotFoundError';
 
 export class AuthService {
     constructor(
@@ -49,8 +50,10 @@ export class AuthService {
         accessToken: string;
         refreshToken: RefreshToken;
     }> => {
-        const user = await this.userService.findOneByEmail(email);
-        if (!user) throw new InvalidCredentialsError();
+        const user = await this.userService.findOneByEmail(email).catch((err) => {
+            if (err instanceof UserNotFoundError) throw new InvalidCredentialsError();
+            throw err;
+        });
 
         const doesMatch = await bcrypt.compare(password, user.passwordHash);
         if (!doesMatch) throw new InvalidCredentialsError();
@@ -65,8 +68,10 @@ export class AuthService {
     refresh = async (
         token: string,
     ): Promise<{ accessToken: string; refreshToken: RefreshToken }> => {
-        let refreshToken = await this.refreshTokenService.findOneByToken(token);
-        if (!refreshToken) throw new InvalidRefreshTokenError();
+        let refreshToken = await this.refreshTokenService.findOneByToken(token).catch((err) => {
+            if (err instanceof RefreshTokenNotFoundError) throw new InvalidRefreshTokenError();
+            throw err;
+        });
         if (refreshToken.expiresAt < new Date()) throw new ExpiredRefreshTokenError();
 
         refreshToken.expiresAt = new Date(Date.now() + RefreshTokenService.TTL);

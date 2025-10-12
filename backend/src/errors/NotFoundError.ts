@@ -17,3 +17,9 @@ export class TransactionNotFoundError extends NotFoundError {
         super('Transaction not found');
     }
 }
+
+export class RefreshTokenNotFoundError extends NotFoundError {
+    constructor() {
+        super('Refresh token not found');
+    }
+}

@@ -57,12 +57,18 @@ export class UserService {
         return user;
     };
 
-    findOneById = async (id: ObjectId): Promise<User | null> => {
-        return await this.userRepository.findOne('_id', id);
+    findOneById = async (id: ObjectId): Promise<User> => {
+        const user = await this.userRepository.findOne('_id', id);
+        if (!user) throw new UserNotFoundError();
+
+        return user;
     };
 
-    findOneByEmail = async (email: string): Promise<User | null> => {
-        return await this.userRepository.findOne('email', email);
+    findOneByEmail = async (email: string): Promise<User> => {
+        const user = await this.userRepository.findOne('email', email);
+        if (!user) throw new UserNotFoundError();
+
+        return user;
     };
 
     updateOne = async (user: User): Promise<User> => {

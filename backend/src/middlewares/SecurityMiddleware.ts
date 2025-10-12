@@ -37,7 +37,6 @@ export class SecurityMiddleware {
         const payload = this.jwtService.verifyAccess(accessToken);
         const { userId } = authenticateUserInputSchema.parse({ userId: payload.sub });
         const user = await this.userService.findOneById(userId);
-        if (!user) throw new UserNotFoundError();
 
         req.user = user;
         next();
@@ -52,7 +51,6 @@ export class SecurityMiddleware {
         });
 
         const transaction = await this.transactionService.findOneById(transactionId);
-        if (!transaction) throw new TransactionNotFoundError();
 
         if (!user._id.equals(transaction.userId)) throw new TransactionAccessForbiddenError();
 

@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { RefreshToken } from '../types/RefreshToken';
 import { TokenUtils } from '../utils/TokenUtils';
+import { RefreshTokenNotFoundError } from '../errors/NotFoundError';
 
 export class RefreshTokenService {
     static readonly TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -23,8 +24,11 @@ export class RefreshTokenService {
         return refreshToken;
     };
 
-    findOneByToken = async (token: string): Promise<RefreshToken | null> => {
-        return await this.refreshTokenRepository.findOne('token', token);
+    findOneByToken = async (token: string): Promise<RefreshToken> => {
+        const refreshToken = await this.refreshTokenRepository.findOne('token', token);
+        if (!refreshToken) throw new RefreshTokenNotFoundError();
+
+        return refreshToken;
     };
 
     updateOne = async (refreshToken: RefreshToken): Promise<RefreshToken> => {
