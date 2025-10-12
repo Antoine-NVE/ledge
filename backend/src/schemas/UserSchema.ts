@@ -22,6 +22,35 @@ export class UserSchema {
         })
         .strict();
 
+    register = this.base
+        .pick({
+            email: true,
+        })
+        .extend({
+            password: z
+                .string()
+                .min(1, 'Password is required')
+                .regex(/^\S.*\S$|^\S$/, 'Password cannot start or end with whitespace')
+                .regex(
+                    /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$/,
+                    'Password must be at least 8 characters, and include an uppercase letter, a lowercase letter, a number, and a special character',
+                ),
+            confirmPassword: z.string().min(1, 'Please confirm password'),
+        })
+        .refine((data) => data.password === data.confirmPassword, {
+            message: 'Passwords do not match',
+            path: ['confirmPassword'],
+        });
+
+    login = this.base
+        .pick({
+            email: true,
+        })
+        .extend({
+            password: z.string().min(1, 'Password is required'),
+            rememberMe: z.boolean(),
+        });
+
     authenticate = z
         .object({
             userId: z
