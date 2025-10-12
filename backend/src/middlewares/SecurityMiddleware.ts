@@ -12,8 +12,8 @@ import { TransactionAccessForbiddenError } from '../errors/ForbiddenError';
 import { Transaction } from '../types/Transaction';
 import { UserService } from '../services/UserService';
 import { TransactionService } from '../services/TransactionService';
-import { authorizeTransactionInputSchema } from '../schemas/TransactionSchema';
 import { UserSchema } from '../schemas/UserSchema';
+import { TransactionSchema } from '../schemas/TransactionSchema';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -28,6 +28,7 @@ export class SecurityMiddleware {
         private transactionService: TransactionService,
         private jwtService: JwtService,
         private userSchema: UserSchema,
+        private transactionSchema: TransactionSchema,
     ) {}
 
     authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -47,7 +48,7 @@ export class SecurityMiddleware {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const { transactionId } = authorizeTransactionInputSchema.parse({
+        const { transactionId } = this.transactionSchema.authorize.parse({
             transactionId: req.params.id,
         });
 
