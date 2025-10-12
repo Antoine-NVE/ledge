@@ -1,5 +1,7 @@
 import z from 'zod';
-import { userSchema } from '../schemas/UserSchema';
+import { UserSchema } from '../schemas/UserSchema';
 import { WithId } from 'mongodb';
 
-export type User = z.infer<typeof userSchema>;
+type UserSchemaInstance = InstanceType<typeof UserSchema>;
+
+export type User = z.infer<UserSchemaInstance['base']>;

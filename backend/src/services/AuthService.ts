@@ -10,7 +10,6 @@ import bcrypt from 'bcrypt';
 import { JwtService } from './JwtService';
 import { WithId } from 'mongodb';
 import { User } from '../types/User';
-import { userSchema } from '../schemas/UserSchema';
 import { RefreshToken } from '../types/RefreshToken';
 import { refreshTokenSchema } from '../schemas/RefreshTokenSchema';
 import { UserService } from './UserService';

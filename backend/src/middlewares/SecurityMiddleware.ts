@@ -13,7 +13,7 @@ import { Transaction } from '../types/Transaction';
 import { UserService } from '../services/UserService';
 import { TransactionService } from '../services/TransactionService';
 import { authorizeTransactionInputSchema } from '../schemas/TransactionSchema';
-import { authenticateUserInputSchema } from '../schemas/UserSchema';
+import { UserSchema } from '../schemas/UserSchema';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -27,6 +27,7 @@ export class SecurityMiddleware {
         private userService: UserService,
         private transactionService: TransactionService,
         private jwtService: JwtService,
+        private userSchema: UserSchema,
     ) {}
 
     authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -35,7 +36,7 @@ export class SecurityMiddleware {
         if (!accessToken) throw new RequiredAccessTokenError('refresh');
 
         const payload = this.jwtService.verifyAccess(accessToken);
-        const { userId } = authenticateUserInputSchema.parse({ userId: payload.sub });
+        const { userId } = this.userSchema.authenticate.parse({ userId: payload.sub });
         const user = await this.userService.findOneById(userId);
 
         req.user = user;

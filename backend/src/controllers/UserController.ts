@@ -5,16 +5,19 @@ import { UserService } from '../services/UserService';
 import { UserRepository } from '../repositories/UserRepository';
 import { UndefinedUserError } from '../errors/InternalServerError';
 import { env } from '../config/env';
-import { sendVerificationEmailInputSchema, verifyEmailInputSchema } from '../schemas/UserSchema';
+import { UserSchema } from '../schemas/UserSchema';
 
 export class UserController {
-    constructor(private userService: UserService) {}
+    constructor(
+        private userService: UserService,
+        private userSchema: UserSchema,
+    ) {}
 
     sendVerificationEmail = async (req: Request, res: Response): Promise<void> => {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const { frontendBaseUrl } = sendVerificationEmailInputSchema.parse(req.body);
+        const { frontendBaseUrl } = this.userSchema.sendVerificationEmail.parse(req.body);
 
         await this.userService.sendVerificationEmail(user, frontendBaseUrl);
 
@@ -26,7 +29,7 @@ export class UserController {
     };
 
     verifyEmail = async (req: Request<{ token: string }>, res: Response): Promise<void> => {
-        const { token } = verifyEmailInputSchema.parse(req.body);
+        const { token } = this.userSchema.verifyEmail.parse(req.body);
 
         await this.userService.verifyEmail(token);
 
