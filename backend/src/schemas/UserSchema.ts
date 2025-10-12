@@ -48,8 +48,4 @@ export class UserSchema {
             password: z.string().min(1, 'Password is required'),
             rememberMe: z.boolean(),
         });
-
-    safe = this.base.omit({
-        passwordHash: true,
-    });
 }

@@ -34,10 +34,12 @@ export class AuthController {
         const cookieService = new CookieService(req, res);
         cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
 
+        const { passwordHash, ...safeUser } = user;
+
         res.status(201).json({
             message: 'User registered successfully',
             data: {
-                user,
+                user: safeUser,
             },
             errors: null,
         });
@@ -53,10 +55,12 @@ export class AuthController {
         const cookieService = new CookieService(req, res);
         cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
 
+        const { passwordHash, ...safeUser } = user;
+
         res.status(200).json({
             message: 'User logged in successfully',
             data: {
-                user,
+                user: safeUser,
             },
             errors: null,
         });

@@ -52,10 +52,12 @@ export class UserController {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
+        const { passwordHash, ...safeUser } = user;
+
         res.status(200).json({
             message: 'User retrieved successfully',
             data: {
-                user,
+                user: safeUser,
             },
             errors: null,
         });
