@@ -29,8 +29,6 @@ export class UserController {
 
         res.status(200).json({
             message: 'Verification email sent successfully',
-            data: null,
-            errors: null,
         });
     };
 
@@ -43,8 +41,6 @@ export class UserController {
 
         res.status(200).json({
             message: 'Email verified successfully',
-            data: null,
-            errors: null,
         });
     };
 
@@ -59,7 +55,6 @@ export class UserController {
             data: {
                 user: safeUser,
             },
-            errors: null,
         });
     };
 }

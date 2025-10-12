@@ -41,7 +41,6 @@ export class AuthController {
             data: {
                 user: safeUser,
             },
-            errors: null,
         });
     };
 
@@ -62,7 +61,6 @@ export class AuthController {
             data: {
                 user: safeUser,
             },
-            errors: null,
         });
     };
 
@@ -80,8 +78,6 @@ export class AuthController {
 
         res.status(200).json({
             message: 'Tokens refreshed successfully',
-            data: null,
-            errors: null,
         });
     };
 
@@ -95,8 +91,6 @@ export class AuthController {
 
         res.status(200).json({
             message: 'User logged out successfully',
-            data: null,
-            errors: null,
         });
     };
 }

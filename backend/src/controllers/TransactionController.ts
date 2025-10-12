@@ -36,7 +36,6 @@ export class TransactionController {
             data: {
                 transaction,
             },
-            errors: null,
         });
     };
 
@@ -51,7 +50,6 @@ export class TransactionController {
             data: {
                 transactions,
             },
-            errors: null,
         });
     };
 
@@ -64,7 +62,6 @@ export class TransactionController {
             data: {
                 transaction,
             },
-            errors: null,
         });
     };
 
@@ -88,7 +85,6 @@ export class TransactionController {
             data: {
                 transaction,
             },
-            errors: null,
         });
     };
 
@@ -100,8 +96,6 @@ export class TransactionController {
 
         res.status(200).json({
             message: 'Transaction deleted successfully',
-            data: null,
-            errors: null,
         });
     };
 }
