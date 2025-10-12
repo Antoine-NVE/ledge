@@ -2,9 +2,14 @@ import { ObjectId } from 'mongodb';
 import { TransactionRepository } from '../repositories/TransactionRepository';
 import { Transaction } from '../types/Transaction';
 import { TransactionNotFoundError } from '../errors/NotFoundError';
+import { InvalidDataError } from '../errors/InternalServerError';
+import { TransactionSchema } from '../schemas/TransactionSchema';
 
 export class TransactionService {
-    constructor(private transactionRepository: TransactionRepository) {}
+    constructor(
+        private transactionRepository: TransactionRepository,
+        private transactionSchema: TransactionSchema,
+    ) {}
 
     insertOne = async (
         month: string,
@@ -14,7 +19,7 @@ export class TransactionService {
         isRecurring: boolean,
         userId: ObjectId,
     ): Promise<Transaction> => {
-        const transaction: Transaction = {
+        const { success, data, error } = this.transactionSchema.base.safeParse({
             _id: new ObjectId(),
             month,
             name,
@@ -24,7 +29,9 @@ export class TransactionService {
             userId,
             createdAt: new Date(),
             updatedAt: null,
-        };
+        });
+        if (!success) throw new InvalidDataError(error);
+        const transaction = data;
 
         await this.transactionRepository.insertOne(transaction);
 
@@ -44,6 +51,10 @@ export class TransactionService {
 
     updateOne = async (transaction: Transaction): Promise<Transaction> => {
         transaction.updatedAt = new Date();
+
+        const { success, data, error } = this.transactionSchema.base.safeParse(transaction);
+        if (!success) throw new InvalidDataError(error);
+        transaction = data;
 
         await this.transactionRepository.updateOne(transaction);
 

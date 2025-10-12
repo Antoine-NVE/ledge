@@ -1,7 +1,9 @@
 import { EmailAlreadyVerifiedError } from '../errors/ConflictError';
+import { InvalidDataError } from '../errors/InternalServerError';
 import { UserNotFoundError } from '../errors/NotFoundError';
 import { EmailVerificationCooldownError } from '../errors/TooManyRequestsError';
 import { UserRepository } from '../repositories/UserRepository';
+import { UserSchema } from '../schemas/UserSchema';
 import { User } from '../types/User';
 import { EmailService } from './EmailService';
 import { JwtService } from './JwtService';
@@ -12,6 +14,7 @@ export class UserService {
         private jwtService: JwtService,
         private emailService: EmailService,
         private userRepository: UserRepository,
+        private userSchema: UserSchema,
     ) {}
 
     sendVerificationEmail = async (user: User, frontendBaseUrl: string): Promise<void> => {
@@ -42,7 +45,7 @@ export class UserService {
     };
 
     insertOne = async (email: string, passwordHash: string): Promise<User> => {
-        const user: User = {
+        const { success, data, error } = this.userSchema.base.safeParse({
             _id: new ObjectId(),
             email,
             passwordHash,
@@ -50,7 +53,9 @@ export class UserService {
             emailVerificationCooldownExpiresAt: null,
             createdAt: new Date(),
             updatedAt: null,
-        };
+        });
+        if (!success) throw new InvalidDataError(error);
+        const user = data;
 
         await this.userRepository.insertOne(user);
 
@@ -73,6 +78,10 @@ export class UserService {
 
     updateOne = async (user: User): Promise<User> => {
         user.updatedAt = new Date();
+
+        const { success, data, error } = this.userSchema.base.safeParse(user);
+        if (!success) throw new InvalidDataError(error);
+        user = data;
 
         await this.userRepository.updateOne(user);
 

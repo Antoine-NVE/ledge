@@ -39,9 +39,9 @@ const refreshTokenSchema = new RefreshTokenSchema();
 const transactionSchema = new TransactionSchema();
 const securitySchema = new SecuritySchema(allowedOrigins);
 
-const userService = new UserService(jwtService, emailService, userRepository);
-const refreshTokenService = new RefreshTokenService(refreshTokenRepository);
-const transactionService = new TransactionService(transactionRepository);
+const userService = new UserService(jwtService, emailService, userRepository, userSchema);
+const refreshTokenService = new RefreshTokenService(refreshTokenRepository, refreshTokenSchema);
+const transactionService = new TransactionService(transactionRepository, transactionSchema);
 
 const authService = new AuthService(userService, jwtService, refreshTokenService);
 
