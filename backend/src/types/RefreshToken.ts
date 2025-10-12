@@ -1,5 +1,7 @@
 import z from 'zod';
-import { refreshTokenSchema } from '../schemas/RefreshTokenSchema';
 import { WithId } from 'mongodb';
+import { RefreshTokenSchema } from '../schemas/RefreshTokenSchema';
 
-export type RefreshToken = z.infer<typeof refreshTokenSchema>;
+type RefreshTokenSchemaInstance = InstanceType<typeof RefreshTokenSchema>;
+
+export type RefreshToken = z.infer<RefreshTokenSchemaInstance['base']>;

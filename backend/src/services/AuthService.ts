@@ -11,7 +11,6 @@ import { JwtService } from './JwtService';
 import { WithId } from 'mongodb';
 import { User } from '../types/User';
 import { RefreshToken } from '../types/RefreshToken';
-import { refreshTokenSchema } from '../schemas/RefreshTokenSchema';
 import { UserService } from './UserService';
 import { RefreshTokenService } from './RefreshTokenService';
 import { RefreshTokenNotFoundError, UserNotFoundError } from '../errors/NotFoundError';
