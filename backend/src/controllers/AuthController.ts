@@ -18,9 +18,9 @@ export class AuthController {
     ) {}
 
     register = async (req: Request, res: Response) => {
-        const result = this.userSchema.register.safeParse(req.body);
-        if (!result.success) throw new ValidationError(result.error);
-        const { email, password } = result.data;
+        const { success, data, error } = this.userSchema.register.safeParse(req.body);
+        if (!success) throw new ValidationError(error);
+        const { email, password } = data;
 
         // The user can't choose to be remembered at registration
         // Next time the user logs in, they can choose to be remembered
@@ -44,9 +44,9 @@ export class AuthController {
     };
 
     login = async (req: Request, res: Response) => {
-        const result = this.userSchema.login.safeParse(req.body);
-        if (!result.success) throw new ValidationError(result.error);
-        const { email, password, rememberMe } = result.data;
+        const { success, data, error } = this.userSchema.login.safeParse(req.body);
+        if (!success) throw new ValidationError(error);
+        const { email, password, rememberMe } = data;
 
         const { user, accessToken, refreshToken } = await this.authService.login(email, password);
 

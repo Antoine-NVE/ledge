@@ -19,9 +19,11 @@ export class UserController {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const result = this.securitySchema.sendVerificationEmail.safeParse(req.body);
-        if (!result.success) throw new InvalidDataError(result.error);
-        const { frontendBaseUrl } = result.data;
+        const { success, data, error } = this.securitySchema.sendVerificationEmail.safeParse(
+            req.body,
+        );
+        if (!success) throw new InvalidDataError(error);
+        const { frontendBaseUrl } = data;
 
         await this.userService.sendVerificationEmail(user, frontendBaseUrl);
 
@@ -33,9 +35,9 @@ export class UserController {
     };
 
     verifyEmail = async (req: Request<{ token: string }>, res: Response): Promise<void> => {
-        const result = this.securitySchema.verifyEmail.safeParse(req.body);
-        if (!result.success) throw new InvalidDataError(result.error);
-        const { token } = result.data;
+        const { success, data, error } = this.securitySchema.verifyEmail.safeParse(req.body);
+        if (!success) throw new InvalidDataError(error);
+        const { token } = data;
 
         await this.userService.verifyEmail(token);
 
