@@ -33,7 +33,7 @@ export class SecuritySchema {
 
     verifyEmail = z
         .object({
-            token: z.string().jwt(),
+            jwt: z.string().jwt(),
         })
         .strict();
 }

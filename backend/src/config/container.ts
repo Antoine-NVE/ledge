@@ -39,7 +39,13 @@ const refreshTokenSchema = new RefreshTokenSchema();
 const transactionSchema = new TransactionSchema();
 const securitySchema = new SecuritySchema(allowedOrigins);
 
-const userService = new UserService(jwtService, emailService, userRepository, userSchema);
+const userService = new UserService(
+    jwtService,
+    emailService,
+    userRepository,
+    userSchema,
+    securitySchema,
+);
 const refreshTokenService = new RefreshTokenService(refreshTokenRepository, refreshTokenSchema);
 const transactionService = new TransactionService(transactionRepository, transactionSchema);
 

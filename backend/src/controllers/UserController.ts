@@ -32,12 +32,12 @@ export class UserController {
         });
     };
 
-    verifyEmail = async (req: Request<{ token: string }>, res: Response): Promise<void> => {
+    verifyEmail = async (req: Request, res: Response): Promise<void> => {
         const { success, data, error } = this.securitySchema.verifyEmail.safeParse(req.body);
         if (!success) throw new InvalidDataError(error);
-        const { token } = data;
+        const { jwt } = data;
 
-        await this.userService.verifyEmail(token);
+        await this.userService.verifyEmail(jwt);
 
         res.status(200).json({
             message: 'Email verified successfully',

@@ -3,6 +3,7 @@ import { InvalidDataError } from '../errors/InternalServerError';
 import { UserNotFoundError } from '../errors/NotFoundError';
 import { EmailVerificationCooldownError } from '../errors/TooManyRequestsError';
 import { UserRepository } from '../repositories/UserRepository';
+import { SecuritySchema } from '../schemas/SecuritySchema';
 import { UserSchema } from '../schemas/UserSchema';
 import { User } from '../types/User';
 import { EmailService } from './EmailService';
@@ -15,6 +16,7 @@ export class UserService {
         private emailService: EmailService,
         private userRepository: UserRepository,
         private userSchema: UserSchema,
+        private securitySchema: SecuritySchema,
     ) {}
 
     sendVerificationEmail = async (user: User, frontendBaseUrl: string): Promise<void> => {
@@ -33,10 +35,16 @@ export class UserService {
         await this.updateOne(user);
     };
 
-    verifyEmail = async (token: string): Promise<void> => {
-        const payload = this.jwtService.verifyEmailVerification(token);
+    verifyEmail = async (jwt: string): Promise<void> => {
+        const payload = this.jwtService.verifyEmailVerification(jwt);
 
-        const user = await this.findOneById(new ObjectId(payload.sub));
+        const { success, data, error } = this.securitySchema.authenticate.safeParse({
+            userId: payload.sub,
+        });
+        if (!success) throw new InvalidDataError(error);
+        const { userId } = data;
+
+        const user = await this.findOneById(userId);
         if (!user) throw new UserNotFoundError();
         if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
 
