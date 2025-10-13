@@ -2,7 +2,7 @@ export abstract class HttpError extends Error {
     constructor(
         message: string,
         public statusCode: number,
-        public errors?: object,
+        public errors?: Record<string, string[]>,
         public action?: string,
     ) {
         super(message);

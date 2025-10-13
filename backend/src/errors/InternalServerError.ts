@@ -2,7 +2,7 @@ import z from 'zod';
 import { HttpError } from './HttpError';
 
 export abstract class InternalServerError extends HttpError {
-    constructor(message: string, errors?: object) {
+    constructor(message: string, errors?: Record<string, string[]>) {
         super(message, 500, errors);
     }
 }
@@ -20,7 +20,7 @@ export class UndefinedTransactionError extends InternalServerError {
 }
 
 export class InvalidDataError extends InternalServerError {
-    constructor(errors: object) {
+    constructor(errors: Record<string, string[]>) {
         super('Invalid data', errors);
     }
 }
