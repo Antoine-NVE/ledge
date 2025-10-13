@@ -43,7 +43,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
     if (env.NODE_ENV === 'development') {
         res.status(500).json({
             message: err.message,
-            errors: (err instanceof HttpError && err.errors) ?? undefined,
+            errors: err instanceof HttpError ? err.errors : undefined,
         });
         return;
     }
