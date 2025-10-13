@@ -1,5 +1,5 @@
 import z from 'zod';
-import { EmailAlreadyVerifiedError } from '../errors/ConflictError';
+import { EmailAlreadyExistsError, EmailAlreadyVerifiedError } from '../errors/ConflictError';
 import { InvalidDataError } from '../errors/InternalServerError';
 import { UserNotFoundError } from '../errors/NotFoundError';
 import { EmailVerificationCooldownError } from '../errors/TooManyRequestsError';
@@ -7,7 +7,7 @@ import { UserRepository } from '../repositories/UserRepository';
 import { User } from '../types/User';
 import { EmailService } from './EmailService';
 import { JwtService } from './JwtService';
-import { ObjectId } from 'mongodb';
+import { MongoServerError, ObjectId } from 'mongodb';
 import { parseSchema } from '../utils/schema';
 import { objectIdSchema } from '../schemas/security';
 import { userSchema } from '../schemas/user';
@@ -57,7 +57,12 @@ export class UserService {
             updatedAt: null,
         });
 
-        await this.userRepository.insertOne(user);
+        await this.userRepository.insertOne(user).catch((err) => {
+            if (err instanceof MongoServerError && err.code === 11000) {
+                throw new EmailAlreadyExistsError();
+            }
+            throw err;
+        });
 
         return user;
     };
