@@ -61,12 +61,13 @@ export const sendVerificationEmail = async (): Promise<[ApiResponse<null, null>,
 
 export const verifyEmail = async (token: string): Promise<[ApiResponse<null, null>, Response | null]> => {
     try {
-        const response = await customFetch(import.meta.env.VITE_API_URL + `/users/verify-email/${token}`, {
-            method: 'GET',
+        const response = await customFetch(import.meta.env.VITE_API_URL + `/users/verify-email`, {
+            method: 'POST',
             credentials: 'include',
             headers: {
                 'Content-Type': 'application/json',
             },
+            body: JSON.stringify({ jwt: token }),
         });
 
         // Can be any status code, including 200, 401, or 500

@@ -5,15 +5,17 @@ import { register } from '../api/auth';
 interface Form {
     email: string;
     password: string;
+    confirmPassword: string;
 }
 
 interface FormErrors {
-    email?: string;
-    password?: string;
+    email?: string[];
+    password?: string[];
+    confirmPassword?: string[];
 }
 
 const Register = () => {
-    const [form, setForm] = useState<Form>({ email: '', password: '' });
+    const [form, setForm] = useState<Form>({ email: '', password: '', confirmPassword: '' });
     const [formErrors, setFormErrors] = useState<FormErrors>({});
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -37,7 +39,7 @@ const Register = () => {
         setError(null);
         setSuccess(null);
 
-        const [result, response] = await register(form.email, form.password);
+        const [result, response] = await register(form.email, form.password, form.confirmPassword);
 
         if (!response || !response.ok) {
             setError(result.message);
@@ -75,7 +77,9 @@ const Register = () => {
                             disabled={isLoading}
                             className={`${inputBaseClass} ${formErrors.email ? 'border-red-500' : 'border-gray-300'}`}
                         />
-                        {formErrors.email && <p className="mt-1 text-xs text-red-600">{formErrors.email}</p>}
+                        {formErrors.email && formErrors.email[0] && (
+                            <p className="mt-1 text-xs text-red-600">{formErrors.email[0]}</p>
+                        )}
                     </div>
 
                     <div>
@@ -93,7 +97,29 @@ const Register = () => {
                                 formErrors.password ? 'border-red-500' : 'border-gray-300'
                             }`}
                         />
-                        {formErrors.password && <p className="mt-1 text-xs text-red-600">{formErrors.password}</p>}
+                        {formErrors.password && formErrors.password[0] && (
+                            <p className="mt-1 text-xs text-red-600">{formErrors.password[0]}</p>
+                        )}
+                    </div>
+
+                    <div>
+                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                            Confirm Password
+                        </label>
+                        <input
+                            name="confirmPassword"
+                            id="confirmPassword"
+                            type="password"
+                            value={form.confirmPassword}
+                            onChange={handleChange}
+                            disabled={isLoading}
+                            className={`${inputBaseClass} ${
+                                formErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'
+                            }`}
+                        />
+                        {formErrors.confirmPassword && formErrors.confirmPassword[0] && (
+                            <p className="mt-1 text-xs text-red-600">{formErrors.confirmPassword[0]}</p>
+                        )}
                     </div>
 
                     <button

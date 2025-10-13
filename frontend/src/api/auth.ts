@@ -6,7 +6,8 @@ const API_URL = import.meta.env.VITE_API_URL + '/auth';
 
 export const register = async (
     email: string,
-    password: string
+    password: string,
+    confirmPassword: string
 ): Promise<[ApiResponse<{ user: User } | null, null>, Response | null]> => {
     try {
         const response = await customFetch(API_URL + '/register', {
@@ -15,7 +16,7 @@ export const register = async (
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ email, password }),
+            body: JSON.stringify({ email, password, confirmPassword }),
         });
 
         // Can be any status code, including 200, 401, or 500

@@ -75,7 +75,7 @@ const DeleteTransactionModal = ({ isOpen, onClose, transaction, onDelete }: Prop
 
                     <p className="mb-4">
                         Are you sure you want to delete the transaction <strong>{transaction.name}</strong> of{' '}
-                        <strong>{(transaction.value / 100).toFixed(2)} €</strong>?
+                        <strong>{transaction.value} €</strong>?
                     </p>
                     <p className="text-sm text-gray-500 mb-4">This action cannot be undone. Please confirm.</p>
 

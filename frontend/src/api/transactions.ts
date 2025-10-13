@@ -105,7 +105,12 @@ export const updateTransaction = async (
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(transaction),
+            body: JSON.stringify({
+                name: transaction.name,
+                value: transaction.value,
+                isIncome: transaction.isIncome,
+                isRecurring: transaction.isRecurring,
+            }),
         });
 
         // Can be any status code, including 200, 401, or 500
