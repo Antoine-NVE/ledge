@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/UserService';
-import {  UndefinedUserError } from '../errors/InternalServerError';
+import { UndefinedUserError } from '../errors/InternalServerError';
 import { clearUser } from '../utils/clear';
 import { parseSchema } from '../utils/schema';
 import { allowedOriginSchema, jwtSchema } from '../schemas/security';

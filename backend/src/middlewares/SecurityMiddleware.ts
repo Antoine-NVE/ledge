@@ -1,8 +1,9 @@
 import { NextFunction, Request, Response } from 'express';
 import { JwtService } from '../services/JwtService';
 import { CookieService } from '../services/CookieService';
-import { RequiredAccessTokenError } from '../errors/UnauthorizedError';import { User } from '../types/User';
-import {  UndefinedUserError } from '../errors/InternalServerError';
+import { RequiredAccessTokenError } from '../errors/UnauthorizedError';
+import { User } from '../types/User';
+import { UndefinedUserError } from '../errors/InternalServerError';
 import { TransactionAccessForbiddenError } from '../errors/ForbiddenError';
 import { Transaction } from '../types/Transaction';
 import { UserService } from '../services/UserService';
