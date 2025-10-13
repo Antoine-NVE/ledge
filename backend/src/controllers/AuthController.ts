@@ -7,19 +7,17 @@ import { UserRepository } from '../repositories/UserRepository';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { exit } from 'process';
 import { RequiredRefreshTokenError } from '../errors/UnauthorizedError';
-import { UserSchema } from '../schemas/UserSchema';
 import { ValidationError } from '../errors/BadRequestError';
 import z from 'zod';
 import { clearUser } from '../utils/clear';
+import { parseSchema } from '../utils/schema';
+import { userLoginSchema, userRegisterSchema } from '../schemas/user';
 
 export class AuthController {
-    constructor(
-        private authService: AuthService,
-        private userSchema: UserSchema,
-    ) {}
+    constructor(private authService: AuthService) {}
 
     register = async (req: Request, res: Response) => {
-        const { email, password } = this.userSchema.parseRegister(req.body);
+        const { email, password } = parseSchema(userRegisterSchema, req.body, true);
 
         // The user can't choose to be remembered at registration
         // Next time the user logs in, they can choose to be remembered
@@ -42,7 +40,7 @@ export class AuthController {
     };
 
     login = async (req: Request, res: Response) => {
-        const { email, password, rememberMe } = this.userSchema.parseLogin(req.body);
+        const { email, password, rememberMe } = parseSchema(userLoginSchema, req.body, true);
 
         const { user, accessToken, refreshToken } = await this.authService.login(email, password);
 

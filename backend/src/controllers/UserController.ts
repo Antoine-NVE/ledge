@@ -5,22 +5,19 @@ import { UserService } from '../services/UserService';
 import { UserRepository } from '../repositories/UserRepository';
 import { InvalidDataError, UndefinedUserError } from '../errors/InternalServerError';
 import { env } from '../config/env';
-import { UserSchema } from '../schemas/UserSchema';
-import { SecuritySchema } from '../schemas/SecuritySchema';
 import z from 'zod';
 import { clearUser } from '../utils/clear';
+import { parseSchema } from '../utils/schema';
+import { allowedOriginSchema, jwtSchema } from '../schemas/security';
 
 export class UserController {
-    constructor(
-        private userService: UserService,
-        private securitySchema: SecuritySchema,
-    ) {}
+    constructor(private userService: UserService) {}
 
     sendVerificationEmail = async (req: Request, res: Response): Promise<void> => {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const frontendBaseUrl = this.securitySchema.parseAllowedOrigin(req.body);
+        const frontendBaseUrl = parseSchema(allowedOriginSchema, req.body.frontendBaseUrl);
 
         await this.userService.sendVerificationEmail(user, frontendBaseUrl);
 
@@ -30,7 +27,7 @@ export class UserController {
     };
 
     verifyEmail = async (req: Request, res: Response): Promise<void> => {
-        const jwt = this.securitySchema.parseJwt(req.body);
+        const jwt = parseSchema(jwtSchema, req.body.jwt);
 
         await this.userService.verifyEmail(jwt);
 

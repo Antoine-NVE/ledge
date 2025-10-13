@@ -12,10 +12,9 @@ import { TransactionAccessForbiddenError } from '../errors/ForbiddenError';
 import { Transaction } from '../types/Transaction';
 import { UserService } from '../services/UserService';
 import { TransactionService } from '../services/TransactionService';
-import { UserSchema } from '../schemas/UserSchema';
-import { TransactionSchema } from '../schemas/TransactionSchema';
-import { SecuritySchema } from '../schemas/SecuritySchema';
 import z from 'zod';
+import { parseSchema } from '../utils/schema';
+import { objectIdSchema } from '../schemas/security';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -29,7 +28,6 @@ export class SecurityMiddleware {
         private userService: UserService,
         private transactionService: TransactionService,
         private jwtService: JwtService,
-        private securitySchema: SecuritySchema,
     ) {}
 
     authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
@@ -38,7 +36,7 @@ export class SecurityMiddleware {
         if (!accessToken) throw new RequiredAccessTokenError('refresh');
 
         const payload = this.jwtService.verifyAccess(accessToken);
-        const userId = this.securitySchema.parseObjectId(payload.sub);
+        const userId = parseSchema(objectIdSchema, payload.sub);
         const user = await this.userService.findOneById(userId);
 
         req.user = user;
@@ -49,7 +47,7 @@ export class SecurityMiddleware {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const transactionId = this.securitySchema.parseObjectId(req.params.id);
+        const transactionId = parseSchema(objectIdSchema, req.params.id);
         const transaction = await this.transactionService.findOneById(transactionId);
 
         if (!user._id.equals(transaction.userId)) throw new TransactionAccessForbiddenError();

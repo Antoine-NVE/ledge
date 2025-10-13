@@ -4,20 +4,19 @@ import { InvalidDataError } from '../errors/InternalServerError';
 import { UserNotFoundError } from '../errors/NotFoundError';
 import { EmailVerificationCooldownError } from '../errors/TooManyRequestsError';
 import { UserRepository } from '../repositories/UserRepository';
-import { SecuritySchema } from '../schemas/SecuritySchema';
-import { UserSchema } from '../schemas/UserSchema';
 import { User } from '../types/User';
 import { EmailService } from './EmailService';
 import { JwtService } from './JwtService';
 import { ObjectId } from 'mongodb';
+import { parseSchema } from '../utils/schema';
+import { objectIdSchema } from '../schemas/security';
+import { userSchema } from '../schemas/user';
 
 export class UserService {
     constructor(
         private jwtService: JwtService,
         private emailService: EmailService,
         private userRepository: UserRepository,
-        private userSchema: UserSchema,
-        private securitySchema: SecuritySchema,
     ) {}
 
     sendVerificationEmail = async (user: User, frontendBaseUrl: string): Promise<void> => {
@@ -39,7 +38,7 @@ export class UserService {
     verifyEmail = async (jwt: string): Promise<void> => {
         const payload = this.jwtService.verifyEmailVerification(jwt);
 
-        const userId = this.securitySchema.parseObjectId(payload.sub);
+        const userId = parseSchema(objectIdSchema, payload.sub);
         const user = await this.findOneById(userId);
         if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
 
@@ -48,7 +47,7 @@ export class UserService {
     };
 
     insertOne = async (email: string, passwordHash: string): Promise<User> => {
-        const user = this.userSchema.parseBase({
+        const user = parseSchema(userSchema, {
             _id: new ObjectId(),
             email,
             passwordHash,
@@ -80,7 +79,7 @@ export class UserService {
     updateOne = async (user: User): Promise<User> => {
         user.updatedAt = new Date();
 
-        user = this.userSchema.parseBase(user);
+        user = parseSchema(userSchema, user);
 
         await this.userRepository.updateOne(user);
 

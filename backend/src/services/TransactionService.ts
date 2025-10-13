@@ -3,14 +3,12 @@ import { TransactionRepository } from '../repositories/TransactionRepository';
 import { Transaction } from '../types/Transaction';
 import { TransactionNotFoundError } from '../errors/NotFoundError';
 import { InvalidDataError } from '../errors/InternalServerError';
-import { TransactionSchema } from '../schemas/TransactionSchema';
 import z from 'zod';
+import { parseSchema } from '../utils/schema';
+import { transactionSchema } from '../schemas/transaction';
 
 export class TransactionService {
-    constructor(
-        private transactionRepository: TransactionRepository,
-        private transactionSchema: TransactionSchema,
-    ) {}
+    constructor(private transactionRepository: TransactionRepository) {}
 
     insertOne = async (
         month: string,
@@ -20,7 +18,7 @@ export class TransactionService {
         isRecurring: boolean,
         userId: ObjectId,
     ): Promise<Transaction> => {
-        const transaction = this.transactionSchema.parseBase({
+        const transaction = parseSchema(transactionSchema, {
             _id: new ObjectId(),
             month,
             name,
@@ -51,7 +49,7 @@ export class TransactionService {
     updateOne = async (transaction: Transaction): Promise<Transaction> => {
         transaction.updatedAt = new Date();
 
-        transaction = this.transactionSchema.parseBase(transaction);
+        transaction = parseSchema(transactionSchema, transaction);
 
         await this.transactionRepository.updateOne(transaction);
 

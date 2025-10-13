@@ -4,22 +4,22 @@ import { TransactionRepository } from '../repositories/TransactionRepository';
 import { Transaction } from '../types/Transaction';
 import { TransactionNotFoundError } from '../errors/NotFoundError';
 import { TransactionService } from '../services/TransactionService';
-import { TransactionSchema } from '../schemas/TransactionSchema';
 import { ValidationError } from '../errors/BadRequestError';
 import z from 'zod';
+import { parseSchema } from '../utils/schema';
+import { transactionCreateSchema, transactionUpdateSchema } from '../schemas/transaction';
 
 export class TransactionController {
-    constructor(
-        private transactionService: TransactionService,
-        private transactionSchema: TransactionSchema,
-    ) {}
+    constructor(private transactionService: TransactionService) {}
 
     create = async (req: Request, res: Response) => {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const { month, name, value, isIncome, isRecurring } = this.transactionSchema.parseCreate(
+        const { month, name, value, isIncome, isRecurring } = parseSchema(
+            transactionCreateSchema,
             req.body,
+            true,
         );
 
         const transaction = await this.transactionService.insertOne(
@@ -69,7 +69,11 @@ export class TransactionController {
         let transaction: Transaction | undefined = req.transaction;
         if (!transaction) throw new UndefinedTransactionError();
 
-        const { name, value, isIncome, isRecurring } = this.transactionSchema.parseUpdate(req.body);
+        const { name, value, isIncome, isRecurring } = parseSchema(
+            transactionUpdateSchema,
+            req.body,
+            true,
+        );
 
         transaction.name = name;
         transaction.value = value;
