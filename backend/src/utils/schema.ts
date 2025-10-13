@@ -5,7 +5,9 @@ import { InvalidDataError } from '../errors/InternalServerError';
 const formatError = (error: z.ZodError): Record<string, string[]> => {
     const { formErrors, fieldErrors } = z.flattenError(error);
 
-    return formErrors.length > 0 ? { global: formErrors, ...fieldErrors } : fieldErrors;
+    return formErrors.length > 0
+        ? { global: formErrors, ...fieldErrors }
+        : fieldErrors;
 };
 
 export const parseSchema = <T>(

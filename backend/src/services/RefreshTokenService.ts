@@ -27,7 +27,10 @@ export class RefreshTokenService {
     };
 
     findOneByToken = async (token: string): Promise<RefreshToken> => {
-        const refreshToken = await this.refreshTokenRepository.findOne('token', token);
+        const refreshToken = await this.refreshTokenRepository.findOne(
+            'token',
+            token,
+        );
         if (!refreshToken) throw new RefreshTokenNotFoundError();
 
         return refreshToken;

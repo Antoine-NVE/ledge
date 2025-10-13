@@ -4,7 +4,9 @@ export const parseNumber = (value: string | undefined): number | undefined => {
     return isNaN(number) ? undefined : number;
 };
 
-export const parseBoolean = (value: string | undefined): boolean | undefined => {
+export const parseBoolean = (
+    value: string | undefined,
+): boolean | undefined => {
     if (value === undefined) return undefined;
     if (value === 'true') return true;
     if (value === 'false') return false;

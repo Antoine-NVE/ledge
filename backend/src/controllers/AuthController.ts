@@ -10,16 +10,18 @@ export class AuthController {
     constructor(private authService: AuthService) {}
 
     register = async (req: Request, res: Response) => {
-        const { email, password } = parseSchema(userRegisterSchema, req.body, true);
+        const { email, password } = parseSchema(
+            userRegisterSchema,
+            req.body,
+            true,
+        );
 
         // The user can't choose to be remembered at registration
         // Next time the user logs in, they can choose to be remembered
         const rememberMe = false;
 
-        const { user, accessToken, refreshToken } = await this.authService.register(
-            email,
-            password,
-        );
+        const { user, accessToken, refreshToken } =
+            await this.authService.register(email, password);
 
         const cookieService = new CookieService(req, res);
         cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
@@ -33,9 +35,14 @@ export class AuthController {
     };
 
     login = async (req: Request, res: Response) => {
-        const { email, password, rememberMe } = parseSchema(userLoginSchema, req.body, true);
+        const { email, password, rememberMe } = parseSchema(
+            userLoginSchema,
+            req.body,
+            true,
+        );
 
-        const { user, accessToken, refreshToken } = await this.authService.login(email, password);
+        const { user, accessToken, refreshToken } =
+            await this.authService.login(email, password);
 
         const cookieService = new CookieService(req, res);
         cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
@@ -56,7 +63,8 @@ export class AuthController {
         let rememberMe = cookieService.getRememberMe();
         if (rememberMe === undefined) rememberMe = false; // Default to false if not provided
 
-        const { accessToken, refreshToken } = await this.authService.refresh(token);
+        const { accessToken, refreshToken } =
+            await this.authService.refresh(token);
 
         cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
 

@@ -1,9 +1,15 @@
 import { Request, Response } from 'express';
-import { UndefinedTransactionError, UndefinedUserError } from '../errors/InternalServerError';
+import {
+    UndefinedTransactionError,
+    UndefinedUserError,
+} from '../errors/InternalServerError';
 import { Transaction } from '../types/Transaction';
 import { TransactionService } from '../services/TransactionService';
 import { parseSchema } from '../utils/schema';
-import { transactionCreateSchema, transactionUpdateSchema } from '../schemas/transaction';
+import {
+    transactionCreateSchema,
+    transactionUpdateSchema,
+} from '../schemas/transaction';
 
 export class TransactionController {
     constructor(private transactionService: TransactionService) {}
@@ -39,7 +45,9 @@ export class TransactionController {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const transactions = await this.transactionService.findByUserId(user._id);
+        const transactions = await this.transactionService.findByUserId(
+            user._id,
+        );
 
         res.status(200).json({
             message: 'Transactions retrieved successfully',

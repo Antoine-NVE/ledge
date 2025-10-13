@@ -8,11 +8,17 @@ import { allowedOriginSchema, jwtSchema } from '../schemas/security';
 export class UserController {
     constructor(private userService: UserService) {}
 
-    sendVerificationEmail = async (req: Request, res: Response): Promise<void> => {
+    sendVerificationEmail = async (
+        req: Request,
+        res: Response,
+    ): Promise<void> => {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
-        const frontendBaseUrl = parseSchema(allowedOriginSchema, req.body.frontendBaseUrl);
+        const frontendBaseUrl = parseSchema(
+            allowedOriginSchema,
+            req.body.frontendBaseUrl,
+        );
 
         await this.userService.sendVerificationEmail(user, frontendBaseUrl);
 

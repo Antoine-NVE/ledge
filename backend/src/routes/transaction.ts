@@ -4,7 +4,13 @@ import { container } from '../config/container';
 const router = express.Router();
 
 const { authenticateUser, authorizeTransaction } = container.securityMiddleware;
-const { create, readMany, read, update, delete: remove } = container.transactionController;
+const {
+    create,
+    readMany,
+    read,
+    update,
+    delete: remove,
+} = container.transactionController;
 
 router.post('/', authenticateUser, create);
 router.get('/', authenticateUser, readMany);

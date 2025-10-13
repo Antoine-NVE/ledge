@@ -25,7 +25,11 @@ export class SecurityMiddleware {
         private jwtService: JwtService,
     ) {}
 
-    authenticateUser = async (req: Request, res: Response, next: NextFunction) => {
+    authenticateUser = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+    ) => {
         const cookieService = new CookieService(req, res);
         const accessToken = cookieService.getAccessToken();
         if (!accessToken) throw new RequiredAccessTokenError('refresh');
@@ -38,14 +42,20 @@ export class SecurityMiddleware {
         next();
     };
 
-    authorizeTransaction = async (req: Request, res: Response, next: NextFunction) => {
+    authorizeTransaction = async (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+    ) => {
         const user = req.user;
         if (!user) throw new UndefinedUserError();
 
         const transactionId = parseSchema(objectIdSchema, req.params.id);
-        const transaction = await this.transactionService.findOneById(transactionId);
+        const transaction =
+            await this.transactionService.findOneById(transactionId);
 
-        if (!user._id.equals(transaction.userId)) throw new TransactionAccessForbiddenError();
+        if (!user._id.equals(transaction.userId))
+            throw new TransactionAccessForbiddenError();
 
         req.transaction = transaction;
         next();

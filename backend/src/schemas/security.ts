@@ -7,6 +7,8 @@ export const objectIdSchema = z
     .refine((val) => ObjectId.isValid(val))
     .transform((val) => new ObjectId(val));
 
-export const allowedOriginSchema = z.url().refine((val) => env.ALLOWED_ORIGINS.includes(val));
+export const allowedOriginSchema = z
+    .url()
+    .refine((val) => env.ALLOWED_ORIGINS.includes(val));
 
 export const jwtSchema = z.jwt();

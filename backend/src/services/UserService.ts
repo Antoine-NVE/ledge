@@ -1,4 +1,7 @@
-import { EmailAlreadyExistsError, EmailAlreadyVerifiedError } from '../errors/ConflictError';
+import {
+    EmailAlreadyExistsError,
+    EmailAlreadyVerifiedError,
+} from '../errors/ConflictError';
 import { UserNotFoundError } from '../errors/NotFoundError';
 import { EmailVerificationCooldownError } from '../errors/TooManyRequestsError';
 import { UserRepository } from '../repositories/UserRepository';
@@ -17,7 +20,10 @@ export class UserService {
         private userRepository: UserRepository,
     ) {}
 
-    sendVerificationEmail = async (user: User, frontendBaseUrl: string): Promise<void> => {
+    sendVerificationEmail = async (
+        user: User,
+        frontendBaseUrl: string,
+    ): Promise<void> => {
         if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
         if (
             user.emailVerificationCooldownExpiresAt &&
@@ -27,9 +33,15 @@ export class UserService {
 
         const jwt = this.jwtService.signEmailVerification(user._id);
 
-        await this.emailService.sendVerification(user.email, frontendBaseUrl, jwt);
+        await this.emailService.sendVerification(
+            user.email,
+            frontendBaseUrl,
+            jwt,
+        );
 
-        user.emailVerificationCooldownExpiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
+        user.emailVerificationCooldownExpiresAt = new Date(
+            Date.now() + 5 * 60 * 1000,
+        ); // 5 minutes
         await this.updateOne(user);
     };
 

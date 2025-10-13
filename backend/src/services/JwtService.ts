@@ -7,7 +7,11 @@ import {
     TokenExpiredError,
     NotBeforeError,
 } from 'jsonwebtoken';
-import { ExpiredJwtError, InactiveJwtError, InvalidJwtError } from '../errors/UnauthorizedError';
+import {
+    ExpiredJwtError,
+    InactiveJwtError,
+    InvalidJwtError,
+} from '../errors/UnauthorizedError';
 import { ObjectId } from 'mongodb';
 import { Payload } from '../types/Payload';
 
@@ -19,7 +23,10 @@ export class JwtService {
     };
 
     signAccess = (userId: ObjectId): string => {
-        return this.sign({ aud: 'access', sub: userId.toString() }, { expiresIn: '15m' });
+        return this.sign(
+            { aud: 'access', sub: userId.toString() },
+            { expiresIn: '15m' },
+        );
     };
 
     signEmailVerification = (userId: ObjectId): string => {
@@ -45,7 +52,8 @@ export class JwtService {
         try {
             return this.verify(jwt, { audience: 'access' });
         } catch (error: unknown) {
-            if (error instanceof ExpiredJwtError) throw new ExpiredJwtError('refresh');
+            if (error instanceof ExpiredJwtError)
+                throw new ExpiredJwtError('refresh');
 
             throw error;
         }

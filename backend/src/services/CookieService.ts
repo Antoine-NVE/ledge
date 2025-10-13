@@ -7,7 +7,11 @@ export class CookieService {
         private res: Response,
     ) {}
 
-    private set = (name: string, value: string, options: CookieOptions): void => {
+    private set = (
+        name: string,
+        value: string,
+        options: CookieOptions,
+    ): void => {
         this.res.cookie(name, value, options);
     };
 
@@ -44,7 +48,11 @@ export class CookieService {
         });
     };
 
-    setAuth = (accessToken: string, refreshToken: string, rememberMe: boolean): void => {
+    setAuth = (
+        accessToken: string,
+        refreshToken: string,
+        rememberMe: boolean,
+    ): void => {
         this.setAccessToken(accessToken, rememberMe);
         this.setRefreshToken(refreshToken, rememberMe);
         this.setRememberMe(rememberMe);

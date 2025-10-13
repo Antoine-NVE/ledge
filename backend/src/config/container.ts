@@ -26,20 +26,32 @@ const jwtService = new JwtService(secret);
 const emailService = new EmailService(host, port, secure, { user, pass }, from);
 
 const userRepository = new UserRepository(db.collection('users'));
-const refreshTokenRepository = new RefreshTokenRepository(db.collection('refreshtokens'));
-const transactionRepository = new TransactionRepository(db.collection('transactions'));
+const refreshTokenRepository = new RefreshTokenRepository(
+    db.collection('refreshtokens'),
+);
+const transactionRepository = new TransactionRepository(
+    db.collection('transactions'),
+);
 
 const userService = new UserService(jwtService, emailService, userRepository);
 const refreshTokenService = new RefreshTokenService(refreshTokenRepository);
 const transactionService = new TransactionService(transactionRepository);
 
-const authService = new AuthService(userService, jwtService, refreshTokenService);
+const authService = new AuthService(
+    userService,
+    jwtService,
+    refreshTokenService,
+);
 
 const authController = new AuthController(authService);
 const userController = new UserController(userService);
 const transactionController = new TransactionController(transactionService);
 
-const securityMiddleware = new SecurityMiddleware(userService, transactionService, jwtService);
+const securityMiddleware = new SecurityMiddleware(
+    userService,
+    transactionService,
+    jwtService,
+);
 
 export const container = {
     authController,

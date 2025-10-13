@@ -8,7 +8,10 @@ export class UserRepository {
         await this.userCollection.insertOne(user);
     };
 
-    findOne = async <K extends keyof User>(key: K, value: User[K]): Promise<User | null> => {
+    findOne = async <K extends keyof User>(
+        key: K,
+        value: User[K],
+    ): Promise<User | null> => {
         return await this.userCollection.findOne({ [key]: value });
     };
 
