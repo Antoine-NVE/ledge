@@ -1,6 +1,4 @@
-import z from 'zod';
 import { EmailAlreadyExistsError, EmailAlreadyVerifiedError } from '../errors/ConflictError';
-import { InvalidDataError } from '../errors/InternalServerError';
 import { UserNotFoundError } from '../errors/NotFoundError';
 import { EmailVerificationCooldownError } from '../errors/TooManyRequestsError';
 import { UserRepository } from '../repositories/UserRepository';

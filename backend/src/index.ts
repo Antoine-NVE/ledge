@@ -1,14 +1,11 @@
 import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-
 import authRoutes from './routes/auth';
 import transactionRoutes from './routes/transaction';
 import userRoutes from './routes/user';
-import { UnauthorizedError } from './errors/UnauthorizedError';
 import { HttpError } from './errors/HttpError';
 import { env } from './config/env';
-import z from 'zod';
 import { RouteNotFoundError } from './errors/NotFoundError';
 
 const app = express();
@@ -29,6 +26,7 @@ app.all(/.*/, () => {
     throw new RouteNotFoundError();
 });
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
     if (err instanceof HttpError && err.statusCode !== 500) {
         res.status(err.statusCode).json({

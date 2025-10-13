@@ -1,11 +1,6 @@
 import { Request, Response } from 'express';
-import { JwtService } from '../services/JwtService';
-import { EmailService } from '../services/EmailService';
 import { UserService } from '../services/UserService';
-import { UserRepository } from '../repositories/UserRepository';
-import { InvalidDataError, UndefinedUserError } from '../errors/InternalServerError';
-import { env } from '../config/env';
-import z from 'zod';
+import {  UndefinedUserError } from '../errors/InternalServerError';
 import { clearUser } from '../utils/clear';
 import { parseSchema } from '../utils/schema';
 import { allowedOriginSchema, jwtSchema } from '../schemas/security';

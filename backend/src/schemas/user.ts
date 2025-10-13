@@ -1,8 +1,5 @@
 import { ObjectId } from 'mongodb';
-import z, { flattenError } from 'zod';
-import { env } from '../config/env';
-import { ValidationError } from '../errors/BadRequestError';
-import { InvalidDataError } from '../errors/InternalServerError';
+import z from 'zod';
 
 export const userSchema = z.strictObject({
     _id: z.custom<ObjectId>((val) => val instanceof ObjectId),

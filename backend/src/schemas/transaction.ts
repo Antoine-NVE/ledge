@@ -1,7 +1,5 @@
-import z, { flattenError } from 'zod';
+import z from 'zod';
 import { ObjectId } from 'mongodb';
-import { ValidationError } from '../errors/BadRequestError';
-import { InvalidDataError } from '../errors/InternalServerError';
 
 export const transactionSchema = z.strictObject({
     _id: z.custom<ObjectId>((val) => val instanceof ObjectId),

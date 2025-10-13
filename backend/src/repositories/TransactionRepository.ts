@@ -1,4 +1,4 @@
-import { Collection, ObjectId, OptionalId } from 'mongodb';
+import { Collection } from 'mongodb';
 import { Transaction } from '../types/Transaction';
 
 export class TransactionRepository {

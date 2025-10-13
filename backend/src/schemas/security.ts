@@ -1,6 +1,5 @@
 import { ObjectId } from 'mongodb';
-import z, { flattenError } from 'zod';
-import { InvalidDataError } from '../errors/InternalServerError';
+import z from 'zod';
 import { env } from '../config/env';
 
 export const objectIdSchema = z

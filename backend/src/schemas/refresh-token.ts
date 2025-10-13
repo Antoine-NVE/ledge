@@ -1,6 +1,5 @@
-import z, { flattenError } from 'zod';
+import z from 'zod';
 import { ObjectId } from 'mongodb';
-import { InvalidDataError } from '../errors/InternalServerError';
 
 export const refreshTokenSchema = z.strictObject({
     _id: z.custom<ObjectId>((val) => val instanceof ObjectId),

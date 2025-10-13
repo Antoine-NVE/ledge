@@ -1,4 +1,4 @@
-import { Collection, Document, InsertOneResult, ObjectId, OptionalId, WithId } from 'mongodb';
+import { Collection } from 'mongodb';
 import { User } from '../types/User';
 
 export class UserRepository {

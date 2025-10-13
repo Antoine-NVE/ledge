@@ -1,4 +1,3 @@
-import z from 'zod';
 import { HttpError } from './HttpError';
 
 export abstract class InternalServerError extends HttpError {

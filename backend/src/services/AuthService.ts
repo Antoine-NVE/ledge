@@ -2,13 +2,9 @@ import {
     ExpiredRefreshTokenError,
     InvalidCredentialsError,
     InvalidRefreshTokenError,
-    RequiredRefreshTokenError,
 } from '../errors/UnauthorizedError';
-import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
-import { UserRepository } from '../repositories/UserRepository';
 import bcrypt from 'bcrypt';
 import { JwtService } from './JwtService';
-import { WithId } from 'mongodb';
 import { User } from '../types/User';
 import { RefreshToken } from '../types/RefreshToken';
 import { UserService } from './UserService';

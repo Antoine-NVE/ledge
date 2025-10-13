@@ -1,5 +1,4 @@
-import z, { flattenError } from 'zod';
-import { InvalidDataError } from '../errors/InternalServerError';
+import z from 'zod';
 
 export const envSchema = z.strictObject({
     NODE_ENV: z.enum(['development', 'production']),

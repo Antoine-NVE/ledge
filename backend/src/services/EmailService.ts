@@ -1,4 +1,4 @@
-import { Transporter, SentMessageInfo, createTransport } from 'nodemailer';
+import { Transporter, createTransport } from 'nodemailer';
 
 export class EmailService {
     private transporter: Transporter;

@@ -1,4 +1,4 @@
-import { Collection, ObjectId, OptionalId, WithId } from 'mongodb';
+import { Collection } from 'mongodb';
 import { RefreshToken } from '../types/RefreshToken';
 
 export class RefreshTokenRepository {

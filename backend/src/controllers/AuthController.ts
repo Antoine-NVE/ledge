@@ -1,14 +1,7 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcrypt';
 import { CookieService } from '../services/CookieService';
-import { JwtService } from '../services/JwtService';
 import { AuthService } from '../services/AuthService';
-import { UserRepository } from '../repositories/UserRepository';
-import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
-import { exit } from 'process';
 import { RequiredRefreshTokenError } from '../errors/UnauthorizedError';
-import { ValidationError } from '../errors/BadRequestError';
-import z from 'zod';
 import { clearUser } from '../utils/clear';
 import { parseSchema } from '../utils/schema';
 import { userLoginSchema, userRegisterSchema } from '../schemas/user';

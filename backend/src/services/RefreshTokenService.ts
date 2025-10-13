@@ -2,8 +2,6 @@ import { ObjectId } from 'mongodb';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { RefreshToken } from '../types/RefreshToken';
 import { RefreshTokenNotFoundError } from '../errors/NotFoundError';
-import { InvalidDataError } from '../errors/InternalServerError';
-import z from 'zod';
 import { generateToken } from '../utils/token';
 import { parseSchema } from '../utils/schema';
 import { refreshTokenSchema } from '../schemas/refresh-token';

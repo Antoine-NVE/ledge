@@ -2,7 +2,6 @@ import {
     sign,
     verify,
     Secret,
-    JwtPayload,
     SignOptions,
     VerifyOptions,
     TokenExpiredError,
