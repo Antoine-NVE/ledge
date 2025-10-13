@@ -4,13 +4,12 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test": "jest",
-        "start": "node dist/index.js",
-        "dev": "tsx watch --clear-screen=false src/index.ts",
-        "build": "rimraf dist && tsc",
-        "seed": "tsx src/__scripts__/seed.ts",
-        "lint": "eslint src",
-        "format": "prettier --write ."
+        "dev": "tsx watch ./src/index.ts",
+        "build": "rimraf ./dist && tsc",
+        "start": "node ./dist/index.js",
+        "format": "prettier --write .",
+        "lint": "eslint ./src",
+        "test": "jest"
     },
     "author": "",
     "license": "ISC",
