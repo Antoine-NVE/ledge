@@ -1,6 +1,5 @@
 import z from 'zod';
 import { HttpError } from './HttpError';
-import { FormatUtils } from '../utils/FormatUtils';
 
 export abstract class InternalServerError extends HttpError {
     constructor(message: string, errors?: object) {

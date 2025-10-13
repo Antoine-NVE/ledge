@@ -7,8 +7,8 @@ import { InvalidDataError, UndefinedUserError } from '../errors/InternalServerEr
 import { env } from '../config/env';
 import { UserSchema } from '../schemas/UserSchema';
 import { SecuritySchema } from '../schemas/SecuritySchema';
-import { FormatUtils } from '../utils/FormatUtils';
 import z from 'zod';
+import { clearUser } from '../utils/clear';
 
 export class UserController {
     constructor(
@@ -46,7 +46,7 @@ export class UserController {
         res.status(200).json({
             message: 'User retrieved successfully',
             data: {
-                user: FormatUtils.formatSafeUser(user),
+                user: clearUser(user),
             },
         });
     };

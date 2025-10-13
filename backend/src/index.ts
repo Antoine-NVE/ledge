@@ -9,7 +9,6 @@ import { UnauthorizedError } from './errors/UnauthorizedError';
 import { HttpError } from './errors/HttpError';
 import { env } from './config/env';
 import z from 'zod';
-import { FormatUtils } from './utils/FormatUtils';
 import { RouteNotFoundError } from './errors/NotFoundError';
 
 const app = express();

@@ -6,7 +6,6 @@ import { TransactionNotFoundError } from '../errors/NotFoundError';
 import { TransactionService } from '../services/TransactionService';
 import { TransactionSchema } from '../schemas/TransactionSchema';
 import { ValidationError } from '../errors/BadRequestError';
-import { FormatUtils } from '../utils/FormatUtils';
 import z from 'zod';
 
 export class TransactionController {

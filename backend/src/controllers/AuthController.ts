@@ -9,8 +9,8 @@ import { exit } from 'process';
 import { RequiredRefreshTokenError } from '../errors/UnauthorizedError';
 import { UserSchema } from '../schemas/UserSchema';
 import { ValidationError } from '../errors/BadRequestError';
-import { FormatUtils } from '../utils/FormatUtils';
 import z from 'zod';
+import { clearUser } from '../utils/clear';
 
 export class AuthController {
     constructor(
@@ -36,7 +36,7 @@ export class AuthController {
         res.status(201).json({
             message: 'User registered successfully',
             data: {
-                user: FormatUtils.formatSafeUser(user),
+                user: clearUser(user),
             },
         });
     };
@@ -52,7 +52,7 @@ export class AuthController {
         res.status(200).json({
             message: 'User logged in successfully',
             data: {
-                user: FormatUtils.formatSafeUser(user),
+                user: clearUser(user),
             },
         });
     };

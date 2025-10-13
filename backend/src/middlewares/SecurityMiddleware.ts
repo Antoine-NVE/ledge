@@ -15,7 +15,6 @@ import { TransactionService } from '../services/TransactionService';
 import { UserSchema } from '../schemas/UserSchema';
 import { TransactionSchema } from '../schemas/TransactionSchema';
 import { SecuritySchema } from '../schemas/SecuritySchema';
-import { FormatUtils } from '../utils/FormatUtils';
 import z from 'zod';
 
 declare module 'express-serve-static-core' {
