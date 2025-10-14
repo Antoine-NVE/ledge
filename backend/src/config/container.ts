@@ -46,7 +46,7 @@ const authService = new AuthService(
     passwordService,
 );
 
-const authController = new AuthController(authService);
+const authController = new AuthController(authService, userService);
 const userController = new UserController(userService);
 const transactionController = new TransactionController(transactionService);
 

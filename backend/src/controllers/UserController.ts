@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/UserService';
 import { UndefinedUserError } from '../errors/InternalServerError';
-import { clearUser } from '../utils/clear';
 import { parseSchema } from '../utils/schema';
 import { allowedOriginSchema, jwtSchema } from '../schemas/security';
 
@@ -44,7 +43,7 @@ export class UserController {
         res.status(200).json({
             message: 'User retrieved successfully',
             data: {
-                user: clearUser(user),
+                user: this.userService.removePasswordHash(user),
             },
         });
     };

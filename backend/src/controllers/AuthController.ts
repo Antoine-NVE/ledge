@@ -2,12 +2,15 @@ import { Request, Response } from 'express';
 import { CookieService } from '../services/CookieService';
 import { AuthService } from '../services/AuthService';
 import { RequiredRefreshTokenError } from '../errors/UnauthorizedError';
-import { clearUser } from '../utils/clear';
 import { parseSchema } from '../utils/schema';
 import { userLoginSchema, userRegisterSchema } from '../schemas/user';
+import { UserService } from '../services/UserService';
 
 export class AuthController {
-    constructor(private authService: AuthService) {}
+    constructor(
+        private authService: AuthService,
+        private userService: UserService,
+    ) {}
 
     register = async (req: Request, res: Response) => {
         const { email, password } = parseSchema(
@@ -29,7 +32,7 @@ export class AuthController {
         res.status(201).json({
             message: 'User registered successfully',
             data: {
-                user: clearUser(user),
+                user: this.userService.removePasswordHash(user),
             },
         });
     };
@@ -50,7 +53,7 @@ export class AuthController {
         res.status(200).json({
             message: 'User logged in successfully',
             data: {
-                user: clearUser(user),
+                user: this.userService.removePasswordHash(user),
             },
         });
     };
