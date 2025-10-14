@@ -10,6 +10,7 @@ import { EmailService } from '../services/EmailService';
 import { JwtService } from '../services/JwtService';
 import { PasswordService } from '../services/PasswordService';
 import { RefreshTokenService } from '../services/RefreshTokenService';
+import { TokenService } from '../services/TokenService';
 import { TransactionService } from '../services/TransactionService';
 import { UserService } from '../services/UserService';
 import { db } from './db';
@@ -26,6 +27,7 @@ const from = env.EMAIL_FROM;
 const jwtService = new JwtService(secret);
 const emailService = new EmailService(host, port, secure, { user, pass }, from);
 const passwordService = new PasswordService();
+const tokenService = new TokenService();
 
 const userRepository = new UserRepository(db.collection('users'));
 const refreshTokenRepository = new RefreshTokenRepository(
@@ -36,7 +38,10 @@ const transactionRepository = new TransactionRepository(
 );
 
 const userService = new UserService(jwtService, emailService, userRepository);
-const refreshTokenService = new RefreshTokenService(refreshTokenRepository);
+const refreshTokenService = new RefreshTokenService(
+    refreshTokenRepository,
+    tokenService,
+);
 const transactionService = new TransactionService(transactionRepository);
 
 const authService = new AuthService(

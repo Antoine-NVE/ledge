@@ -2,19 +2,22 @@ import { ObjectId } from 'mongodb';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { RefreshToken } from '../types/RefreshToken';
 import { RefreshTokenNotFoundError } from '../errors/NotFoundError';
-import { generateToken } from '../utils/token';
 import { parseSchema } from '../utils/schema';
 import { refreshTokenSchema } from '../schemas/refresh-token';
+import { TokenService } from './TokenService';
 
 export class RefreshTokenService {
     readonly TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-    constructor(private refreshTokenRepository: RefreshTokenRepository) {}
+    constructor(
+        private refreshTokenRepository: RefreshTokenRepository,
+        private tokenService: TokenService,
+    ) {}
 
     insertOne = async (userId: ObjectId): Promise<RefreshToken> => {
         const refreshToken = parseSchema(refreshTokenSchema, {
             _id: new ObjectId(),
-            token: generateToken(),
+            token: this.tokenService.generate(),
             expiresAt: new Date(Date.now() + this.TTL),
             userId,
             createdAt: new Date(),
