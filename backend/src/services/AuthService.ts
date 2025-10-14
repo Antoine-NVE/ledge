@@ -83,7 +83,9 @@ export class AuthService {
         if (refreshToken.expiresAt < new Date())
             throw new ExpiredRefreshTokenError();
 
-        refreshToken.expiresAt = new Date(Date.now() + RefreshTokenService.TTL);
+        refreshToken.expiresAt = new Date(
+            Date.now() + this.refreshTokenService.TTL,
+        );
         refreshToken = await this.refreshTokenService.updateOne(refreshToken);
 
         const accessToken = this.jwtService.signAccess(refreshToken.userId);

@@ -7,7 +7,7 @@ import { parseSchema } from '../utils/schema';
 import { refreshTokenSchema } from '../schemas/refresh-token';
 
 export class RefreshTokenService {
-    static readonly TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
+    readonly TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
 
     constructor(private refreshTokenRepository: RefreshTokenRepository) {}
 
@@ -15,7 +15,7 @@ export class RefreshTokenService {
         const refreshToken = parseSchema(refreshTokenSchema, {
             _id: new ObjectId(),
             token: generateToken(),
-            expiresAt: new Date(Date.now() + RefreshTokenService.TTL),
+            expiresAt: new Date(Date.now() + this.TTL),
             userId,
             createdAt: new Date(),
             updatedAt: null,
