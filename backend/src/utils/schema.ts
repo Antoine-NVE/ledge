@@ -2,7 +2,7 @@ import z from 'zod';
 import { ValidationError } from '../errors/BadRequestError';
 import { InvalidDataError } from '../errors/InternalServerError';
 
-const formatError = (error: z.ZodError): Record<string, string[]> => {
+export const formatError = (error: z.ZodError): Record<string, string[]> => {
     const { formErrors, fieldErrors } = z.flattenError(error);
 
     return formErrors.length > 0

@@ -1,5 +1,5 @@
 export const parseNumber = (value: string | undefined): number | undefined => {
-    if (value === undefined) return undefined;
+    if (value === undefined || value === '') return undefined;
     const number = Number(value);
     return isNaN(number) ? undefined : number;
 };
