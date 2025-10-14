@@ -3,7 +3,6 @@ import {
     InvalidCredentialsError,
     InvalidRefreshTokenError,
 } from '../errors/UnauthorizedError';
-import bcrypt from 'bcrypt';
 import { JwtService } from './JwtService';
 import { User } from '../types/User';
 import { RefreshToken } from '../types/RefreshToken';
