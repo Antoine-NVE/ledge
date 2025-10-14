@@ -7,7 +7,18 @@ const config: Config = {
     collectCoverage: true,
     coverageDirectory: 'coverage',
     coverageProvider: 'v8',
-    preset: 'ts-jest', // Added by me
+
+    // Added by me
+    preset: 'ts-jest',
+    collectCoverageFrom: [
+        './src/**/*.ts',
+        '!./src/__tests__/**',
+        '!./src/config/**',
+        '!./src/errors/**',
+        '!./src/routes/**',
+        '!./src/types/**',
+        '!./src/index.ts',
+    ],
 };
 
 export default config;
