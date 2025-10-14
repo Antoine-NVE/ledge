@@ -8,6 +8,7 @@ import { UserRepository } from '../repositories/UserRepository';
 import { AuthService } from '../services/AuthService';
 import { EmailService } from '../services/EmailService';
 import { JwtService } from '../services/JwtService';
+import { PasswordService } from '../services/PasswordService';
 import { RefreshTokenService } from '../services/RefreshTokenService';
 import { TransactionService } from '../services/TransactionService';
 import { UserService } from '../services/UserService';
@@ -24,6 +25,7 @@ const from = env.EMAIL_FROM;
 
 const jwtService = new JwtService(secret);
 const emailService = new EmailService(host, port, secure, { user, pass }, from);
+const passwordService = new PasswordService();
 
 const userRepository = new UserRepository(db.collection('users'));
 const refreshTokenRepository = new RefreshTokenRepository(
@@ -41,6 +43,7 @@ const authService = new AuthService(
     userService,
     jwtService,
     refreshTokenService,
+    passwordService,
 );
 
 const authController = new AuthController(authService);

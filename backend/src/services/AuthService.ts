@@ -13,12 +13,14 @@ import {
     RefreshTokenNotFoundError,
     UserNotFoundError,
 } from '../errors/NotFoundError';
+import { PasswordService } from './PasswordService';
 
 export class AuthService {
     constructor(
         private userService: UserService,
         private jwtService: JwtService,
         private refreshTokenService: RefreshTokenService,
+        private passwordService: PasswordService,
     ) {}
 
     register = async (
@@ -29,7 +31,8 @@ export class AuthService {
         accessToken: string;
         refreshToken: RefreshToken;
     }> => {
-        const passwordHash = await bcrypt.hash(password, 10);
+        const passwordHash = await this.passwordService.hash(password);
+
         const user = await this.userService.insertOne(email, passwordHash);
 
         const refreshToken = await this.refreshTokenService.insertOne(user._id);
@@ -55,7 +58,10 @@ export class AuthService {
                 throw err;
             });
 
-        const doesMatch = await bcrypt.compare(password, user.passwordHash);
+        const doesMatch = await this.passwordService.compare(
+            password,
+            user.passwordHash,
+        );
         if (!doesMatch) throw new InvalidCredentialsError();
 
         const refreshToken = await this.refreshTokenService.insertOne(user._id);
