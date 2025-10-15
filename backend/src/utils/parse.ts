@@ -1,5 +1,5 @@
 export const parseNumber = (value: string | undefined): number | undefined => {
-    if (value === undefined || value === '') return undefined;
+    if (value === '' || value === undefined) return undefined;
     const number = Number(value);
     return isNaN(number) ? undefined : number;
 };
@@ -14,6 +14,6 @@ export const parseBoolean = (
 };
 
 export const parseArray = (value: string | undefined): string[] | undefined => {
-    if (value === undefined) return undefined;
+    if (value === '' || value === undefined) return undefined;
     return value.split(',');
 };
