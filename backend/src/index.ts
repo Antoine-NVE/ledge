@@ -7,6 +7,8 @@ import userRoutes from './routes/user';
 import { HttpError } from './errors/HttpError';
 import { env } from './config/env';
 import { RouteNotFoundError } from './errors/NotFoundError';
+import rateLimit from 'express-rate-limit';
+import { TooManyRequestsError } from './errors/TooManyRequestsError';
 
 const app = express();
 app.use(express.json());
@@ -16,6 +18,16 @@ app.use(
     cors({
         origin: env.ALLOWED_ORIGINS,
         credentials: true,
+    }),
+);
+
+app.use(
+    rateLimit({
+        windowMs: 60 * 1000,
+        max: 100,
+        handler: () => {
+            throw new TooManyRequestsError();
+        },
     }),
 );
 
