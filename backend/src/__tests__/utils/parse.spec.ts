@@ -1,7 +1,7 @@
 import { parseArray, parseBoolean, parseNumber } from '../../utils/parse';
 
 describe('parse utils', () => {
-    describe('parseNumber()', () => {
+    describe('parseNumber', () => {
         it('should parse a valid number', () => {
             expect(parseNumber('3')).toBe(3);
             expect(parseNumber('3.14')).toBe(3.14);
