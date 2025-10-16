@@ -1,5 +1,6 @@
 import z from 'zod';
-import { formatError, parseSchema } from '../../utils/schema';
+import { formatError } from '../../utils/schema';
+import * as schemaUtils from '../../utils/schema';
 import { ValidationError } from '../../errors/BadRequestError';
 import { InvalidDataError } from '../../errors/InternalServerError';
 
@@ -12,15 +13,18 @@ describe('schema utils', () => {
         'Error 4',
     );
 
+    const extraKey = {
+        field3: 'Extra',
+    };
+
     const validData = {
         field1: 'Valid',
         field2: 5,
     };
 
     const validDataWithExtraKey = {
-        field1: 'Valid',
-        field2: 5,
-        field3: 'Extra',
+        ...validData,
+        ...extraKey,
     };
 
     const invalidData = {
@@ -29,9 +33,8 @@ describe('schema utils', () => {
     };
 
     const invalidDataWithExtraKey = {
-        field1: 'Invalid',
-        field2: 4,
-        field3: 'Extra',
+        ...invalidData,
+        ...extraKey,
     };
 
     describe('formatError', () => {
@@ -64,24 +67,36 @@ describe('schema utils', () => {
     });
 
     describe('parseSchema', () => {
+        beforeEach(() => {
+            jest.spyOn(schemaUtils, 'formatError').mockReturnValue({
+                mocked: ['fake error'],
+            });
+        });
+
+        afterEach(() => {
+            jest.resetAllMocks();
+        });
+
         it('should return data if valid', () => {
-            expect(parseSchema(schema, validData)).toEqual(validData);
+            expect(schemaUtils.parseSchema(schema, validData)).toEqual(
+                validData,
+            );
         });
 
         it('should throw a ValidationError if asked to', () => {
-            expect(() => parseSchema(schema, invalidData, true)).toThrow(
-                ValidationError,
-            );
+            expect(() =>
+                schemaUtils.parseSchema(schema, invalidData, true),
+            ).toThrow(ValidationError);
         });
 
         it('should throw a InvalidDataError if asked to', () => {
-            expect(() => parseSchema(schema, invalidData, false)).toThrow(
-                InvalidDataError,
-            );
+            expect(() =>
+                schemaUtils.parseSchema(schema, invalidData, false),
+            ).toThrow(InvalidDataError);
         });
 
         it('should throw a InvalidDataError if not specified', () => {
-            expect(() => parseSchema(schema, invalidData)).toThrow(
+            expect(() => schemaUtils.parseSchema(schema, invalidData)).toThrow(
                 InvalidDataError,
             );
         });
