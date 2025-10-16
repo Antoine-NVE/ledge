@@ -30,8 +30,9 @@ describe('transaction schemas', () => {
         });
 
         it('should refuse extra key', () => {
-            expect(() => transactionSchema.parse(validDataWithExtraKey))
-                .toThrow;
+            expect(() =>
+                transactionSchema.parse(validDataWithExtraKey),
+            ).toThrow();
         });
     });
 
