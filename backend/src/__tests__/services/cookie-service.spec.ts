@@ -1,3 +1,4 @@
+import { Request, Response } from 'express';
 import { CookieService } from '../../services/CookieService';
 
 describe('CookieService', () => {
@@ -7,7 +8,7 @@ describe('CookieService', () => {
     let clearSpy: jest.SpyInstance;
 
     beforeEach(() => {
-        cookieService = new CookieService({} as any, {} as any);
+        cookieService = new CookieService({} as unknown as Request, {} as unknown as Response);
         setSpy = jest.spyOn(cookieService as any, 'set').mockImplementation();
         getSpy = jest.spyOn(cookieService as any, 'get').mockImplementation();
         clearSpy = jest
