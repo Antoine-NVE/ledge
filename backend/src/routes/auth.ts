@@ -1,8 +1,9 @@
 import express from 'express';
-
-import { login, logout, refresh, register } from '../controllers/auth';
+import { container } from '../config/container';
 
 const router = express.Router();
+
+const { register, login, refresh, logout } = container.authController;
 
 router.post('/register', register);
 router.post('/login', login);

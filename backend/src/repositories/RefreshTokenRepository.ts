@@ -1,20 +1,29 @@
-import { Model, Types } from 'mongoose';
-import { RefreshToken, RefreshTokenDocument } from '../models/RefreshToken';
+import { Collection } from 'mongodb';
+import { RefreshToken } from '../types/RefreshToken';
 
-export default class RefreshTokenRepository {
-    constructor(private refreshTokenModel: Model<RefreshTokenDocument>) {}
+export class RefreshTokenRepository {
+    constructor(private refreshTokenCollection: Collection<RefreshToken>) {}
 
-    async create(data: Partial<RefreshToken>): Promise<RefreshTokenDocument> {
-        // We do not use refreshTokenModel.create to ensure that pre-save hooks are executed
-        const refreshToken = new this.refreshTokenModel(data);
-        return await refreshToken.save();
-    }
+    insertOne = async (refreshToken: RefreshToken): Promise<void> => {
+        await this.refreshTokenCollection.insertOne(refreshToken);
+    };
 
-    async findByToken(token: string): Promise<RefreshTokenDocument | null> {
-        return await this.refreshTokenModel.findOne({ token });
-    }
+    findOne = async <K extends keyof RefreshToken>(
+        key: K,
+        value: RefreshToken[K],
+    ): Promise<RefreshToken | null> => {
+        return await this.refreshTokenCollection.findOne({ [key]: value });
+    };
 
-    async delete(id: Types.ObjectId): Promise<RefreshTokenDocument | null> {
-        return await this.refreshTokenModel.findByIdAndDelete(id);
-    }
+    updateOne = async (refreshToken: RefreshToken): Promise<void> => {
+        const { _id, ...rest } = refreshToken;
+        await this.refreshTokenCollection.updateOne({ _id }, { $set: rest });
+    };
+
+    deleteOne = async <K extends keyof RefreshToken>(
+        key: K,
+        value: RefreshToken[K],
+    ): Promise<void> => {
+        await this.refreshTokenCollection.deleteOne({ [key]: value });
+    };
 }

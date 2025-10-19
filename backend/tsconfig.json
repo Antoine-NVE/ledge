@@ -1,12 +1,15 @@
+// npx tsc --init
+
 {
     "compilerOptions": {
-        "target": "ES2024",
+        "target": "es2016",
         "module": "commonjs",
-        "rootDir": "src",
-        "outDir": "dist",
-        "strict": true,
+        "rootDir": "./src", // By default, commented with ./
+        "outDir": "./dist", // Same here
         "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "strict": true,
         "skipLibCheck": true
     },
-    "include": ["src"]
+    "include": ["./src"] // Added by me
 }

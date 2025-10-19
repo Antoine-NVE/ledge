@@ -40,7 +40,7 @@ const TransactionListSection = ({ transactions, total, isIncome, onEdit, onDelet
                         </div>
                         <p className={`font-bold ${valueColor}`}>
                             {isIncome ? '' : '- '}
-                            {(transaction.value / 100).toFixed(2)} €
+                            {transaction.value} €
                         </p>
                         <p className="text-gray-500 text-sm">
                             Added on {new Date(transaction.createdAt).toLocaleDateString('fr-FR')} at{' '}
@@ -49,7 +49,7 @@ const TransactionListSection = ({ transactions, total, isIncome, onEdit, onDelet
                                 minute: '2-digit',
                             })}
                         </p>
-                        {transaction.updatedAt !== transaction.createdAt && (
+                        {transaction.updatedAt && (
                             <p className="text-gray-500 text-sm">
                                 Updated on {new Date(transaction.updatedAt).toLocaleDateString('fr-FR')} at{' '}
                                 {new Date(transaction.updatedAt).toLocaleTimeString('fr-FR', {

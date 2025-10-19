@@ -1,28 +1,36 @@
-import { Model, Types } from 'mongoose';
-import { Transaction, TransactionDocument } from '../models/Transaction';
+import { Collection } from 'mongodb';
+import { Transaction } from '../types/Transaction';
 
-export default class TransactionRepository {
-    constructor(private transactionModel: Model<TransactionDocument>) {}
+export class TransactionRepository {
+    constructor(private transactionCollection: Collection<Transaction>) {}
 
-    async create(data: Partial<Transaction>): Promise<TransactionDocument> {
-        // We do not use transactionModel.create to ensure that pre-save hooks are executed
-        const transaction = new this.transactionModel(data);
-        return await transaction.save();
-    }
+    insertOne = async (transaction: Transaction): Promise<void> => {
+        await this.transactionCollection.insertOne(transaction);
+    };
 
-    async findById(id: Types.ObjectId): Promise<TransactionDocument | null> {
-        return await this.transactionModel.findById(id);
-    }
+    find = async <K extends keyof Transaction>(
+        key: K,
+        value: Transaction[K],
+    ): Promise<Transaction[]> => {
+        return this.transactionCollection.find({ [key]: value }).toArray();
+    };
 
-    async update(id: Types.ObjectId, data: Partial<Transaction>): Promise<TransactionDocument | null> {
-        // We do not use findByIdAndUpdate to ensure that pre-save hooks are executed
-        const transaction = await this.transactionModel.findById(id);
-        if (!transaction) return null;
-        Object.assign(transaction, data);
-        return await transaction.save();
-    }
+    findOne = async <K extends keyof Transaction>(
+        key: K,
+        value: Transaction[K],
+    ): Promise<Transaction | null> => {
+        return this.transactionCollection.findOne({ [key]: value });
+    };
 
-    async delete(id: Types.ObjectId): Promise<TransactionDocument | null> {
-        return await this.transactionModel.findByIdAndDelete(id);
-    }
+    updateOne = async (transaction: Transaction): Promise<void> => {
+        const { _id, ...rest } = transaction;
+        await this.transactionCollection.updateOne({ _id }, { $set: rest });
+    };
+
+    deleteOne = async <K extends keyof Transaction>(
+        key: K,
+        value: Transaction[K],
+    ): Promise<void> => {
+        await this.transactionCollection.deleteOne({ [key]: value });
+    };
 }

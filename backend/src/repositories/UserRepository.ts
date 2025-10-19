@@ -1,28 +1,22 @@
-import { Model, Types } from 'mongoose';
-import { User, UserDocument } from '../models/User';
+import { Collection } from 'mongodb';
+import { User } from '../types/User';
 
-export default class UserRepository {
-    constructor(private userModel: Model<UserDocument>) {}
+export class UserRepository {
+    constructor(private userCollection: Collection<User>) {}
 
-    async create(data: Partial<User>): Promise<UserDocument> {
-        // We do not use userModel.create to ensure that pre-save hooks are executed
-        const user = new this.userModel(data);
-        return await user.save();
-    }
+    insertOne = async (user: User): Promise<void> => {
+        await this.userCollection.insertOne(user);
+    };
 
-    async findById(id: Types.ObjectId): Promise<UserDocument | null> {
-        return await this.userModel.findById(id);
-    }
+    findOne = async <K extends keyof User>(
+        key: K,
+        value: User[K],
+    ): Promise<User | null> => {
+        return await this.userCollection.findOne({ [key]: value });
+    };
 
-    async update(id: Types.ObjectId, data: Partial<User>): Promise<UserDocument | null> {
-        // We do not use findByIdAndUpdate to ensure that pre-save hooks are executed
-        const user = await this.userModel.findById(id);
-        if (!user) return null;
-        Object.assign(user, data);
-        return await user.save();
-    }
-
-    async delete(id: Types.ObjectId): Promise<UserDocument | null> {
-        return await this.userModel.findByIdAndDelete(id);
-    }
+    updateOne = async (user: User): Promise<void> => {
+        const { _id, ...rest } = user;
+        await this.userCollection.updateOne({ _id }, { $set: rest });
+    };
 }

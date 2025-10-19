@@ -73,7 +73,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
             return;
         }
 
-        const value = Math.round(Number(form.value) * 100);
+        const value = Number(form.value);
 
         if (initialTransaction) {
             const transaction: Transaction = {
@@ -180,7 +180,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
             initialTransaction
                 ? {
                       name: initialTransaction.name,
-                      value: (initialTransaction.value / 100).toFixed(2),
+                      value: String(initialTransaction.value),
                       isIncome: initialTransaction.isIncome,
                       isRecurring: initialTransaction.isRecurring,
                   }

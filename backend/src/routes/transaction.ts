@@ -1,20 +1,21 @@
 import express from 'express';
-import authenticate from '../middlewares/authenticate';
-import {
-    createTransaction,
-    getTransactions,
-    getTransaction,
-    removeTransaction,
-    updateTransaction,
-} from '../controllers/transaction';
-import authorizeTransactionAccess from '../middlewares/authorizeTransactionAccess';
+import { container } from '../config/container';
 
 const router = express.Router();
 
-router.post('/', authenticate, createTransaction);
-router.get('/', authenticate, getTransactions);
-router.get('/:id', authenticate, authorizeTransactionAccess, getTransaction);
-router.put('/:id', authenticate, authorizeTransactionAccess, updateTransaction);
-router.delete('/:id', authenticate, authorizeTransactionAccess, removeTransaction);
+const { authenticateUser, authorizeTransaction } = container.securityMiddleware;
+const {
+    create,
+    readMany,
+    read,
+    update,
+    delete: remove,
+} = container.transactionController;
+
+router.post('/', authenticateUser, create);
+router.get('/', authenticateUser, readMany);
+router.get('/:id', authenticateUser, authorizeTransaction, read);
+router.put('/:id', authenticateUser, authorizeTransaction, update);
+router.delete('/:id', authenticateUser, authorizeTransaction, remove);
 
 export default router;
