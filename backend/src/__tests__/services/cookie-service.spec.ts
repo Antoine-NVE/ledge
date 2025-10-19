@@ -8,10 +8,16 @@ describe('CookieService', () => {
     let clearSpy: jest.SpyInstance;
 
     beforeEach(() => {
-        cookieService = new CookieService({} as unknown as Request, {} as unknown as Response);
+        cookieService = new CookieService(
+            {} as unknown as Request,
+            {} as unknown as Response,
+        );
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         setSpy = jest.spyOn(cookieService as any, 'set').mockImplementation();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         getSpy = jest.spyOn(cookieService as any, 'get').mockImplementation();
         clearSpy = jest
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .spyOn(cookieService as any, 'clear')
             .mockImplementation();
     });

@@ -32,6 +32,7 @@ describe('EmailService', () => {
 
     describe('sendVerification', () => {
         it('should call sendMail with correct params', async () => {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             jest.spyOn(emailService as any, 'send').mockResolvedValue({});
 
             const to = 'example@example.com';
