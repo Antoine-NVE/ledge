@@ -1,0 +1,27 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "${FRONTEND_PORT}:80"
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "${BACKEND_PORT}:3000"
+    env_file:
+    - ./backend/.env # .env is not accessible in the second stage of the build for security purpose
+    depends_on:
+      - database
+
+  database:
+    image: mongo:8.0.8
+    ports:
+      - "${DATABASE_PORT}:27017"
+    volumes:
+      - ./data/database:/data/db
