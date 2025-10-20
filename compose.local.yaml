@@ -26,6 +26,7 @@ services:
       - /app/node_modules
     depends_on:
       - database
+      - smtp
 
   database:
     container_name: database
@@ -39,8 +40,9 @@ services:
     container_name: smtp
     image: axllent/mailpit
     ports:
+      # Mailpit SMTP port is 1025, no need to expose it
       - "${MAILPIT_PORT}:8025" # Mailpit web interface
-      # Note: Mailpit SMTP port is 1025 by default, no need to expose it
+    environment:
+      MP_DATABASE: /data/smtp.db # Use persistent storage
     volumes:
-      - ./data/mailpit:/data
-    command: ["--database", "/data/mailpit.db"] # Use persistent storage for Mailpit
+      - ./data/smtp:/data
