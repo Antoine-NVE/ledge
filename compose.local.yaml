@@ -1,6 +1,5 @@
 services:
   frontend:
-    container_name: frontend
     build:
       context: ./frontend
       dockerfile: Dockerfile.local
@@ -15,7 +14,6 @@ services:
       - backend
 
   backend:
-    container_name: backend
     build:
       context: ./backend
       dockerfile: Dockerfile.local
@@ -29,7 +27,6 @@ services:
       - smtp
 
   database:
-    container_name: database
     image: mongo:8.0.8
     ports:
       - "${DATABASE_PORT}:27017"
@@ -37,7 +34,6 @@ services:
       - ./data/database:/data/db
 
   smtp:
-    container_name: smtp
     image: axllent/mailpit
     ports:
       # Mailpit SMTP port is 1025, no need to expose it
