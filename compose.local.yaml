@@ -1,0 +1,43 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.local
+    ports:
+      - "${FRONTEND_DEV_PORT}:5173"
+      - "${FRONTEND_PREVIEW_PORT}:4173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.local
+    ports:
+      - "${BACKEND_PORT}:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    depends_on:
+      - database
+      - smtp
+
+  database:
+    image: mongo:8.0.8
+    ports:
+      - "${DATABASE_PORT}:27017"
+    volumes:
+      - ./data/database:/data/db
+
+  smtp:
+    image: axllent/mailpit
+    ports:
+      # Mailpit SMTP port is 1025, no need to expose it
+      - "${SMTP_PORT}:8025" # Mailpit web interface
+    environment:
+      MP_DATABASE: /data/smtp.db # Use persistent storage
+    volumes:
+      - ./data/smtp:/data

@@ -8,8 +8,6 @@ dotenv.config();
 export const env = parseSchema(envSchema, {
     NODE_ENV: process.env.NODE_ENV,
 
-    DATABASE_SERVICE: process.env.DATABASE_SERVICE,
-
     JWT_SECRET: process.env.JWT_SECRET,
 
     ALLOWED_ORIGINS: parseArray(process.env.ALLOWED_ORIGINS),

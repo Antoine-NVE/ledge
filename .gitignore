@@ -1,7 +1,5 @@
 /data/
 
 /compose.override.yaml
-/compose.dev.yaml
-/compose.prod.yaml
 
 /.env

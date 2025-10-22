@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package*.json ./
 
-RUN npm install
+RUN npm ci
 
 COPY . .
 
@@ -15,8 +15,10 @@ FROM node:22.18.0
 
 WORKDIR /app
 
-COPY --from=build /app/package*.json ./
-COPY --from=build /app/node_modules ./node_modules
+COPY package*.json ./
+
+RUN npm ci --omit=dev
+
 COPY --from=build /app/dist ./dist
 
 EXPOSE 3000
