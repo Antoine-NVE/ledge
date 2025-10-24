@@ -5,6 +5,7 @@ import { parseSchema } from '../utils/schema-utils';
 import { userLoginSchema, userRegisterSchema } from '../schemas/user-schemas';
 import { UserService } from '../services/user-service';
 import { UnauthorizedError } from '../errors/unauthorized-error';
+import { removePasswordHash } from '../utils/clean-utils';
 
 export class AuthController {
     constructor(
@@ -32,7 +33,7 @@ export class AuthController {
         res.status(201).json({
             message: 'User registered successfully',
             data: {
-                user: this.userService.removePasswordHash(user),
+                user: removePasswordHash(user),
             },
         });
     };
@@ -53,7 +54,7 @@ export class AuthController {
         res.status(200).json({
             message: 'User logged in successfully',
             data: {
-                user: this.userService.removePasswordHash(user),
+                user: removePasswordHash(user),
             },
         });
     };

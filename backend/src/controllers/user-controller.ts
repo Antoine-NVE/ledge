@@ -3,6 +3,7 @@ import { UserService } from '../services/user-service';
 import { parseSchema } from '../utils/schema-utils';
 import { allowedOriginSchema, jwtSchema } from '../schemas/security-schemas';
 import { InternalServerError } from '../errors/internal-server-error';
+import { removePasswordHash } from '../utils/clean-utils';
 
 export class UserController {
     constructor(private userService: UserService) {}
@@ -43,7 +44,7 @@ export class UserController {
         res.status(200).json({
             message: 'User retrieved successfully',
             data: {
-                user: this.userService.removePasswordHash(user),
+                user: removePasswordHash(user),
             },
         });
     };

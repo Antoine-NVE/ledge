@@ -168,12 +168,4 @@ describe('UserService', () => {
             expect(result).toEqual(user);
         });
     });
-
-    describe('removePasswordHash', () => {
-        it('should return safeUser', () => {
-            const result = userService.removePasswordHash(user);
-
-            expect(result).not.toContain(passwordHash);
-        });
-    });
 });
