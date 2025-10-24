@@ -1,6 +1,6 @@
 import z from 'zod';
-import { BadRequestError } from '../errors/BadRequestError';
-import { InternalServerError } from '../errors/InternalServerError';
+import { BadRequestError } from '../errors/bad-request-error';
+import { InternalServerError } from '../errors/internal-server-error';
 
 export const formatError = (error: z.ZodError): Record<string, string[]> => {
     const { formErrors, fieldErrors } = z.flattenError(error);

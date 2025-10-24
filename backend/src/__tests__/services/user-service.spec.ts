@@ -1,14 +1,14 @@
 import { ObjectId } from 'mongodb';
-import { UserRepository } from '../../repositories/UserRepository';
-import { EmailService } from '../../services/EmailService';
-import { JwtService } from '../../services/JwtService';
-import { UserService } from '../../services/UserService';
-import { parseSchema } from '../../utils/schema';
-import { User } from '../../types/User';
-import { objectIdSchema } from '../../schemas/security';
-import { userSchema } from '../../schemas/user';
+import { UserRepository } from '../../repositories/user-repository';
+import { EmailService } from '../../services/email-service';
+import { JwtService } from '../../services/jwt-service';
+import { UserService } from '../../services/user-service';
+import { parseSchema } from '../../utils/schema-utils';
+import { User } from '../../types/user-type';
+import { objectIdSchema } from '../../schemas/security-schemas';
+import { userSchema } from '../../schemas/user-schemas';
 
-jest.mock('../../utils/schema', () => ({
+jest.mock('../../utils/schema-utils', () => ({
     parseSchema: jest.fn(),
 }));
 

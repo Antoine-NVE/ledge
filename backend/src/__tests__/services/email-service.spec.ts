@@ -1,4 +1,4 @@
-import { EmailService } from '../../services/EmailService';
+import { EmailService } from '../../services/email-service';
 import nodemailer from 'nodemailer';
 
 jest.mock('nodemailer', () => ({

@@ -1,15 +1,15 @@
 import { ObjectId } from 'mongodb';
-import { RefreshTokenRepository } from '../../repositories/RefreshTokenRepository';
-import { RefreshTokenService } from '../../services/RefreshTokenService';
-import { refreshTokenSchema } from '../../schemas/refresh-token';
-import { parseSchema } from '../../utils/schema';
-import { RefreshToken } from '../../types/RefreshToken';
+import { RefreshTokenRepository } from '../../repositories/refresh-token-repository';
+import { RefreshTokenService } from '../../services/refresh-token-service';
+import { refreshTokenSchema } from '../../schemas/refresh-token-schemas';
+import { parseSchema } from '../../utils/schema-utils';
+import { RefreshToken } from '../../types/refresh-token-type';
 
 const userId = new ObjectId();
 const token = 'token';
 const refreshToken = {} as unknown as RefreshToken;
 
-jest.mock('../../utils/schema', () => ({
+jest.mock('../../utils/schema-utils', () => ({
     parseSchema: jest.fn(),
 }));
 

@@ -1,5 +1,5 @@
 import { Collection } from 'mongodb';
-import { User } from '../types/User';
+import { User } from '../types/user-type';
 
 export class UserRepository {
     constructor(private userCollection: Collection<User>) {}

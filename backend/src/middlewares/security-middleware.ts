@@ -1,15 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
-import { JwtService } from '../services/JwtService';
-import { CookieService } from '../services/CookieService';
-import { User } from '../types/User';
-import { Transaction } from '../types/Transaction';
-import { UserService } from '../services/UserService';
-import { TransactionService } from '../services/TransactionService';
-import { parseSchema } from '../utils/schema';
-import { objectIdSchema } from '../schemas/security';
-import { UnauthorizedError } from '../errors/UnauthorizedError';
-import { InternalServerError } from '../errors/InternalServerError';
-import { ForbiddenError } from '../errors/ForbiddenError';
+import { JwtService } from '../services/jwt-service';
+import { CookieService } from '../services/cookie-service';
+import { User } from '../types/user-type';
+import { Transaction } from '../types/transaction-type';
+import { UserService } from '../services/user-service';
+import { TransactionService } from '../services/transaction-service';
+import { parseSchema } from '../utils/schema-utils';
+import { objectIdSchema } from '../schemas/security-schemas';
+import { UnauthorizedError } from '../errors/unauthorized-error';
+import { InternalServerError } from '../errors/internal-server-error';
+import { ForbiddenError } from '../errors/forbidden-error';
 
 declare module 'express-serve-static-core' {
     interface Request {

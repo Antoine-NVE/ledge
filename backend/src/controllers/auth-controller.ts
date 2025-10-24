@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { CookieService } from '../services/CookieService';
-import { AuthService } from '../services/AuthService';
-import { parseSchema } from '../utils/schema';
-import { userLoginSchema, userRegisterSchema } from '../schemas/user';
-import { UserService } from '../services/UserService';
-import { UnauthorizedError } from '../errors/UnauthorizedError';
+import { CookieService } from '../services/cookie-service';
+import { AuthService } from '../services/auth-service';
+import { parseSchema } from '../utils/schema-utils';
+import { userLoginSchema, userRegisterSchema } from '../schemas/user-schemas';
+import { UserService } from '../services/user-service';
+import { UnauthorizedError } from '../errors/unauthorized-error';
 
 export class AuthController {
     constructor(

@@ -1,4 +1,4 @@
-import { HttpError } from './HttpError';
+import { HttpError } from './http-error';
 
 export class TooManyRequestsError extends HttpError {
     constructor(

@@ -1,4 +1,4 @@
-import { parseArray, parseBoolean, parseNumber } from '../../utils/parse';
+import { parseArray, parseBoolean, parseNumber } from '../../utils/parse-utils';
 
 describe('parse utils', () => {
     describe('parseNumber', () => {

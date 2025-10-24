@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { CookieService } from '../../services/CookieService';
+import { CookieService } from '../../services/cookie-service';
 
 describe('CookieService', () => {
     let cookieService: CookieService;

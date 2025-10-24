@@ -3,7 +3,7 @@ import {
     transactionCreateSchema,
     transactionSchema,
     transactionUpdateSchema,
-} from '../../schemas/transaction';
+} from '../../schemas/transaction-schemas';
 
 describe('transaction schemas', () => {
     describe('transactionSchema', () => {

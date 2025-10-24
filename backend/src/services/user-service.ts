@@ -1,14 +1,14 @@
-import { UserRepository } from '../repositories/UserRepository';
-import { User } from '../types/User';
-import { EmailService } from './EmailService';
-import { JwtService } from './JwtService';
+import { UserRepository } from '../repositories/user-repository';
+import { User } from '../types/user-type';
+import { EmailService } from './email-service';
+import { JwtService } from './jwt-service';
 import { MongoServerError, ObjectId } from 'mongodb';
-import { parseSchema } from '../utils/schema';
-import { objectIdSchema } from '../schemas/security';
-import { userSchema } from '../schemas/user';
-import { ConflictError } from '../errors/ConflictError';
-import { TooManyRequestsError } from '../errors/TooManyRequestsError';
-import { NotFoundError } from '../errors/NotFoundError';
+import { parseSchema } from '../utils/schema-utils';
+import { objectIdSchema } from '../schemas/security-schemas';
+import { userSchema } from '../schemas/user-schemas';
+import { ConflictError } from '../errors/conflict-error';
+import { TooManyRequestsError } from '../errors/too-many-requests-error';
+import { NotFoundError } from '../errors/not-found-error';
 
 export class UserService {
     constructor(

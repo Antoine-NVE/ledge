@@ -1,9 +1,9 @@
 import { ObjectId } from 'mongodb';
-import { parseSchema } from '../../utils/schema';
-import { Transaction } from '../../types/Transaction';
-import { TransactionService } from '../../services/TransactionService';
-import { TransactionRepository } from '../../repositories/TransactionRepository';
-import { transactionSchema } from '../../schemas/transaction';
+import { parseSchema } from '../../utils/schema-utils';
+import { Transaction } from '../../types/transaction-type';
+import { TransactionService } from '../../services/transaction-service';
+import { TransactionRepository } from '../../repositories/transaction-repository';
+import { transactionSchema } from '../../schemas/transaction-schemas';
 
 const transactionId = new ObjectId();
 const month = '2025-10';
@@ -15,7 +15,7 @@ const userId = new ObjectId();
 const transaction = {} as unknown as Transaction;
 const transactions = [transaction];
 
-jest.mock('../../utils/schema', () => ({
+jest.mock('../../utils/schema-utils', () => ({
     parseSchema: jest.fn(),
 }));
 

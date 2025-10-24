@@ -1,9 +1,9 @@
 import { ObjectId } from 'mongodb';
-import { AuthService } from '../../services/AuthService';
-import { UserService } from '../../services/UserService';
-import { JwtService } from '../../services/JwtService';
-import { RefreshTokenService } from '../../services/RefreshTokenService';
-import { PasswordService } from '../../services/PasswordService';
+import { AuthService } from '../../services/auth-service';
+import { UserService } from '../../services/user-service';
+import { JwtService } from '../../services/jwt-service';
+import { RefreshTokenService } from '../../services/refresh-token-service';
+import { PasswordService } from '../../services/password-service';
 
 const userId = new ObjectId();
 const email = 'test@example.com';

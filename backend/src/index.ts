@@ -1,14 +1,14 @@
 import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import authRoutes from './routes/auth';
-import transactionRoutes from './routes/transaction';
-import userRoutes from './routes/user';
-import { HttpError } from './errors/HttpError';
+import authRoutes from './routes/auth-routes';
+import transactionRoutes from './routes/transaction-routes';
+import userRoutes from './routes/user-routes';
+import { HttpError } from './errors/http-error';
 import { env } from './config/env';
 import rateLimit from 'express-rate-limit';
-import { TooManyRequestsError } from './errors/TooManyRequestsError';
-import { NotFoundError } from './errors/NotFoundError';
+import { TooManyRequestsError } from './errors/too-many-requests-error';
+import { NotFoundError } from './errors/not-found-error';
 
 const app = express();
 app.use(express.json());

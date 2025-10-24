@@ -1,4 +1,4 @@
-import { envSchema } from '../../schemas/config';
+import { envSchema } from '../../schemas/config-schemas';
 
 describe('config schemas', () => {
     describe('envSchema', () => {

@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { refreshTokenSchema } from '../../schemas/refresh-token';
+import { refreshTokenSchema } from '../../schemas/refresh-token-schemas';
 
 describe('refresh token schemas', () => {
     describe('refreshTokenSchema', () => {

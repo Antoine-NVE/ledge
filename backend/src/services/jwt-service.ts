@@ -8,8 +8,8 @@ import {
     NotBeforeError,
 } from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
-import { Payload } from '../types/Payload';
-import { UnauthorizedError } from '../errors/UnauthorizedError';
+import { Payload } from '../types/payload-type';
+import { UnauthorizedError } from '../errors/unauthorized-error';
 
 export class JwtService {
     constructor(private secret: Secret) {}

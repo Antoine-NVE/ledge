@@ -1,8 +1,8 @@
 import z from 'zod';
-import { formatError } from '../../utils/schema';
-import * as schemaUtils from '../../utils/schema';
-import { BadRequestError } from '../../errors/BadRequestError';
-import { InternalServerError } from '../../errors/InternalServerError';
+import { formatError } from '../../utils/schema-utils';
+import * as schemaUtils from '../../utils/schema-utils';
+import { BadRequestError } from '../../errors/bad-request-error';
+import { InternalServerError } from '../../errors/internal-server-error';
 
 describe('schema utils', () => {
     const schema = z.strictObject(

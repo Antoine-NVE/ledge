@@ -1,4 +1,4 @@
-import { PasswordService } from '../../services/PasswordService';
+import { PasswordService } from '../../services/password-service';
 import bcrypt from 'bcrypt';
 
 describe('PasswordService', () => {

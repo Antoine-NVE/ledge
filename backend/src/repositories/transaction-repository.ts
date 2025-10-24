@@ -1,5 +1,5 @@
 import { Collection } from 'mongodb';
-import { Transaction } from '../types/Transaction';
+import { Transaction } from '../types/transaction-type';
 
 export class TransactionRepository {
     constructor(private transactionCollection: Collection<Transaction>) {}

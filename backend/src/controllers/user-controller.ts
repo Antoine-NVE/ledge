@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { UserService } from '../services/UserService';
-import { parseSchema } from '../utils/schema';
-import { allowedOriginSchema, jwtSchema } from '../schemas/security';
-import { InternalServerError } from '../errors/InternalServerError';
+import { UserService } from '../services/user-service';
+import { parseSchema } from '../utils/schema-utils';
+import { allowedOriginSchema, jwtSchema } from '../schemas/security-schemas';
+import { InternalServerError } from '../errors/internal-server-error';
 
 export class UserController {
     constructor(private userService: UserService) {}
