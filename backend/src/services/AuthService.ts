@@ -70,7 +70,7 @@ export class AuthService {
             .findOneByToken(token)
             .catch((err) => {
                 if (err instanceof NotFoundError)
-                    throw new UnauthorizedError('Invalid credentials');
+                    throw new UnauthorizedError('Invalid refresh token');
                 throw err;
             });
         if (refreshToken.expiresAt < new Date())
