@@ -1,8 +1,8 @@
 import z from 'zod';
 import { formatError } from '../../utils/schema';
 import * as schemaUtils from '../../utils/schema';
-import { ValidationError } from '../../errors/BadRequestError';
-import { InvalidDataError } from '../../errors/InternalServerError';
+import { BadRequestError } from '../../errors/BadRequestError';
+import { InternalServerError } from '../../errors/InternalServerError';
 
 describe('schema utils', () => {
     const schema = z.strictObject(
@@ -83,21 +83,21 @@ describe('schema utils', () => {
             );
         });
 
-        it('should throw a ValidationError if asked to', () => {
+        it('should throw a BadRequestError if asked to', () => {
             expect(() =>
                 schemaUtils.parseSchema(schema, invalidData, true),
-            ).toThrow(ValidationError);
+            ).toThrow(BadRequestError);
         });
 
-        it('should throw a InvalidDataError if asked to', () => {
+        it('should throw an InternalServerError if asked to', () => {
             expect(() =>
                 schemaUtils.parseSchema(schema, invalidData, false),
-            ).toThrow(InvalidDataError);
+            ).toThrow(InternalServerError);
         });
 
-        it('should throw a InvalidDataError if not specified', () => {
+        it('should throw an InternalServerError if not specified', () => {
             expect(() => schemaUtils.parseSchema(schema, invalidData)).toThrow(
-                InvalidDataError,
+                InternalServerError,
             );
         });
     });

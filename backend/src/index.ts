@@ -6,9 +6,9 @@ import transactionRoutes from './routes/transaction';
 import userRoutes from './routes/user';
 import { HttpError } from './errors/HttpError';
 import { env } from './config/env';
-import { RouteNotFoundError } from './errors/NotFoundError';
 import rateLimit from 'express-rate-limit';
 import { TooManyRequestsError } from './errors/TooManyRequestsError';
+import { NotFoundError } from './errors/NotFoundError';
 
 const app = express();
 app.use(express.json());
@@ -35,29 +35,34 @@ app.use('/auth', authRoutes);
 app.use('/transactions', transactionRoutes);
 app.use('/users', userRoutes);
 app.all(/.*/, () => {
-    throw new RouteNotFoundError();
+    throw new NotFoundError('Route not found');
 });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
-    if (err instanceof HttpError && err.statusCode !== 500) {
-        res.status(err.statusCode).json({
+    const isHttpError = err instanceof HttpError;
+    const status = isHttpError ? err.status : 500;
+
+    if (env.NODE_ENV === 'development') {
+        res.status(status).json({
+            message: err.message,
+            errors: isHttpError ? err.errors : undefined,
+            meta: isHttpError ? err.meta : undefined,
+        });
+        return;
+    }
+
+    if (isHttpError && status < 500) {
+        res.status(status).json({
             message: err.message,
             errors: err.errors,
-            action: err.action,
+            meta: err.meta,
         });
         return;
     }
 
     console.error(err);
-    if (env.NODE_ENV === 'development') {
-        res.status(500).json({
-            message: err.message,
-            errors: err instanceof HttpError ? err.errors : undefined,
-        });
-        return;
-    }
-    res.status(500).json({
+    res.status(status).json({
         message: 'Internal server error',
     });
 });

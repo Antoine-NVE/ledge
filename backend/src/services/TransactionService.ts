@@ -1,9 +1,9 @@
 import { ObjectId } from 'mongodb';
 import { TransactionRepository } from '../repositories/TransactionRepository';
 import { Transaction } from '../types/Transaction';
-import { TransactionNotFoundError } from '../errors/NotFoundError';
 import { parseSchema } from '../utils/schema';
 import { transactionSchema } from '../schemas/transaction';
+import { NotFoundError } from '../errors/NotFoundError';
 
 export class TransactionService {
     constructor(private transactionRepository: TransactionRepository) {}
@@ -39,7 +39,7 @@ export class TransactionService {
 
     findOneById = async (id: ObjectId): Promise<Transaction> => {
         const transaction = await this.transactionRepository.findOne('_id', id);
-        if (!transaction) throw new TransactionNotFoundError();
+        if (!transaction) throw new NotFoundError('Transaction not found');
 
         return transaction;
     };

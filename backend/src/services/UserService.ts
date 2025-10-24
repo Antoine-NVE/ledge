@@ -1,9 +1,3 @@
-import {
-    EmailAlreadyExistsError,
-    EmailAlreadyVerifiedError,
-} from '../errors/ConflictError';
-import { UserNotFoundError } from '../errors/NotFoundError';
-import { EmailVerificationCooldownError } from '../errors/TooManyRequestsError';
 import { UserRepository } from '../repositories/UserRepository';
 import { User } from '../types/User';
 import { EmailService } from './EmailService';
@@ -12,6 +6,9 @@ import { MongoServerError, ObjectId } from 'mongodb';
 import { parseSchema } from '../utils/schema';
 import { objectIdSchema } from '../schemas/security';
 import { userSchema } from '../schemas/user';
+import { ConflictError } from '../errors/ConflictError';
+import { TooManyRequestsError } from '../errors/TooManyRequestsError';
+import { NotFoundError } from '../errors/NotFoundError';
 
 export class UserService {
     constructor(
@@ -24,12 +21,15 @@ export class UserService {
         user: User,
         frontendBaseUrl: string,
     ): Promise<void> => {
-        if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
+        if (user.isEmailVerified)
+            throw new ConflictError('Email already verified');
         if (
             user.emailVerificationCooldownExpiresAt &&
             user.emailVerificationCooldownExpiresAt > new Date()
         )
-            throw new EmailVerificationCooldownError();
+            throw new TooManyRequestsError(
+                'Please wait before requesting another verification email',
+            );
 
         const jwt = this.jwtService.signEmailVerification(user._id);
 
@@ -50,7 +50,8 @@ export class UserService {
 
         const userId = parseSchema(objectIdSchema, payload.sub);
         const user = await this.findOneById(userId);
-        if (user.isEmailVerified) throw new EmailAlreadyVerifiedError();
+        if (user.isEmailVerified)
+            throw new ConflictError('Email already verified');
 
         user.isEmailVerified = true;
         await this.updateOne(user);
@@ -69,7 +70,7 @@ export class UserService {
 
         await this.userRepository.insertOne(user).catch((err) => {
             if (err instanceof MongoServerError && err.code === 11000) {
-                throw new EmailAlreadyExistsError();
+                throw new ConflictError('Email already exists');
             }
             throw err;
         });
@@ -79,14 +80,14 @@ export class UserService {
 
     findOneById = async (id: ObjectId): Promise<User> => {
         const user = await this.userRepository.findOne('_id', id);
-        if (!user) throw new UserNotFoundError();
+        if (!user) throw new NotFoundError('User not found');
 
         return user;
     };
 
     findOneByEmail = async (email: string): Promise<User> => {
         const user = await this.userRepository.findOne('email', email);
-        if (!user) throw new UserNotFoundError();
+        if (!user) throw new NotFoundError('User not found');
 
         return user;
     };

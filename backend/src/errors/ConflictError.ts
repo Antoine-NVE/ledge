@@ -1,19 +1,11 @@
 import { HttpError } from './HttpError';
 
-export abstract class ConflictError extends HttpError {
-    constructor(message: string) {
-        super(message, 409);
-    }
-}
-
-export class EmailAlreadyExistsError extends ConflictError {
-    constructor() {
-        super('Email already exists');
-    }
-}
-
-export class EmailAlreadyVerifiedError extends ConflictError {
-    constructor() {
-        super('Email already verified');
+export class ConflictError extends HttpError {
+    constructor(
+        message: string = 'Conflict',
+        errors?: Record<string, string[]>,
+        meta?: Record<string, unknown>,
+    ) {
+        super(message, 409, errors, meta);
     }
 }

@@ -1,6 +1,6 @@
 import z from 'zod';
-import { ValidationError } from '../errors/BadRequestError';
-import { InvalidDataError } from '../errors/InternalServerError';
+import { BadRequestError } from '../errors/BadRequestError';
+import { InternalServerError } from '../errors/InternalServerError';
 
 export const formatError = (error: z.ZodError): Record<string, string[]> => {
     const { formErrors, fieldErrors } = z.flattenError(error);
@@ -19,8 +19,9 @@ export const parseSchema = <T>(
 
     if (!result.success) {
         const formatted = formatError(result.error);
-        if (isClientError) throw new ValidationError(formatted);
-        throw new InvalidDataError(formatted);
+        if (isClientError)
+            throw new BadRequestError('Validation error', formatted);
+        throw new InternalServerError('Validation error', formatted);
     }
 
     return result.data;

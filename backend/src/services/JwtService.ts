@@ -7,13 +7,9 @@ import {
     TokenExpiredError,
     NotBeforeError,
 } from 'jsonwebtoken';
-import {
-    ExpiredJwtError,
-    InactiveJwtError,
-    InvalidJwtError,
-} from '../errors/UnauthorizedError';
 import { ObjectId } from 'mongodb';
 import { Payload } from '../types/Payload';
+import { UnauthorizedError } from '../errors/UnauthorizedError';
 
 export class JwtService {
     constructor(private secret: Secret) {}
@@ -41,10 +37,12 @@ export class JwtService {
             // TODO: create a real verification
             return verify(jwt, this.secret, options) as Payload;
         } catch (error: unknown) {
-            if (error instanceof NotBeforeError) throw new InactiveJwtError();
-            if (error instanceof TokenExpiredError) throw new ExpiredJwtError();
+            if (error instanceof NotBeforeError)
+                throw new UnauthorizedError('Inactive JWT');
+            if (error instanceof TokenExpiredError)
+                throw new UnauthorizedError('Expired JWT');
 
-            throw new InvalidJwtError();
+            throw new UnauthorizedError('Invalid JWT');
         }
     };
 
@@ -52,8 +50,10 @@ export class JwtService {
         try {
             return this.verify(jwt, { audience: 'access' });
         } catch (error: unknown) {
-            if (error instanceof ExpiredJwtError)
-                throw new ExpiredJwtError('refresh');
+            if (error instanceof UnauthorizedError)
+                throw new UnauthorizedError(error.message, undefined, {
+                    action: 'refresh',
+                });
 
             throw error;
         }

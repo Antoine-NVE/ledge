@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/UserService';
-import { UndefinedUserError } from '../errors/InternalServerError';
 import { parseSchema } from '../utils/schema';
 import { allowedOriginSchema, jwtSchema } from '../schemas/security';
+import { InternalServerError } from '../errors/InternalServerError';
 
 export class UserController {
     constructor(private userService: UserService) {}
@@ -12,7 +12,7 @@ export class UserController {
         res: Response,
     ): Promise<void> => {
         const user = req.user;
-        if (!user) throw new UndefinedUserError();
+        if (!user) throw new InternalServerError('Undefined user');
 
         const frontendBaseUrl = parseSchema(
             allowedOriginSchema,
@@ -38,7 +38,7 @@ export class UserController {
 
     me = async (req: Request, res: Response): Promise<void> => {
         const user = req.user;
-        if (!user) throw new UndefinedUserError();
+        if (!user) throw new InternalServerError('Undefined user');
 
         res.status(200).json({
             message: 'User retrieved successfully',

@@ -1,18 +1,11 @@
-import {
-    ExpiredRefreshTokenError,
-    InvalidCredentialsError,
-    InvalidRefreshTokenError,
-} from '../errors/UnauthorizedError';
 import { JwtService } from './JwtService';
 import { User } from '../types/User';
 import { RefreshToken } from '../types/RefreshToken';
 import { UserService } from './UserService';
 import { RefreshTokenService } from './RefreshTokenService';
-import {
-    RefreshTokenNotFoundError,
-    UserNotFoundError,
-} from '../errors/NotFoundError';
 import { PasswordService } from './PasswordService';
+import { NotFoundError } from '../errors/NotFoundError';
+import { UnauthorizedError } from '../errors/UnauthorizedError';
 
 export class AuthService {
     constructor(
@@ -52,8 +45,8 @@ export class AuthService {
         const user = await this.userService
             .findOneByEmail(email)
             .catch((err) => {
-                if (err instanceof UserNotFoundError)
-                    throw new InvalidCredentialsError();
+                if (err instanceof NotFoundError)
+                    throw new UnauthorizedError('Invalid credentials');
                 throw err;
             });
 
@@ -61,7 +54,7 @@ export class AuthService {
             password,
             user.passwordHash,
         );
-        if (!doesMatch) throw new InvalidCredentialsError();
+        if (!doesMatch) throw new UnauthorizedError('Invalid credentials');
 
         const refreshToken = await this.refreshTokenService.insertOne(user._id);
 
@@ -76,12 +69,12 @@ export class AuthService {
         let refreshToken = await this.refreshTokenService
             .findOneByToken(token)
             .catch((err) => {
-                if (err instanceof RefreshTokenNotFoundError)
-                    throw new InvalidRefreshTokenError();
+                if (err instanceof NotFoundError)
+                    throw new UnauthorizedError('Invalid refresh token');
                 throw err;
             });
         if (refreshToken.expiresAt < new Date())
-            throw new ExpiredRefreshTokenError();
+            throw new UnauthorizedError('Expired refresh token');
 
         refreshToken.expiresAt = new Date(
             Date.now() + this.refreshTokenService.TTL,

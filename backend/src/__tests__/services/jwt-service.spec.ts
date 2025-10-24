@@ -1,10 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { JwtService } from '../../services/JwtService';
 import jwt from 'jsonwebtoken';
-import {
-    ExpiredJwtError,
-    InactiveJwtError,
-} from '../../errors/UnauthorizedError';
+import { UnauthorizedError } from '../../errors/UnauthorizedError';
 
 describe('JwtService', () => {
     let jwtService: JwtService;
@@ -96,16 +93,16 @@ describe('JwtService', () => {
             ).toThrow();
         });
 
-        it('should throw ExpiredJwtError with expired JWT', () => {
+        it('should throw UnauthorizedError with expired JWT', () => {
             expect(() => {
                 jwtService.verifyAccess(expiredAccessJwt);
-            }).toThrow(ExpiredJwtError);
+            }).toThrow(UnauthorizedError);
         });
 
-        it('should throw InactiveJwtError with inactive JWT', () => {
+        it('should throw UnauthorizedError with inactive JWT', () => {
             expect(() => {
                 jwtService.verifyAccess(inactiveAccessJwt);
-            }).toThrow(InactiveJwtError);
+            }).toThrow(UnauthorizedError);
         });
     });
 
