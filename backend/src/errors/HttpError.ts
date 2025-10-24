@@ -1,7 +1,7 @@
 export abstract class HttpError extends Error {
     constructor(
         message: string,
-        public statusCode: number,
+        public status: number,
         public errors?: Record<string, string[]>,
         public meta?: Record<string, unknown>,
     ) {

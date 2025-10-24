@@ -40,8 +40,20 @@ app.all(/.*/, () => {
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
-    if (err instanceof HttpError && err.statusCode !== 500) {
-        res.status(err.statusCode).json({
+    const isHttpError = err instanceof HttpError;
+    const status = isHttpError ? err.status : 500;
+
+    if (env.NODE_ENV === 'development') {
+        res.status(status).json({
+            message: err.message,
+            errors: isHttpError ? err.errors : undefined,
+            meta: isHttpError ? err.meta : undefined,
+        });
+        return;
+    }
+
+    if (isHttpError && status < 500) {
+        res.status(status).json({
             message: err.message,
             errors: err.errors,
             meta: err.meta,
@@ -50,14 +62,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
     }
 
     console.error(err);
-    if (env.NODE_ENV === 'development') {
-        res.status(500).json({
-            message: err.message,
-            errors: err instanceof HttpError ? err.errors : undefined,
-        });
-        return;
-    }
-    res.status(500).json({
+    res.status(status).json({
         message: 'Internal server error',
     });
 });
