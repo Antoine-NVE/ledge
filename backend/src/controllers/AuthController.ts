@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 import { CookieService } from '../services/CookieService';
 import { AuthService } from '../services/AuthService';
-import { RequiredRefreshTokenError } from '../errors/UnauthorizedError';
 import { parseSchema } from '../utils/schema';
 import { userLoginSchema, userRegisterSchema } from '../schemas/user';
 import { UserService } from '../services/UserService';
+import { UnauthorizedError } from '../errors/UnauthorizedError';
 
 export class AuthController {
     constructor(
@@ -61,7 +61,7 @@ export class AuthController {
     refresh = async (req: Request, res: Response) => {
         const cookieService = new CookieService(req, res);
         const token = cookieService.getRefreshToken();
-        if (!token) throw new RequiredRefreshTokenError();
+        if (!token) throw new UnauthorizedError('Required refresh token');
 
         let rememberMe = cookieService.getRememberMe();
         if (rememberMe === undefined) rememberMe = false; // Default to false if not provided

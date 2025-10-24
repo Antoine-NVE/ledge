@@ -3,9 +3,9 @@ export abstract class HttpError extends Error {
         message: string,
         public statusCode: number,
         public errors?: Record<string, string[]>,
-        public action?: string,
+        public meta?: Record<string, unknown>,
     ) {
         super(message);
-        this.name = this.constructor.name;
+        this.name = new.target.name;
     }
 }

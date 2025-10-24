@@ -1,10 +1,10 @@
 import { ObjectId } from 'mongodb';
 import { RefreshTokenRepository } from '../repositories/RefreshTokenRepository';
 import { RefreshToken } from '../types/RefreshToken';
-import { RefreshTokenNotFoundError } from '../errors/NotFoundError';
 import { parseSchema } from '../utils/schema';
 import { refreshTokenSchema } from '../schemas/refresh-token';
 import { TokenService } from './TokenService';
+import { NotFoundError } from '../errors/NotFoundError';
 
 export class RefreshTokenService {
     readonly TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -34,7 +34,7 @@ export class RefreshTokenService {
             'token',
             token,
         );
-        if (!refreshToken) throw new RefreshTokenNotFoundError();
+        if (!refreshToken) throw new NotFoundError('Refresh token not found');
 
         return refreshToken;
     };

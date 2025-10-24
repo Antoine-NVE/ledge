@@ -1,8 +1,4 @@
 import { Request, Response } from 'express';
-import {
-    UndefinedTransactionError,
-    UndefinedUserError,
-} from '../errors/InternalServerError';
 import { Transaction } from '../types/Transaction';
 import { TransactionService } from '../services/TransactionService';
 import { parseSchema } from '../utils/schema';
@@ -10,13 +6,14 @@ import {
     transactionCreateSchema,
     transactionUpdateSchema,
 } from '../schemas/transaction';
+import { InternalServerError } from '../errors/InternalServerError';
 
 export class TransactionController {
     constructor(private transactionService: TransactionService) {}
 
     create = async (req: Request, res: Response) => {
         const user = req.user;
-        if (!user) throw new UndefinedUserError();
+        if (!user) throw new InternalServerError('Undefined user');
 
         const { month, name, value, isIncome, isRecurring } = parseSchema(
             transactionCreateSchema,
@@ -43,7 +40,7 @@ export class TransactionController {
 
     readMany = async (req: Request, res: Response) => {
         const user = req.user;
-        if (!user) throw new UndefinedUserError();
+        if (!user) throw new InternalServerError('Undefined user');
 
         const transactions = await this.transactionService.findByUserId(
             user._id,
@@ -59,7 +56,8 @@ export class TransactionController {
 
     read = async (req: Request, res: Response) => {
         const transaction = req.transaction;
-        if (!transaction) throw new UndefinedTransactionError();
+        if (!transaction)
+            throw new InternalServerError('Undefined transaction');
 
         res.status(200).json({
             message: 'Transaction retrieved successfully',
@@ -71,7 +69,8 @@ export class TransactionController {
 
     update = async (req: Request, res: Response) => {
         let transaction: Transaction | undefined = req.transaction;
-        if (!transaction) throw new UndefinedTransactionError();
+        if (!transaction)
+            throw new InternalServerError('Undefined transaction');
 
         const { name, value, isIncome, isRecurring } = parseSchema(
             transactionUpdateSchema,
@@ -96,7 +95,8 @@ export class TransactionController {
 
     delete = async (req: Request, res: Response) => {
         const transaction = req.transaction;
-        if (!transaction) throw new UndefinedTransactionError();
+        if (!transaction)
+            throw new InternalServerError('Undefined transaction');
 
         this.transactionService.deleteOneById(transaction._id);
 

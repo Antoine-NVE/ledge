@@ -6,9 +6,9 @@ import transactionRoutes from './routes/transaction';
 import userRoutes from './routes/user';
 import { HttpError } from './errors/HttpError';
 import { env } from './config/env';
-import { RouteNotFoundError } from './errors/NotFoundError';
 import rateLimit from 'express-rate-limit';
 import { TooManyRequestsError } from './errors/TooManyRequestsError';
+import { NotFoundError } from './errors/NotFoundError';
 
 const app = express();
 app.use(express.json());
@@ -35,7 +35,7 @@ app.use('/auth', authRoutes);
 app.use('/transactions', transactionRoutes);
 app.use('/users', userRoutes);
 app.all(/.*/, () => {
-    throw new RouteNotFoundError();
+    throw new NotFoundError('Route not found');
 });
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -44,7 +44,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
         res.status(err.statusCode).json({
             message: err.message,
             errors: err.errors,
-            action: err.action,
+            meta: err.meta,
         });
         return;
     }

@@ -1,13 +1,11 @@
 import { HttpError } from './HttpError';
 
-export abstract class BadRequestError extends HttpError {
-    constructor(message: string, errors?: Record<string, string[]>) {
-        super(message, 400, errors);
-    }
-}
-
-export class ValidationError extends BadRequestError {
-    constructor(errors: Record<string, string[]>) {
-        super('Validation error', errors);
+export class BadRequestError extends HttpError {
+    constructor(
+        message: string = 'Bad request',
+        errors?: Record<string, string[]>,
+        meta?: Record<string, unknown>,
+    ) {
+        super(message, 400, errors, meta);
     }
 }
