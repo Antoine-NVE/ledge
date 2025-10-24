@@ -1,12 +1,12 @@
 import { ObjectId } from 'mongodb';
-import { UserRepository } from '../../entities/user/user-repository';
+import { UserRepository } from '../../domain/user/user-repository';
 import { EmailService } from '../../services/email-service';
 import { JwtService } from '../../services/jwt-service';
 import { UserService } from '../../services/user-service';
 import { parseSchema } from '../../utils/schema-utils';
 import { objectIdSchema } from '../../schemas/security-schemas';
 import { userSchema } from '../../schemas/user-schemas';
-import { User } from '../../entities/user/user-types';
+import { User } from '../../domain/user/user-types';
 
 jest.mock('../../utils/schema-utils', () => ({
     parseSchema: jest.fn(),

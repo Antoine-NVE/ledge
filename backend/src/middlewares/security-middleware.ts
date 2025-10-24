@@ -8,8 +8,8 @@ import { objectIdSchema } from '../schemas/security-schemas';
 import { UnauthorizedError } from '../errors/unauthorized-error';
 import { InternalServerError } from '../errors/internal-server-error';
 import { ForbiddenError } from '../errors/forbidden-error';
-import { User } from '../entities/user/user-types';
-import { Transaction } from '../entities/transaction/transaction-types';
+import { User } from '../domain/user/user-types';
+import { Transaction } from '../domain/transaction/transaction-types';
 
 declare module 'express-serve-static-core' {
     interface Request {

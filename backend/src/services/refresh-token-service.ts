@@ -1,10 +1,10 @@
 import { ObjectId } from 'mongodb';
-import { RefreshTokenRepository } from '../entities/refresh-token/refresh-token-repository';
+import { RefreshTokenRepository } from '../domain/refresh-token/refresh-token-repository';
 import { parseSchema } from '../utils/schema-utils';
 import { refreshTokenSchema } from '../schemas/refresh-token-schemas';
 import { TokenService } from './token-service';
 import { NotFoundError } from '../errors/not-found-error';
-import { RefreshToken } from '../entities/refresh-token/refresh-token-types';
+import { RefreshToken } from '../domain/refresh-token/refresh-token-types';
 
 export class RefreshTokenService {
     readonly TTL = 7 * 24 * 60 * 60 * 1000; // 7 days

@@ -4,8 +4,8 @@ import { RefreshTokenService } from './refresh-token-service';
 import { PasswordService } from './password-service';
 import { NotFoundError } from '../errors/not-found-error';
 import { UnauthorizedError } from '../errors/unauthorized-error';
-import { User } from '../entities/user/user-types';
-import { RefreshToken } from '../entities/refresh-token/refresh-token-types';
+import { User } from '../domain/user/user-types';
+import { RefreshToken } from '../domain/refresh-token/refresh-token-types';
 
 export class AuthService {
     constructor(

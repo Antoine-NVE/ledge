@@ -1,9 +1,9 @@
 import { ObjectId } from 'mongodb';
-import { RefreshTokenRepository } from '../../entities/refresh-token/refresh-token-repository';
+import { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository';
 import { RefreshTokenService } from '../../services/refresh-token-service';
 import { refreshTokenSchema } from '../../schemas/refresh-token-schemas';
 import { parseSchema } from '../../utils/schema-utils';
-import { RefreshToken } from '../../entities/refresh-token/refresh-token-types';
+import { RefreshToken } from '../../domain/refresh-token/refresh-token-types';
 
 const userId = new ObjectId();
 const token = 'token';

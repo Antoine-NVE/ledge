@@ -6,7 +6,7 @@ import {
     transactionUpdateSchema,
 } from '../schemas/transaction-schemas';
 import { InternalServerError } from '../errors/internal-server-error';
-import { Transaction } from '../entities/transaction/transaction-types';
+import { Transaction } from '../domain/transaction/transaction-types';
 
 export class TransactionController {
     constructor(private transactionService: TransactionService) {}
