@@ -1,8 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { JwtService } from '../services/jwt-service';
 import { CookieService } from '../services/cookie-service';
-import { User } from '../types/user-type';
-import { Transaction } from '../types/transaction-type';
 import { UserService } from '../services/user-service';
 import { TransactionService } from '../services/transaction-service';
 import { parseSchema } from '../utils/schema-utils';
@@ -10,6 +8,8 @@ import { objectIdSchema } from '../schemas/security-schemas';
 import { UnauthorizedError } from '../errors/unauthorized-error';
 import { InternalServerError } from '../errors/internal-server-error';
 import { ForbiddenError } from '../errors/forbidden-error';
+import { User } from '../entities/user/user-types';
+import { Transaction } from '../entities/transaction/transaction-types';
 
 declare module 'express-serve-static-core' {
     interface Request {

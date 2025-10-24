@@ -1,5 +1,5 @@
 import { Collection } from 'mongodb';
-import { RefreshToken } from '../types/refresh-token-type';
+import { RefreshToken } from '../entities/refresh-token/refresh-token-types';
 
 export class RefreshTokenRepository {
     constructor(private refreshTokenCollection: Collection<RefreshToken>) {}

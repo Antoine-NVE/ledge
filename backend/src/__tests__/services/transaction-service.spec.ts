@@ -1,9 +1,9 @@
 import { ObjectId } from 'mongodb';
 import { parseSchema } from '../../utils/schema-utils';
-import { Transaction } from '../../types/transaction-type';
 import { TransactionService } from '../../services/transaction-service';
 import { TransactionRepository } from '../../repositories/transaction-repository';
 import { transactionSchema } from '../../schemas/transaction-schemas';
+import { Transaction } from '../../entities/transaction/transaction-types';
 
 const transactionId = new ObjectId();
 const month = '2025-10';

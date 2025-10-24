@@ -1,11 +1,11 @@
 import { JwtService } from './jwt-service';
-import { User } from '../types/user-type';
-import { RefreshToken } from '../types/refresh-token-type';
 import { UserService } from './user-service';
 import { RefreshTokenService } from './refresh-token-service';
 import { PasswordService } from './password-service';
 import { NotFoundError } from '../errors/not-found-error';
 import { UnauthorizedError } from '../errors/unauthorized-error';
+import { User } from '../entities/user/user-types';
+import { RefreshToken } from '../entities/refresh-token/refresh-token-types';
 
 export class AuthService {
     constructor(

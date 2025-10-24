@@ -1,9 +1,9 @@
 import { ObjectId } from 'mongodb';
 import { TransactionRepository } from '../repositories/transaction-repository';
-import { Transaction } from '../types/transaction-type';
 import { parseSchema } from '../utils/schema-utils';
 import { transactionSchema } from '../schemas/transaction-schemas';
 import { NotFoundError } from '../errors/not-found-error';
+import { Transaction } from '../entities/transaction/transaction-types';
 
 export class TransactionService {
     constructor(private transactionRepository: TransactionRepository) {}

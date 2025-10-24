@@ -3,7 +3,7 @@ import { RefreshTokenRepository } from '../../repositories/refresh-token-reposit
 import { RefreshTokenService } from '../../services/refresh-token-service';
 import { refreshTokenSchema } from '../../schemas/refresh-token-schemas';
 import { parseSchema } from '../../utils/schema-utils';
-import { RefreshToken } from '../../types/refresh-token-type';
+import { RefreshToken } from '../../entities/refresh-token/refresh-token-types';
 
 const userId = new ObjectId();
 const token = 'token';

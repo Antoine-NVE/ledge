@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { Transaction } from '../types/transaction-type';
 import { TransactionService } from '../services/transaction-service';
 import { parseSchema } from '../utils/schema-utils';
 import {
@@ -7,6 +6,7 @@ import {
     transactionUpdateSchema,
 } from '../schemas/transaction-schemas';
 import { InternalServerError } from '../errors/internal-server-error';
+import { Transaction } from '../entities/transaction/transaction-types';
 
 export class TransactionController {
     constructor(private transactionService: TransactionService) {}
