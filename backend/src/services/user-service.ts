@@ -1,4 +1,4 @@
-import { UserRepository } from '../repositories/user-repository';
+import { UserRepository } from '../entities/user/user-repository';
 import { EmailService } from './email-service';
 import { JwtService } from './jwt-service';
 import { MongoServerError, ObjectId } from 'mongodb';

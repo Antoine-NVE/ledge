@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { TransactionRepository } from '../repositories/transaction-repository';
+import { TransactionRepository } from '../entities/transaction/transaction-repository';
 import { parseSchema } from '../utils/schema-utils';
 import { transactionSchema } from '../schemas/transaction-schemas';
 import { NotFoundError } from '../errors/not-found-error';

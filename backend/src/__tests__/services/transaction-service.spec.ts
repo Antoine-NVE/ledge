@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { parseSchema } from '../../utils/schema-utils';
 import { TransactionService } from '../../services/transaction-service';
-import { TransactionRepository } from '../../repositories/transaction-repository';
+import { TransactionRepository } from '../../entities/transaction/transaction-repository';
 import { transactionSchema } from '../../schemas/transaction-schemas';
 import { Transaction } from '../../entities/transaction/transaction-types';
 

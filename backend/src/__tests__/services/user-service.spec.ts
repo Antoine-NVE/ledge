@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { UserRepository } from '../../repositories/user-repository';
+import { UserRepository } from '../../entities/user/user-repository';
 import { EmailService } from '../../services/email-service';
 import { JwtService } from '../../services/jwt-service';
 import { UserService } from '../../services/user-service';
