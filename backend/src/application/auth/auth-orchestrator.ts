@@ -1,11 +1,12 @@
 import { JwtService } from '../../services/jwt-service';
-import { UserService } from '../../services/user-service';
-import { RefreshTokenService } from '../../services/refresh-token-service';
+import { UserService } from '../../domain/user/user-service';
 import { PasswordService } from '../../services/password-service';
 import { NotFoundError } from '../../errors/not-found-error';
 import { UnauthorizedError } from '../../errors/unauthorized-error';
 import { User } from '../../domain/user/user-types';
 import { RefreshToken } from '../../domain/refresh-token/refresh-token-types';
+import { RefreshTokenService } from '../../domain/refresh-token/refresh-token-service';
+import { TokenService } from '../../services/token-service';
 
 export class AuthOrchestrator {
     constructor(
@@ -13,6 +14,7 @@ export class AuthOrchestrator {
         private jwtService: JwtService,
         private refreshTokenService: RefreshTokenService,
         private passwordService: PasswordService,
+        private tokenService: TokenService,
     ) {}
 
     register = async (
@@ -25,9 +27,14 @@ export class AuthOrchestrator {
     }> => {
         const passwordHash = await this.passwordService.hash(password);
 
-        const user = await this.userService.insertOne(email, passwordHash);
+        const user = await this.userService.register(email, passwordHash);
 
-        const refreshToken = await this.refreshTokenService.insertOne(user._id);
+        const token = this.tokenService.generate();
+
+        const refreshToken = await this.refreshTokenService.create(
+            token,
+            user._id,
+        );
 
         const accessToken = this.jwtService.signAccess(user._id);
 
@@ -56,7 +63,12 @@ export class AuthOrchestrator {
         );
         if (!doesMatch) throw new UnauthorizedError('Invalid credentials');
 
-        const refreshToken = await this.refreshTokenService.insertOne(user._id);
+        const token = this.tokenService.generate();
+
+        const refreshToken = await this.refreshTokenService.create(
+            token,
+            user._id,
+        );
 
         const accessToken = this.jwtService.signAccess(user._id);
 
@@ -76,10 +88,8 @@ export class AuthOrchestrator {
         if (refreshToken.expiresAt < new Date())
             throw new UnauthorizedError('Expired refresh token');
 
-        refreshToken.expiresAt = new Date(
-            Date.now() + this.refreshTokenService.TTL,
-        );
-        refreshToken = await this.refreshTokenService.updateOne(refreshToken);
+        refreshToken =
+            await this.refreshTokenService.extendExpiration(refreshToken);
 
         const accessToken = this.jwtService.signAccess(refreshToken.userId);
 

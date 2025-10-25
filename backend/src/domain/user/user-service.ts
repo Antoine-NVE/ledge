@@ -1,13 +1,13 @@
-import { UserRepository } from '../domain/user/user-repository';
+import { UserRepository } from './user-repository';
 import { MongoServerError, ObjectId } from 'mongodb';
-import { ConflictError } from '../errors/conflict-error';
-import { NotFoundError } from '../errors/not-found-error';
-import { User } from '../domain/user/user-types';
+import { ConflictError } from '../../errors/conflict-error';
+import { NotFoundError } from '../../errors/not-found-error';
+import { User } from './user-types';
 
 export class UserService {
     constructor(private userRepository: UserRepository) {}
 
-    insertOne = async (email: string, passwordHash: string): Promise<User> => {
+    register = async (email: string, passwordHash: string): Promise<User> => {
         const user: User = {
             _id: new ObjectId(),
             email,
@@ -42,8 +42,22 @@ export class UserService {
         return user;
     };
 
-    updateOne = async (user: User): Promise<User> => {
+    setEmailVerificationCooldown = async (user: User): Promise<User> => {
         user.updatedAt = new Date();
+
+        user.emailVerificationCooldownExpiresAt = new Date(
+            Date.now() + 5 * 60 * 1000,
+        ); // 5 minutes
+
+        await this.userRepository.updateOne(user);
+
+        return user;
+    };
+
+    markEmailAsVerified = async (user: User): Promise<User> => {
+        user.updatedAt = new Date();
+
+        user.isEmailVerified = true;
 
         await this.userRepository.updateOne(user);
 

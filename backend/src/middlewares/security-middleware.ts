@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import { JwtService } from '../services/jwt-service';
 import { CookieService } from '../services/cookie-service';
-import { UserService } from '../services/user-service';
-import { TransactionService } from '../services/transaction-service';
+import { UserService } from '../domain/user/user-service';
+import { TransactionService } from '../domain/transaction/transaction-service';
 import { parseSchema } from '../utils/schema-utils';
 import { objectIdSchema } from '../schemas/security-schemas';
 import { UnauthorizedError } from '../errors/unauthorized-error';
@@ -54,8 +54,7 @@ export class SecurityMiddleware {
         if (!user) throw new InternalServerError('Undefined user');
 
         const transactionId = parseSchema(objectIdSchema, req.params.id);
-        const transaction =
-            await this.transactionService.findOneById(transactionId);
+        const transaction = await this.transactionService.read(transactionId);
 
         if (!user._id.equals(transaction.userId))
             throw new ForbiddenError('Forbidden access');

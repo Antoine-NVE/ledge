@@ -4,7 +4,7 @@ import { TooManyRequestsError } from '../../errors/too-many-requests-error';
 import { objectIdSchema } from '../../schemas/security-schemas';
 import { EmailService } from '../../services/email-service';
 import { JwtService } from '../../services/jwt-service';
-import { UserService } from '../../services/user-service';
+import { UserService } from '../../domain/user/user-service';
 import { parseSchema } from '../../utils/schema-utils';
 
 export class UserOrchestrator {
@@ -36,10 +36,7 @@ export class UserOrchestrator {
             jwt,
         );
 
-        user.emailVerificationCooldownExpiresAt = new Date(
-            Date.now() + 5 * 60 * 1000,
-        ); // 5 minutes
-        await this.userService.updateOne(user);
+        await this.userService.setEmailVerificationCooldown(user);
     };
 
     verifyEmail = async (jwt: string): Promise<void> => {
@@ -50,7 +47,6 @@ export class UserOrchestrator {
         if (user.isEmailVerified)
             throw new ConflictError('Email already verified');
 
-        user.isEmailVerified = true;
-        await this.userService.updateOne(user);
+        await this.userService.markEmailAsVerified(user);
     };
 }

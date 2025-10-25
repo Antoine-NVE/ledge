@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { AuthService } from '../../application/auth/auth-orchestrator';
-import { UserService } from '../../services/user-service';
+import { UserService } from '../../domain/user/user-service';
 import { JwtService } from '../../services/jwt-service';
 import { RefreshTokenService } from '../../services/refresh-token-service';
 import { PasswordService } from '../../services/password-service';

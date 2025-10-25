@@ -6,10 +6,9 @@ import { AuthOrchestrator } from '../application/auth/auth-orchestrator';
 import { EmailService } from '../services/email-service';
 import { JwtService } from '../services/jwt-service';
 import { PasswordService } from '../services/password-service';
-import { RefreshTokenService } from '../services/refresh-token-service';
 import { TokenService } from '../services/token-service';
-import { TransactionService } from '../services/transaction-service';
-import { UserService } from '../services/user-service';
+import { TransactionService } from '../domain/transaction/transaction-service';
+import { UserService } from '../domain/user/user-service';
 import { db } from './db';
 import { env } from './env';
 import { AuthController } from '../presentation/auth/auth-controller';
@@ -17,6 +16,7 @@ import { UserController } from '../presentation/user/user-controller';
 import { TransactionController } from '../presentation/transaction/transaction-controller';
 import { UserOrchestrator } from '../application/user/user-orchestrator';
 import { TransactionOrchestrator } from '../application/transaction/transaction-orchestrator';
+import { RefreshTokenService } from '../domain/refresh-token/refresh-token-service';
 
 const secret = env.JWT_SECRET;
 const host = env.SMTP_HOST;
@@ -40,10 +40,7 @@ const transactionRepository = new TransactionRepository(
 );
 
 const userService = new UserService(userRepository);
-const refreshTokenService = new RefreshTokenService(
-    refreshTokenRepository,
-    tokenService,
-);
+const refreshTokenService = new RefreshTokenService(refreshTokenRepository);
 const transactionService = new TransactionService(transactionRepository);
 
 const authOrchestrator = new AuthOrchestrator(
@@ -51,6 +48,7 @@ const authOrchestrator = new AuthOrchestrator(
     jwtService,
     refreshTokenService,
     passwordService,
+    tokenService,
 );
 const userOrchestrator = new UserOrchestrator(
     jwtService,

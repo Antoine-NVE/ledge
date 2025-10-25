@@ -1,21 +1,17 @@
 import { ObjectId } from 'mongodb';
-import { RefreshTokenRepository } from '../domain/refresh-token/refresh-token-repository';
-import { TokenService } from './token-service';
-import { NotFoundError } from '../errors/not-found-error';
-import { RefreshToken } from '../domain/refresh-token/refresh-token-types';
+import { RefreshTokenRepository } from './refresh-token-repository';
+import { RefreshToken } from './refresh-token-types';
+import { NotFoundError } from '../../errors/not-found-error';
 
 export class RefreshTokenService {
-    readonly TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
+    private readonly TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-    constructor(
-        private refreshTokenRepository: RefreshTokenRepository,
-        private tokenService: TokenService,
-    ) {}
+    constructor(private refreshTokenRepository: RefreshTokenRepository) {}
 
-    insertOne = async (userId: ObjectId): Promise<RefreshToken> => {
+    create = async (token: string, userId: ObjectId): Promise<RefreshToken> => {
         const refreshToken: RefreshToken = {
             _id: new ObjectId(),
-            token: this.tokenService.generate(),
+            token,
             expiresAt: new Date(Date.now() + this.TTL),
             userId,
             createdAt: new Date(),
@@ -37,8 +33,12 @@ export class RefreshTokenService {
         return refreshToken;
     };
 
-    updateOne = async (refreshToken: RefreshToken): Promise<RefreshToken> => {
+    extendExpiration = async (
+        refreshToken: RefreshToken,
+    ): Promise<RefreshToken> => {
         refreshToken.updatedAt = new Date();
+
+        refreshToken.expiresAt = new Date(Date.now() + this.TTL);
 
         await this.refreshTokenRepository.updateOne(refreshToken);
 
