@@ -1,13 +1,13 @@
-import { JwtService } from './jwt-service';
-import { UserService } from './user-service';
-import { RefreshTokenService } from './refresh-token-service';
-import { PasswordService } from './password-service';
-import { NotFoundError } from '../errors/not-found-error';
-import { UnauthorizedError } from '../errors/unauthorized-error';
-import { User } from '../domain/user/user-types';
-import { RefreshToken } from '../domain/refresh-token/refresh-token-types';
+import { JwtService } from '../../services/jwt-service';
+import { UserService } from '../../services/user-service';
+import { RefreshTokenService } from '../../services/refresh-token-service';
+import { PasswordService } from '../../services/password-service';
+import { NotFoundError } from '../../errors/not-found-error';
+import { UnauthorizedError } from '../../errors/unauthorized-error';
+import { User } from '../../domain/user/user-types';
+import { RefreshToken } from '../../domain/refresh-token/refresh-token-types';
 
-export class AuthService {
+export class AuthOrchestrator {
     constructor(
         private userService: UserService,
         private jwtService: JwtService,

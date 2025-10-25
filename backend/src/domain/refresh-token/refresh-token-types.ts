@@ -1,12 +1,12 @@
 import { ObjectId } from 'mongodb';
 
-export type NewRefreshToken = {
+export type RefreshTokenData = {
     token: string;
     expiresAt: Date;
     userId: ObjectId;
 };
 
-export type RefreshToken = NewRefreshToken & {
+export type RefreshToken = RefreshTokenData & {
     _id: ObjectId;
     createdAt: Date;
     updatedAt: Date | null;

@@ -1,13 +1,13 @@
 import { ObjectId } from 'mongodb';
 
-export type NewUser = {
+export type UserData = {
     email: string;
     passwordHash: string;
     isEmailVerified: boolean;
     emailVerificationCooldownExpiresAt: Date | null;
 };
 
-export type User = NewUser & {
+export type User = UserData & {
     _id: ObjectId;
     createdAt: Date;
     updatedAt: Date | null;

@@ -1,11 +1,8 @@
-import { AuthController } from '../controllers/auth-controller';
-import { TransactionController } from '../controllers/transaction-controller';
-import { UserController } from '../controllers/user-controller';
 import { SecurityMiddleware } from '../middlewares/security-middleware';
 import { RefreshTokenRepository } from '../domain/refresh-token/refresh-token-repository';
 import { TransactionRepository } from '../domain/transaction/transaction-repository';
 import { UserRepository } from '../domain/user/user-repository';
-import { AuthService } from '../services/auth-service';
+import { AuthOrchestrator } from '../application/auth/auth-orchestrator';
 import { EmailService } from '../services/email-service';
 import { JwtService } from '../services/jwt-service';
 import { PasswordService } from '../services/password-service';
@@ -15,6 +12,11 @@ import { TransactionService } from '../services/transaction-service';
 import { UserService } from '../services/user-service';
 import { db } from './db';
 import { env } from './env';
+import { AuthController } from '../presentation/auth/auth-controller';
+import { UserController } from '../presentation/user/user-controller';
+import { TransactionController } from '../presentation/transaction/transaction-controller';
+import { UserOrchestrator } from '../application/user/user-orchestrator';
+import { TransactionOrchestrator } from '../application/transaction/transaction-orchestrator';
 
 const secret = env.JWT_SECRET;
 const host = env.SMTP_HOST;
@@ -37,23 +39,31 @@ const transactionRepository = new TransactionRepository(
     db.collection('transactions'),
 );
 
-const userService = new UserService(jwtService, emailService, userRepository);
+const userService = new UserService(userRepository);
 const refreshTokenService = new RefreshTokenService(
     refreshTokenRepository,
     tokenService,
 );
 const transactionService = new TransactionService(transactionRepository);
 
-const authService = new AuthService(
+const authOrchestrator = new AuthOrchestrator(
     userService,
     jwtService,
     refreshTokenService,
     passwordService,
 );
+const userOrchestrator = new UserOrchestrator(
+    jwtService,
+    emailService,
+    userService,
+);
+const transactionOrchestrator = new TransactionOrchestrator(transactionService);
 
-const authController = new AuthController(authService, userService);
-const userController = new UserController(userService);
-const transactionController = new TransactionController(transactionService);
+const authController = new AuthController(authOrchestrator);
+const userController = new UserController(userOrchestrator);
+const transactionController = new TransactionController(
+    transactionOrchestrator,
+);
 
 const securityMiddleware = new SecurityMiddleware(
     userService,

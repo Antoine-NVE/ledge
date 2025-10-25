@@ -1,20 +1,16 @@
 import { Request, Response } from 'express';
 import { CookieService } from '../../services/cookie-service';
-import { AuthService } from '../../services/auth-service';
+import { AuthOrchestrator } from '../../application/auth/auth-orchestrator';
 import { parseSchema } from '../../utils/schema-utils';
 import {
     userLoginSchema,
     userRegisterSchema,
 } from '../../schemas/user-schemas';
-import { UserService } from '../../services/user-service';
 import { UnauthorizedError } from '../../errors/unauthorized-error';
 import { removePasswordHash } from '../../utils/clean-utils';
 
 export class AuthController {
-    constructor(
-        private authService: AuthService,
-        private userService: UserService,
-    ) {}
+    constructor(private authOrchestrator: AuthOrchestrator) {}
 
     register = async (req: Request, res: Response) => {
         const { email, password } = parseSchema(
@@ -28,7 +24,7 @@ export class AuthController {
         const rememberMe = false;
 
         const { user, accessToken, refreshToken } =
-            await this.authService.register(email, password);
+            await this.authOrchestrator.register(email, password);
 
         const cookieService = new CookieService(req, res);
         cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
@@ -49,7 +45,7 @@ export class AuthController {
         );
 
         const { user, accessToken, refreshToken } =
-            await this.authService.login(email, password);
+            await this.authOrchestrator.login(email, password);
 
         const cookieService = new CookieService(req, res);
         cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
@@ -71,7 +67,7 @@ export class AuthController {
         if (rememberMe === undefined) rememberMe = false; // Default to false if not provided
 
         const { accessToken, refreshToken } =
-            await this.authService.refresh(token);
+            await this.authOrchestrator.refresh(token);
 
         cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
 
@@ -84,7 +80,7 @@ export class AuthController {
         const cookieService = new CookieService(req, res);
         const token = cookieService.getRefreshToken();
 
-        if (token) await this.authService.logout(token);
+        if (token) await this.authOrchestrator.logout(token);
 
         cookieService.clearAuth();
 

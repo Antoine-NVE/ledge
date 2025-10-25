@@ -1,27 +1,19 @@
 import { ObjectId } from 'mongodb';
 import { TransactionRepository } from '../domain/transaction/transaction-repository';
 import { NotFoundError } from '../errors/not-found-error';
-import { Transaction } from '../domain/transaction/transaction-types';
+import {
+    Transaction,
+    TransactionData,
+    TransactionUpdateData,
+} from '../domain/transaction/transaction-types';
 
 export class TransactionService {
     constructor(private transactionRepository: TransactionRepository) {}
 
-    insertOne = async (
-        month: string,
-        name: string,
-        value: number,
-        isIncome: boolean,
-        isRecurring: boolean,
-        userId: ObjectId,
-    ): Promise<Transaction> => {
+    insertOne = async (data: TransactionData): Promise<Transaction> => {
         const transaction: Transaction = {
             _id: new ObjectId(),
-            month,
-            name,
-            value,
-            isIncome,
-            isRecurring,
-            userId,
+            ...data,
             createdAt: new Date(),
             updatedAt: null,
         };
@@ -42,8 +34,13 @@ export class TransactionService {
         return transaction;
     };
 
-    updateOne = async (transaction: Transaction): Promise<Transaction> => {
+    updateOne = async (
+        transaction: Transaction,
+        data: TransactionUpdateData,
+    ): Promise<Transaction> => {
         transaction.updatedAt = new Date();
+
+        Object.assign(transaction, data);
 
         await this.transactionRepository.updateOne(transaction);
 

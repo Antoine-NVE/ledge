@@ -1,60 +1,11 @@
 import { UserRepository } from '../domain/user/user-repository';
-import { EmailService } from './email-service';
-import { JwtService } from './jwt-service';
 import { MongoServerError, ObjectId } from 'mongodb';
-import { parseSchema } from '../utils/schema-utils';
-import { objectIdSchema } from '../schemas/security-schemas';
 import { ConflictError } from '../errors/conflict-error';
-import { TooManyRequestsError } from '../errors/too-many-requests-error';
 import { NotFoundError } from '../errors/not-found-error';
 import { User } from '../domain/user/user-types';
 
 export class UserService {
-    constructor(
-        private jwtService: JwtService,
-        private emailService: EmailService,
-        private userRepository: UserRepository,
-    ) {}
-
-    sendVerificationEmail = async (
-        user: User,
-        frontendBaseUrl: string,
-    ): Promise<void> => {
-        if (user.isEmailVerified)
-            throw new ConflictError('Email already verified');
-        if (
-            user.emailVerificationCooldownExpiresAt &&
-            user.emailVerificationCooldownExpiresAt > new Date()
-        )
-            throw new TooManyRequestsError(
-                'Please wait before requesting another verification email',
-            );
-
-        const jwt = this.jwtService.signEmailVerification(user._id);
-
-        await this.emailService.sendVerification(
-            user.email,
-            frontendBaseUrl,
-            jwt,
-        );
-
-        user.emailVerificationCooldownExpiresAt = new Date(
-            Date.now() + 5 * 60 * 1000,
-        ); // 5 minutes
-        await this.updateOne(user);
-    };
-
-    verifyEmail = async (jwt: string): Promise<void> => {
-        const payload = this.jwtService.verifyEmailVerification(jwt);
-
-        const userId = parseSchema(objectIdSchema, payload.sub);
-        const user = await this.findOneById(userId);
-        if (user.isEmailVerified)
-            throw new ConflictError('Email already verified');
-
-        user.isEmailVerified = true;
-        await this.updateOne(user);
-    };
+    constructor(private userRepository: UserRepository) {}
 
     insertOne = async (email: string, passwordHash: string): Promise<User> => {
         const user: User = {

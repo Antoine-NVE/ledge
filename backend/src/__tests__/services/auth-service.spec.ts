@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { AuthService } from '../../services/auth-service';
+import { AuthService } from '../../application/auth/auth-orchestrator';
 import { UserService } from '../../services/user-service';
 import { JwtService } from '../../services/jwt-service';
 import { RefreshTokenService } from '../../services/refresh-token-service';

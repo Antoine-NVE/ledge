@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import { UserService } from '../../services/user-service';
 import { parseSchema } from '../../utils/schema-utils';
 import { allowedOriginSchema, jwtSchema } from '../../schemas/security-schemas';
 import { InternalServerError } from '../../errors/internal-server-error';
 import { removePasswordHash } from '../../utils/clean-utils';
+import { UserOrchestrator } from '../../application/user/user-orchestrator';
 
 export class UserController {
-    constructor(private userService: UserService) {}
+    constructor(private userOrchestrator: UserOrchestrator) {}
 
     sendVerificationEmail = async (
         req: Request,
@@ -20,7 +20,10 @@ export class UserController {
             req.body.frontendBaseUrl,
         );
 
-        await this.userService.sendVerificationEmail(user, frontendBaseUrl);
+        await this.userOrchestrator.sendVerificationEmail(
+            user,
+            frontendBaseUrl,
+        );
 
         res.status(200).json({
             message: 'Verification email sent successfully',
@@ -30,7 +33,7 @@ export class UserController {
     verifyEmail = async (req: Request, res: Response): Promise<void> => {
         const jwt = parseSchema(jwtSchema, req.body.jwt);
 
-        await this.userService.verifyEmail(jwt);
+        await this.userOrchestrator.verifyEmail(jwt);
 
         res.status(200).json({
             message: 'Email verified successfully',

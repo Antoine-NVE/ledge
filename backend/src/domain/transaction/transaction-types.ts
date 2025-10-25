@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 
-export type NewTransaction = {
+export type TransactionData = {
     month: string;
     name: string;
     value: number;
@@ -9,7 +9,9 @@ export type NewTransaction = {
     userId: ObjectId;
 };
 
-export type Transaction = NewTransaction & {
+export type TransactionUpdateData = Omit<TransactionData, 'month' | 'userId'>;
+
+export type Transaction = TransactionData & {
     _id: ObjectId;
     createdAt: Date;
     updatedAt: Date | null;
