@@ -2,19 +2,16 @@ import { Request, Response } from 'express';
 import { CookieService } from '../../services/cookie-service';
 import { AuthOrchestrator } from '../../application/auth/auth-orchestrator';
 import { parseSchema } from '../../utils/schema-utils';
-import {
-    userLoginSchema,
-    userRegisterSchema,
-} from '../../schemas/user-schemas';
 import { UnauthorizedError } from '../../errors/unauthorized-error';
 import { removePasswordHash } from '../../utils/clean-utils';
+import { loginBodySchema, registerBodySchema } from './auth-schemas';
 
 export class AuthController {
     constructor(private authOrchestrator: AuthOrchestrator) {}
 
     register = async (req: Request, res: Response) => {
         const { email, password } = parseSchema(
-            userRegisterSchema,
+            registerBodySchema,
             req.body,
             true,
         );
@@ -39,7 +36,7 @@ export class AuthController {
 
     login = async (req: Request, res: Response) => {
         const { email, password, rememberMe } = parseSchema(
-            userLoginSchema,
+            loginBodySchema,
             req.body,
             true,
         );
