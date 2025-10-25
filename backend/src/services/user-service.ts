@@ -4,7 +4,6 @@ import { JwtService } from './jwt-service';
 import { MongoServerError, ObjectId } from 'mongodb';
 import { parseSchema } from '../utils/schema-utils';
 import { objectIdSchema } from '../schemas/security-schemas';
-import { userSchema } from '../schemas/user-schemas';
 import { ConflictError } from '../errors/conflict-error';
 import { TooManyRequestsError } from '../errors/too-many-requests-error';
 import { NotFoundError } from '../errors/not-found-error';
@@ -58,7 +57,7 @@ export class UserService {
     };
 
     insertOne = async (email: string, passwordHash: string): Promise<User> => {
-        const user = parseSchema(userSchema, {
+        const user: User = {
             _id: new ObjectId(),
             email,
             passwordHash,
@@ -66,7 +65,7 @@ export class UserService {
             emailVerificationCooldownExpiresAt: null,
             createdAt: new Date(),
             updatedAt: null,
-        });
+        };
 
         await this.userRepository.insertOne(user).catch((err) => {
             if (err instanceof MongoServerError && err.code === 11000) {
@@ -94,8 +93,6 @@ export class UserService {
 
     updateOne = async (user: User): Promise<User> => {
         user.updatedAt = new Date();
-
-        user = parseSchema(userSchema, user);
 
         await this.userRepository.updateOne(user);
 

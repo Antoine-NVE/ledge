@@ -1,7 +1,5 @@
 import { ObjectId } from 'mongodb';
 import { RefreshTokenRepository } from '../domain/refresh-token/refresh-token-repository';
-import { parseSchema } from '../utils/schema-utils';
-import { refreshTokenSchema } from '../schemas/refresh-token-schemas';
 import { TokenService } from './token-service';
 import { NotFoundError } from '../errors/not-found-error';
 import { RefreshToken } from '../domain/refresh-token/refresh-token-types';
@@ -15,14 +13,14 @@ export class RefreshTokenService {
     ) {}
 
     insertOne = async (userId: ObjectId): Promise<RefreshToken> => {
-        const refreshToken = parseSchema(refreshTokenSchema, {
+        const refreshToken: RefreshToken = {
             _id: new ObjectId(),
             token: this.tokenService.generate(),
             expiresAt: new Date(Date.now() + this.TTL),
             userId,
             createdAt: new Date(),
             updatedAt: null,
-        });
+        };
 
         await this.refreshTokenRepository.insertOne(refreshToken);
 
@@ -41,8 +39,6 @@ export class RefreshTokenService {
 
     updateOne = async (refreshToken: RefreshToken): Promise<RefreshToken> => {
         refreshToken.updatedAt = new Date();
-
-        refreshToken = parseSchema(refreshTokenSchema, refreshToken);
 
         await this.refreshTokenRepository.updateOne(refreshToken);
 

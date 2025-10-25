@@ -1,7 +1,5 @@
 import { ObjectId } from 'mongodb';
 import { TransactionRepository } from '../domain/transaction/transaction-repository';
-import { parseSchema } from '../utils/schema-utils';
-import { transactionSchema } from '../schemas/transaction-schemas';
 import { NotFoundError } from '../errors/not-found-error';
 import { Transaction } from '../domain/transaction/transaction-types';
 
@@ -16,7 +14,7 @@ export class TransactionService {
         isRecurring: boolean,
         userId: ObjectId,
     ): Promise<Transaction> => {
-        const transaction = parseSchema(transactionSchema, {
+        const transaction: Transaction = {
             _id: new ObjectId(),
             month,
             name,
@@ -26,7 +24,7 @@ export class TransactionService {
             userId,
             createdAt: new Date(),
             updatedAt: null,
-        });
+        };
 
         await this.transactionRepository.insertOne(transaction);
 
@@ -46,8 +44,6 @@ export class TransactionService {
 
     updateOne = async (transaction: Transaction): Promise<Transaction> => {
         transaction.updatedAt = new Date();
-
-        transaction = parseSchema(transactionSchema, transaction);
 
         await this.transactionRepository.updateOne(transaction);
 
