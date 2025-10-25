@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { UserService } from '../services/user-service';
-import { parseSchema } from '../utils/schema-utils';
-import { allowedOriginSchema, jwtSchema } from '../schemas/security-schemas';
-import { InternalServerError } from '../errors/internal-server-error';
-import { removePasswordHash } from '../utils/clean-utils';
+import { UserService } from '../../services/user-service';
+import { parseSchema } from '../../utils/schema-utils';
+import { allowedOriginSchema, jwtSchema } from '../../schemas/security-schemas';
+import { InternalServerError } from '../../errors/internal-server-error';
+import { removePasswordHash } from '../../utils/clean-utils';
 
 export class UserController {
     constructor(private userService: UserService) {}

@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import { TransactionService } from '../services/transaction-service';
-import { parseSchema } from '../utils/schema-utils';
+import { TransactionService } from '../../services/transaction-service';
+import { parseSchema } from '../../utils/schema-utils';
 import {
     transactionCreateSchema,
     transactionUpdateSchema,
-} from '../schemas/transaction-schemas';
-import { InternalServerError } from '../errors/internal-server-error';
-import { Transaction } from '../domain/transaction/transaction-types';
+} from '../../schemas/transaction-schemas';
+import { InternalServerError } from '../../errors/internal-server-error';
+import { Transaction } from '../../domain/transaction/transaction-types';
 
 export class TransactionController {
     constructor(private transactionService: TransactionService) {}

@@ -1,9 +1,9 @@
 import express, { NextFunction, Request, Response } from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import authRoutes from './routes/auth-routes';
-import transactionRoutes from './routes/transaction-routes';
-import userRoutes from './routes/user-routes';
+import authRoutes from './presentation/auth/auth-routes';
+import transactionRoutes from './presentation/transaction/transaction-routes';
+import userRoutes from './presentation/user/user-routes';
 import { HttpError } from './errors/http-error';
 import { env } from './config/env';
 import rateLimit from 'express-rate-limit';

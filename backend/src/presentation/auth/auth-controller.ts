@@ -1,11 +1,14 @@
 import { Request, Response } from 'express';
-import { CookieService } from '../services/cookie-service';
-import { AuthService } from '../services/auth-service';
-import { parseSchema } from '../utils/schema-utils';
-import { userLoginSchema, userRegisterSchema } from '../schemas/user-schemas';
-import { UserService } from '../services/user-service';
-import { UnauthorizedError } from '../errors/unauthorized-error';
-import { removePasswordHash } from '../utils/clean-utils';
+import { CookieService } from '../../services/cookie-service';
+import { AuthService } from '../../services/auth-service';
+import { parseSchema } from '../../utils/schema-utils';
+import {
+    userLoginSchema,
+    userRegisterSchema,
+} from '../../schemas/user-schemas';
+import { UserService } from '../../services/user-service';
+import { UnauthorizedError } from '../../errors/unauthorized-error';
+import { removePasswordHash } from '../../utils/clean-utils';
 
 export class AuthController {
     constructor(
