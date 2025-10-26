@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { CookieService } from '../../services/cookie-service';
 import { AuthOrchestrator } from '../../application/auth/auth-orchestrator';
-import { parseSchema } from '../../utils/schema-utils';
-import { UnauthorizedError } from '../../errors/unauthorized-error';
-import { removePasswordHash } from '../../utils/clean-utils';
+import { UnauthorizedError } from '../../infrastructure/errors/unauthorized-error';
 import { loginBodySchema, registerBodySchema } from './auth-schemas';
+import { parseSchema } from '../../infrastructure/utils/schema-utils';
+import { CookieService } from '../../infrastructure/services/cookie-service';
+import { removePasswordHash } from '../../infrastructure/utils/clean-utils';
 
 export class AuthController {
     constructor(private authOrchestrator: AuthOrchestrator) {}

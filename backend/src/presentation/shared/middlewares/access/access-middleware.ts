@@ -1,16 +1,16 @@
 import { NextFunction, Request, Response } from 'express';
-import { JwtService } from '../../../../services/jwt-service';
-import { CookieService } from '../../../../services/cookie-service';
 import { UserService } from '../../../../domain/user/user-service';
 import { TransactionService } from '../../../../domain/transaction/transaction-service';
-import { parseSchema } from '../../../../utils/schema-utils';
-import { objectIdSchema } from '../../../../schemas/security-schemas';
-import { UnauthorizedError } from '../../../../errors/unauthorized-error';
-import { InternalServerError } from '../../../../errors/internal-server-error';
-import { ForbiddenError } from '../../../../errors/forbidden-error';
+import { objectIdSchema } from '../../../../infrastructure/schemas/security-schemas';
+import { UnauthorizedError } from '../../../../infrastructure/errors/unauthorized-error';
+import { InternalServerError } from '../../../../infrastructure/errors/internal-server-error';
+import { ForbiddenError } from '../../../../infrastructure/errors/forbidden-error';
 import { User } from '../../../../domain/user/user-types';
 import { Transaction } from '../../../../domain/transaction/transaction-types';
 import { authorizeParamsSchema } from './access-schemas';
+import { JwtService } from '../../../../infrastructure/services/jwt-service';
+import { CookieService } from '../../../../infrastructure/services/cookie-service';
+import { parseSchema } from '../../../../infrastructure/utils/schema-utils';
 
 declare module 'express-serve-static-core' {
     interface Request {

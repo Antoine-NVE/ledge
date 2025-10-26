@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { RefreshTokenRepository } from './refresh-token-repository';
 import { RefreshToken } from './refresh-token-types';
-import { NotFoundError } from '../../errors/not-found-error';
+import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 
 export class RefreshTokenService {
     private readonly TTL = 7 * 24 * 60 * 60 * 1000; // 7 days

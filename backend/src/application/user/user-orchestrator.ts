@@ -1,11 +1,11 @@
 import { User } from '../../domain/user/user-types';
-import { ConflictError } from '../../errors/conflict-error';
-import { TooManyRequestsError } from '../../errors/too-many-requests-error';
-import { objectIdSchema } from '../../schemas/security-schemas';
-import { EmailService } from '../../services/email-service';
-import { JwtService } from '../../services/jwt-service';
+import { ConflictError } from '../../infrastructure/errors/conflict-error';
+import { TooManyRequestsError } from '../../infrastructure/errors/too-many-requests-error';
+import { objectIdSchema } from '../../infrastructure/schemas/security-schemas';
 import { UserService } from '../../domain/user/user-service';
-import { parseSchema } from '../../utils/schema-utils';
+import { JwtService } from '../../infrastructure/services/jwt-service';
+import { EmailService } from '../../infrastructure/services/email-service';
+import { parseSchema } from '../../infrastructure/utils/schema-utils';
 
 export class UserOrchestrator {
     constructor(

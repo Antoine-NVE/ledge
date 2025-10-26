@@ -4,8 +4,8 @@ import { EmailService } from '../../services/email-service';
 import { JwtService } from '../../services/jwt-service';
 import { UserService } from '../../domain/user/user-service';
 import { parseSchema } from '../../utils/schema-utils';
-import { objectIdSchema } from '../../schemas/security-schemas';
-import { userSchema } from '../../schemas/user-schemas';
+import { objectIdSchema } from '../../infrastructure/schemas/security-schemas';
+import { userSchema } from '../../infrastructure/schemas/user-schemas';
 import { User } from '../../domain/user/user-types';
 
 jest.mock('../../utils/schema-utils', () => ({

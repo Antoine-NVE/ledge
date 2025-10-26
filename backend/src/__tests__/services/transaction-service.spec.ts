@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import { parseSchema } from '../../utils/schema-utils';
 import { TransactionService } from '../../services/transaction-service';
 import { TransactionRepository } from '../../domain/transaction/transaction-repository';
-import { transactionSchema } from '../../schemas/transaction-schemas';
+import { transactionSchema } from '../../infrastructure/schemas/transaction-schemas';
 import { Transaction } from '../../domain/transaction/transaction-types';
 
 const transactionId = new ObjectId();

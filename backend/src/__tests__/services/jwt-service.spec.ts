@@ -1,7 +1,7 @@
 import { ObjectId } from 'mongodb';
 import { JwtService } from '../../services/jwt-service';
 import jwt from 'jsonwebtoken';
-import { UnauthorizedError } from '../../errors/unauthorized-error';
+import { UnauthorizedError } from '../../infrastructure/errors/unauthorized-error';
 
 describe('JwtService', () => {
     let jwtService: JwtService;

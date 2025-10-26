@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { parseSchema } from '../../utils/schema-utils';
-import { InternalServerError } from '../../errors/internal-server-error';
+import { InternalServerError } from '../../infrastructure/errors/internal-server-error';
 import { Transaction } from '../../domain/transaction/transaction-types';
 import { TransactionOrchestrator } from '../../application/transaction/transaction-orchestrator';
 import { createBodySchema, updateBodySchema } from './transaction-schemas';
+import { parseSchema } from '../../infrastructure/utils/schema-utils';
 
 export class TransactionController {
     constructor(private transactionOrchestrator: TransactionOrchestrator) {}

@@ -1,12 +1,12 @@
-import { JwtService } from '../../services/jwt-service';
 import { UserService } from '../../domain/user/user-service';
-import { PasswordService } from '../../services/password-service';
-import { NotFoundError } from '../../errors/not-found-error';
-import { UnauthorizedError } from '../../errors/unauthorized-error';
+import { NotFoundError } from '../../infrastructure/errors/not-found-error';
+import { UnauthorizedError } from '../../infrastructure/errors/unauthorized-error';
 import { User } from '../../domain/user/user-types';
 import { RefreshToken } from '../../domain/refresh-token/refresh-token-types';
 import { RefreshTokenService } from '../../domain/refresh-token/refresh-token-service';
-import { TokenService } from '../../services/token-service';
+import { JwtService } from '../../infrastructure/services/jwt-service';
+import { PasswordService } from '../../infrastructure/services/password-service';
+import { TokenService } from '../../infrastructure/services/token-service';
 
 export class AuthOrchestrator {
     constructor(

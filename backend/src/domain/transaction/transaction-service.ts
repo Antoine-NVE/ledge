@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { TransactionRepository } from './transaction-repository';
-import { NotFoundError } from '../../errors/not-found-error';
+import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 import {
     Transaction,
     TransactionData,

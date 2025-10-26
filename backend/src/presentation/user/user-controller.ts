@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import { parseSchema } from '../../utils/schema-utils';
-import { InternalServerError } from '../../errors/internal-server-error';
-import { removePasswordHash } from '../../utils/clean-utils';
+import { InternalServerError } from '../../infrastructure/errors/internal-server-error';
 import { UserOrchestrator } from '../../application/user/user-orchestrator';
 import {
     sendVerificationEmailBodySchema,
     verifyEmailBodySchema,
 } from './user-schemas';
+import { parseSchema } from '../../infrastructure/utils/schema-utils';
+import { removePasswordHash } from '../../infrastructure/utils/clean-utils';
 
 export class UserController {
     constructor(private userOrchestrator: UserOrchestrator) {}

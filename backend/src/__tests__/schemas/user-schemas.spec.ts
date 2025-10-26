@@ -3,7 +3,7 @@ import {
     userLoginSchema,
     userRegisterSchema,
     userSchema,
-} from '../../schemas/user-schemas';
+} from '../../infrastructure/schemas/user-schemas';
 
 describe('user schemas', () => {
     describe('userSchema', () => {

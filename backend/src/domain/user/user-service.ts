@@ -1,7 +1,7 @@
 import { UserRepository } from './user-repository';
 import { MongoServerError, ObjectId } from 'mongodb';
-import { ConflictError } from '../../errors/conflict-error';
-import { NotFoundError } from '../../errors/not-found-error';
+import { ConflictError } from '../../infrastructure/errors/conflict-error';
+import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 import { User } from './user-types';
 
 export class UserService {
