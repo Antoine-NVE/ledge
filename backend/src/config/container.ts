@@ -1,4 +1,4 @@
-import { SecurityMiddleware } from '../middlewares/security-middleware';
+import { AccessMiddleware } from '../presentation/shared/middlewares/access/access-middleware';
 import { RefreshTokenRepository } from '../domain/refresh-token/refresh-token-repository';
 import { TransactionRepository } from '../domain/transaction/transaction-repository';
 import { UserRepository } from '../domain/user/user-repository';
@@ -63,7 +63,7 @@ const transactionController = new TransactionController(
     transactionOrchestrator,
 );
 
-const securityMiddleware = new SecurityMiddleware(
+const accessMiddleware = new AccessMiddleware(
     userService,
     transactionService,
     jwtService,
@@ -73,5 +73,5 @@ export const container = {
     authController,
     userController,
     transactionController,
-    securityMiddleware,
+    accessMiddleware,
 };

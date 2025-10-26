@@ -3,7 +3,7 @@ import { container } from '../../config/container';
 
 const router = express.Router();
 
-const { authenticateUser, authorizeTransaction } = container.securityMiddleware;
+const { authenticate, authorize } = container.accessMiddleware;
 const {
     create,
     readAll,
@@ -12,10 +12,10 @@ const {
     delete: remove,
 } = container.transactionController;
 
-router.post('/', authenticateUser, create);
-router.get('/', authenticateUser, readAll);
-router.get('/:id', authenticateUser, authorizeTransaction, read);
-router.put('/:id', authenticateUser, authorizeTransaction, update);
-router.delete('/:id', authenticateUser, authorizeTransaction, remove);
+router.post('/', authenticate, create);
+router.get('/', authenticate, readAll);
+router.get('/:id', authenticate, authorize, read);
+router.put('/:id', authenticate, authorize, update);
+router.delete('/:id', authenticate, authorize, remove);
 
 export default router;
