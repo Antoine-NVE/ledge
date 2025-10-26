@@ -1,7 +1,6 @@
 import { User } from '../../domain/user/user-types';
 import { ConflictError } from '../../infrastructure/errors/conflict-error';
 import { TooManyRequestsError } from '../../infrastructure/errors/too-many-requests-error';
-import { objectIdSchema } from '../../infrastructure/schemas/security-schemas';
 import { UserService } from '../../domain/user/user-service';
 import { JwtService } from '../../infrastructure/services/jwt-service';
 import { EmailService } from '../../infrastructure/services/email-service';
@@ -40,10 +39,8 @@ export class UserOrchestrator {
     };
 
     verifyEmail = async (jwt: string): Promise<void> => {
-        const payload = this.jwtService.verifyEmailVerification(jwt);
-
-        const userId = parseSchema(objectIdSchema, payload.sub);
-        const user = await this.userService.findOneById(userId);
+        const { sub } = this.jwtService.verifyEmailVerification(jwt);
+        const user = await this.userService.findOneById(sub);
         if (user.isEmailVerified)
             throw new ConflictError('Email already verified');
 

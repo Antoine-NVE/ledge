@@ -8,8 +8,9 @@ import {
     NotBeforeError,
 } from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
-import { Payload } from '../types/payload-type';
 import { UnauthorizedError } from '../errors/unauthorized-error';
+import { parseSchema } from '../utils/schema-utils';
+import { verifySchema } from '../schemas/jwt-service-schemas';
 
 export class JwtService {
     constructor(private secret: Secret) {}
@@ -32,10 +33,9 @@ export class JwtService {
         );
     };
 
-    private verify = (jwt: string, options?: VerifyOptions): Payload => {
+    private verify = (jwt: string, options?: VerifyOptions) => {
         try {
-            // TODO: create a real verification
-            return verify(jwt, this.secret, options) as Payload;
+            return parseSchema(verifySchema, verify(jwt, this.secret, options));
         } catch (error: unknown) {
             if (error instanceof NotBeforeError)
                 throw new UnauthorizedError('Inactive JWT');
@@ -46,7 +46,7 @@ export class JwtService {
         }
     };
 
-    verifyAccess = (jwt: string): Payload => {
+    verifyAccess = (jwt: string) => {
         try {
             return this.verify(jwt, { audience: 'access' });
         } catch (error: unknown) {
@@ -59,7 +59,7 @@ export class JwtService {
         }
     };
 
-    verifyEmailVerification = (jwt: string): Payload => {
+    verifyEmailVerification = (jwt: string) => {
         return this.verify(jwt, { audience: 'email-verification' });
     };
 }

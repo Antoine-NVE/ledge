@@ -3,7 +3,7 @@ import {
     allowedOriginSchema,
     jwtSchema,
     objectIdSchema,
-} from '../../infrastructure/schemas/security-schemas';
+} from '../../infrastructure/schemas/jwt-service-schemas';
 
 jest.mock('../../config/env', () => ({
     env: {

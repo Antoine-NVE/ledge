@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { envSchema } from '../schemas/config-schemas';
+import { envSchema } from '../schemas/env-config-schemas';
 import { parseSchema } from '../utils/schema-utils';
 import { parseArray, parseBoolean, parseNumber } from '../utils/parse-utils';
 

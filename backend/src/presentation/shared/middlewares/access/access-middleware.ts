@@ -1,7 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { UserService } from '../../../../domain/user/user-service';
 import { TransactionService } from '../../../../domain/transaction/transaction-service';
-import { objectIdSchema } from '../../../../infrastructure/schemas/security-schemas';
 import { UnauthorizedError } from '../../../../infrastructure/errors/unauthorized-error';
 import { InternalServerError } from '../../../../infrastructure/errors/internal-server-error';
 import { ForbiddenError } from '../../../../infrastructure/errors/forbidden-error';
@@ -34,9 +33,8 @@ export class AccessMiddleware {
                 action: 'refresh',
             });
 
-        const payload = this.jwtService.verifyAccess(accessToken);
-        const userId = parseSchema(objectIdSchema, payload.sub);
-        const user = await this.userService.findOneById(userId);
+        const { sub } = this.jwtService.verifyAccess(accessToken);
+        const user = await this.userService.findOneById(sub);
 
         req.user = user;
         next();
