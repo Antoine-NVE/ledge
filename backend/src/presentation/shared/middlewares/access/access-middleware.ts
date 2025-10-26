@@ -10,6 +10,7 @@ import { InternalServerError } from '../../../../errors/internal-server-error';
 import { ForbiddenError } from '../../../../errors/forbidden-error';
 import { User } from '../../../../domain/user/user-types';
 import { Transaction } from '../../../../domain/transaction/transaction-types';
+import { authorizeParamsSchema } from './access-schemas';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -25,11 +26,7 @@ export class AccessMiddleware {
         private jwtService: JwtService,
     ) {}
 
-    authenticate = async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ) => {
+    authenticate = async (req: Request, res: Response, next: NextFunction) => {
         const cookieService = new CookieService(req, res);
         const accessToken = cookieService.getAccessToken();
         if (!accessToken)
@@ -45,16 +42,12 @@ export class AccessMiddleware {
         next();
     };
 
-    authorize = async (
-        req: Request,
-        res: Response,
-        next: NextFunction,
-    ) => {
+    authorize = async (req: Request, res: Response, next: NextFunction) => {
         const user = req.user;
         if (!user) throw new InternalServerError('Undefined user');
 
-        const transactionId = parseSchema(objectIdSchema, req.params.id);
-        const transaction = await this.transactionService.read(transactionId);
+        const { id } = parseSchema(authorizeParamsSchema, req.params);
+        const transaction = await this.transactionService.read(id);
 
         if (!user._id.equals(transaction.userId))
             throw new ForbiddenError('Forbidden access');
