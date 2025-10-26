@@ -11,16 +11,15 @@ import { TooManyRequestsError } from './errors/too-many-requests-error';
 import { NotFoundError } from './errors/not-found-error';
 
 const app = express();
+
 app.use(express.json());
 app.use(cookieParser());
-
 app.use(
     cors({
         origin: env.ALLOWED_ORIGINS,
         credentials: true,
     }),
 );
-
 app.use(
     rateLimit({
         windowMs: 60 * 1000,
@@ -69,5 +68,5 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
 
 const port = 3000;
 app.listen(port, () => {
-    console.log(`Backend listening at http://0.0.0.0:${port}`);
+    console.log(`Backend listening on port ${port}`);
 });
