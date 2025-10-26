@@ -5,7 +5,7 @@ import authRoutes from './presentation/auth/auth-routes';
 import transactionRoutes from './presentation/transaction/transaction-routes';
 import userRoutes from './presentation/user/user-routes';
 import { HttpError } from './infrastructure/errors/http-error';
-import { env } from './infrastructure/config/env';
+import { env } from './infrastructure/config/env-config';
 import rateLimit from 'express-rate-limit';
 import { TooManyRequestsError } from './infrastructure/errors/too-many-requests-error';
 import { NotFoundError } from './infrastructure/errors/not-found-error';
