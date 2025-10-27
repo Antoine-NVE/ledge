@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import z from 'zod';
 import { BadRequestError } from '../../../../infrastructure/errors/bad-request-error';
-import { formatError } from '../../../../infrastructure/utils/schema-utils';
+import { formatZodError } from '../../../../infrastructure/utils/format-utils';
 
 export const validate =
     (schema: z.ZodSchema) =>
@@ -9,7 +9,10 @@ export const validate =
         const { success, data, error } = schema.safeParse(req.body);
 
         if (!success) {
-            throw new BadRequestError('Validation error', formatError(error));
+            throw new BadRequestError(
+                'Validation error',
+                formatZodError(error),
+            );
         }
 
         req.body = data;

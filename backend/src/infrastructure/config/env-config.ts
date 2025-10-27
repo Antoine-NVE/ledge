@@ -1,11 +1,12 @@
 import dotenv from 'dotenv';
 import { envSchema } from '../schemas/env-config-schemas';
-import { parseSchema } from '../utils/schema-utils';
 import { parseArray, parseBoolean, parseNumber } from '../utils/parse-utils';
+import { InternalServerError } from '../errors/internal-server-error';
+import { formatZodError } from '../utils/format-utils';
 
 dotenv.config();
 
-export const env = parseSchema(envSchema, {
+const { success, data, error } = envSchema.safeParse({
     NODE_ENV: process.env.NODE_ENV,
 
     JWT_SECRET: process.env.JWT_SECRET,
@@ -19,3 +20,9 @@ export const env = parseSchema(envSchema, {
     SMTP_PASS: process.env.SMTP_PASS,
     EMAIL_FROM: process.env.EMAIL_FROM,
 });
+
+if (!success) {
+    throw new InternalServerError('Invalid .env', formatZodError(error));
+}
+
+export const env = data;

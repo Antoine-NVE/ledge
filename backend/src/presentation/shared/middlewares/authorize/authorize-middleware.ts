@@ -3,7 +3,7 @@ import { TransactionService } from '../../../../domain/transaction/transaction-s
 import { ForbiddenError } from '../../../../infrastructure/errors/forbidden-error';
 import { authorizeParamsSchema } from './authorize-schemas';
 import { InternalServerError } from '../../../../infrastructure/errors/internal-server-error';
-import { formatError } from '../../../../infrastructure/utils/schema-utils';
+import { formatZodError } from '../../../../infrastructure/utils/format-utils';
 import { Transaction } from '../../../../domain/transaction/transaction-types';
 
 declare module 'express-serve-static-core' {
@@ -22,7 +22,7 @@ export const authorize =
         if (!success) {
             throw new InternalServerError(
                 'Validation error',
-                formatError(error),
+                formatZodError(error),
             );
         }
 

@@ -9,8 +9,9 @@ import {
 } from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import { UnauthorizedError } from '../errors/unauthorized-error';
-import { parseSchema } from '../utils/schema-utils';
 import { verifySchema } from '../schemas/jwt-service-schemas';
+import { InternalServerError } from '../errors/internal-server-error';
+import { formatZodError } from '../utils/format-utils';
 
 export class JwtService {
     constructor(private secret: Secret) {}
@@ -47,8 +48,16 @@ export class JwtService {
             throw new UnauthorizedError('Invalid JWT');
         }
 
-        // Can throw internal server error
-        return parseSchema(verifySchema, payload);
+        const { success, data, error } = verifySchema.safeParse(payload);
+
+        if (!success) {
+            throw new InternalServerError(
+                'Invalid JWT payload',
+                formatZodError(error),
+            );
+        }
+
+        return data;
     };
 
     verifyAccess = (jwt: string) => {
