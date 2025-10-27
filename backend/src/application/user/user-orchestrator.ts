@@ -4,7 +4,6 @@ import { TooManyRequestsError } from '../../infrastructure/errors/too-many-reque
 import { UserService } from '../../domain/user/user-service';
 import { JwtService } from '../../infrastructure/services/jwt-service';
 import { EmailService } from '../../infrastructure/services/email-service';
-import { parseSchema } from '../../infrastructure/utils/schema-utils';
 
 export class UserOrchestrator {
     constructor(
