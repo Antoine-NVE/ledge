@@ -1,4 +1,3 @@
-import { AccessMiddleware } from '../../presentation/shared/middlewares/access/access-middleware';
 import { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository';
 import { TransactionRepository } from '../../domain/transaction/transaction-repository';
 import { UserRepository } from '../../domain/user/user-repository';
@@ -63,15 +62,11 @@ const transactionController = new TransactionController(
     transactionOrchestrator,
 );
 
-const accessMiddleware = new AccessMiddleware(
-    userService,
-    transactionService,
-    jwtService,
-);
-
 export const container = {
     authController,
     userController,
     transactionController,
-    accessMiddleware,
+    jwtService,
+    userService,
+    transactionService,
 };

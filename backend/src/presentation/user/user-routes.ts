@@ -5,19 +5,20 @@ import {
     sendVerificationEmailBodySchema,
     verifyEmailBodySchema,
 } from './user-schemas';
+import { authenticate } from '../shared/middlewares/authenticate/authenticate-middleware';
 
 const router = express.Router();
 
-const { authenticate } = container.accessMiddleware;
+const { jwtService, userService } = container;
 const { sendVerificationEmail, verifyEmail, me } = container.userController;
 
 router.post(
     '/send-verification-email',
-    authenticate,
+    authenticate(jwtService, userService),
     validate(sendVerificationEmailBodySchema),
     sendVerificationEmail,
 );
 router.post('/verify-email', validate(verifyEmailBodySchema), verifyEmail);
-router.get('/me', authenticate, me);
+router.get('/me', authenticate(jwtService, userService), me);
 
 export default router;
