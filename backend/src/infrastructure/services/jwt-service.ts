@@ -34,8 +34,10 @@ export class JwtService {
     };
 
     private verify = (jwt: string, options?: VerifyOptions) => {
+        let payload;
+
         try {
-            return parseSchema(verifySchema, verify(jwt, this.secret, options));
+            payload = verify(jwt, this.secret, options);
         } catch (error: unknown) {
             if (error instanceof NotBeforeError)
                 throw new UnauthorizedError('Inactive JWT');
@@ -44,6 +46,9 @@ export class JwtService {
 
             throw new UnauthorizedError('Invalid JWT');
         }
+
+        // Can throw internal server error
+        return parseSchema(verifySchema, payload);
     };
 
     verifyAccess = (jwt: string) => {
@@ -55,6 +60,7 @@ export class JwtService {
                     action: 'refresh',
                 });
 
+            // Should only re-throw internal server error
             throw error;
         }
     };
