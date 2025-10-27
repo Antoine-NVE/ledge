@@ -14,10 +14,10 @@ const {
     delete: remove,
 } = container.transactionController;
 
-router.post('/', validate(createBodySchema), authenticate, create);
-router.get('/', validate(updateBodySchema), authenticate, readAll);
+router.post('/', authenticate, validate(createBodySchema), create);
+router.get('/', authenticate, readAll);
 router.get('/:id', authenticate, authorize, read);
-router.put('/:id', authenticate, authorize, update);
+router.put('/:id', authenticate, authorize, validate(updateBodySchema), update);
 router.delete('/:id', authenticate, authorize, remove);
 
 export default router;
