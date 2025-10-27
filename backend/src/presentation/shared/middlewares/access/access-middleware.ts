@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 import { UserService } from '../../../../domain/user/user-service';
 import { TransactionService } from '../../../../domain/transaction/transaction-service';
 import { UnauthorizedError } from '../../../../infrastructure/errors/unauthorized-error';
-import { InternalServerError } from '../../../../infrastructure/errors/internal-server-error';
 import { ForbiddenError } from '../../../../infrastructure/errors/forbidden-error';
 import { User } from '../../../../domain/user/user-types';
 import { Transaction } from '../../../../domain/transaction/transaction-types';
@@ -13,8 +12,8 @@ import { parseSchema } from '../../../../infrastructure/utils/schema-utils';
 
 declare module 'express-serve-static-core' {
     interface Request {
-        user?: User;
-        transaction?: Transaction;
+        user: User;
+        transaction: Transaction;
     }
 }
 
@@ -41,13 +40,10 @@ export class AccessMiddleware {
     };
 
     authorize = async (req: Request, res: Response, next: NextFunction) => {
-        const user = req.user;
-        if (!user) throw new InternalServerError('Undefined user');
-
         const { id } = parseSchema(authorizeParamsSchema, req.params);
         const transaction = await this.transactionService.read(id);
 
-        if (!user._id.equals(transaction.userId))
+        if (!req.user._id.equals(transaction.userId))
             throw new ForbiddenError('Forbidden access');
 
         req.transaction = transaction;

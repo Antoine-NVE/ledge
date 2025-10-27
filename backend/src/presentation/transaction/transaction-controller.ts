@@ -1,18 +1,13 @@
 import { Request, Response } from 'express';
-import { InternalServerError } from '../../infrastructure/errors/internal-server-error';
-import { Transaction } from '../../domain/transaction/transaction-types';
 import { TransactionOrchestrator } from '../../application/transaction/transaction-orchestrator';
 
 export class TransactionController {
     constructor(private transactionOrchestrator: TransactionOrchestrator) {}
 
     create = async (req: Request, res: Response) => {
-        const user = req.user;
-        if (!user) throw new InternalServerError('Undefined user');
-
         const transaction = await this.transactionOrchestrator.create({
             ...req.body,
-            userId: user._id,
+            userId: req.user._id,
         });
 
         res.status(201).json({
@@ -24,11 +19,8 @@ export class TransactionController {
     };
 
     readAll = async (req: Request, res: Response) => {
-        const user = req.user;
-        if (!user) throw new InternalServerError('Undefined user');
-
         const transactions = await this.transactionOrchestrator.readAll(
-            user._id,
+            req.user._id,
         );
 
         res.status(200).json({
@@ -40,25 +32,17 @@ export class TransactionController {
     };
 
     read = async (req: Request, res: Response) => {
-        const transaction = req.transaction;
-        if (!transaction)
-            throw new InternalServerError('Undefined transaction');
-
         res.status(200).json({
             message: 'Transaction retrieved successfully',
             data: {
-                transaction,
+                transaction: req.transaction,
             },
         });
     };
 
     update = async (req: Request, res: Response) => {
-        let transaction: Transaction | undefined = req.transaction;
-        if (!transaction)
-            throw new InternalServerError('Undefined transaction');
-
-        transaction = await this.transactionOrchestrator.update(
-            transaction,
+        const transaction = await this.transactionOrchestrator.update(
+            req.transaction,
             req.body,
         );
 
@@ -71,11 +55,7 @@ export class TransactionController {
     };
 
     delete = async (req: Request, res: Response) => {
-        const transaction = req.transaction;
-        if (!transaction)
-            throw new InternalServerError('Undefined transaction');
-
-        this.transactionOrchestrator.delete(transaction._id);
+        this.transactionOrchestrator.delete(req.transaction._id);
 
         res.status(200).json({
             message: 'Transaction deleted successfully',

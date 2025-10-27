@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { InternalServerError } from '../../infrastructure/errors/internal-server-error';
 import { UserOrchestrator } from '../../application/user/user-orchestrator';
 import { removePasswordHash } from '../../infrastructure/utils/clean-utils';
 
@@ -10,12 +9,10 @@ export class UserController {
         req: Request,
         res: Response,
     ): Promise<void> => {
-        const user = req.user;
-        if (!user) throw new InternalServerError('Undefined user');
-
         const { frontendBaseUrl } = req.body;
+
         await this.userOrchestrator.sendVerificationEmail(
-            user,
+            req.user,
             frontendBaseUrl,
         );
 
@@ -35,13 +32,10 @@ export class UserController {
     };
 
     me = async (req: Request, res: Response): Promise<void> => {
-        const user = req.user;
-        if (!user) throw new InternalServerError('Undefined user');
-
         res.status(200).json({
             message: 'User retrieved successfully',
             data: {
-                user: removePasswordHash(user),
+                user: removePasswordHash(req.user),
             },
         });
     };
