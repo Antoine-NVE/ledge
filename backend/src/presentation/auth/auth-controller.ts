@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 import { AuthOrchestrator } from '../../application/auth/auth-orchestrator';
 import { UnauthorizedError } from '../../infrastructure/errors/unauthorized-error';
-import { loginBodySchema, registerBodySchema } from './auth-schemas';
-import { parseSchema } from '../../infrastructure/utils/schema-utils';
 import { CookieService } from '../../infrastructure/services/cookie-service';
 import { removePasswordHash } from '../../infrastructure/utils/clean-utils';
 
@@ -10,11 +8,7 @@ export class AuthController {
     constructor(private authOrchestrator: AuthOrchestrator) {}
 
     register = async (req: Request, res: Response) => {
-        const { email, password } = parseSchema(
-            registerBodySchema,
-            req.body,
-            true,
-        );
+        const { email, password } = req.body;
 
         // The user can't choose to be remembered at registration
         // Next time the user logs in, they can choose to be remembered
@@ -35,11 +29,7 @@ export class AuthController {
     };
 
     login = async (req: Request, res: Response) => {
-        const { email, password, rememberMe } = parseSchema(
-            loginBodySchema,
-            req.body,
-            true,
-        );
+        const { email, password, rememberMe } = req.body;
 
         const { user, accessToken, refreshToken } =
             await this.authOrchestrator.login(email, password);

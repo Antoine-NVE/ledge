@@ -1,11 +1,6 @@
 import { Request, Response } from 'express';
 import { InternalServerError } from '../../infrastructure/errors/internal-server-error';
 import { UserOrchestrator } from '../../application/user/user-orchestrator';
-import {
-    sendVerificationEmailBodySchema,
-    verifyEmailBodySchema,
-} from './user-schemas';
-import { parseSchema } from '../../infrastructure/utils/schema-utils';
 import { removePasswordHash } from '../../infrastructure/utils/clean-utils';
 
 export class UserController {
@@ -18,11 +13,7 @@ export class UserController {
         const user = req.user;
         if (!user) throw new InternalServerError('Undefined user');
 
-        const { frontendBaseUrl } = parseSchema(
-            sendVerificationEmailBodySchema,
-            req.body,
-        );
-
+        const { frontendBaseUrl } = req.body;
         await this.userOrchestrator.sendVerificationEmail(
             user,
             frontendBaseUrl,
@@ -34,7 +25,7 @@ export class UserController {
     };
 
     verifyEmail = async (req: Request, res: Response): Promise<void> => {
-        const { jwt } = parseSchema(verifyEmailBodySchema, req.body);
+        const { jwt } = req.body;
 
         await this.userOrchestrator.verifyEmail(jwt);
 

@@ -2,8 +2,6 @@ import { Request, Response } from 'express';
 import { InternalServerError } from '../../infrastructure/errors/internal-server-error';
 import { Transaction } from '../../domain/transaction/transaction-types';
 import { TransactionOrchestrator } from '../../application/transaction/transaction-orchestrator';
-import { createBodySchema, updateBodySchema } from './transaction-schemas';
-import { parseSchema } from '../../infrastructure/utils/schema-utils';
 
 export class TransactionController {
     constructor(private transactionOrchestrator: TransactionOrchestrator) {}
@@ -12,10 +10,8 @@ export class TransactionController {
         const user = req.user;
         if (!user) throw new InternalServerError('Undefined user');
 
-        const data = parseSchema(createBodySchema, req.body, true);
-
         const transaction = await this.transactionOrchestrator.create({
-            ...data,
+            ...req.body,
             userId: user._id,
         });
 
@@ -61,11 +57,9 @@ export class TransactionController {
         if (!transaction)
             throw new InternalServerError('Undefined transaction');
 
-        const data = parseSchema(updateBodySchema, req.body, true);
-
         transaction = await this.transactionOrchestrator.update(
             transaction,
-            data,
+            req.body,
         );
 
         res.status(200).json({
