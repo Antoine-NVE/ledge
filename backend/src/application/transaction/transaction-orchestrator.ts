@@ -25,6 +25,6 @@ export class TransactionOrchestrator {
     };
 
     delete = async (id: ObjectId): Promise<void> => {
-        return await this.transactionService.delete(id);
+        await this.transactionService.delete(id);
     };
 }
