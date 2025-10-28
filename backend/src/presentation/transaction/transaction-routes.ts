@@ -1,9 +1,11 @@
 import express from 'express';
 import { container } from '../../infrastructure/config/container-config';
-import { validate } from '../shared/middlewares/validate/validate-middleware';
+import { validateBody } from '../shared/middlewares/validate-body/validate-body-middleware';
 import { createBodySchema, updateBodySchema } from './transaction-schemas';
 import { authenticate } from '../shared/middlewares/authenticate/authenticate-middleware';
 import { authorize } from '../shared/middlewares/authorize/authorize-middleware';
+import { authorizeParamsSchema } from '../shared/middlewares/authorize/authorize-schemas';
+import { validateParams } from '../shared/middlewares/validate-params/validate-params-middleware';
 
 const router = express.Router();
 
@@ -19,26 +21,29 @@ const {
 router.post(
     '/',
     authenticate(jwtService, userService),
-    validate(createBodySchema),
+    validateBody(createBodySchema),
     create,
 );
 router.get('/', authenticate(jwtService, userService), readAll);
 router.get(
     '/:id',
     authenticate(jwtService, userService),
+    validateParams(authorizeParamsSchema),
     authorize(transactionService),
     read,
 );
 router.put(
     '/:id',
     authenticate(jwtService, userService),
+    validateParams(authorizeParamsSchema),
     authorize(transactionService),
-    validate(updateBodySchema),
+    validateBody(updateBodySchema),
     update,
 );
 router.delete(
     '/:id',
     authenticate(jwtService, userService),
+    validateParams(authorizeParamsSchema),
     authorize(transactionService),
     remove,
 );

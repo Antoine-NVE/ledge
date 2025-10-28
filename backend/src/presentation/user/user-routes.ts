@@ -1,6 +1,6 @@
 import express from 'express';
 import { container } from '../../infrastructure/config/container-config';
-import { validate } from '../shared/middlewares/validate/validate-middleware';
+import { validateBody } from '../shared/middlewares/validate-body/validate-body-middleware';
 import {
     sendVerificationEmailBodySchema,
     verifyEmailBodySchema,
@@ -15,10 +15,10 @@ const { sendVerificationEmail, verifyEmail, me } = container.userController;
 router.post(
     '/send-verification-email',
     authenticate(jwtService, userService),
-    validate(sendVerificationEmailBodySchema),
+    validateBody(sendVerificationEmailBodySchema),
     sendVerificationEmail,
 );
-router.post('/verify-email', validate(verifyEmailBodySchema), verifyEmail);
+router.post('/verify-email', validateBody(verifyEmailBodySchema), verifyEmail);
 router.get('/me', authenticate(jwtService, userService), me);
 
 export default router;
