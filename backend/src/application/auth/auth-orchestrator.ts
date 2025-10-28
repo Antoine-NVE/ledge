@@ -52,8 +52,10 @@ export class AuthOrchestrator {
         const user = await this.userService
             .findOneByEmail(email)
             .catch((err) => {
-                if (err instanceof NotFoundError)
+                if (err instanceof NotFoundError) {
                     throw new UnauthorizedError('Invalid credentials');
+                }
+
                 throw err;
             });
 
@@ -81,12 +83,16 @@ export class AuthOrchestrator {
         let refreshToken = await this.refreshTokenService
             .findOneByToken(token)
             .catch((err) => {
-                if (err instanceof NotFoundError)
+                if (err instanceof NotFoundError) {
                     throw new UnauthorizedError('Invalid refresh token');
+                }
+
                 throw err;
             });
-        if (refreshToken.expiresAt < new Date())
+
+        if (refreshToken.expiresAt < new Date()) {
             throw new UnauthorizedError('Expired refresh token');
+        }
 
         refreshToken =
             await this.refreshTokenService.extendExpiration(refreshToken);
