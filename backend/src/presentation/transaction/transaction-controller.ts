@@ -1,10 +1,11 @@
 import { Request, Response } from 'express';
 import { TransactionOrchestrator } from '../../application/transaction/transaction-orchestrator';
+import { CreateBody, UpdateBody } from './transaction-types';
 
 export class TransactionController {
     constructor(private transactionOrchestrator: TransactionOrchestrator) {}
 
-    create = async (req: Request, res: Response) => {
+    create = async (req: Request<{}, {}, CreateBody>, res: Response) => {
         const transaction = await this.transactionOrchestrator.create({
             ...req.body,
             userId: req.user._id,
@@ -40,7 +41,7 @@ export class TransactionController {
         });
     };
 
-    update = async (req: Request, res: Response) => {
+    update = async (req: Request<{}, {}, UpdateBody>, res: Response) => {
         const transaction = await this.transactionOrchestrator.update(
             req.transaction,
             req.body,

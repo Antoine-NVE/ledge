@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
 import { UserOrchestrator } from '../../application/user/user-orchestrator';
 import { removePasswordHash } from '../../infrastructure/utils/clean-utils';
+import { SendVerificationEmailBody, VerifyEmailBody } from './user-types';
 
 export class UserController {
     constructor(private userOrchestrator: UserOrchestrator) {}
 
     sendVerificationEmail = async (
-        req: Request,
+        req: Request<{}, {}, SendVerificationEmailBody>,
         res: Response,
     ): Promise<void> => {
         const { frontendBaseUrl } = req.body;
@@ -21,7 +22,10 @@ export class UserController {
         });
     };
 
-    verifyEmail = async (req: Request, res: Response): Promise<void> => {
+    verifyEmail = async (
+        req: Request<{}, {}, VerifyEmailBody>,
+        res: Response,
+    ): Promise<void> => {
         const { jwt } = req.body;
 
         await this.userOrchestrator.verifyEmail(jwt);

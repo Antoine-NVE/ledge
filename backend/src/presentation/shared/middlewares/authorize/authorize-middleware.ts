@@ -3,6 +3,7 @@ import { TransactionService } from '../../../../domain/transaction/transaction-s
 import { ForbiddenError } from '../../../../infrastructure/errors/forbidden-error';
 import { Transaction } from '../../../../domain/transaction/transaction-types';
 import { ObjectId } from 'mongodb';
+import { AuthorizeParams } from './authorize-type';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -12,7 +13,11 @@ declare module 'express-serve-static-core' {
 
 export const authorize =
     (transactionService: TransactionService) =>
-    async (req: Request, res: Response, next: NextFunction) => {
+    async (
+        req: Request<AuthorizeParams>,
+        res: Response,
+        next: NextFunction,
+    ) => {
         const transaction = await transactionService.read(
             new ObjectId(req.params.id),
         );

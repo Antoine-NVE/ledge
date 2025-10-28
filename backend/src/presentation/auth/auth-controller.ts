@@ -3,11 +3,12 @@ import { AuthOrchestrator } from '../../application/auth/auth-orchestrator';
 import { UnauthorizedError } from '../../infrastructure/errors/unauthorized-error';
 import { CookieService } from '../../infrastructure/services/cookie-service';
 import { removePasswordHash } from '../../infrastructure/utils/clean-utils';
+import { LoginBody, RegisterBody } from './auth-types';
 
 export class AuthController {
     constructor(private authOrchestrator: AuthOrchestrator) {}
 
-    register = async (req: Request, res: Response) => {
+    register = async (req: Request<{}, {}, RegisterBody>, res: Response) => {
         const { email, password } = req.body;
 
         // The user can't choose to be remembered at registration
@@ -28,7 +29,7 @@ export class AuthController {
         });
     };
 
-    login = async (req: Request, res: Response) => {
+    login = async (req: Request<{}, {}, LoginBody>, res: Response) => {
         const { email, password, rememberMe } = req.body;
 
         const { user, accessToken, refreshToken } =
