@@ -10,8 +10,8 @@ import {
 import { ObjectId } from 'mongodb';
 import { UnauthorizedError } from '../errors/unauthorized-error';
 import { verifySchema } from '../schemas/jwt-service-schemas';
-import { InternalServerError } from '../errors/internal-server-error';
 import { formatZodError } from '../utils/format-utils';
+import { BadRequestError } from '../errors/bad-request-error';
 
 export class JwtService {
     constructor(private secret: Secret) {}
@@ -51,7 +51,7 @@ export class JwtService {
         const { success, data, error } = verifySchema.safeParse(payload);
 
         if (!success) {
-            throw new InternalServerError(
+            throw new BadRequestError(
                 'Invalid JWT payload',
                 formatZodError(error),
             );
@@ -69,7 +69,6 @@ export class JwtService {
                     action: 'refresh',
                 });
 
-            // Should only re-throw internal server error
             throw error;
         }
     };
