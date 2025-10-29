@@ -27,9 +27,9 @@ export class JwtService {
         );
     };
 
-    signEmailVerification = (userId: ObjectId): string => {
+    signVerificationEmail = (userId: ObjectId): string => {
         return this.sign(
-            { aud: 'email-verification', sub: userId.toString() },
+            { aud: 'verification-email', sub: userId.toString() },
             { expiresIn: '1h' },
         );
     };
@@ -73,7 +73,7 @@ export class JwtService {
         }
     };
 
-    verifyEmailVerification = (jwt: string) => {
-        return this.verify(jwt, { audience: 'email-verification' });
+    verifyVerificationEmail = (jwt: string) => {
+        return this.verify(jwt, { audience: 'verification-email' });
     };
 }

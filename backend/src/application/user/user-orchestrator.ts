@@ -16,17 +16,20 @@ export class UserOrchestrator {
         user: User,
         frontendBaseUrl: string,
     ): Promise<void> => {
-        if (user.isEmailVerified)
+        if (user.isEmailVerified) {
             throw new ConflictError('Email already verified');
+        }
+
         if (
             user.emailVerificationCooldownExpiresAt &&
             user.emailVerificationCooldownExpiresAt > new Date()
-        )
+        ) {
             throw new TooManyRequestsError(
                 'Please wait before requesting another verification email',
             );
+        }
 
-        const jwt = this.jwtService.signEmailVerification(user._id);
+        const jwt = this.jwtService.signVerificationEmail(user._id);
 
         await this.emailService.sendVerification(
             user.email,
@@ -38,10 +41,11 @@ export class UserOrchestrator {
     };
 
     verifyEmail = async (jwt: string): Promise<void> => {
-        const { sub } = this.jwtService.verifyEmailVerification(jwt);
+        const { sub } = this.jwtService.verifyVerificationEmail(jwt);
         const user = await this.userService.findOneById(sub);
-        if (user.isEmailVerified)
+        if (user.isEmailVerified) {
             throw new ConflictError('Email already verified');
+        }
 
         await this.userService.markEmailAsVerified(user);
     };
