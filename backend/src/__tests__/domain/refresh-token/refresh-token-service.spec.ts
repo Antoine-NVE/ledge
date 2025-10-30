@@ -25,6 +25,10 @@ describe('RefreshTokenService', () => {
         refreshTokenService = new RefreshTokenService(refreshTokenRepository);
     });
 
+    afterEach(() => {
+        jest.useRealTimers();
+    });
+
     describe('create', () => {
         it('should call refreshTokenRepository to insertOne', async () => {
             await refreshTokenService.create(TEST_TOKEN, TEST_USER_ID);
@@ -83,21 +87,21 @@ describe('RefreshTokenService', () => {
 
     describe('extendExpiration', () => {
         it('should update updatedAt and expiresAt', async () => {
-            const now = Date.now();
-            jest.spyOn(Date, 'now').mockReturnValue(now);
+            const now = new Date();
+            jest.useFakeTimers().setSystemTime(now);
 
             refreshToken = {
                 ...refreshToken,
-                expiresAt: new Date(now - 1000),
-                updatedAt: new Date(now - 1000),
+                expiresAt: new Date(now.getTime() - 1000),
+                updatedAt: new Date(now.getTime() - 1000),
             };
 
             const result =
                 await refreshTokenService.extendExpiration(refreshToken);
 
             expect(result).toMatchObject({
-                expiresAt: new Date(now + 7 * 24 * 60 * 60 * 1000),
-                updatedAt: new Date(now),
+                expiresAt: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000),
+                updatedAt: new Date(now.getTime()),
             });
         });
 
