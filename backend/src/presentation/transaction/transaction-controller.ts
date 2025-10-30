@@ -5,7 +5,16 @@ import { CreateBody, UpdateBody } from './transaction-types';
 export class TransactionController {
     constructor(private transactionOrchestrator: TransactionOrchestrator) {}
 
-    create = async (req: Request<{}, {}, CreateBody>, res: Response) => {
+    create = async (
+        req: Request<
+            {
+                [key: string]: string;
+            },
+            unknown,
+            CreateBody
+        >,
+        res: Response,
+    ) => {
         const transaction = await this.transactionOrchestrator.create({
             ...req.body,
             userId: req.user._id,
@@ -41,7 +50,16 @@ export class TransactionController {
         });
     };
 
-    update = async (req: Request<{}, {}, UpdateBody>, res: Response) => {
+    update = async (
+        req: Request<
+            {
+                [key: string]: string;
+            },
+            unknown,
+            UpdateBody
+        >,
+        res: Response,
+    ) => {
         const transaction = await this.transactionOrchestrator.update(
             req.transaction,
             req.body,

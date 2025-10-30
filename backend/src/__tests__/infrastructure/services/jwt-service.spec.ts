@@ -63,7 +63,7 @@ describe('JwtService', () => {
     describe('verifyAccess', () => {
         const audience = 'access';
 
-        const successScenario = (payload: any) => {
+        const successScenario = (payload: unknown) => {
             verifyMock.mockReturnValue(payload);
             safeParseMock.mockReturnValue({ success: true, data: payload });
 
@@ -103,7 +103,7 @@ describe('JwtService', () => {
     describe('verifyVerificationEmail', () => {
         const audience = 'verification-email';
 
-        const successScenario = (payload: any) => {
+        const successScenario = (payload: unknown) => {
             verifyMock.mockReturnValue(payload);
             safeParseMock.mockReturnValue({ success: true, data: payload });
 

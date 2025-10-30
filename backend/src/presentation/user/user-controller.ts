@@ -7,7 +7,13 @@ export class UserController {
     constructor(private userOrchestrator: UserOrchestrator) {}
 
     sendVerificationEmail = async (
-        req: Request<{}, {}, SendVerificationEmailBody>,
+        req: Request<
+            {
+                [key: string]: string;
+            },
+            unknown,
+            SendVerificationEmailBody
+        >,
         res: Response,
     ): Promise<void> => {
         const { frontendBaseUrl } = req.body;
@@ -23,7 +29,13 @@ export class UserController {
     };
 
     verifyEmail = async (
-        req: Request<{}, {}, VerifyEmailBody>,
+        req: Request<
+            {
+                [key: string]: string;
+            },
+            unknown,
+            VerifyEmailBody
+        >,
         res: Response,
     ): Promise<void> => {
         const { jwt } = req.body;

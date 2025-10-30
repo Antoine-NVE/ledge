@@ -8,7 +8,16 @@ import { LoginBody, RegisterBody } from './auth-types';
 export class AuthController {
     constructor(private authOrchestrator: AuthOrchestrator) {}
 
-    register = async (req: Request<{}, {}, RegisterBody>, res: Response) => {
+    register = async (
+        req: Request<
+            {
+                [key: string]: string;
+            },
+            unknown,
+            RegisterBody
+        >,
+        res: Response,
+    ) => {
         const { email, password } = req.body;
 
         // The user can't choose to be remembered at registration
@@ -29,7 +38,16 @@ export class AuthController {
         });
     };
 
-    login = async (req: Request<{}, {}, LoginBody>, res: Response) => {
+    login = async (
+        req: Request<
+            {
+                [key: string]: string;
+            },
+            unknown,
+            LoginBody
+        >,
+        res: Response,
+    ) => {
         const { email, password, rememberMe } = req.body;
 
         const { user, accessToken, refreshToken } =
