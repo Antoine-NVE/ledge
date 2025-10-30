@@ -72,6 +72,8 @@ export class CookieService {
 
     getRememberMe = (): boolean | undefined => {
         const value = this.get('remember_me');
+        if (value === undefined) return undefined;
+
         return parseBoolean(value);
     };
 

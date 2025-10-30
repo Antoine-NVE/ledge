@@ -10,6 +10,7 @@ export class UserOrchestrator {
         private jwtService: JwtService,
         private emailService: EmailService,
         private userService: UserService,
+        private emailFrom: string,
     ) {}
 
     sendVerificationEmail = async (
@@ -32,6 +33,7 @@ export class UserOrchestrator {
         const jwt = this.jwtService.signVerificationEmail(user._id);
 
         await this.emailService.sendVerification(
+            this.emailFrom,
             user.email,
             frontendBaseUrl,
             jwt,

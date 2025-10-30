@@ -4,8 +4,8 @@ import { UserRepository } from '../../domain/user/user-repository';
 import { AuthOrchestrator } from '../../application/auth/auth-orchestrator';
 import { TransactionService } from '../../domain/transaction/transaction-service';
 import { UserService } from '../../domain/user/user-service';
-import { db } from './db-config';
-import { env } from './env-config';
+import { db } from './db';
+import { env } from './env';
 import { AuthController } from '../../presentation/auth/auth-controller';
 import { UserController } from '../../presentation/user/user-controller';
 import { TransactionController } from '../../presentation/transaction/transaction-controller';
@@ -23,10 +23,14 @@ const port = env.SMTP_PORT;
 const secure = env.SMTP_SECURE;
 const user = env.SMTP_USER;
 const pass = env.SMTP_PASS;
-const from = env.EMAIL_FROM;
 
 const jwtService = new JwtService(secret);
-const emailService = new EmailService(host, port, secure, { user, pass }, from);
+const emailService = new EmailService({
+    host,
+    port,
+    secure,
+    auth: { user, pass },
+});
 const passwordService = new PasswordService();
 const tokenService = new TokenService();
 
@@ -53,6 +57,7 @@ const userOrchestrator = new UserOrchestrator(
     jwtService,
     emailService,
     userService,
+    env.EMAIL_FROM,
 );
 const transactionOrchestrator = new TransactionOrchestrator(transactionService);
 

@@ -1,5 +1,5 @@
 import express from 'express';
-import { container } from '../../infrastructure/config/container-config';
+import { container } from '../../infrastructure/config/container';
 import { validateBody } from '../shared/middlewares/validate-body/validate-body-middleware';
 import { createBodySchema, updateBodySchema } from './transaction-schemas';
 import { authenticate } from '../shared/middlewares/authenticate/authenticate-middleware';
