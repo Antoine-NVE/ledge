@@ -4,18 +4,13 @@ import { UnauthorizedError } from '../../infrastructure/errors/unauthorized-erro
 import { CookieService } from '../../infrastructure/services/cookie-service';
 import { removePasswordHash } from '../../infrastructure/utils/clean-utils';
 import { LoginBody, RegisterBody } from './auth-types';
+import { ParamsDictionary } from 'express-serve-static-core';
 
 export class AuthController {
     constructor(private authOrchestrator: AuthOrchestrator) {}
 
     register = async (
-        req: Request<
-            {
-                [key: string]: string;
-            },
-            unknown,
-            RegisterBody
-        >,
+        req: Request<ParamsDictionary, unknown, RegisterBody>,
         res: Response,
     ) => {
         const { email, password } = req.body;
@@ -39,13 +34,7 @@ export class AuthController {
     };
 
     login = async (
-        req: Request<
-            {
-                [key: string]: string;
-            },
-            unknown,
-            LoginBody
-        >,
+        req: Request<ParamsDictionary, unknown, LoginBody>,
         res: Response,
     ) => {
         const { email, password, rememberMe } = req.body;

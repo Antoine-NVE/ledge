@@ -2,18 +2,13 @@ import { Request, Response } from 'express';
 import { UserOrchestrator } from '../../application/user/user-orchestrator';
 import { removePasswordHash } from '../../infrastructure/utils/clean-utils';
 import { SendVerificationEmailBody, VerifyEmailBody } from './user-types';
+import { ParamsDictionary } from 'express-serve-static-core';
 
 export class UserController {
     constructor(private userOrchestrator: UserOrchestrator) {}
 
     sendVerificationEmail = async (
-        req: Request<
-            {
-                [key: string]: string;
-            },
-            unknown,
-            SendVerificationEmailBody
-        >,
+        req: Request<ParamsDictionary, unknown, SendVerificationEmailBody>,
         res: Response,
     ): Promise<void> => {
         const { frontendBaseUrl } = req.body;
@@ -29,13 +24,7 @@ export class UserController {
     };
 
     verifyEmail = async (
-        req: Request<
-            {
-                [key: string]: string;
-            },
-            unknown,
-            VerifyEmailBody
-        >,
+        req: Request<ParamsDictionary, unknown, VerifyEmailBody>,
         res: Response,
     ): Promise<void> => {
         const { jwt } = req.body;

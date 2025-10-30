@@ -1,18 +1,13 @@
 import { Request, Response } from 'express';
 import { TransactionOrchestrator } from '../../application/transaction/transaction-orchestrator';
 import { CreateBody, UpdateBody } from './transaction-types';
+import { ParamsDictionary } from 'express-serve-static-core';
 
 export class TransactionController {
     constructor(private transactionOrchestrator: TransactionOrchestrator) {}
 
     create = async (
-        req: Request<
-            {
-                [key: string]: string;
-            },
-            unknown,
-            CreateBody
-        >,
+        req: Request<ParamsDictionary, unknown, CreateBody>,
         res: Response,
     ) => {
         const transaction = await this.transactionOrchestrator.create({
@@ -51,13 +46,7 @@ export class TransactionController {
     };
 
     update = async (
-        req: Request<
-            {
-                [key: string]: string;
-            },
-            unknown,
-            UpdateBody
-        >,
+        req: Request<ParamsDictionary, unknown, UpdateBody>,
         res: Response,
     ) => {
         const transaction = await this.transactionOrchestrator.update(
