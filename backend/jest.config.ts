@@ -10,15 +10,7 @@ const config: Config = {
 
     // Added by me
     preset: 'ts-jest',
-    collectCoverageFrom: [
-        './src/**/*.ts',
-        '!./src/__tests__/**',
-        '!./src/config/**',
-        '!./src/errors/**',
-        '!./src/routes/**',
-        '!./src/types/**',
-        '!./src/index.ts',
-    ],
+    collectCoverageFrom: ['./src/**/*.ts'],
 };
 
 export default config;
