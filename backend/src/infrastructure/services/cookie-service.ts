@@ -70,11 +70,10 @@ export class CookieService {
         return this.get('refresh_token');
     };
 
-    getRememberMe = (): boolean | undefined => {
-        const value = this.get('remember_me');
-        if (value === undefined) return undefined;
-
-        return parseBoolean(value);
+    getRememberMe = (): boolean => {
+        const value = parseBoolean(this.get('remember_me'));
+        if (value === undefined) return false;
+        return value;
     };
 
     private clear = (name: string): void => {

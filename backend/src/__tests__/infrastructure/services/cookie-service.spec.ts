@@ -215,17 +215,17 @@ describe('CookieService', () => {
             expect(parseBoolean).toHaveBeenCalledWith('false');
         });
 
-        it('returns undefined when remember_me cookie is missing', () => {
+        it('returns false when remember_me cookie is missing', () => {
             reqMock.cookies = {};
-            expect(cookieService.getRememberMe()).toBeUndefined();
-            expect(parseBoolean).not.toHaveBeenCalled();
+            expect(cookieService.getRememberMe()).toBe(false);
+            expect(parseBoolean).toHaveBeenCalledWith(undefined);
         });
 
-        it('returns undefined when remember_me cookie has an invalid value', () => {
+        it('returns false when remember_me cookie has an invalid value', () => {
             reqMock.cookies = { remember_me: 'invalid' };
             (parseBoolean as jest.Mock).mockReturnValueOnce(undefined);
 
-            expect(cookieService.getRememberMe()).toBeUndefined();
+            expect(cookieService.getRememberMe()).toBe(false);
             expect(parseBoolean).toHaveBeenCalledWith('invalid');
         });
     });

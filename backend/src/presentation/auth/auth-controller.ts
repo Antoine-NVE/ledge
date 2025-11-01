@@ -58,8 +58,7 @@ export class AuthController {
         const token = cookieService.getRefreshToken();
         if (!token) throw new UnauthorizedError('Required refresh token');
 
-        let rememberMe = cookieService.getRememberMe();
-        if (rememberMe === undefined) rememberMe = false; // Default to false if not provided
+        const rememberMe = cookieService.getRememberMe();
 
         const { accessToken, refreshToken } =
             await this.authOrchestrator.refresh(token);
