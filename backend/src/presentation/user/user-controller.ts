@@ -36,7 +36,7 @@ export class UserController {
         });
     };
 
-    me = async (req: Request, res: Response): Promise<void> => {
+    me = (req: Request, res: Response): void => {
         res.status(200).json({
             message: 'User retrieved successfully',
             data: {

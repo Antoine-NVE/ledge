@@ -8,9 +8,7 @@ import { removePasswordHash } from '../../../infrastructure/utils/clean-utils';
 import { UnauthorizedError } from '../../../infrastructure/errors/unauthorized-error';
 
 jest.mock('../../../infrastructure/services/cookie-service');
-jest.mock('../../../infrastructure/utils/clean-utils', () => ({
-    removePasswordHash: jest.fn(),
-}));
+jest.mock('../../../infrastructure/utils/clean-utils');
 
 describe('AuthController', () => {
     const EMAIL = 'test@example.com';
