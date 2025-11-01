@@ -36,7 +36,7 @@ export class TransactionController {
         });
     };
 
-    read = async (req: Request, res: Response) => {
+    read = (req: Request, res: Response) => {
         res.status(200).json({
             message: 'Transaction retrieved successfully',
             data: {
@@ -63,7 +63,7 @@ export class TransactionController {
     };
 
     delete = async (req: Request, res: Response) => {
-        this.transactionOrchestrator.delete(req.transaction._id);
+        await this.transactionOrchestrator.delete(req.transaction._id);
 
         res.status(200).json({
             message: 'Transaction deleted successfully',
