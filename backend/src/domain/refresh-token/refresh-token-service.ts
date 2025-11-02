@@ -43,9 +43,11 @@ export class RefreshTokenService {
 
     extendExpiration = async (
         refreshToken: RefreshToken,
+        newToken: string,
     ): Promise<RefreshToken> => {
         refreshToken.updatedAt = new Date();
 
+        refreshToken.token = newToken;
         refreshToken.expiresAt = new Date(Date.now() + this.TTL);
 
         await this.refreshTokenRepository.updateOne(refreshToken);
