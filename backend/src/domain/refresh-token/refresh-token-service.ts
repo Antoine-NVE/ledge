@@ -1,7 +1,8 @@
-import { ObjectId } from 'mongodb';
+import { MongoServerError, ObjectId } from 'mongodb';
 import { RefreshTokenRepository } from './refresh-token-repository';
 import { RefreshToken } from './refresh-token-types';
 import { NotFoundError } from '../../infrastructure/errors/not-found-error';
+import { InternalServerError } from '../../infrastructure/errors/internal-server-error';
 
 export class RefreshTokenService {
     private readonly TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
@@ -18,7 +19,14 @@ export class RefreshTokenService {
             updatedAt: null,
         };
 
-        await this.refreshTokenRepository.insertOne(refreshToken);
+        await this.refreshTokenRepository
+            .insertOne(refreshToken)
+            .catch((err) => {
+                if (err instanceof MongoServerError && err.code === 11000) {
+                    throw new InternalServerError('Duplicate token');
+                }
+                throw err;
+            });
 
         return refreshToken;
     };
@@ -35,9 +43,11 @@ export class RefreshTokenService {
 
     extendExpiration = async (
         refreshToken: RefreshToken,
+        newToken: string,
     ): Promise<RefreshToken> => {
         refreshToken.updatedAt = new Date();
 
+        refreshToken.token = newToken;
         refreshToken.expiresAt = new Date(Date.now() + this.TTL);
 
         await this.refreshTokenRepository.updateOne(refreshToken);

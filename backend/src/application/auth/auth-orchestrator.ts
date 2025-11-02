@@ -94,8 +94,11 @@ export class AuthOrchestrator {
             throw new UnauthorizedError('Expired refresh token');
         }
 
-        refreshToken =
-            await this.refreshTokenService.extendExpiration(refreshToken);
+        const newToken = this.tokenService.generate();
+        refreshToken = await this.refreshTokenService.extendExpiration(
+            refreshToken,
+            newToken,
+        );
 
         const accessToken = this.jwtService.signAccess(refreshToken.userId);
 
