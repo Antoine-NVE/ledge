@@ -3,7 +3,6 @@ import { RefreshTokenRepository } from '../../../domain/refresh-token/refresh-to
 import { RefreshTokenService } from '../../../domain/refresh-token/refresh-token-service';
 import { RefreshToken } from '../../../domain/refresh-token/refresh-token-types';
 import { NotFoundError } from '../../../infrastructure/errors/not-found-error';
-import { ConflictError } from '../../../infrastructure/errors/conflict-error';
 import { InternalServerError } from '../../../infrastructure/errors/internal-server-error';
 
 describe('RefreshTokenService', () => {
@@ -109,7 +108,7 @@ describe('RefreshTokenService', () => {
     });
 
     describe('extendExpiration', () => {
-        it('should update updatedAt and expiresAt', async () => {
+        it('should update token, updatedAt and expiresAt', async () => {
             const now = new Date();
             jest.useFakeTimers().setSystemTime(now);
 
@@ -119,17 +118,23 @@ describe('RefreshTokenService', () => {
                 updatedAt: new Date(now.getTime() - 1000),
             };
 
-            const result =
-                await refreshTokenService.extendExpiration(refreshToken);
+            const result = await refreshTokenService.extendExpiration(
+                refreshToken,
+                TEST_TOKEN,
+            );
 
             expect(result).toMatchObject({
+                token: TEST_TOKEN,
                 expiresAt: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000),
                 updatedAt: new Date(now.getTime()),
             });
         });
 
         it('should call refreshTokenRepository to updateOne', async () => {
-            await refreshTokenService.extendExpiration(refreshToken);
+            await refreshTokenService.extendExpiration(
+                refreshToken,
+                TEST_TOKEN,
+            );
 
             expect(refreshTokenRepository.updateOne).toHaveBeenCalledWith(
                 refreshToken,

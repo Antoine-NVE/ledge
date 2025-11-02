@@ -16,6 +16,7 @@ describe('AuthOrchestrator', () => {
     const TEST_PASSWORD = 'Azerty123!';
     const TEST_HASHED_PASSWORD = 'hashed-password';
     const TEST_TOKEN = 'token'; // Field of RefreshToken
+    const TEST_NEW_TOKEN = 'new-token';
     const TEST_ACCESS_TOKEN = 'access-token'; // JWT
 
     let user: User;
@@ -162,7 +163,7 @@ describe('AuthOrchestrator', () => {
         it('should throw UnauthorizedError if passwords do not match', async () => {
             (passwordService.compare as jest.Mock).mockResolvedValue(false);
 
-            expect(
+            await expect(
                 authOrchestrator.login(TEST_EMAIL, TEST_PASSWORD),
             ).rejects.toThrow(UnauthorizedError);
         });
@@ -245,10 +246,15 @@ describe('AuthOrchestrator', () => {
         });
 
         it('should call refreshTokenService to extendExpiration', async () => {
+            (tokenService.generate as jest.Mock).mockReturnValue(
+                TEST_NEW_TOKEN,
+            );
+
             await authOrchestrator.refresh(TEST_TOKEN);
 
             expect(refreshTokenService.extendExpiration).toHaveBeenCalledWith(
                 refreshToken,
+                TEST_NEW_TOKEN,
             );
         });
 
