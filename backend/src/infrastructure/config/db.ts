@@ -7,6 +7,12 @@ const client = new MongoClient(`mongodb://database:27017`);
     const db = client.db('ledge');
 
     await db.collection('users').createIndex({ email: 1 }, { unique: true });
+    await db
+        .collection('refreshtokens')
+        .createIndex({ token: 1 }, { unique: true });
+    await db
+        .collection('refreshtokens')
+        .createIndex({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 })();
 
 export const db = client.db('ledge');
