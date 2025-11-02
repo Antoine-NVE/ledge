@@ -1,51 +1,27 @@
-import express, { NextFunction, Request, Response } from 'express';
-import cors from 'cors';
+import express from 'express';
 import cookieParser from 'cookie-parser';
 import authRoutes from '../../presentation/auth/auth-routes';
 import transactionRoutes from '../../presentation/transaction/transaction-routes';
 import userRoutes from '../../presentation/user/user-routes';
-import { HttpError } from '../errors/http-error';
-import { env } from '../config/env';
-import rateLimit from 'express-rate-limit';
-import { TooManyRequestsError } from '../errors/too-many-requests-error';
 import { NotFoundError } from '../errors/not-found-error';
 import swaggerUi from 'swagger-ui-express';
-import swaggerJsdoc from 'swagger-jsdoc';
+import { corsMiddleware } from './middlewares/cors-middleware';
+import { rateLimitMiddleware } from './middlewares/rate-limit-middleware';
+import { swaggerMiddleware } from './middlewares/swagger-middleware';
+import { errorHandlerMiddleware } from './middlewares/error-handler-middleware';
 
 const app = express();
 
+// Security
+app.use(corsMiddleware);
+app.use(rateLimitMiddleware);
+
+// Parsing
 app.use(express.json());
 app.use(cookieParser());
-app.use(
-    cors({
-        origin: env.ALLOWED_ORIGINS,
-        credentials: true,
-    }),
-);
-app.use(
-    rateLimit({
-        windowMs: 60 * 1000,
-        max: 100,
-        handler: () => {
-            throw new TooManyRequestsError();
-        },
-    }),
-);
 
-const options = {
-    definition: {
-        openapi: '3.0.0',
-        info: {
-            title: 'Ledge API',
-            version: '1.0.0',
-        },
-    },
-    apis: ['./src/presentation/*/*-routes.ts'],
-};
-
-const swaggerSpec = swaggerJsdoc(options);
-
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+// Routes
+app.use('/api-docs', swaggerUi.serve, swaggerMiddleware);
 app.use('/auth', authRoutes);
 app.use('/transactions', transactionRoutes);
 app.use('/users', userRoutes);
@@ -53,35 +29,10 @@ app.all(/.*/, () => {
     throw new NotFoundError('Route not found');
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-app.use((err: Error, req: Request, res: Response, next: NextFunction): void => {
-    const isHttpError = err instanceof HttpError;
-    const status = isHttpError ? err.status : 500;
+// Error handler
+app.use(errorHandlerMiddleware);
 
-    if (env.NODE_ENV === 'development') {
-        res.status(status).json({
-            message: err.message,
-            errors: isHttpError ? err.errors : undefined,
-            meta: isHttpError ? err.meta : undefined,
-        });
-        return;
-    }
-
-    if (isHttpError && status < 500) {
-        res.status(status).json({
-            message: err.message,
-            errors: err.errors,
-            meta: err.meta,
-        });
-        return;
-    }
-
-    console.error(err);
-    res.status(status).json({
-        message: 'Internal server error',
-    });
-});
-
+// Server
 const port = 3000;
 app.listen(port, () => {
     console.log(`Backend listening on port ${port}`);
