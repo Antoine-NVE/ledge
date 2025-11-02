@@ -9,6 +9,8 @@ import { env } from '../config/env';
 import rateLimit from 'express-rate-limit';
 import { TooManyRequestsError } from '../errors/too-many-requests-error';
 import { NotFoundError } from '../errors/not-found-error';
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
 
 const app = express();
 
@@ -30,6 +32,20 @@ app.use(
     }),
 );
 
+const options = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'Ledge API',
+            version: '1.0.0',
+        },
+    },
+    apis: ['./src/presentation/*/*-routes.ts'],
+};
+
+const swaggerSpec = swaggerJsdoc(options);
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 app.use('/auth', authRoutes);
 app.use('/transactions', transactionRoutes);
 app.use('/users', userRoutes);

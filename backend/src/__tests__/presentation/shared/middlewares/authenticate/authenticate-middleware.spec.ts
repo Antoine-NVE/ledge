@@ -4,6 +4,8 @@ import { JwtService } from '../../../../../infrastructure/services/jwt-service';
 import { UserService } from '../../../../../domain/user/user-service';
 import { CookieService } from '../../../../../infrastructure/services/cookie-service';
 import { UnauthorizedError } from '../../../../../infrastructure/errors/unauthorized-error';
+import { NotFoundError } from '../../../../../infrastructure/errors/not-found-error';
+import { InternalServerError } from '../../../../../infrastructure/errors/internal-server-error';
 
 jest.mock('../../../../../infrastructure/services/cookie-service');
 
@@ -43,6 +45,34 @@ describe('authenticate middleware', () => {
             UnauthorizedError,
         );
         expect(next).not.toHaveBeenCalled();
+    });
+
+    it('should throw an UnauthorizedError if user is not found', async () => {
+        const token = 'valid-token';
+
+        cookieServiceMock = {
+            getAccessToken: jest.fn().mockReturnValue(token),
+        } as unknown as jest.Mocked<CookieService>;
+        (CookieService as jest.Mock).mockImplementation(
+            () => cookieServiceMock,
+        );
+        (jwtService.verifyAccess as jest.Mock).mockReturnValue({ sub: '123' });
+
+        (userService.findOneById as jest.Mock).mockRejectedValue(
+            new NotFoundError(),
+        );
+
+        await expect(
+            authenticate(jwtService, userService)(req, res, next),
+        ).rejects.toThrow(UnauthorizedError);
+
+        (userService.findOneById as jest.Mock).mockRejectedValue(
+            new InternalServerError(),
+        );
+
+        await expect(
+            authenticate(jwtService, userService)(req, res, next),
+        ).rejects.toThrow(InternalServerError);
     });
 
     it('sets req.user and calls next if token is valid', async () => {
