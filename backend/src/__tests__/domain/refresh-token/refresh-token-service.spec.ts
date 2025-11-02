@@ -1,8 +1,10 @@
-import { ObjectId } from 'mongodb';
+import { MongoServerError, ObjectId } from 'mongodb';
 import { RefreshTokenRepository } from '../../../domain/refresh-token/refresh-token-repository';
 import { RefreshTokenService } from '../../../domain/refresh-token/refresh-token-service';
 import { RefreshToken } from '../../../domain/refresh-token/refresh-token-types';
 import { NotFoundError } from '../../../infrastructure/errors/not-found-error';
+import { ConflictError } from '../../../infrastructure/errors/conflict-error';
+import { InternalServerError } from '../../../infrastructure/errors/internal-server-error';
 
 describe('RefreshTokenService', () => {
     const TEST_TOKEN = 'token';
@@ -17,7 +19,9 @@ describe('RefreshTokenService', () => {
         refreshToken = {} as unknown as RefreshToken;
 
         refreshTokenRepository = {
-            insertOne: jest.fn(),
+            insertOne: jest.fn().mockReturnValue({
+                catch: jest.fn(),
+            }),
             findOne: jest.fn().mockResolvedValue(refreshToken),
             updateOne: jest.fn(),
             deleteOne: jest.fn(),
@@ -40,6 +44,25 @@ describe('RefreshTokenService', () => {
                     updatedAt: null,
                 }),
             );
+        });
+
+        it('should throw an InternalServerError for duplicate token', async () => {
+            const mongoError = Object.assign(new MongoServerError({}), {
+                code: 11000,
+            });
+            (refreshTokenRepository.insertOne as jest.Mock)
+                .mockRejectedValueOnce(mongoError)
+                .mockRejectedValueOnce(new InternalServerError('Test error'));
+
+            // Duplicate token
+            await expect(
+                refreshTokenService.create(TEST_TOKEN, TEST_USER_ID),
+            ).rejects.toThrow(new InternalServerError('Duplicate token'));
+
+            // Any other error
+            await expect(
+                refreshTokenService.create(TEST_TOKEN, TEST_USER_ID),
+            ).rejects.toThrow(new InternalServerError('Test error'));
         });
 
         it('should return refreshToken', async () => {
