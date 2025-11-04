@@ -36,7 +36,7 @@ services:
     image: axllent/mailpit
     ports:
       # Mailpit SMTP port is 1025, no need to expose it
-      - "${SMTP_PORT}:8025" # Mailpit web interface
+      - "${SMTP_WEB_PORT}:8025" # Mailpit web interface
     environment:
       MP_DATABASE: /data/smtp.db # Use persistent storage
     volumes:
