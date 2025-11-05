@@ -14,10 +14,10 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+    env_file:
+    - ./.env # .env is not accessible in the second stage of the build for security purpose
     ports:
       - "${BACKEND_PORT}:3000"
-    env_file:
-    - ./backend/.env # .env is not accessible in the second stage of the build for security purpose
     depends_on:
       - database
 

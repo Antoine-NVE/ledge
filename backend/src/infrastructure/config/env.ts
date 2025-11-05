@@ -1,10 +1,7 @@
-import dotenv from 'dotenv';
 import { envSchema } from '../schemas/env-schemas';
 import { parseArray, parseBoolean, parseNumber } from '../utils/parse-utils';
 import { InternalServerError } from '../errors/internal-server-error';
 import { formatZodError } from '../utils/format-utils';
-
-dotenv.config();
 
 const { success, data, error } = envSchema.safeParse({
     NODE_ENV: process.env.NODE_ENV,
