@@ -1,0 +1,36 @@
+name: Quality checks
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  backend-ci:
+    name: Backend checks (format, lint, tests)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node 22.18.0
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.18.0
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: ./backend
+
+      - name: Prettier format check
+        run: npm run format:check
+        working-directory: ./backend
+
+      - name: ESLint check
+        run: npm run lint
+        working-directory: ./backend
+
+      - name: Run tests
+        run: npm run test
+        working-directory: ./backend
