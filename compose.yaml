@@ -1,11 +1,6 @@
 services:
   frontend:
     image: ghcr.io/antoine-nve/ledge-frontend:${FRONTEND_TAG}
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      args:
-        VITE_API_URL: ${VITE_API_URL}
     ports:
       - "${FRONTEND_PORT}:80"
     depends_on:
@@ -13,9 +8,6 @@ services:
 
   backend:
     image: ghcr.io/antoine-nve/ledge-backend:latest
-    build:
-      context: ./backend
-      dockerfile: Dockerfile
     env_file:
     - ./.env
     ports:
