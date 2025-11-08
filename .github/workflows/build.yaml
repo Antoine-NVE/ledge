@@ -16,21 +16,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u antoine-nve --password-stdin
 
-      - name: Build backend
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & push backend (multi-arch)
         run: |
-          docker build \
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
             -t ghcr.io/antoine-nve/ledge-backend:latest \
             -f backend/Dockerfile \
-            ./backend
-
-      - name: Push backend
-        run: docker push ghcr.io/antoine-nve/ledge-backend:latest
+            --push \
+            backend
 
   frontend-dev:
     name: Frontend (dev)
@@ -38,22 +43,27 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u antoine-nve --password-stdin
 
-      - name: Build frontend dev
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & push frontend (dev) multi-arch
         run: |
-          docker build \
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
             -t ghcr.io/antoine-nve/ledge-frontend:dev \
             --build-arg VITE_API_URL=https://dev-ledge-api.antoine-navette.fr/ \
             -f frontend/Dockerfile \
-            ./frontend
-
-      - name: Push frontend dev
-        run: docker push ghcr.io/antoine-nve/ledge-frontend:dev
+            --push \
+            frontend
 
   frontend-prod:
     name: Frontend (prod)
@@ -61,19 +71,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u antoine-nve --password-stdin
 
-      - name: Build frontend prod
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & push frontend (prod) multi-arch
         run: |
-          docker build \
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
             -t ghcr.io/antoine-nve/ledge-frontend:prod \
             --build-arg VITE_API_URL=https://ledge-api.antoine-navette.fr/ \
             -f frontend/Dockerfile \
-            ./frontend
-
-      - name: Push frontend prod
-        run: docker push ghcr.io/antoine-nve/ledge-frontend:prod
+            --push \
+            frontend
