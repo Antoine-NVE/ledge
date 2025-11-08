@@ -20,64 +20,60 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Login to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u antoine-nve --password-stdin
 
       - name: Build backend
         run: |
           docker build \
-            -t ghcr.io/${{ github.actor }}/ledge-backend:latest \
+            -t ghcr.io/antoine-nve/ledge-backend:latest \
             -f backend/Dockerfile \
             ./backend
 
       - name: Push backend
-        run: docker push ghcr.io/${{ github.actor }}/ledge-backend:latest
+        run: docker push ghcr.io/antoine-nve/ledge-backend:latest
 
-
-  frontend_dev:
+  frontend-dev:
     name: Frontend (dev)
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    environment: dev
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Login to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u antoine-nve --password-stdin
 
       - name: Build frontend dev
         run: |
           docker build \
-            -t ghcr.io/${{ github.actor }}/ledge-frontend:dev \
-            --build-arg VITE_API_URL=${{ vars.VITE_API_URL }} \
+            -t ghcr.io/antoine-nve/ledge-frontend:dev \
+            --build-arg VITE_API_URL=https://dev-ledge-api.antoine-navette.fr/ \
             -f frontend/Dockerfile \
             ./frontend
 
       - name: Push frontend dev
-        run: docker push ghcr.io/${{ github.actor }}/ledge-frontend:dev
+        run: docker push ghcr.io/antoine-nve/ledge-frontend:dev
 
-
-  frontend_prod:
+  frontend-prod:
     name: Frontend (prod)
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
-    environment: prod
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
       - name: Login to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u antoine-nve --password-stdin
 
       - name: Build frontend prod
         run: |
           docker build \
-            -t ghcr.io/${{ github.actor }}/ledge-frontend:prod \
-            --build-arg VITE_API_URL=${{ vars.VITE_API_URL }} \
+            -t ghcr.io/antoine-nve/ledge-frontend:prod \
+            --build-arg VITE_API_URL=https://ledge-api.antoine-navette.fr/ \
             -f frontend/Dockerfile \
             ./frontend
 
       - name: Push frontend prod
-        run: docker push ghcr.io/${{ github.actor }}/ledge-frontend:prod
+        run: docker push ghcr.io/antoine-nve/ledge-frontend:prod
