@@ -60,7 +60,7 @@ jobs:
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             -t ghcr.io/antoine-nve/ledge-frontend:dev \
-            --build-arg VITE_API_URL=https://dev-ledge-api.antoine-navette.fr/ \
+            --build-arg VITE_API_URL=https://dev-ledge-api.antoine-navette.fr \
             -f frontend/Dockerfile \
             --push \
             frontend
@@ -88,7 +88,7 @@ jobs:
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
             -t ghcr.io/antoine-nve/ledge-frontend:prod \
-            --build-arg VITE_API_URL=https://ledge-api.antoine-navette.fr/ \
+            --build-arg VITE_API_URL=https://ledge-api.antoine-navette.fr \
             -f frontend/Dockerfile \
             --push \
             frontend
