@@ -8,10 +8,13 @@ const name = z
 const value = z
     .number()
     .min(0.01, 'Value is too short')
-    .refine(
-        (val) => Number.isInteger(val * 100),
-        'Value must have at most 2 decimal places',
-    )
+    .refine((val) => {
+        // We cannot return Number.isInteger(val * 100)
+        // It doesn't work with some values (ex.: 542.42) due to binary conversions
+        const str = val.toString();
+        const decimals = str.split('.')[1];
+        return !decimals || decimals.length <= 2;
+    }, 'Value must have at most 2 decimal places')
     .max(999999999.99, 'Value is too big');
 const isIncome = z.boolean();
 const isRecurring = z.boolean();
