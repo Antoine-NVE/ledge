@@ -77,8 +77,6 @@ describe('Transaction schemas', () => {
         it('should accept a valid value', () => {
             let data = updateBodySchema.safeParse(validData);
 
-            console.log(data);
-
             expect(data.success).toBe(true);
 
             data = updateBodySchema.safeParse({
