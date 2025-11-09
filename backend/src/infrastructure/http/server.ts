@@ -9,6 +9,7 @@ import { corsMiddleware } from './middlewares/cors-middleware';
 import { rateLimitMiddleware } from './middlewares/rate-limit-middleware';
 import { swaggerMiddleware } from './middlewares/swagger-middleware';
 import { errorHandlerMiddleware } from './middlewares/error-handler-middleware';
+import { env } from '../config/env';
 
 const app = express();
 
@@ -21,7 +22,9 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Routes
-app.use('/api-docs', swaggerUi.serve, swaggerMiddleware);
+if (env.NODE_ENV === 'development') {
+    app.use('/docs', swaggerUi.serve, swaggerMiddleware);
+}
 app.use('/auth', authRoutes);
 app.use('/transactions', transactionRoutes);
 app.use('/users', userRoutes);
