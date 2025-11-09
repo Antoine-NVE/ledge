@@ -1,10 +1,10 @@
 import z from 'zod';
 
-const email = z.email('Invalid email address').toLowerCase();
+const emailSchema = z.email('Invalid email address').toLowerCase();
 
 export const registerBodySchema = z
     .object({
-        email,
+        email: emailSchema,
         password: z
             .string()
             .min(1, 'Password is required')
@@ -24,7 +24,7 @@ export const registerBodySchema = z
     });
 
 export const loginBodySchema = z.object({
-    email,
+    email: emailSchema,
     password: z.string().min(1, 'Password is required'),
     rememberMe: z.boolean(),
 });
