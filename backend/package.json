@@ -9,8 +9,8 @@
         "start": "node .",
         "format": "prettier --write .",
         "format:check": "prettier --check .",
-        "lint": "eslint ./src",
-        "test": "jest ."
+        "lint": "eslint",
+        "test": "jest"
     },
     "author": "",
     "license": "ISC",
