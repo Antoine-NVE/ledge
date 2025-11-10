@@ -1,5 +1,5 @@
 import express from 'express';
-import { container } from '../../infrastructure/config/container';
+import { container } from '../../infrastructure/config/container-config';
 import { validateBody } from '../shared/middlewares/validate-body/validate-body-middleware';
 import {
     sendVerificationEmailBodySchema,

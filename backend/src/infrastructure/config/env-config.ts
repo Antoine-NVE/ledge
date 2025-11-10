@@ -1,4 +1,4 @@
-import { envSchema } from '../schemas/env-schemas';
+import { envSchema } from '../schemas/env-config-schemas';
 import { parseArray, parseBoolean, parseNumber } from '../utils/parse-utils';
 import { InternalServerError } from '../errors/internal-server-error';
 import { formatZodError } from '../utils/format-utils';

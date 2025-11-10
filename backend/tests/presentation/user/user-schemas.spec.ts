@@ -1,6 +1,6 @@
 import { sendVerificationEmailBodySchema } from '../../../src/presentation/user/user-schemas';
 
-jest.mock('../../../src/infrastructure/config/env', () => ({
+jest.mock('../../../src/infrastructure/config/env-config', () => ({
     env: {
         ALLOWED_ORIGINS: ['https://mock-dev', 'https://mock-prod'],
     },
