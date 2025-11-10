@@ -2,7 +2,6 @@ import { ObjectId } from 'mongodb';
 import {
     Transaction,
     TransactionData,
-    TransactionUpdateData,
 } from '../../domain/transaction/transaction-types';
 import { TransactionService } from '../../domain/transaction/transaction-service';
 
@@ -19,7 +18,7 @@ export class TransactionOrchestrator {
 
     update = async (
         transaction: Transaction,
-        data: TransactionUpdateData,
+        data: Omit<TransactionData, 'month' | 'userId'>,
     ): Promise<Transaction> => {
         return await this.transactionService.update(transaction, data);
     };

@@ -10,6 +10,4 @@ export type TransactionData = {
     userId: ObjectId;
 };
 
-export type TransactionUpdateData = Omit<TransactionData, 'month' | 'userId'>;
-
 export type Transaction = TransactionData & BaseDocument;

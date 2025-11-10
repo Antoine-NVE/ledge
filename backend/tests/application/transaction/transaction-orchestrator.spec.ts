@@ -4,7 +4,6 @@ import { TransactionService } from '../../../src/domain/transaction/transaction-
 import {
     Transaction,
     TransactionData,
-    TransactionUpdateData,
 } from '../../../src/domain/transaction/transaction-types';
 
 describe('TransactionOrchestrator', () => {
@@ -12,7 +11,7 @@ describe('TransactionOrchestrator', () => {
     const TEST_USER_ID = new ObjectId();
 
     let transactionData: TransactionData;
-    let transactionUpdateData: TransactionUpdateData;
+    let transactionUpdateData: Omit<TransactionData, 'month' | 'userId'>;
     let transaction: Transaction;
     let transactionArray: Transaction[];
 
@@ -21,7 +20,10 @@ describe('TransactionOrchestrator', () => {
 
     beforeEach(() => {
         transactionData = {} as unknown as TransactionData;
-        transactionUpdateData = {} as unknown as TransactionUpdateData;
+        transactionUpdateData = {} as unknown as Omit<
+            TransactionData,
+            'month' | 'userId'
+        >;
         transaction = {} as unknown as Transaction;
         transactionArray = [transaction];
 

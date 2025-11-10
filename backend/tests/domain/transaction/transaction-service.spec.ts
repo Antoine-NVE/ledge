@@ -2,7 +2,6 @@ import { ObjectId } from 'mongodb';
 import {
     Transaction,
     TransactionData,
-    TransactionUpdateData,
 } from '../../../src/domain/transaction/transaction-types';
 import { TransactionRepository } from '../../../src/domain/transaction/transaction-repository';
 import { TransactionService } from '../../../src/domain/transaction/transaction-service';
@@ -13,7 +12,7 @@ describe('TransactionService', () => {
     const TEST_USER_ID = new ObjectId();
 
     let transactionData: TransactionData;
-    let transactionUpdateData: TransactionUpdateData;
+    let transactionUpdateData: Omit<TransactionData, 'month' | 'userId'>;
     let transaction: Transaction;
     let transactionArray: Transaction[];
 
@@ -24,7 +23,7 @@ describe('TransactionService', () => {
         transactionData = {} as unknown as TransactionData;
         transactionUpdateData = {
             name: 'updated-name',
-        } as unknown as TransactionUpdateData;
+        } as unknown as Omit<TransactionData, 'month' | 'userId'>;
         transaction = {} as unknown as Transaction;
         transactionArray = [transaction];
 
