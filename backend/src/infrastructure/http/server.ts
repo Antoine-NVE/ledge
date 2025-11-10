@@ -9,7 +9,7 @@ import { corsMiddleware } from './middlewares/cors-middleware';
 import { rateLimitMiddleware } from './middlewares/rate-limit-middleware';
 import { swaggerMiddleware } from './middlewares/swagger-middleware';
 import { errorHandlerMiddleware } from './middlewares/error-handler-middleware';
-import { env } from '../config/env';
+import { env } from '../config/env-config';
 
 const app = express();
 
