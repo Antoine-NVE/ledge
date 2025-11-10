@@ -15,7 +15,6 @@ export class TransactionService {
             _id: new ObjectId(),
             ...data,
             createdAt: new Date(),
-            updatedAt: null,
         };
 
         await this.transactionRepository.insertOne(transaction);

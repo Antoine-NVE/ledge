@@ -16,7 +16,6 @@ export class RefreshTokenService {
             expiresAt: new Date(Date.now() + this.TTL),
             userId,
             createdAt: new Date(),
-            updatedAt: null,
         };
 
         await this.refreshTokenRepository

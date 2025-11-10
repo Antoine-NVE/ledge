@@ -13,9 +13,7 @@ export class UserService {
             email,
             passwordHash,
             isEmailVerified: false,
-            emailVerificationCooldownExpiresAt: null,
             createdAt: new Date(),
-            updatedAt: null,
         };
 
         await this.userRepository.insertOne(user).catch((err) => {

@@ -45,8 +45,6 @@ describe('UserService', () => {
                     email: TEST_EMAIL,
                     passwordHash: TEST_PASSWORD_HASH,
                     isEmailVerified: false,
-                    emailVerificationCooldownExpiresAt: null,
-                    updatedAt: null,
                 }),
             );
         });
@@ -85,8 +83,6 @@ describe('UserService', () => {
                 email: TEST_EMAIL,
                 passwordHash: TEST_PASSWORD_HASH,
                 isEmailVerified: false,
-                emailVerificationCooldownExpiresAt: null,
-                updatedAt: null,
             });
         });
     });

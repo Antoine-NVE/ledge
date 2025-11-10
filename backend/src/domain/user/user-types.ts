@@ -1,14 +1,10 @@
-import { ObjectId } from 'mongodb';
+import { BaseDocument } from '../shared/shared-types';
 
 export type UserData = {
     email: string;
     passwordHash: string;
     isEmailVerified: boolean;
-    emailVerificationCooldownExpiresAt: Date | null;
+    emailVerificationCooldownExpiresAt?: Date;
 };
 
-export type User = UserData & {
-    _id: ObjectId;
-    createdAt: Date;
-    updatedAt: Date | null;
-};
+export type User = UserData & BaseDocument;

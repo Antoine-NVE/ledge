@@ -45,7 +45,6 @@ describe('TransactionService', () => {
             expect(transactionRepository.insertOne).toHaveBeenCalledWith(
                 expect.objectContaining({
                     ...transactionData,
-                    updatedAt: null,
                 }),
             );
         });
@@ -55,7 +54,6 @@ describe('TransactionService', () => {
 
             expect(result).toMatchObject({
                 ...transactionData,
-                updatedAt: null,
             });
         });
     });

@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import { BaseDocument } from '../shared/shared-types';
 
 export type RefreshTokenData = {
     token: string;
@@ -6,8 +7,4 @@ export type RefreshTokenData = {
     userId: ObjectId;
 };
 
-export type RefreshToken = RefreshTokenData & {
-    _id: ObjectId;
-    createdAt: Date;
-    updatedAt: Date | null;
-};
+export type RefreshToken = RefreshTokenData & BaseDocument;

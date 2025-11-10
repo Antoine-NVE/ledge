@@ -40,7 +40,6 @@ describe('RefreshTokenService', () => {
                 expect.objectContaining({
                     token: TEST_TOKEN,
                     userId: TEST_USER_ID,
-                    updatedAt: null,
                 }),
             );
         });
@@ -74,7 +73,6 @@ describe('RefreshTokenService', () => {
                 expect.objectContaining({
                     token: TEST_TOKEN,
                     userId: TEST_USER_ID,
-                    updatedAt: null,
                 }),
             );
         });

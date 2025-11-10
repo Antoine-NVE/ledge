@@ -1,4 +1,5 @@
 import { ObjectId } from 'mongodb';
+import { BaseDocument } from '../shared/shared-types';
 
 export type TransactionData = {
     month: string;
@@ -11,8 +12,4 @@ export type TransactionData = {
 
 export type TransactionUpdateData = Omit<TransactionData, 'month' | 'userId'>;
 
-export type Transaction = TransactionData & {
-    _id: ObjectId;
-    createdAt: Date;
-    updatedAt: Date | null;
-};
+export type Transaction = TransactionData & BaseDocument;
