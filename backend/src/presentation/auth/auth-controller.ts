@@ -20,7 +20,7 @@ export class AuthController {
         const rememberMe = false;
 
         const { user, accessToken, refreshToken } =
-            await this.authOrchestrator.register(email, password);
+            await this.authOrchestrator.register({ email, password });
 
         const cookieService = new CookieService(req, res);
         cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
@@ -40,7 +40,7 @@ export class AuthController {
         const { email, password, rememberMe } = req.body;
 
         const { user, accessToken, refreshToken } =
-            await this.authOrchestrator.login(email, password);
+            await this.authOrchestrator.login({ email, password });
 
         const cookieService = new CookieService(req, res);
         cookieService.setAuth(accessToken, refreshToken.token, rememberMe);

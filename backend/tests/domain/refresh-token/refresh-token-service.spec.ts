@@ -34,7 +34,10 @@ describe('RefreshTokenService', () => {
 
     describe('create', () => {
         it('should call refreshTokenRepository to insertOne', async () => {
-            await refreshTokenService.create(TEST_TOKEN, TEST_USER_ID);
+            await refreshTokenService.create({
+                token: TEST_TOKEN,
+                userId: TEST_USER_ID,
+            });
 
             expect(refreshTokenRepository.insertOne).toHaveBeenCalledWith(
                 expect.objectContaining({
@@ -54,20 +57,26 @@ describe('RefreshTokenService', () => {
 
             // Duplicate token
             await expect(
-                refreshTokenService.create(TEST_TOKEN, TEST_USER_ID),
+                refreshTokenService.create({
+                    token: TEST_TOKEN,
+                    userId: TEST_USER_ID,
+                }),
             ).rejects.toThrow(new InternalServerError('Duplicate token'));
 
             // Any other error
             await expect(
-                refreshTokenService.create(TEST_TOKEN, TEST_USER_ID),
+                refreshTokenService.create({
+                    token: TEST_TOKEN,
+                    userId: TEST_USER_ID,
+                }),
             ).rejects.toThrow(new InternalServerError('Test error'));
         });
 
         it('should return refreshToken', async () => {
-            const result = await refreshTokenService.create(
-                TEST_TOKEN,
-                TEST_USER_ID,
-            );
+            const result = await refreshTokenService.create({
+                token: TEST_TOKEN,
+                userId: TEST_USER_ID,
+            });
 
             expect(result).toEqual(
                 expect.objectContaining({

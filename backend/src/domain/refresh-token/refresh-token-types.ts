@@ -3,8 +3,8 @@ import { BaseDocument } from '../shared/shared-types';
 
 export type RefreshTokenData = {
     token: string;
-    expiresAt: Date;
     userId: ObjectId;
+    expiresAt: Date;
 };
 
 export type RefreshToken = RefreshTokenData & BaseDocument;

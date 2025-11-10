@@ -1,7 +1,7 @@
 import { UserService } from '../../domain/user/user-service';
 import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 import { UnauthorizedError } from '../../infrastructure/errors/unauthorized-error';
-import { User } from '../../domain/user/user-types';
+import { User, UserData } from '../../domain/user/user-types';
 import { RefreshToken } from '../../domain/refresh-token/refresh-token-types';
 import { RefreshTokenService } from '../../domain/refresh-token/refresh-token-service';
 import { JwtService } from '../../infrastructure/services/jwt-service';
@@ -17,34 +17,37 @@ export class AuthOrchestrator {
         private tokenService: TokenService,
     ) {}
 
-    register = async (
-        email: string,
-        password: string,
-    ): Promise<{
+    register = async ({
+        email,
+        password,
+    }: Pick<UserData, 'email'> & { password: string }): Promise<{
         user: User;
         accessToken: string;
         refreshToken: RefreshToken;
     }> => {
         const passwordHash = await this.passwordService.hash(password);
 
-        const user = await this.userService.register(email, passwordHash);
+        const user = await this.userService.register({ email, passwordHash });
 
         const token = this.tokenService.generate();
 
-        const refreshToken = await this.refreshTokenService.create(
+        const refreshToken = await this.refreshTokenService.create({
             token,
-            user._id,
-        );
+            userId: user._id,
+        });
 
         const accessToken = this.jwtService.signAccess(user._id);
 
         return { user, accessToken, refreshToken };
     };
 
-    login = async (
-        email: string,
-        password: string,
-    ): Promise<{
+    login = async ({
+        email,
+        password,
+    }: {
+        email: string;
+        password: string;
+    }): Promise<{
         user: User;
         accessToken: string;
         refreshToken: RefreshToken;
@@ -67,10 +70,10 @@ export class AuthOrchestrator {
 
         const token = this.tokenService.generate();
 
-        const refreshToken = await this.refreshTokenService.create(
+        const refreshToken = await this.refreshTokenService.create({
             token,
-            user._id,
-        );
+            userId: user._id,
+        });
 
         const accessToken = this.jwtService.signAccess(user._id);
 
