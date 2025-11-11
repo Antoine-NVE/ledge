@@ -42,6 +42,6 @@ services:
       # Mailpit SMTP port is 1025, no need to expose it
       - "${SMTP_WEB_PORT}:8025" # Mailpit web interface
     environment:
-      MP_DATABASE: /data/smtp.db # Use persistent storage
+      MP_DATABASE: /data/mailpit.db # Use persistent storage
     volumes:
       - ./data/smtp:/data
