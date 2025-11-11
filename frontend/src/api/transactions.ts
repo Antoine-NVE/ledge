@@ -109,7 +109,6 @@ export const updateTransaction = async (
                 name: transaction.name,
                 value: transaction.value,
                 isIncome: transaction.isIncome,
-                isRecurring: transaction.isRecurring,
             }),
         });
 

@@ -58,7 +58,6 @@ const TransactionListSection = ({ transactions, total, isIncome, onEdit, onDelet
                                 })}
                             </p>
                         )}
-                        {transaction.isRecurring && <p className="text-blue-700 text-sm font-medium">Recurring</p>}
                     </div>
                 ))
             ) : (

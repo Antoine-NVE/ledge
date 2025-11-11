@@ -17,19 +17,16 @@ const valueSchema = z
     }, 'Value must have at most 2 decimal places')
     .max(999999999.99, 'Value is too big');
 const isIncomeSchema = z.boolean();
-const isRecurringSchema = z.boolean();
 
 export const createBodySchema = z.object({
     month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/),
     name: nameSchema,
     value: valueSchema,
     isIncome: isIncomeSchema,
-    isRecurring: isRecurringSchema,
 });
 
 export const updateBodySchema = z.object({
     name: nameSchema,
     value: valueSchema,
     isIncome: isIncomeSchema,
-    isRecurring: isRecurringSchema,
 });

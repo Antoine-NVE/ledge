@@ -6,7 +6,6 @@ export type TransactionData = {
     name: string;
     value: number;
     isIncome: boolean;
-    isRecurring: boolean;
     userId: ObjectId;
 };
 
@@ -14,5 +13,5 @@ export type Transaction = TransactionData & BaseDocument;
 
 export type UpdateTransactionData = Pick<
     TransactionData,
-    'name' | 'value' | 'isIncome' | 'isRecurring'
+    'name' | 'value' | 'isIncome'
 >;

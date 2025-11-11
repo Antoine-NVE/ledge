@@ -13,7 +13,6 @@ describe('Transaction schemas', () => {
                 name: 'Test',
                 value: 452.42,
                 isIncome: false,
-                isRecurring: false,
             };
         });
 
@@ -70,7 +69,6 @@ describe('Transaction schemas', () => {
                 name: 'Test',
                 value: 452.42,
                 isIncome: false,
-                isRecurring: false,
             };
         });
 

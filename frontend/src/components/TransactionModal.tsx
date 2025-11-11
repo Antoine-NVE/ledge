@@ -14,7 +14,6 @@ interface FormTransaction {
     name: string;
     value: string;
     isIncome: boolean | null;
-    isRecurring: boolean;
 }
 
 interface FormErrors {
@@ -22,14 +21,12 @@ interface FormErrors {
     name: string;
     value: string;
     isIncome: string;
-    isRecurring: string;
 }
 
 const EMPTY_FORM: FormTransaction = {
     name: '',
     value: '',
     isIncome: null,
-    isRecurring: false,
 };
 
 const EMPTY_ERRORS: FormErrors = {
@@ -37,7 +34,6 @@ const EMPTY_ERRORS: FormErrors = {
     name: '',
     value: '',
     isIncome: '',
-    isRecurring: '',
 };
 
 const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }: Props) => {
@@ -80,7 +76,6 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                 ...initialTransaction,
                 ...form,
                 value,
-                isRecurring: form.isRecurring!,
                 isIncome: form.isIncome!,
             };
             handleUpdate(transaction);
@@ -88,7 +83,6 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
             const transaction: NewTransaction = {
                 ...form,
                 value,
-                isRecurring: form.isRecurring!,
                 isIncome: form.isIncome!,
                 month,
             };
@@ -182,7 +176,6 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                       name: initialTransaction.name,
                       value: String(initialTransaction.value),
                       isIncome: initialTransaction.isIncome,
-                      isRecurring: initialTransaction.isRecurring,
                   }
                 : EMPTY_FORM
         );
@@ -274,22 +267,6 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                                 </label>
                             </div>
                             {formErrors.isIncome && <p className="text-red-500 text-sm mt-1">{formErrors.isIncome}</p>}
-                        </div>
-
-                        {/* Recurring */}
-                        <div>
-                            <label className="flex items-center gap-2 cursor-pointer select-none">
-                                <input
-                                    className="cursor-pointer"
-                                    type="checkbox"
-                                    checked={form.isRecurring}
-                                    onChange={() => setForm({ ...form, isRecurring: !form.isRecurring })}
-                                />
-                                <span>Recurring</span>
-                            </label>
-                            {formErrors.isRecurring && (
-                                <p className="text-red-500 text-sm mt-1">{formErrors.isRecurring}</p>
-                            )}
                         </div>
 
                         {/* General error */}

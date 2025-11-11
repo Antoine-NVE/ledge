@@ -36,7 +36,6 @@ const {
  *               - name
  *               - value
  *               - isIncome
- *               - isRecurring
  *             properties:
  *               month:
  *                 type: string
@@ -45,8 +44,6 @@ const {
  *               value:
  *                 type: number
  *               isIncome:
- *                 type: boolean
- *               isRecurring:
  *                 type: boolean
  *     responses:
  *       201:
@@ -130,15 +127,12 @@ router.get(
  *               - name
  *               - value
  *               - isIncome
- *               - isRecurring
  *             properties:
  *               name:
  *                 type: string
  *               value:
  *                 type: number
  *               isIncome:
- *                 type: boolean
- *               isRecurring:
  *                 type: boolean
  *     responses:
  *       200:
