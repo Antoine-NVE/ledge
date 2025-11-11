@@ -1,6 +1,7 @@
 import { MongoClient } from 'mongodb';
 
-const client = new MongoClient(`mongodb://database:27017`);
+export const client = new MongoClient(`mongodb://database:27017`);
+
 (async () => {
     await client.connect();
 

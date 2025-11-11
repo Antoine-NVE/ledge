@@ -11,7 +11,9 @@
         "format": "prettier --write ./",
         "format:check": "prettier --check ./",
         "lint": "eslint",
-        "test": "jest"
+        "test": "jest",
+        "migrate": "node ./dist/scripts/migrate.js up",
+        "migrate:down": "node ./dist/scripts/migrate.js down"
     },
     "author": "",
     "license": "ISC",
