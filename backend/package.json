@@ -52,6 +52,7 @@
         "nodemailer": "^7.0.3",
         "swagger-jsdoc": "^6.2.8",
         "swagger-ui-express": "^5.0.1",
+        "umzug": "^3.8.2",
         "zod": "^4.1.11"
     }
 }
