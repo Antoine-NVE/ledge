@@ -2,14 +2,14 @@
     "name": "backend",
     "version": "1.0.0",
     "description": "",
-    "main": "./dist/infrastructure/http/server.js",
+    "main": "./dist/src/infrastructure/http/server.js",
     "scripts": {
         "dev": "tsx watch ./src/infrastructure/http/server.ts",
         "clean": "rimraf ./dist",
         "build": "npm run clean && tsc",
         "start": "node .",
-        "format": "prettier --write .",
-        "format:check": "prettier --check .",
+        "format": "prettier --write ./",
+        "format:check": "prettier --check ./",
         "lint": "eslint",
         "test": "jest"
     },

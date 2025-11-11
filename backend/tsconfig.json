@@ -4,12 +4,12 @@
     "compilerOptions": {
         "target": "es2016",
         "module": "commonjs",
-        "rootDir": "./src", // By default, commented with ./
-        "outDir": "./dist", // Same here
+        "rootDir": "./", // Commented by default
+        "outDir": "./dist", // Commented by default with "./"
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "strict": true,
         "skipLibCheck": true
     },
-    "include": ["./src"] // Added by me
+    "include": ["./scripts", "./src"] // Added by me
 }
