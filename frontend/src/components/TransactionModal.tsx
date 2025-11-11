@@ -13,27 +13,27 @@ interface Props {
 interface FormTransaction {
     name: string;
     value: string;
-    isIncome: boolean | null;
+    type: 'income' | 'expense' | null;
 }
 
 interface FormErrors {
     general: string;
     name: string;
     value: string;
-    isIncome: string;
+    type: string;
 }
 
 const EMPTY_FORM: FormTransaction = {
     name: '',
     value: '',
-    isIncome: null,
+    type: null,
 };
 
 const EMPTY_ERRORS: FormErrors = {
     general: '',
     name: '',
     value: '',
-    isIncome: '',
+    type: '',
 };
 
 const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }: Props) => {
@@ -61,8 +61,8 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
         } else if (Number(form.value) <= 0) {
             errors.value = 'Value must be greater than 0';
         }
-        if (form.isIncome === null) {
-            errors.isIncome = 'Type is required';
+        if (form.type === null) {
+            errors.type = 'Type is required';
         }
         setFormErrors(errors);
         if (Object.values(errors).some((error) => error !== '')) {
@@ -76,14 +76,14 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                 ...initialTransaction,
                 ...form,
                 value,
-                isIncome: form.isIncome!,
+                type: form.type!,
             };
             handleUpdate(transaction);
         } else {
             const transaction: NewTransaction = {
                 ...form,
                 value,
-                isIncome: form.isIncome!,
+                type: form.type!,
                 month,
             };
             handleCreate(transaction);
@@ -175,7 +175,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                 ? {
                       name: initialTransaction.name,
                       value: String(initialTransaction.value),
-                      isIncome: initialTransaction.isIncome,
+                      type: initialTransaction.type,
                   }
                 : EMPTY_FORM
         );
@@ -250,8 +250,8 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                                         className="cursor-pointer"
                                         type="radio"
                                         name="transactionTypeModal"
-                                        checked={form.isIncome === true}
-                                        onChange={() => setForm({ ...form, isIncome: true })}
+                                        checked={form.type === 'income'}
+                                        onChange={() => setForm({ ...form, type: 'income' })}
                                     />
                                     <span>Income</span>
                                 </label>
@@ -260,13 +260,13 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                                         className="cursor-pointer"
                                         type="radio"
                                         name="transactionTypeModal"
-                                        checked={form.isIncome === false}
-                                        onChange={() => setForm({ ...form, isIncome: false })}
+                                        checked={form.type === 'expense'}
+                                        onChange={() => setForm({ ...form, type: 'expense' })}
                                     />
                                     <span>Expense</span>
                                 </label>
                             </div>
-                            {formErrors.isIncome && <p className="text-red-500 text-sm mt-1">{formErrors.isIncome}</p>}
+                            {formErrors.type && <p className="text-red-500 text-sm mt-1">{formErrors.type}</p>}
                         </div>
 
                         {/* General error */}

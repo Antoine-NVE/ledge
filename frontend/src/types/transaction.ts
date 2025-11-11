@@ -1,8 +1,8 @@
 export interface NewTransaction {
     month: string;
-    isIncome: boolean;
     name: string;
     value: number;
+    type: 'income' | 'expense';
 }
 
 export interface Transaction extends NewTransaction {

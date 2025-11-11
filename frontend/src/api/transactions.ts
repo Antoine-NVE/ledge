@@ -108,7 +108,7 @@ export const updateTransaction = async (
             body: JSON.stringify({
                 name: transaction.name,
                 value: transaction.value,
-                isIncome: transaction.isIncome,
+                type: transaction.type,
             }),
         });
 

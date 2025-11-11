@@ -12,7 +12,7 @@ describe('Transaction schemas', () => {
                 month: '2025-11',
                 name: 'Test',
                 value: 452.42,
-                isIncome: false,
+                type: 'income',
             };
         });
 
@@ -68,7 +68,7 @@ describe('Transaction schemas', () => {
             validData = {
                 name: 'Test',
                 value: 452.42,
-                isIncome: false,
+                type: 'income',
             };
         });
 

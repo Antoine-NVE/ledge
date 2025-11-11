@@ -35,7 +35,7 @@ const {
  *               - month
  *               - name
  *               - value
- *               - isIncome
+ *               - type
  *             properties:
  *               month:
  *                 type: string
@@ -43,8 +43,9 @@ const {
  *                 type: string
  *               value:
  *                 type: number
- *               isIncome:
- *                 type: boolean
+ *               type:
+ *                 type: string
+ *                 enum: [income, expense]
  *     responses:
  *       201:
  *         description: Transaction created successfully
@@ -126,14 +127,15 @@ router.get(
  *             required:
  *               - name
  *               - value
- *               - isIncome
+ *               - type
  *             properties:
  *               name:
  *                 type: string
  *               value:
  *                 type: number
- *               isIncome:
- *                 type: boolean
+ *               type:
+ *                 type: string
+ *                 enum: [income, expense]
  *     responses:
  *       200:
  *         description: Transaction updated successfully

@@ -5,7 +5,7 @@ export type TransactionData = {
     month: string;
     name: string;
     value: number;
-    isIncome: boolean;
+    type: 'income' | 'expense';
     userId: ObjectId;
 };
 
@@ -13,5 +13,5 @@ export type Transaction = TransactionData & BaseDocument;
 
 export type UpdateTransactionData = Pick<
     TransactionData,
-    'name' | 'value' | 'isIncome'
+    'name' | 'value' | 'type'
 >;
