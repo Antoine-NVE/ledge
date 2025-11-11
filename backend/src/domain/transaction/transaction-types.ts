@@ -11,3 +11,8 @@ export type TransactionData = {
 };
 
 export type Transaction = TransactionData & BaseDocument;
+
+export type UpdateTransactionData = Pick<
+    TransactionData,
+    'name' | 'value' | 'isIncome' | 'isRecurring'
+>;

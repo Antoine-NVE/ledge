@@ -1,7 +1,11 @@
 import { ObjectId } from 'mongodb';
 import { TransactionRepository } from './transaction-repository';
 import { NotFoundError } from '../../infrastructure/errors/not-found-error';
-import { Transaction, TransactionData } from './transaction-types';
+import {
+    Transaction,
+    TransactionData,
+    UpdateTransactionData,
+} from './transaction-types';
 
 export class TransactionService {
     constructor(private transactionRepository: TransactionRepository) {}
@@ -31,7 +35,7 @@ export class TransactionService {
 
     update = async (
         transaction: Transaction,
-        data: Omit<TransactionData, 'month' | 'userId'>,
+        data: UpdateTransactionData,
     ): Promise<Transaction> => {
         transaction.updatedAt = new Date();
 

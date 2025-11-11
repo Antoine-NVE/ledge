@@ -2,14 +2,12 @@ import { UserRepository } from './user-repository';
 import { MongoServerError, ObjectId } from 'mongodb';
 import { ConflictError } from '../../infrastructure/errors/conflict-error';
 import { NotFoundError } from '../../infrastructure/errors/not-found-error';
-import { User, UserData } from './user-types';
+import { RegisterUserData, User } from './user-types';
 
 export class UserService {
     constructor(private userRepository: UserRepository) {}
 
-    register = async (
-        data: Pick<UserData, 'email' | 'passwordHash'>,
-    ): Promise<User> => {
+    register = async (data: RegisterUserData): Promise<User> => {
         const user: User = {
             _id: new ObjectId(),
             ...data,

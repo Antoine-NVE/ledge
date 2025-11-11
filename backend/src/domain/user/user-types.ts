@@ -8,3 +8,5 @@ export type UserData = {
 };
 
 export type User = UserData & BaseDocument;
+
+export type RegisterUserData = Pick<UserData, 'email' | 'passwordHash'>;

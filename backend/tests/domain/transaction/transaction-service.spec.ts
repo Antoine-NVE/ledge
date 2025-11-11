@@ -2,6 +2,7 @@ import { ObjectId } from 'mongodb';
 import {
     Transaction,
     TransactionData,
+    UpdateTransactionData,
 } from '../../../src/domain/transaction/transaction-types';
 import { TransactionRepository } from '../../../src/domain/transaction/transaction-repository';
 import { TransactionService } from '../../../src/domain/transaction/transaction-service';
@@ -12,7 +13,7 @@ describe('TransactionService', () => {
     const TEST_USER_ID = new ObjectId();
 
     let transactionData: TransactionData;
-    let transactionUpdateData: Omit<TransactionData, 'month' | 'userId'>;
+    let updateTransactionData: UpdateTransactionData;
     let transaction: Transaction;
     let transactionArray: Transaction[];
 
@@ -21,9 +22,9 @@ describe('TransactionService', () => {
 
     beforeEach(() => {
         transactionData = {} as unknown as TransactionData;
-        transactionUpdateData = {
+        updateTransactionData = {
             name: 'updated-name',
-        } as unknown as Omit<TransactionData, 'month' | 'userId'>;
+        } as unknown as UpdateTransactionData;
         transaction = {} as unknown as Transaction;
         transactionArray = [transaction];
 
@@ -105,18 +106,18 @@ describe('TransactionService', () => {
         it('should update values', async () => {
             const result = await transactionService.update(
                 transaction,
-                transactionUpdateData,
+                updateTransactionData,
             );
 
             expect(result).toMatchObject({
-                ...transactionUpdateData,
+                ...updateTransactionData,
             });
         });
 
         it('should return transaction', async () => {
             const result = await transactionService.update(
                 transaction,
-                transactionUpdateData,
+                updateTransactionData,
             );
 
             expect(result).toEqual(transaction);

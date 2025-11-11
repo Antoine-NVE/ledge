@@ -1,12 +1,13 @@
 import { UserService } from '../../domain/user/user-service';
 import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 import { UnauthorizedError } from '../../infrastructure/errors/unauthorized-error';
-import { User, UserData } from '../../domain/user/user-types';
+import { User } from '../../domain/user/user-types';
 import { RefreshToken } from '../../domain/refresh-token/refresh-token-types';
 import { RefreshTokenService } from '../../domain/refresh-token/refresh-token-service';
 import { JwtService } from '../../infrastructure/services/jwt-service';
 import { PasswordService } from '../../infrastructure/services/password-service';
 import { TokenService } from '../../infrastructure/services/token-service';
+import { LoginInput, RegisterInput } from './auth-types';
 
 export class AuthOrchestrator {
     constructor(
@@ -20,7 +21,7 @@ export class AuthOrchestrator {
     register = async ({
         email,
         password,
-    }: Pick<UserData, 'email'> & { password: string }): Promise<{
+    }: RegisterInput): Promise<{
         user: User;
         accessToken: string;
         refreshToken: RefreshToken;
@@ -44,10 +45,7 @@ export class AuthOrchestrator {
     login = async ({
         email,
         password,
-    }: {
-        email: string;
-        password: string;
-    }): Promise<{
+    }: LoginInput): Promise<{
         user: User;
         accessToken: string;
         refreshToken: RefreshToken;

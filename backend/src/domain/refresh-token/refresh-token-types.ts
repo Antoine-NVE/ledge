@@ -8,3 +8,5 @@ export type RefreshTokenData = {
 };
 
 export type RefreshToken = RefreshTokenData & BaseDocument;
+
+export type CreateRefreshTokenData = Pick<RefreshTokenData, 'token' | 'userId'>;
