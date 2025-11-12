@@ -1,10 +1,13 @@
 import z from 'zod';
 
+const monthSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
+
 const nameSchema = z
     .string()
     .trim()
     .min(1, 'Name is required')
     .max(99, 'Name is too long');
+
 const valueSchema = z
     .number()
     .min(0.01, 'Value is too short')
@@ -16,17 +19,33 @@ const valueSchema = z
         return !decimals || decimals.length <= 2;
     }, 'Value must have at most 2 decimal places')
     .max(999999999.99, 'Value is too big');
-const typeSchema = z.enum(['income', 'expense']);
 
-export const createBodySchema = z.object({
-    month: z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/),
-    name: nameSchema,
-    value: valueSchema,
-    type: typeSchema,
-});
+const expenseCategorySchema = z.enum(['need', 'want', 'investment']).nullable();
 
-export const updateBodySchema = z.object({
-    name: nameSchema,
-    value: valueSchema,
-    type: typeSchema,
-});
+const makeIncomeSchema = (withMonth: boolean) =>
+    z.object({
+        ...(withMonth ? { month: monthSchema } : undefined),
+        name: nameSchema,
+        value: valueSchema,
+        type: z.literal('income'),
+        expenseCategory: z.undefined(),
+    });
+
+const makeExpenseSchema = (withMonth: boolean) =>
+    z.object({
+        ...(withMonth ? { month: monthSchema } : undefined),
+        name: nameSchema,
+        value: valueSchema,
+        type: z.literal('expense'),
+        expenseCategory: expenseCategorySchema,
+    });
+
+export const createBodySchema = z.discriminatedUnion('type', [
+    makeIncomeSchema(true),
+    makeExpenseSchema(true),
+]);
+
+export const updateBodySchema = z.discriminatedUnion('type', [
+    makeIncomeSchema(false),
+    makeExpenseSchema(false),
+]);
