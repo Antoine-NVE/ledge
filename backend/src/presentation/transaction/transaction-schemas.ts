@@ -28,7 +28,6 @@ const makeIncomeSchema = (withMonth: boolean) =>
         name: nameSchema,
         value: valueSchema,
         type: z.literal('income'),
-        expenseCategory: z.undefined(),
     });
 
 const makeExpenseSchema = (withMonth: boolean) =>
