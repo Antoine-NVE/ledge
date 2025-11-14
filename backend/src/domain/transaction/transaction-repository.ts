@@ -24,7 +24,20 @@ export class TransactionRepository {
 
     updateOne = async (transaction: Transaction): Promise<void> => {
         const { _id, ...rest } = transaction;
-        await this.transactionCollection.updateOne({ _id }, { $set: rest });
+
+        // Ensure the database reflects the exact shape of the Transaction object
+        // Some fields (like expenseCategory) must disappear when they no longer apply,
+        // otherwise old values could remain in MongoDB and create inconsistent documents
+        const updateQuery: {
+            $set: typeof rest;
+            $unset?: Record<string, ''>;
+        } = { $set: rest };
+
+        if (!('expenseCategory' in rest)) {
+            updateQuery.$unset = { expenseCategory: '' };
+        }
+
+        await this.transactionCollection.updateOne({ _id }, updateQuery);
     };
 
     deleteOne = async <K extends keyof Transaction>(
