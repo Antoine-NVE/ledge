@@ -20,31 +20,46 @@ const valueSchema = z
     }, 'Value must have at most 2 decimal places')
     .max(999999999.99, 'Value is too big');
 
+const incomeTypeSchema = z.literal('income');
+
+const expenseTypeSchema = z.literal('expense');
+
 const expenseCategorySchema = z.enum(['need', 'want', 'investment']).nullable();
 
-const makeIncomeSchema = (withMonth: boolean) =>
-    z.object({
-        ...(withMonth ? { month: monthSchema } : undefined),
-        name: nameSchema,
-        value: valueSchema,
-        type: z.literal('income'),
-    });
+const createIncomeSchema = z.object({
+    month: monthSchema,
+    name: nameSchema,
+    value: valueSchema,
+    type: incomeTypeSchema,
+});
 
-const makeExpenseSchema = (withMonth: boolean) =>
-    z.object({
-        ...(withMonth ? { month: monthSchema } : undefined),
-        name: nameSchema,
-        value: valueSchema,
-        type: z.literal('expense'),
-        expenseCategory: expenseCategorySchema,
-    });
+const createExpenseSchema = z.object({
+    month: monthSchema,
+    name: nameSchema,
+    value: valueSchema,
+    type: expenseTypeSchema,
+    expenseCategory: expenseCategorySchema,
+});
+
+const updateIncomeSchema = z.object({
+    name: nameSchema,
+    value: valueSchema,
+    type: incomeTypeSchema,
+});
+
+const updateExpenseSchema = z.object({
+    name: nameSchema,
+    value: valueSchema,
+    type: expenseTypeSchema,
+    expenseCategory: expenseCategorySchema,
+});
 
 export const createBodySchema = z.discriminatedUnion('type', [
-    makeIncomeSchema(true),
-    makeExpenseSchema(true),
+    createIncomeSchema,
+    createExpenseSchema,
 ]);
 
 export const updateBodySchema = z.discriminatedUnion('type', [
-    makeIncomeSchema(false),
-    makeExpenseSchema(false),
+    updateIncomeSchema,
+    updateExpenseSchema,
 ]);
