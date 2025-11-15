@@ -11,6 +11,7 @@ import { NotFoundError } from '../../../src/infrastructure/errors/not-found-erro
 describe('TransactionService', () => {
     const TEST_TRANSACTION_ID = new ObjectId();
     const TEST_USER_ID = new ObjectId();
+    const TRANSACTION_ID = new ObjectId();
 
     let transactionData: TransactionData;
     let updateTransactionData: UpdateTransactionData;
@@ -25,7 +26,9 @@ describe('TransactionService', () => {
         updateTransactionData = {
             name: 'updated-name',
         } as unknown as UpdateTransactionData;
-        transaction = {} as unknown as Transaction;
+        transaction = {
+            _id: TRANSACTION_ID,
+        } as unknown as Transaction;
         transactionArray = [transaction];
 
         transactionRepository = {
@@ -114,13 +117,16 @@ describe('TransactionService', () => {
             });
         });
 
-        it('should return transaction', async () => {
+        it('should return an updated transaction', async () => {
             const result = await transactionService.update(
                 transaction,
                 updateTransactionData,
             );
 
-            expect(result).toEqual(transaction);
+            expect(result).toMatchObject({
+                ...transaction,
+                ...updateTransactionData,
+            });
         });
     });
 

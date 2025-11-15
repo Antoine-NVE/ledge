@@ -83,6 +83,13 @@ describe('TransactionRepository', () => {
 
     describe('updateOne', () => {
         it('should call transactionCollection to updateOne', async () => {
+            transaction.type = 'expense';
+
+            // Always true, only here to stop TypeScript errors
+            if (transaction.type === 'expense') {
+                transaction.expenseCategory = 'need';
+            }
+
             await transactionRepository.updateOne(transaction);
 
             const { _id, ...rest } = transaction;
@@ -90,6 +97,17 @@ describe('TransactionRepository', () => {
             expect(transactionCollection.updateOne).toHaveBeenCalledWith(
                 { _id },
                 { $set: rest },
+            );
+        });
+
+        it('should delete expenseCategory if not present in input transaction', async () => {
+            await transactionRepository.updateOne(transaction); // Here transaction does not possess expenseCategory
+
+            const { _id, ...rest } = transaction;
+
+            expect(transactionCollection.updateOne).toHaveBeenCalledWith(
+                { _id },
+                { $set: rest, $unset: { expenseCategory: '' } },
             );
         });
     });
