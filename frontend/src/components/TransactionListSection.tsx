@@ -42,6 +42,10 @@ const TransactionListSection = ({ transactions, total, type, onEdit, onDelete }:
                             {type === 'income' ? '' : '- '}
                             {transaction.value} €
                         </p>
+                        {transaction.type === 'expense' && transaction.expenseCategory ? (
+                            <p className={`capitalize font-bold ${transaction.expenseCategory === 'need' ? 'text-blue-500' : transaction.expenseCategory === 'want' ? 'text-red-500' : 'text-green-500'}`}>
+                                {transaction.expenseCategory}
+                            </p>) : undefined}
                         <p className="text-gray-500 text-sm">
                             Added on {new Date(transaction.createdAt).toLocaleDateString('fr-FR')} at{' '}
                             {new Date(transaction.createdAt).toLocaleTimeString('fr-FR', {
