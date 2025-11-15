@@ -1,12 +1,22 @@
-export interface NewTransaction {
+type Income = {
     month: string;
     name: string;
     value: number;
-    type: 'income' | 'expense';
-}
+    type: "income";
+};
 
-export interface Transaction extends NewTransaction {
+type Expense = {
+    month: string;
+    name: string;
+    value: number;
+    type: "expense";
+    expenseCategory: "need" | "want" | "investment" | null;
+};
+
+export type NewTransaction = Income | Expense;
+
+export type Transaction = NewTransaction & {
     _id: string;
     createdAt: string;
     updatedAt: string;
-}
+};
