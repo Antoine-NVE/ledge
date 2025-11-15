@@ -24,11 +24,9 @@ jobs:
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "TARGET_PATH=/srv/apps/ledge/prod" >> $GITHUB_ENV
             echo "ENV=production" >> $GITHUB_ENV
-            echo "TAG=prod" >> $GITHUB_ENV
           else
             echo "TARGET_PATH=/srv/apps/ledge/dev" >> $GITHUB_ENV
             echo "ENV=development" >> $GITHUB_ENV
-            echo "TAG=dev" >> $GITHUB_ENV
           fi
 
       - name: Pull latest code
