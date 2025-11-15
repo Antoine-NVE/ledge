@@ -109,6 +109,7 @@ export const updateTransaction = async (
                 name: transaction.name,
                 value: transaction.value,
                 type: transaction.type,
+                ...(transaction.type === 'expense' ? {expenseCategory: transaction.expenseCategory} : undefined)
             }),
         });
 
