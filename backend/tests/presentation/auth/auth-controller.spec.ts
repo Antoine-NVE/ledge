@@ -89,10 +89,10 @@ describe('AuthController', () => {
                 resMock as Response,
             );
 
-            expect(authOrchestratorMock.register).toHaveBeenCalledWith(
-                EMAIL,
-                PASSWORD,
-            );
+            expect(authOrchestratorMock.register).toHaveBeenCalledWith({
+                email: EMAIL,
+                password: PASSWORD,
+            });
         });
 
         it('should call cookieService.setAuth with valid parameters', async () => {
@@ -139,10 +139,10 @@ describe('AuthController', () => {
         it('should call authOrchestrator.login with valid parameters', async () => {
             await authController.login(reqMock as Request, resMock as Response);
 
-            expect(authOrchestratorMock.login).toHaveBeenCalledWith(
-                EMAIL,
-                PASSWORD,
-            );
+            expect(authOrchestratorMock.login).toHaveBeenCalledWith({
+                email: EMAIL,
+                password: PASSWORD,
+            });
         });
 
         it('should call cookieService.setAuth with valid paramaters', async () => {

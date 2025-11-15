@@ -74,8 +74,8 @@ const Month = () => {
     }, [filteredTransactions, sort]);
 
     // Séparation et totaux dynamiques
-    const incomes = displayedTransactions.filter((t) => t.isIncome);
-    const expenses = displayedTransactions.filter((t) => !t.isIncome);
+    const incomes = displayedTransactions.filter((t) => t.type === 'income');
+    const expenses = displayedTransactions.filter((t) => t.type === 'expense');
     const totalIncomes = incomes.reduce((acc, t) => acc + t.value, 0);
     const totalExpenses = expenses.reduce((acc, t) => acc + t.value, 0);
     const total = totalIncomes - totalExpenses;
@@ -229,7 +229,7 @@ const Month = () => {
                     <TransactionListSection
                         transactions={incomes}
                         total={totalIncomes}
-                        isIncome={true}
+                        type={"income"}
                         onEdit={(transaction: Transaction) => handleEditTransaction(transaction)}
                         onDelete={(transaction: Transaction) => handleDeleteTransaction(transaction)}
                     />
@@ -238,7 +238,7 @@ const Month = () => {
                     <TransactionListSection
                         transactions={expenses}
                         total={totalExpenses}
-                        isIncome={false}
+                        type={"expense"}
                         onEdit={(transaction: Transaction) => handleEditTransaction(transaction)}
                         onDelete={(transaction: Transaction) => handleDeleteTransaction(transaction)}
                     />

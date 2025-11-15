@@ -38,15 +38,16 @@ describe('UserService', () => {
 
     describe('register', () => {
         it('should call userRepository.insertOne', async () => {
-            await userService.register(TEST_EMAIL, TEST_PASSWORD_HASH);
+            await userService.register({
+                email: TEST_EMAIL,
+                passwordHash: TEST_PASSWORD_HASH,
+            });
 
             expect(userRepository.insertOne).toHaveBeenCalledWith(
                 expect.objectContaining({
                     email: TEST_EMAIL,
                     passwordHash: TEST_PASSWORD_HASH,
                     isEmailVerified: false,
-                    emailVerificationCooldownExpiresAt: null,
-                    updatedAt: null,
                 }),
             );
         });
@@ -61,7 +62,10 @@ describe('UserService', () => {
             );
 
             expect(
-                userService.register(TEST_EMAIL, TEST_PASSWORD_HASH),
+                userService.register({
+                    email: TEST_EMAIL,
+                    passwordHash: TEST_PASSWORD_HASH,
+                }),
             ).rejects.toThrow(ConflictError);
         });
 
@@ -71,22 +75,23 @@ describe('UserService', () => {
             );
 
             expect(
-                userService.register(TEST_EMAIL, TEST_PASSWORD_HASH),
+                userService.register({
+                    email: TEST_EMAIL,
+                    passwordHash: TEST_PASSWORD_HASH,
+                }),
             ).rejects.toThrow(InternalServerError);
         });
 
         it('should return an user', async () => {
-            const result = await userService.register(
-                TEST_EMAIL,
-                TEST_PASSWORD_HASH,
-            );
+            const result = await userService.register({
+                email: TEST_EMAIL,
+                passwordHash: TEST_PASSWORD_HASH,
+            });
 
             expect(result).toMatchObject({
                 email: TEST_EMAIL,
                 passwordHash: TEST_PASSWORD_HASH,
                 isEmailVerified: false,
-                emailVerificationCooldownExpiresAt: null,
-                updatedAt: null,
             });
         });
     });

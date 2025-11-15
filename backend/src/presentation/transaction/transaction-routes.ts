@@ -35,8 +35,7 @@ const {
  *               - month
  *               - name
  *               - value
- *               - isIncome
- *               - isRecurring
+ *               - type
  *             properties:
  *               month:
  *                 type: string
@@ -44,10 +43,9 @@ const {
  *                 type: string
  *               value:
  *                 type: number
- *               isIncome:
- *                 type: boolean
- *               isRecurring:
- *                 type: boolean
+ *               type:
+ *                 type: string
+ *                 enum: [income, expense]
  *     responses:
  *       201:
  *         description: Transaction created successfully
@@ -129,17 +127,15 @@ router.get(
  *             required:
  *               - name
  *               - value
- *               - isIncome
- *               - isRecurring
+ *               - type
  *             properties:
  *               name:
  *                 type: string
  *               value:
  *                 type: number
- *               isIncome:
- *                 type: boolean
- *               isRecurring:
- *                 type: boolean
+ *               type:
+ *                 type: string
+ *                 enum: [income, expense]
  *     responses:
  *       200:
  *         description: Transaction updated successfully

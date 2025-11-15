@@ -7,6 +7,7 @@ import { RefreshTokenService } from '../../domain/refresh-token/refresh-token-se
 import { JwtService } from '../../infrastructure/services/jwt-service';
 import { PasswordService } from '../../infrastructure/services/password-service';
 import { TokenService } from '../../infrastructure/services/token-service';
+import { LoginInput, RegisterInput } from './auth-types';
 
 export class AuthOrchestrator {
     constructor(
@@ -17,34 +18,34 @@ export class AuthOrchestrator {
         private tokenService: TokenService,
     ) {}
 
-    register = async (
-        email: string,
-        password: string,
-    ): Promise<{
+    register = async ({
+        email,
+        password,
+    }: RegisterInput): Promise<{
         user: User;
         accessToken: string;
         refreshToken: RefreshToken;
     }> => {
         const passwordHash = await this.passwordService.hash(password);
 
-        const user = await this.userService.register(email, passwordHash);
+        const user = await this.userService.register({ email, passwordHash });
 
         const token = this.tokenService.generate();
 
-        const refreshToken = await this.refreshTokenService.create(
+        const refreshToken = await this.refreshTokenService.create({
             token,
-            user._id,
-        );
+            userId: user._id,
+        });
 
         const accessToken = this.jwtService.signAccess(user._id);
 
         return { user, accessToken, refreshToken };
     };
 
-    login = async (
-        email: string,
-        password: string,
-    ): Promise<{
+    login = async ({
+        email,
+        password,
+    }: LoginInput): Promise<{
         user: User;
         accessToken: string;
         refreshToken: RefreshToken;
@@ -67,10 +68,10 @@ export class AuthOrchestrator {
 
         const token = this.tokenService.generate();
 
-        const refreshToken = await this.refreshTokenService.create(
+        const refreshToken = await this.refreshTokenService.create({
             token,
-            user._id,
-        );
+            userId: user._id,
+        });
 
         const accessToken = this.jwtService.signAccess(user._id);
 

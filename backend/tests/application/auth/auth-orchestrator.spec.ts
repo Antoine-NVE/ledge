@@ -75,46 +75,61 @@ describe('AuthOrchestrator', () => {
 
     describe('register', () => {
         it('should call passwordService to hash', async () => {
-            await authOrchestrator.register(TEST_EMAIL, TEST_PASSWORD);
+            await authOrchestrator.register({
+                email: TEST_EMAIL,
+                password: TEST_PASSWORD,
+            });
 
             expect(passwordService.hash).toHaveBeenCalledWith(TEST_PASSWORD);
         });
 
         it('should call userService to register', async () => {
-            await authOrchestrator.register(TEST_EMAIL, TEST_PASSWORD);
+            await authOrchestrator.register({
+                email: TEST_EMAIL,
+                password: TEST_PASSWORD,
+            });
 
-            expect(userService.register).toHaveBeenCalledWith(
-                TEST_EMAIL,
-                TEST_HASHED_PASSWORD,
-            );
+            expect(userService.register).toHaveBeenCalledWith({
+                email: TEST_EMAIL,
+                passwordHash: TEST_HASHED_PASSWORD,
+            });
         });
 
         it('should call tokenService to generate', async () => {
-            await authOrchestrator.register(TEST_EMAIL, TEST_PASSWORD);
+            await authOrchestrator.register({
+                email: TEST_EMAIL,
+                password: TEST_PASSWORD,
+            });
 
             expect(tokenService.generate).toHaveBeenCalled();
         });
 
         it('should call refreshTokenService to create', async () => {
-            await authOrchestrator.register(TEST_EMAIL, TEST_PASSWORD);
+            await authOrchestrator.register({
+                email: TEST_EMAIL,
+                password: TEST_PASSWORD,
+            });
 
-            expect(refreshTokenService.create).toHaveBeenCalledWith(
-                TEST_TOKEN,
-                user._id,
-            );
+            expect(refreshTokenService.create).toHaveBeenCalledWith({
+                token: TEST_TOKEN,
+                userId: user._id,
+            });
         });
 
         it('should call jwtService to signAccess', async () => {
-            await authOrchestrator.register(TEST_EMAIL, TEST_PASSWORD);
+            await authOrchestrator.register({
+                email: TEST_EMAIL,
+                password: TEST_PASSWORD,
+            });
 
             expect(jwtService.signAccess).toHaveBeenCalledWith(user._id);
         });
 
         it('should return user, accessToken and refreshToken', async () => {
-            const result = await authOrchestrator.register(
-                TEST_EMAIL,
-                TEST_PASSWORD,
-            );
+            const result = await authOrchestrator.register({
+                email: TEST_EMAIL,
+                password: TEST_PASSWORD,
+            });
 
             expect(result).toEqual({
                 user,
@@ -126,7 +141,10 @@ describe('AuthOrchestrator', () => {
 
     describe('login', () => {
         it('should call userService to findOneByEmail', async () => {
-            await authOrchestrator.login(TEST_EMAIL, TEST_PASSWORD);
+            await authOrchestrator.login({
+                email: TEST_EMAIL,
+                password: TEST_PASSWORD,
+            });
 
             expect(userService.findOneByEmail).toHaveBeenCalledWith(TEST_EMAIL);
         });
@@ -137,7 +155,10 @@ describe('AuthOrchestrator', () => {
             );
 
             expect(
-                authOrchestrator.login(TEST_EMAIL, TEST_PASSWORD),
+                authOrchestrator.login({
+                    email: TEST_EMAIL,
+                    password: TEST_PASSWORD,
+                }),
             ).rejects.toThrow(UnauthorizedError);
         });
 
@@ -147,12 +168,18 @@ describe('AuthOrchestrator', () => {
             );
 
             expect(
-                authOrchestrator.login(TEST_EMAIL, TEST_PASSWORD),
+                authOrchestrator.login({
+                    email: TEST_EMAIL,
+                    password: TEST_PASSWORD,
+                }),
             ).rejects.toThrow(InternalServerError);
         });
 
         it('should call passwordService to compare', async () => {
-            await authOrchestrator.login(TEST_EMAIL, TEST_PASSWORD);
+            await authOrchestrator.login({
+                email: TEST_EMAIL,
+                password: TEST_PASSWORD,
+            });
 
             expect(passwordService.compare).toHaveBeenCalledWith(
                 TEST_PASSWORD,
@@ -164,36 +191,48 @@ describe('AuthOrchestrator', () => {
             (passwordService.compare as jest.Mock).mockResolvedValue(false);
 
             await expect(
-                authOrchestrator.login(TEST_EMAIL, TEST_PASSWORD),
+                authOrchestrator.login({
+                    email: TEST_EMAIL,
+                    password: TEST_PASSWORD,
+                }),
             ).rejects.toThrow(UnauthorizedError);
         });
 
         it('should call tokenService to generate', async () => {
-            await authOrchestrator.login(TEST_EMAIL, TEST_PASSWORD);
+            await authOrchestrator.login({
+                email: TEST_EMAIL,
+                password: TEST_PASSWORD,
+            });
 
             expect(tokenService.generate).toHaveBeenCalled();
         });
 
         it('should call refreshTokenService to create', async () => {
-            await authOrchestrator.login(TEST_EMAIL, TEST_PASSWORD);
+            await authOrchestrator.login({
+                email: TEST_EMAIL,
+                password: TEST_PASSWORD,
+            });
 
-            expect(refreshTokenService.create).toHaveBeenCalledWith(
-                TEST_TOKEN,
-                user._id,
-            );
+            expect(refreshTokenService.create).toHaveBeenCalledWith({
+                token: TEST_TOKEN,
+                userId: user._id,
+            });
         });
 
         it('should call jwtService to signAccess', async () => {
-            await authOrchestrator.login(TEST_EMAIL, TEST_PASSWORD);
+            await authOrchestrator.login({
+                email: TEST_EMAIL,
+                password: TEST_PASSWORD,
+            });
 
             expect(jwtService.signAccess).toHaveBeenCalledWith(user._id);
         });
 
         it('should return user, accessToken and refreshToken', async () => {
-            const result = await authOrchestrator.login(
-                TEST_EMAIL,
-                TEST_PASSWORD,
-            );
+            const result = await authOrchestrator.login({
+                email: TEST_EMAIL,
+                password: TEST_PASSWORD,
+            });
 
             expect(result).toEqual({
                 user,

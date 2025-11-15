@@ -24,11 +24,9 @@ jobs:
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "TARGET_PATH=/srv/apps/ledge/prod" >> $GITHUB_ENV
             echo "ENV=production" >> $GITHUB_ENV
-            echo "TAG=prod" >> $GITHUB_ENV
           else
             echo "TARGET_PATH=/srv/apps/ledge/dev" >> $GITHUB_ENV
             echo "ENV=development" >> $GITHUB_ENV
-            echo "TAG=dev" >> $GITHUB_ENV
           fi
 
       - name: Pull latest code
@@ -38,13 +36,26 @@ jobs:
 
       - name: Pull latest images
         run: |
-          echo "Pulling images for $ENV environment..."
           cd "$TARGET_PATH"
           docker compose pull
 
-      - name: Restart containers
+      - name: Stop existing containers
         run: |
           cd "$TARGET_PATH"
-          docker compose down
-          docker compose up -d --remove-orphans
-          echo "Deployment to $ENV server completed."
+          docker compose down --remove-orphans
+
+      - name: Start database only
+        run: |
+          cd "$TARGET_PATH"
+          docker compose up -d database
+
+      - name: Run migrations
+        run: |
+          cd "$TARGET_PATH"
+          docker compose run --rm backend npm run migrate
+
+      - name: Start full stack
+        run: |
+          cd "$TARGET_PATH"
+          docker compose up -d
+          echo "Deployment to $ENV completed."

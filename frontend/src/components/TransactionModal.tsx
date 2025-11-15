@@ -13,31 +13,29 @@ interface Props {
 interface FormTransaction {
     name: string;
     value: string;
-    isIncome: boolean | null;
-    isRecurring: boolean;
+    type: 'income' | 'expense' | null;
+    expenseCategory: 'need' | 'want' | 'investment' | null;
 }
 
 interface FormErrors {
     general: string;
     name: string;
     value: string;
-    isIncome: string;
-    isRecurring: string;
+    type: string;
 }
 
 const EMPTY_FORM: FormTransaction = {
     name: '',
     value: '',
-    isIncome: null,
-    isRecurring: false,
+    type: null,
+    expenseCategory: null,
 };
 
 const EMPTY_ERRORS: FormErrors = {
     general: '',
     name: '',
     value: '',
-    isIncome: '',
-    isRecurring: '',
+    type: '',
 };
 
 const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }: Props) => {
@@ -65,8 +63,8 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
         } else if (Number(form.value) <= 0) {
             errors.value = 'Value must be greater than 0';
         }
-        if (form.isIncome === null) {
-            errors.isIncome = 'Type is required';
+        if (form.type === null) {
+            errors.type = 'Type is required';
         }
         setFormErrors(errors);
         if (Object.values(errors).some((error) => error !== '')) {
@@ -80,17 +78,23 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                 ...initialTransaction,
                 ...form,
                 value,
-                isRecurring: form.isRecurring!,
-                isIncome: form.isIncome!,
+                type: form.type!,
+                expenseCategory:
+                    form.type === 'expense'
+                        ? form.expenseCategory
+                        : null,
             };
             handleUpdate(transaction);
         } else {
             const transaction: NewTransaction = {
                 ...form,
                 value,
-                isRecurring: form.isRecurring!,
-                isIncome: form.isIncome!,
+                type: form.type!,
                 month,
+                expenseCategory:
+                    form.type === 'expense'
+                        ? form.expenseCategory
+                        : null,
             };
             handleCreate(transaction);
         }
@@ -179,11 +183,14 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
         setForm(
             initialTransaction
                 ? {
-                      name: initialTransaction.name,
-                      value: String(initialTransaction.value),
-                      isIncome: initialTransaction.isIncome,
-                      isRecurring: initialTransaction.isRecurring,
-                  }
+                    name: initialTransaction.name,
+                    value: String(initialTransaction.value),
+                    type: initialTransaction.type,
+                    expenseCategory:
+                        initialTransaction.type === 'expense'
+                            ? initialTransaction.expenseCategory ?? null
+                            : null,
+                }
                 : EMPTY_FORM
         );
 
@@ -257,8 +264,8 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                                         className="cursor-pointer"
                                         type="radio"
                                         name="transactionTypeModal"
-                                        checked={form.isIncome === true}
-                                        onChange={() => setForm({ ...form, isIncome: true })}
+                                        checked={form.type === 'income'}
+                                        onChange={() => setForm({ ...form, type: 'income', expenseCategory: null })}
                                     />
                                     <span>Income</span>
                                 </label>
@@ -267,30 +274,54 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                                         className="cursor-pointer"
                                         type="radio"
                                         name="transactionTypeModal"
-                                        checked={form.isIncome === false}
-                                        onChange={() => setForm({ ...form, isIncome: false })}
+                                        checked={form.type === 'expense'}
+                                        onChange={() => setForm({ ...form, type: 'expense' })}
                                     />
                                     <span>Expense</span>
                                 </label>
                             </div>
-                            {formErrors.isIncome && <p className="text-red-500 text-sm mt-1">{formErrors.isIncome}</p>}
+                            {formErrors.type && <p className="text-red-500 text-sm mt-1">{formErrors.type}</p>}
                         </div>
 
-                        {/* Recurring */}
-                        <div>
-                            <label className="flex items-center gap-2 cursor-pointer select-none">
-                                <input
-                                    className="cursor-pointer"
-                                    type="checkbox"
-                                    checked={form.isRecurring}
-                                    onChange={() => setForm({ ...form, isRecurring: !form.isRecurring })}
-                                />
-                                <span>Recurring</span>
-                            </label>
-                            {formErrors.isRecurring && (
-                                <p className="text-red-500 text-sm mt-1">{formErrors.isRecurring}</p>
-                            )}
-                        </div>
+                        {/* Expense category */}
+                        {form.type === 'expense' && (
+                            <div>
+                                <label className="block text-sm font-medium mb-1">Category</label>
+                                <div className="flex gap-2 flex-wrap">
+
+                                    {[
+                                        {key: 'need', label: 'Need', color: 'bg-blue-500'},
+                                        {key: 'want', label: 'Want', color: 'bg-red-500'},
+                                        {key: 'investment', label: 'Investment', color: 'bg-green-500'},
+                                    ].map((cat) => (
+                                        <button
+                                            key={cat.key}
+                                            type="button"
+                                            onClick={() =>
+                                                setForm({
+                                                    ...form,
+                                                    expenseCategory:
+                                                        form.expenseCategory === cat.key ? null : (cat.key as any),
+                                                })
+                                            }
+                                            className={`
+                        px-3 py-1 rounded-full text-white text-sm cursor-pointer transition
+                        ${cat.color}
+                        ${
+                                                form.expenseCategory === cat.key
+                                                    ? 'opacity-100'
+                                                    : 'opacity-40 hover:opacity-70'
+                                            }
+                    `}
+                                        >
+                                            {cat.label}
+                                        </button>
+                                    ))}
+
+                                </div>
+                            </div>
+                        )}
+
 
                         {/* General error */}
                         {formErrors.general && <p className="text-red-600 text-sm">{formErrors.general}</p>}

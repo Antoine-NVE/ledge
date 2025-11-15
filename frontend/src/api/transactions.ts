@@ -108,8 +108,8 @@ export const updateTransaction = async (
             body: JSON.stringify({
                 name: transaction.name,
                 value: transaction.value,
-                isIncome: transaction.isIncome,
-                isRecurring: transaction.isRecurring,
+                type: transaction.type,
+                ...(transaction.type === 'expense' ? {expenseCategory: transaction.expenseCategory} : undefined)
             }),
         });
 

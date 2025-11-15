@@ -12,8 +12,7 @@ describe('Transaction schemas', () => {
                 month: '2025-11',
                 name: 'Test',
                 value: 452.42,
-                isIncome: false,
-                isRecurring: false,
+                type: 'income',
             };
         });
 
@@ -60,6 +59,27 @@ describe('Transaction schemas', () => {
 
             expect(success).toBe(false);
         });
+
+        it('should remove expenseCategory for incomes', () => {
+            const { data } = createBodySchema.safeParse({
+                ...validData,
+                expenseCategory: 'need',
+            });
+
+            expect(data).toEqual(validData);
+        });
+
+        it('should keep expenseCategory for expenses', () => {
+            const validExpense = {
+                ...validData,
+                type: 'expense',
+                expenseCategory: 'need',
+            };
+
+            const { data } = createBodySchema.safeParse(validExpense);
+
+            expect(data).toEqual(validExpense);
+        });
     });
 
     describe('updateBodySchema', () => {
@@ -69,8 +89,7 @@ describe('Transaction schemas', () => {
             validData = {
                 name: 'Test',
                 value: 452.42,
-                isIncome: false,
-                isRecurring: false,
+                type: 'income',
             };
         });
 
@@ -94,6 +113,27 @@ describe('Transaction schemas', () => {
             });
 
             expect(success).toBe(false);
+        });
+
+        it('should remove expenseCategory for incomes', () => {
+            const { data } = updateBodySchema.safeParse({
+                ...validData,
+                expenseCategory: 'need',
+            });
+
+            expect(data).toEqual(validData);
+        });
+
+        it('should keep expenseCategory for expenses', () => {
+            const validExpense = {
+                ...validData,
+                type: 'expense',
+                expenseCategory: 'need',
+            };
+
+            const { data } = updateBodySchema.safeParse(validExpense);
+
+            expect(data).toEqual(validExpense);
         });
     });
 });

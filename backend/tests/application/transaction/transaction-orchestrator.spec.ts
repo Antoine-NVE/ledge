@@ -4,7 +4,7 @@ import { TransactionService } from '../../../src/domain/transaction/transaction-
 import {
     Transaction,
     TransactionData,
-    TransactionUpdateData,
+    UpdateTransactionData,
 } from '../../../src/domain/transaction/transaction-types';
 
 describe('TransactionOrchestrator', () => {
@@ -12,7 +12,7 @@ describe('TransactionOrchestrator', () => {
     const TEST_USER_ID = new ObjectId();
 
     let transactionData: TransactionData;
-    let transactionUpdateData: TransactionUpdateData;
+    let updateTransactionData: UpdateTransactionData;
     let transaction: Transaction;
     let transactionArray: Transaction[];
 
@@ -21,7 +21,7 @@ describe('TransactionOrchestrator', () => {
 
     beforeEach(() => {
         transactionData = {} as unknown as TransactionData;
-        transactionUpdateData = {} as unknown as TransactionUpdateData;
+        updateTransactionData = {} as unknown as UpdateTransactionData;
         transaction = {} as unknown as Transaction;
         transactionArray = [transaction];
 
@@ -74,19 +74,19 @@ describe('TransactionOrchestrator', () => {
         it('should call transactionService to update', async () => {
             await transactionOrchestrator.update(
                 transaction,
-                transactionUpdateData,
+                updateTransactionData,
             );
 
             expect(transactionService.update).toHaveBeenCalledWith(
                 transaction,
-                transactionUpdateData,
+                updateTransactionData,
             );
         });
 
         it('should return transaction', async () => {
             const result = await transactionOrchestrator.update(
                 transaction,
-                transactionUpdateData,
+                updateTransactionData,
             );
 
             expect(result).toEqual(transaction);

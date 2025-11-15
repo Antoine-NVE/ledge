@@ -2,15 +2,18 @@
     "name": "backend",
     "version": "1.0.0",
     "description": "",
-    "main": "./dist/infrastructure/http/server.js",
+    "main": "./dist/src/infrastructure/http/server.js",
     "scripts": {
         "dev": "tsx watch ./src/infrastructure/http/server.ts",
-        "build": "rimraf ./dist && tsc",
+        "clean": "rimraf ./dist",
+        "build": "npm run clean && tsc",
         "start": "node .",
-        "format": "prettier --write .",
-        "format:check": "prettier --check .",
+        "format": "prettier --write ./",
+        "format:check": "prettier --check ./",
         "lint": "eslint",
-        "test": "jest"
+        "test": "jest",
+        "migrate": "node ./dist/scripts/migrate.js up",
+        "migrate:down": "node ./dist/scripts/migrate.js down"
     },
     "author": "",
     "license": "ISC",
@@ -51,6 +54,7 @@
         "nodemailer": "^7.0.3",
         "swagger-jsdoc": "^6.2.8",
         "swagger-ui-express": "^5.0.1",
+        "umzug": "^3.8.2",
         "zod": "^4.1.11"
     }
 }

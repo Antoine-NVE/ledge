@@ -2,7 +2,7 @@ import { ObjectId } from 'mongodb';
 import {
     Transaction,
     TransactionData,
-    TransactionUpdateData,
+    UpdateTransactionData,
 } from '../../../src/domain/transaction/transaction-types';
 import { TransactionRepository } from '../../../src/domain/transaction/transaction-repository';
 import { TransactionService } from '../../../src/domain/transaction/transaction-service';
@@ -11,9 +11,10 @@ import { NotFoundError } from '../../../src/infrastructure/errors/not-found-erro
 describe('TransactionService', () => {
     const TEST_TRANSACTION_ID = new ObjectId();
     const TEST_USER_ID = new ObjectId();
+    const TRANSACTION_ID = new ObjectId();
 
     let transactionData: TransactionData;
-    let transactionUpdateData: TransactionUpdateData;
+    let updateTransactionData: UpdateTransactionData;
     let transaction: Transaction;
     let transactionArray: Transaction[];
 
@@ -22,10 +23,12 @@ describe('TransactionService', () => {
 
     beforeEach(() => {
         transactionData = {} as unknown as TransactionData;
-        transactionUpdateData = {
+        updateTransactionData = {
             name: 'updated-name',
-        } as unknown as TransactionUpdateData;
-        transaction = {} as unknown as Transaction;
+        } as unknown as UpdateTransactionData;
+        transaction = {
+            _id: TRANSACTION_ID,
+        } as unknown as Transaction;
         transactionArray = [transaction];
 
         transactionRepository = {
@@ -45,7 +48,6 @@ describe('TransactionService', () => {
             expect(transactionRepository.insertOne).toHaveBeenCalledWith(
                 expect.objectContaining({
                     ...transactionData,
-                    updatedAt: null,
                 }),
             );
         });
@@ -55,7 +57,6 @@ describe('TransactionService', () => {
 
             expect(result).toMatchObject({
                 ...transactionData,
-                updatedAt: null,
             });
         });
     });
@@ -108,21 +109,24 @@ describe('TransactionService', () => {
         it('should update values', async () => {
             const result = await transactionService.update(
                 transaction,
-                transactionUpdateData,
+                updateTransactionData,
             );
 
             expect(result).toMatchObject({
-                ...transactionUpdateData,
+                ...updateTransactionData,
             });
         });
 
-        it('should return transaction', async () => {
+        it('should return an updated transaction', async () => {
             const result = await transactionService.update(
                 transaction,
-                transactionUpdateData,
+                updateTransactionData,
             );
 
-            expect(result).toEqual(transaction);
+            expect(result).toMatchObject({
+                ...transaction,
+                ...updateTransactionData,
+            });
         });
     });
 

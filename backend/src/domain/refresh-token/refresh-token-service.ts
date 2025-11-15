@@ -1,6 +1,6 @@
 import { MongoServerError, ObjectId } from 'mongodb';
 import { RefreshTokenRepository } from './refresh-token-repository';
-import { RefreshToken } from './refresh-token-types';
+import { CreateRefreshTokenData, RefreshToken } from './refresh-token-types';
 import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 import { InternalServerError } from '../../infrastructure/errors/internal-server-error';
 
@@ -9,14 +9,12 @@ export class RefreshTokenService {
 
     constructor(private refreshTokenRepository: RefreshTokenRepository) {}
 
-    create = async (token: string, userId: ObjectId): Promise<RefreshToken> => {
+    create = async (data: CreateRefreshTokenData): Promise<RefreshToken> => {
         const refreshToken: RefreshToken = {
             _id: new ObjectId(),
-            token,
+            ...data,
             expiresAt: new Date(Date.now() + this.TTL),
-            userId,
             createdAt: new Date(),
-            updatedAt: null,
         };
 
         await this.refreshTokenRepository
