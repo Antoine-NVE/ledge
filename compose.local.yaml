@@ -38,6 +38,8 @@ services:
 
   cache:
     image: redis:8.2
+    ports:
+      - "6379:6379"
 
   smtp:
     image: axllent/mailpit
