@@ -16,6 +16,8 @@ import { JwtService } from '../services/jwt-service';
 import { EmailService } from '../services/email-service';
 import { PasswordService } from '../services/password-service';
 import { TokenService } from '../services/token-service';
+import { CacheService } from '../services/cache-service';
+import { client } from './cache-config';
 
 const secret = env.JWT_SECRET;
 const host = env.SMTP_HOST;
@@ -33,6 +35,7 @@ const emailService = new EmailService({
 });
 const passwordService = new PasswordService();
 const tokenService = new TokenService();
+const cacheService = new CacheService(client);
 
 const userRepository = new UserRepository(db.collection('users'));
 const refreshTokenRepository = new RefreshTokenRepository(
@@ -57,6 +60,7 @@ const userOrchestrator = new UserOrchestrator(
     jwtService,
     emailService,
     userService,
+    cacheService,
     env.EMAIL_FROM,
 );
 const transactionOrchestrator = new TransactionOrchestrator(transactionService);
