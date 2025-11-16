@@ -36,6 +36,9 @@ services:
     volumes:
       - ./data/database:/data/db
 
+  cache:
+    image: redis:8.2
+
   smtp:
     image: axllent/mailpit
     ports:
