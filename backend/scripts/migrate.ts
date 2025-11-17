@@ -19,11 +19,12 @@ const direction = process.argv[2];
     try {
         if (direction === 'up') await umzug.up();
         if (direction === 'down') await umzug.down();
+
+        console.log('Migration done');
     } catch (err) {
-        console.error(err);
+        console.error('Migration failed:', err);
         process.exit(1);
     } finally {
         await client.close();
-        process.exit(0);
     }
 })();

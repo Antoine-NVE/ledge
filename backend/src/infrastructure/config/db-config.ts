@@ -1,12 +1,12 @@
-import { MongoClient } from 'mongodb';
+import { Db, MongoClient } from 'mongodb';
 
 export const client = new MongoClient(`mongodb://database:27017`);
+export const db: Db = client.db('ledge');
 
 (async () => {
     try {
+        // Only here to catch connection errors
         await client.connect();
-
-        const db = client.db('ledge');
 
         await db
             .collection('users')
@@ -27,5 +27,3 @@ export const client = new MongoClient(`mongodb://database:27017`);
         process.exit(1);
     }
 })();
-
-export const db = client.db('ledge');
