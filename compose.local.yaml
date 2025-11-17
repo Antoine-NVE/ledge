@@ -27,6 +27,7 @@ services:
       - /app/node_modules
     depends_on:
       - database
+      - cache
       - smtp
 
   database:
