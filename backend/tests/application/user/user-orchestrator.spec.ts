@@ -6,6 +6,7 @@ import { TooManyRequestsError } from '../../../src/infrastructure/errors/too-man
 import { EmailService } from '../../../src/infrastructure/services/email-service';
 import { JwtService } from '../../../src/infrastructure/services/jwt-service';
 import { UserOrchestrator } from '../../../src/application/user/user-orchestrator';
+import { CacheService } from '../../../src/infrastructure/services/cache-service';
 
 describe('UserOrchestrator', () => {
     const TEST_URL = 'http://localhost:3000';
@@ -18,6 +19,7 @@ describe('UserOrchestrator', () => {
     let jwtService: JwtService;
     let emailService: EmailService;
     let userService: UserService;
+    let cacheServiceMock: CacheService;
     let userOrchestrator: UserOrchestrator;
 
     beforeEach(() => {
@@ -40,10 +42,15 @@ describe('UserOrchestrator', () => {
             findOneById: jest.fn().mockResolvedValue(user),
             markEmailAsVerified: jest.fn(),
         } as unknown as UserService;
+        cacheServiceMock = {
+            setVerificationEmailCooldown: jest.fn(),
+            existsVerificationEmailCooldown: jest.fn().mockResolvedValue(false),
+        } as unknown as CacheService;
         userOrchestrator = new UserOrchestrator(
             jwtService,
             emailService,
             userService,
+            cacheServiceMock,
             TEST_EMAIL_FROM,
         );
     });
@@ -59,14 +66,12 @@ describe('UserOrchestrator', () => {
             ).rejects.toThrow(ConflictError);
         });
 
-        it('should throw a TooManyRequestsError before end of cooldown', () => {
-            user = {
-                emailVerificationCooldownExpiresAt: new Date(
-                    Date.now() + 60 * 1000, // 1 minute
-                ),
-            } as unknown as User;
+        it('should call cacheServiceMock.existsVerificationEmailCooldown and throw if false', async () => {
+            (
+                cacheServiceMock.existsVerificationEmailCooldown as jest.Mock
+            ).mockResolvedValue(true);
 
-            expect(
+            await expect(
                 userOrchestrator.sendVerificationEmail(user, TEST_URL),
             ).rejects.toThrow(TooManyRequestsError);
         });
@@ -90,12 +95,12 @@ describe('UserOrchestrator', () => {
             );
         });
 
-        it('should call userService to setEmailVerificationCooldown', async () => {
+        it('should call cacheService.setVerificationEmailCooldown', async () => {
             await userOrchestrator.sendVerificationEmail(user, TEST_URL);
 
             expect(
-                userService.setEmailVerificationCooldown,
-            ).toHaveBeenLastCalledWith(user);
+                cacheServiceMock.setVerificationEmailCooldown,
+            ).toHaveBeenLastCalledWith(user._id);
         });
     });
 
@@ -116,7 +121,7 @@ describe('UserOrchestrator', () => {
             );
         });
 
-        it('should throw a ConflictError if email is already verified', () => {
+        it('should throw a ConflictError if email is already verified', async () => {
             user = {
                 ...user,
                 isEmailVerified: true,
@@ -124,9 +129,9 @@ describe('UserOrchestrator', () => {
 
             (userService.findOneById as jest.Mock).mockResolvedValue(user);
 
-            expect(userOrchestrator.verifyEmail(TEST_JWT)).rejects.toThrow(
-                ConflictError,
-            );
+            await expect(
+                userOrchestrator.verifyEmail(TEST_JWT),
+            ).rejects.toThrow(ConflictError);
         });
 
         it('should call userService to markEmailAsVerified', async () => {
