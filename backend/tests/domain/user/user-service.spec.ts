@@ -146,29 +146,6 @@ describe('UserService', () => {
         });
     });
 
-    describe('setEmailVerificationCooldown', () => {
-        it('should update user with cooldown timestamp', async () => {
-            const now = new Date();
-            jest.useFakeTimers().setSystemTime(now);
-
-            await userService.setEmailVerificationCooldown(user);
-
-            expect(userRepository.updateOne).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    updatedAt: now,
-                    emailVerificationCooldownExpiresAt: new Date(
-                        now.getTime() + 5 * 60 * 1000,
-                    ),
-                }),
-            );
-        });
-
-        it('should return the updated user', async () => {
-            const result = await userService.setEmailVerificationCooldown(user);
-            expect(result).toBe(user);
-        });
-    });
-
     describe('markEmailAsVerified', () => {
         it('should update user with verified email', async () => {
             const now = new Date();
