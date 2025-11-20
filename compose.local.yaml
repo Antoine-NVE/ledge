@@ -31,7 +31,7 @@ services:
       - smtp
 
   database:
-    image: mongo:8.0.8
+    image: mongo:8.0
     ports:
       - "${DATABASE_PORT}:27017"
     volumes:
@@ -43,7 +43,7 @@ services:
       - "${CACHE_PORT}:6379"
 
   smtp:
-    image: axllent/mailpit
+    image: axllent/mailpit:v1.27
     ports:
       # Mailpit SMTP port is 1025, no need to expose it
       - "${SMTP_WEB_PORT}:8025" # Mailpit web interface
