@@ -4,12 +4,14 @@ import { TooManyRequestsError } from '../../infrastructure/errors/too-many-reque
 import { UserService } from '../../domain/user/user-service';
 import { JwtService } from '../../infrastructure/services/jwt-service';
 import { EmailService } from '../../infrastructure/services/email-service';
+import { CacheService } from '../../infrastructure/services/cache-service';
 
 export class UserOrchestrator {
     constructor(
         private jwtService: JwtService,
         private emailService: EmailService,
         private userService: UserService,
+        private cacheService: CacheService,
         private emailFrom: string,
     ) {}
 
@@ -21,10 +23,7 @@ export class UserOrchestrator {
             throw new ConflictError('Email already verified');
         }
 
-        if (
-            user.emailVerificationCooldownExpiresAt &&
-            user.emailVerificationCooldownExpiresAt > new Date()
-        ) {
+        if (await this.cacheService.existsVerificationEmailCooldown(user._id)) {
             throw new TooManyRequestsError(
                 'Please wait before requesting another verification email',
             );
@@ -39,7 +38,7 @@ export class UserOrchestrator {
             jwt,
         );
 
-        await this.userService.setEmailVerificationCooldown(user);
+        await this.cacheService.setVerificationEmailCooldown(user._id);
     };
 
     verifyEmail = async (jwt: string): Promise<void> => {

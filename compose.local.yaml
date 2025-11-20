@@ -27,6 +27,7 @@ services:
       - /app/node_modules
     depends_on:
       - database
+      - cache
       - smtp
 
   database:
@@ -35,6 +36,11 @@ services:
       - "${DATABASE_PORT}:27017"
     volumes:
       - ./data/database:/data/db
+
+  cache:
+    image: redis:8.2
+    ports:
+      - "${CACHE_PORT}:6379"
 
   smtp:
     image: axllent/mailpit

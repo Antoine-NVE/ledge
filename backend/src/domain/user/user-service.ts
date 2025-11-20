@@ -39,18 +39,6 @@ export class UserService {
         return user;
     };
 
-    setEmailVerificationCooldown = async (user: User): Promise<User> => {
-        user.updatedAt = new Date();
-
-        user.emailVerificationCooldownExpiresAt = new Date(
-            Date.now() + 5 * 60 * 1000, // 5 minutes
-        );
-
-        await this.userRepository.updateOne(user);
-
-        return user;
-    };
-
     markEmailAsVerified = async (user: User): Promise<User> => {
         user.updatedAt = new Date();
 

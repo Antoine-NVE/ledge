@@ -1,7 +1,5 @@
 import { envSchema } from '../schemas/env-config-schemas';
 import { parseArray, parseBoolean, parseNumber } from '../utils/parse-utils';
-import { InternalServerError } from '../errors/internal-server-error';
-import { formatZodError } from '../utils/format-utils';
 
 const { success, data, error } = envSchema.safeParse({
     NODE_ENV: process.env.NODE_ENV,
@@ -19,7 +17,10 @@ const { success, data, error } = envSchema.safeParse({
 });
 
 if (!success) {
-    throw new InternalServerError('Invalid .env', formatZodError(error));
+    console.error('Invalid .env:', error);
+    process.exit(1);
 }
+
+console.log('Valid .env');
 
 export const env = data;
