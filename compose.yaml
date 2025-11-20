@@ -16,7 +16,7 @@ services:
       - database
 
   database:
-    image: mongo:8.0.8
+    image: mongo:8.0
     ports:
       - "${DATABASE_PORT}:27017"
     volumes:
