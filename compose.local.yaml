@@ -43,7 +43,7 @@ services:
       - "${CACHE_PORT}:6379"
 
   smtp:
-    image: axllent/mailpit
+    image: axllent/mailpit:v1.27
     ports:
       # Mailpit SMTP port is 1025, no need to expose it
       - "${SMTP_WEB_PORT}:8025" # Mailpit web interface
