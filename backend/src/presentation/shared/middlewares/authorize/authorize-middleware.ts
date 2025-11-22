@@ -11,9 +11,10 @@ declare module 'express-serve-static-core' {
     }
 }
 
-export const authorize =
-    (transactionService: TransactionService) =>
-    async (
+export const createAuthorizeMiddleware = (
+    transactionService: TransactionService,
+) => {
+    return async (
         req: Request<AuthorizeParams>,
         res: Response,
         next: NextFunction,
@@ -29,3 +30,4 @@ export const authorize =
         req.transaction = transaction;
         next();
     };
+};

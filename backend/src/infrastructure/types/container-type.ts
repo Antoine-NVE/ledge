@@ -1,15 +1,21 @@
 import { AuthController } from '../../presentation/auth/auth-controller';
 import { UserController } from '../../presentation/user/user-controller';
 import { TransactionController } from '../../presentation/transaction/transaction-controller';
-import { JwtService } from '../services/jwt-service';
-import { UserService } from '../../domain/user/user-service';
-import { TransactionService } from '../../domain/transaction/transaction-service';
+import { NextFunction, Request, Response } from 'express';
+import { AuthorizeParams } from '../../presentation/shared/middlewares/authorize/authorize-types';
 
 export type Container = {
     authController: AuthController;
     userController: UserController;
     transactionController: TransactionController;
-    jwtService: JwtService;
-    userService: UserService;
-    transactionService: TransactionService;
+    authenticate: (
+        req: Request,
+        res: Response,
+        next: NextFunction,
+    ) => Promise<void>;
+    authorize: (
+        req: Request<AuthorizeParams>,
+        res: Response,
+        next: NextFunction,
+    ) => Promise<void>;
 };

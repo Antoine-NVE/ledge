@@ -1,16 +1,14 @@
 import express from 'express';
-import { validateBody } from '../shared/middlewares/validate-body/validate-body-middleware';
 import { createBodySchema, updateBodySchema } from './transaction-schemas';
-import { authenticate } from '../shared/middlewares/authenticate/authenticate-middleware';
-import { authorize } from '../shared/middlewares/authorize/authorize-middleware';
 import { authorizeParamsSchema } from '../shared/middlewares/authorize/authorize-schemas';
-import { validateParams } from '../shared/middlewares/validate-params/validate-params-middleware';
 import { Container } from '../../infrastructure/types/container-type';
+import { createValidateParamsMiddleware } from '../shared/middlewares/validate-params/validate-params-middleware';
+import { createValidateBodyMiddleware } from '../shared/middlewares/validate-body/validate-body-middleware';
 
-export const transactionRoutes = (container: Container) => {
+export const createTransactionRoutes = (container: Container) => {
     const router = express.Router();
 
-    const { jwtService, userService, transactionService } = container;
+    const { authenticate, authorize } = container;
     const {
         create,
         readAll,
@@ -18,6 +16,9 @@ export const transactionRoutes = (container: Container) => {
         update,
         delete: remove,
     } = container.transactionController;
+    const validateParams = createValidateParamsMiddleware(
+        authorizeParamsSchema,
+    );
 
     /**
      * @openapi
@@ -59,8 +60,8 @@ export const transactionRoutes = (container: Container) => {
      */
     router.post(
         '/',
-        authenticate(jwtService, userService),
-        validateBody(createBodySchema),
+        authenticate,
+        createValidateBodyMiddleware(createBodySchema),
         create,
     );
 
@@ -81,7 +82,7 @@ export const transactionRoutes = (container: Container) => {
      *       500:
      *         description: Internal server error
      */
-    router.get('/', authenticate(jwtService, userService), readAll);
+    router.get('/', authenticate, readAll);
 
     /**
      * @openapi
@@ -104,13 +105,7 @@ export const transactionRoutes = (container: Container) => {
      *       500:
      *         description: Internal server error
      */
-    router.get(
-        '/:id',
-        authenticate(jwtService, userService),
-        validateParams(authorizeParamsSchema),
-        authorize(transactionService),
-        read,
-    );
+    router.get('/:id', authenticate, validateParams, authorize, read);
 
     /**
      * @openapi
@@ -153,10 +148,10 @@ export const transactionRoutes = (container: Container) => {
      */
     router.put(
         '/:id',
-        authenticate(jwtService, userService),
-        validateParams(authorizeParamsSchema),
-        authorize(transactionService),
-        validateBody(updateBodySchema),
+        authenticate,
+        validateParams,
+        authorize,
+        createValidateBodyMiddleware(updateBodySchema),
         update,
     );
 
@@ -181,13 +176,7 @@ export const transactionRoutes = (container: Container) => {
      *       500:
      *         description: Internal server error
      */
-    router.delete(
-        '/:id',
-        authenticate(jwtService, userService),
-        validateParams(authorizeParamsSchema),
-        authorize(transactionService),
-        remove,
-    );
+    router.delete('/:id', authenticate, validateParams, authorize, remove);
 
     return router;
 };

@@ -19,6 +19,8 @@ import { Container } from '../types/container-type';
 import { Db } from 'mongodb';
 import { Env } from '../types/env-type';
 import { RedisClientType } from 'redis';
+import { createAuthenticateMiddleware } from '../../presentation/shared/middlewares/authenticate/authenticate-middleware';
+import { createAuthorizeMiddleware } from '../../presentation/shared/middlewares/authorize/authorize-middleware';
 
 export const buildContainer = (
     env: Env,
@@ -67,7 +69,7 @@ export const buildContainer = (
         emailService,
         userService,
         cacheService,
-        env.EMAIL_FROM,
+        env,
     );
     const transactionOrchestrator = new TransactionOrchestrator(
         transactionService,
@@ -79,12 +81,14 @@ export const buildContainer = (
         transactionOrchestrator,
     );
 
+    const authenticate = createAuthenticateMiddleware(jwtService, userService);
+    const authorize = createAuthorizeMiddleware(transactionService);
+
     return {
         authController,
         userController,
         transactionController,
-        jwtService,
-        userService,
-        transactionService,
+        authenticate,
+        authorize,
     };
 };

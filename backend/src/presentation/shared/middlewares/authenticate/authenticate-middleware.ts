@@ -12,9 +12,11 @@ declare module 'express-serve-static-core' {
     }
 }
 
-export const authenticate =
-    (jwtService: JwtService, userService: UserService) =>
-    async (req: Request, res: Response, next: NextFunction) => {
+export const createAuthenticateMiddleware = (
+    jwtService: JwtService,
+    userService: UserService,
+) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
         const cookieService = new CookieService(req, res);
         const accessToken = cookieService.getAccessToken();
         if (!accessToken) {
@@ -33,3 +35,4 @@ export const authenticate =
         });
         next();
     };
+};

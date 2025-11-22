@@ -6,12 +6,12 @@ import swaggerUi from 'swagger-ui-express';
 import { swaggerMiddleware } from './middlewares/swagger-middleware';
 import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 import { createErrorHandlerMiddleware } from './middlewares/error-handler-middleware';
-import { authRoutes } from '../auth/auth-routes';
-import { transactionRoutes } from '../transaction/transaction-routes';
-import { userRoutes } from '../user/user-routes';
 import { Container } from '../../infrastructure/types/container-type';
 import { Env } from '../../infrastructure/types/env-type';
 import { Logger } from 'pino';
+import { createAuthRoutes } from '../auth/auth-routes';
+import { createTransactionRoutes } from '../transaction/transaction-routes';
+import { createUserRoutes } from '../user/user-routes';
 
 export const createHttpServer = (
     env: Env,
@@ -32,9 +32,9 @@ export const createHttpServer = (
     if (env.NODE_ENV === 'development') {
         app.use('/docs', swaggerUi.serve, swaggerMiddleware);
     }
-    app.use('/auth', authRoutes(container));
-    app.use('/transactions', transactionRoutes(container));
-    app.use('/users', userRoutes(container, env));
+    app.use('/auth', createAuthRoutes(container));
+    app.use('/transactions', createTransactionRoutes(container));
+    app.use('/users', createUserRoutes(container, env));
     app.all(/.*/, () => {
         throw new NotFoundError('Route not found');
     });

@@ -1,20 +1,17 @@
 import express from 'express';
-import { validateBody } from '../shared/middlewares/validate-body/validate-body-middleware';
 import {
     createSendVerificationEmailBodySchema,
     verifyEmailBodySchema,
 } from './user-schemas';
-import { authenticate } from '../shared/middlewares/authenticate/authenticate-middleware';
 import { Container } from '../../infrastructure/types/container-type';
 import { Env } from '../../infrastructure/types/env-type';
+import { createValidateBodyMiddleware } from '../shared/middlewares/validate-body/validate-body-middleware';
 
-export const userRoutes = (container: Container, env: Env) => {
+export const createUserRoutes = (container: Container, env: Env) => {
     const router = express.Router();
 
-    const { jwtService, userService } = container;
+    const { authenticate } = container;
     const { sendVerificationEmail, verifyEmail, me } = container.userController;
-    const sendVerificationEmailBodySchema =
-        createSendVerificationEmailBodySchema(env);
 
     /**
      * @openapi
@@ -50,8 +47,10 @@ export const userRoutes = (container: Container, env: Env) => {
      */
     router.post(
         '/send-verification-email',
-        authenticate(jwtService, userService),
-        validateBody(sendVerificationEmailBodySchema),
+        authenticate,
+        createValidateBodyMiddleware(
+            createSendVerificationEmailBodySchema(env),
+        ),
         sendVerificationEmail,
     );
 
@@ -89,7 +88,7 @@ export const userRoutes = (container: Container, env: Env) => {
      */
     router.post(
         '/verify-email',
-        validateBody(verifyEmailBodySchema),
+        createValidateBodyMiddleware(verifyEmailBodySchema),
         verifyEmail,
     );
 
@@ -108,7 +107,7 @@ export const userRoutes = (container: Container, env: Env) => {
      *       500:
      *         description: Internal server error
      */
-    router.get('/me', authenticate(jwtService, userService), me);
+    router.get('/me', authenticate, me);
 
     return router;
 };

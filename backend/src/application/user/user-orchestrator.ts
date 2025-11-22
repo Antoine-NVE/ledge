@@ -5,6 +5,7 @@ import { UserService } from '../../domain/user/user-service';
 import { JwtService } from '../../infrastructure/services/jwt-service';
 import { EmailService } from '../../infrastructure/services/email-service';
 import { CacheService } from '../../infrastructure/services/cache-service';
+import { Env } from '../../infrastructure/types/env-type';
 
 export class UserOrchestrator {
     constructor(
@@ -12,7 +13,7 @@ export class UserOrchestrator {
         private emailService: EmailService,
         private userService: UserService,
         private cacheService: CacheService,
-        private emailFrom: string,
+        private env: Env,
     ) {}
 
     sendVerificationEmail = async (
@@ -32,7 +33,7 @@ export class UserOrchestrator {
         const jwt = this.jwtService.signVerificationEmail(user._id);
 
         await this.emailService.sendVerification(
-            this.emailFrom,
+            this.env.EMAIL_FROM,
             user.email,
             frontendBaseUrl,
             jwt,

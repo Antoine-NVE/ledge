@@ -3,9 +3,8 @@ import z from 'zod';
 import { BadRequestError } from '../../../../infrastructure/errors/bad-request-error';
 import { formatZodError } from '../../../../infrastructure/utils/format-utils';
 
-export const validateBody =
-    (schema: z.ZodSchema) =>
-    (req: Request, res: Response, next: NextFunction) => {
+export const createValidateBodyMiddleware = (schema: z.ZodSchema) => {
+    return (req: Request, res: Response, next: NextFunction) => {
         const { success, data, error } = schema.safeParse(req.body);
 
         if (!success) {
@@ -18,3 +17,4 @@ export const validateBody =
         req.body = data;
         next();
     };
+};
