@@ -8,7 +8,7 @@ import { connectToCache } from './infrastructure/config/cache-config';
 const start = async () => {
     try {
         const env = loadEnv();
-        const logger = createLogger(env);
+        const logger = createLogger(env.NODE_ENV);
 
         const cacheClient = await connectToCache();
         logger.info('Redis connected');

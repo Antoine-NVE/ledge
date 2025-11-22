@@ -13,7 +13,7 @@ export class UserOrchestrator {
         private emailService: EmailService,
         private userService: UserService,
         private cacheService: CacheService,
-        private env: Env,
+        private emailFrom: Env['EMAIL_FROM'],
     ) {}
 
     sendVerificationEmail = async (
@@ -33,7 +33,7 @@ export class UserOrchestrator {
         const jwt = this.jwtService.signVerificationEmail(user._id);
 
         await this.emailService.sendVerification(
-            this.env.EMAIL_FROM,
+            this.emailFrom,
             user.email,
             frontendBaseUrl,
             jwt,

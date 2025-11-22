@@ -7,7 +7,10 @@ import { Container } from '../../infrastructure/types/container-type';
 import { Env } from '../../infrastructure/types/env-type';
 import { createValidateBodyMiddleware } from '../shared/middlewares/validate-body/validate-body-middleware';
 
-export const createUserRoutes = (container: Container, env: Env) => {
+export const createUserRoutes = (
+    container: Container,
+    allowedOrigins: Env['ALLOWED_ORIGINS'],
+) => {
     const router = express.Router();
 
     const { authenticate } = container;
@@ -49,7 +52,7 @@ export const createUserRoutes = (container: Container, env: Env) => {
         '/send-verification-email',
         authenticate,
         createValidateBodyMiddleware(
-            createSendVerificationEmailBodySchema(env),
+            createSendVerificationEmailBodySchema(allowedOrigins),
         ),
         sendVerificationEmail,
     );

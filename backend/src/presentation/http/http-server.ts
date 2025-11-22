@@ -21,7 +21,7 @@ export const createHttpServer = (
     const app = express();
 
     // Security
-    app.use(createCorsMiddleware(env));
+    app.use(createCorsMiddleware(env.ALLOWED_ORIGINS));
     app.use(rateLimitMiddleware);
 
     // Parsing
@@ -34,13 +34,13 @@ export const createHttpServer = (
     }
     app.use('/auth', createAuthRoutes(container));
     app.use('/transactions', createTransactionRoutes(container));
-    app.use('/users', createUserRoutes(container, env));
+    app.use('/users', createUserRoutes(container, env.ALLOWED_ORIGINS));
     app.all(/.*/, () => {
         throw new NotFoundError('Route not found');
     });
 
     // Error handler
-    app.use(createErrorHandlerMiddleware(env, logger));
+    app.use(createErrorHandlerMiddleware(env.NODE_ENV, logger));
 
     return app;
 };

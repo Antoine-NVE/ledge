@@ -3,7 +3,10 @@ import { HttpError } from '../../../infrastructure/errors/http-error';
 import { Env } from '../../../infrastructure/types/env-type';
 import { Logger } from 'pino';
 
-export const createErrorHandlerMiddleware = (env: Env, logger: Logger) => {
+export const createErrorHandlerMiddleware = (
+    nodeEnv: Env['NODE_ENV'],
+    logger: Logger,
+) => {
     return (
         err: Error,
         req: Request,
@@ -13,7 +16,7 @@ export const createErrorHandlerMiddleware = (env: Env, logger: Logger) => {
         const isHttpError = err instanceof HttpError;
         const status = isHttpError ? err.status : 500;
 
-        if (env.NODE_ENV === 'development') {
+        if (nodeEnv === 'development') {
             res.status(status).json({
                 message: err.message,
                 errors: isHttpError ? err.errors : undefined,

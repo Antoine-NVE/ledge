@@ -1,11 +1,11 @@
 import z from 'zod';
 import { Env } from '../../infrastructure/types/env-type';
 
-export const createSendVerificationEmailBodySchema = (env: Env) => {
+export const createSendVerificationEmailBodySchema = (
+    allowedOrigins: Env['ALLOWED_ORIGINS'],
+) => {
     return z.object({
-        frontendBaseUrl: z
-            .url()
-            .refine((val) => env.ALLOWED_ORIGINS.includes(val)),
+        frontendBaseUrl: z.url().refine((val) => allowedOrigins.includes(val)),
     });
 };
 

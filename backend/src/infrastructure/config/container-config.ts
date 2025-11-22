@@ -69,7 +69,7 @@ export const buildContainer = (
         emailService,
         userService,
         cacheService,
-        env,
+        env.EMAIL_FROM,
     );
     const transactionOrchestrator = new TransactionOrchestrator(
         transactionService,

@@ -1,9 +1,11 @@
 import cors from 'cors';
 import { Env } from '../../../infrastructure/types/env-type';
 
-export const createCorsMiddleware = (env: Env) => {
+export const createCorsMiddleware = (
+    allowedOrigins: Env['ALLOWED_ORIGINS'],
+) => {
     return cors({
-        origin: env.ALLOWED_ORIGINS,
+        origin: allowedOrigins,
         credentials: true,
     });
 };
