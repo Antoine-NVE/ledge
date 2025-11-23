@@ -2,7 +2,7 @@ import { envSchema } from '../schemas/env-config-schemas';
 import { parseArray, parseBoolean, parseNumber } from '../utils/parse-utils';
 
 export const loadEnv = () => {
-    const result = envSchema.safeParse({
+    return envSchema.parse({
         NODE_ENV: process.env.NODE_ENV,
 
         JWT_SECRET: process.env.JWT_SECRET,
@@ -16,8 +16,4 @@ export const loadEnv = () => {
         SMTP_PASS: process.env.SMTP_PASS,
         EMAIL_FROM: process.env.EMAIL_FROM,
     });
-
-    if (!result.success) throw result.error;
-
-    return result.data;
 };
