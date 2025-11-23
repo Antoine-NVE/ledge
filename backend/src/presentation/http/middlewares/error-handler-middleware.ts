@@ -26,17 +26,30 @@ export const createErrorHandlerMiddleware = (
         }
 
         if (isHttpError && status < 500) {
+            const message = err.message;
+            logger.warn(
+                {
+                    err,
+                    userId: req.user?._id,
+                    transactionId: req.transaction?._id,
+                },
+                message,
+            );
             res.status(status).json({
-                message: err.message,
+                message,
                 errors: err.errors,
                 meta: err.meta,
             });
             return;
         }
 
-        logger.error({ err }, 'Unhandled error middleware');
+        const message = 'Internal server error';
+        logger.error(
+            { err, userId: req.user?._id, transactionId: req.transaction?._id },
+            message,
+        );
         res.status(status).json({
-            message: 'Internal server error',
+            message,
         });
     };
 };
