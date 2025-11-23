@@ -4,7 +4,7 @@ import { buildContainer } from './infrastructure/config/container-config';
 import { loadEnv } from './infrastructure/config/env-config';
 import { createLogger } from './infrastructure/config/logger-config';
 import { connectToCache } from './infrastructure/config/cache-config';
-import { Logger } from 'pino';
+import { step, stop } from './infrastructure/utils/lifecycle-utils';
 
 const start = async () => {
     // .env is not verified yet, but we need a logger now
@@ -40,23 +40,6 @@ const start = async () => {
     server.on('error', (err) => {
         stop(logger, 'HTTP server startup', err);
     });
-};
-
-const step = async <T>(
-    name: string,
-    logger: Logger,
-    fn: () => Promise<T>,
-): Promise<T> => {
-    try {
-        return await fn();
-    } catch (err) {
-        return stop(logger, name, err); // Return nothing
-    }
-};
-
-const stop = (logger: Logger, stepName: string, err: unknown) => {
-    logger.fatal({ err }, `${stepName} failed`);
-    process.exit(1);
 };
 
 start().then();

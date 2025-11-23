@@ -1,9 +1,9 @@
 import { MongoDBStorage, Umzug } from 'umzug';
 import path from 'node:path';
-import { Logger } from 'pino';
 import { createLogger } from '../src/infrastructure/config/logger-config';
 import { connectToDb } from '../src/infrastructure/config/db-config';
 import { MongoClient } from 'mongodb';
+import { step } from '../src/infrastructure/utils/lifecycle-utils';
 
 const start = async () => {
     const logger = createLogger(
@@ -45,23 +45,6 @@ const start = async () => {
     });
 
     return client;
-};
-
-const step = async <T>(
-    name: string,
-    logger: Logger,
-    fn: () => Promise<T>,
-): Promise<T> => {
-    try {
-        return await fn();
-    } catch (err) {
-        return stop(logger, name, err); // Return nothing
-    }
-};
-
-const stop = (logger: Logger, stepName: string, err: unknown) => {
-    logger.fatal({ err }, `${stepName} failed`);
-    process.exit(1);
 };
 
 start().then(async (client: MongoClient) => {
