@@ -65,7 +65,7 @@ export class TransactionService {
         return updated;
     };
 
-    delete = async (id: ObjectId): Promise<void> => {
-        await this.transactionRepository.deleteOne('_id', id);
+    delete = async (transaction: Transaction): Promise<void> => {
+        await this.transactionRepository.deleteOne(transaction);
     };
 }

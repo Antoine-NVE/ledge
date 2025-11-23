@@ -42,7 +42,7 @@ export class UserOrchestrator {
         await this.cacheService.setVerificationEmailCooldown(user._id);
     };
 
-    verifyEmail = async (jwt: string): Promise<void> => {
+    verifyEmail = async (jwt: string): Promise<User> => {
         const { sub } = this.jwtService.verifyVerificationEmail(jwt);
         const user = await this.userService.findOneById(sub);
         if (user.isEmailVerified) {
@@ -50,5 +50,7 @@ export class UserOrchestrator {
         }
 
         await this.userService.markEmailAsVerified(user);
+
+        return user;
     };
 }

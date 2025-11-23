@@ -53,7 +53,13 @@ export class RefreshTokenService {
         return refreshToken;
     };
 
-    deleteOneByToken = async (token: string): Promise<void> => {
-        await this.refreshTokenRepository.deleteOne('token', token);
+    findOneAndDeleteByToken = async (token: string) => {
+        const refreshToken = await this.refreshTokenRepository.findOneAndDelete(
+            'token',
+            token,
+        );
+        if (!refreshToken) throw new NotFoundError('Refresh token not found');
+
+        return refreshToken;
     };
 }

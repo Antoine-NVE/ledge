@@ -20,10 +20,12 @@ export class RefreshTokenRepository {
         await this.refreshTokenCollection.updateOne({ _id }, { $set: rest });
     };
 
-    deleteOne = async <K extends keyof RefreshToken>(
+    findOneAndDelete = async <K extends keyof RefreshToken>(
         key: K,
         value: RefreshToken[K],
-    ): Promise<void> => {
-        await this.refreshTokenCollection.deleteOne({ [key]: value });
+    ): Promise<RefreshToken | null> => {
+        return await this.refreshTokenCollection.findOneAndDelete({
+            [key]: value,
+        });
     };
 }

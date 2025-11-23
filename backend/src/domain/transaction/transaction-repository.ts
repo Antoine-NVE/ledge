@@ -40,10 +40,7 @@ export class TransactionRepository {
         await this.transactionCollection.updateOne({ _id }, updateQuery);
     };
 
-    deleteOne = async <K extends keyof Transaction>(
-        key: K,
-        value: Transaction[K],
-    ): Promise<void> => {
-        await this.transactionCollection.deleteOne({ [key]: value });
+    deleteOne = async (transaction: Transaction): Promise<void> => {
+        await this.transactionCollection.deleteOne({ _id: transaction._id });
     };
 }

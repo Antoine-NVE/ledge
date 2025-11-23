@@ -21,11 +21,13 @@ import { Env } from '../types/env-type';
 import { RedisClientType } from 'redis';
 import { createAuthenticateMiddleware } from '../../presentation/shared/middlewares/authenticate/authenticate-middleware';
 import { createAuthorizeMiddleware } from '../../presentation/shared/middlewares/authorize/authorize-middleware';
+import { Logger } from 'pino';
 
 export const buildContainer = (
     env: Env,
     cacheClient: RedisClientType,
     db: Db,
+    logger: Logger,
 ): Container => {
     const secret = env.JWT_SECRET;
     const host = env.SMTP_HOST;
@@ -75,10 +77,11 @@ export const buildContainer = (
         transactionService,
     );
 
-    const authController = new AuthController(authOrchestrator);
-    const userController = new UserController(userOrchestrator);
+    const authController = new AuthController(authOrchestrator, logger);
+    const userController = new UserController(userOrchestrator, logger);
     const transactionController = new TransactionController(
         transactionOrchestrator,
+        logger,
     );
 
     const authenticate = createAuthenticateMiddleware(jwtService, userService);

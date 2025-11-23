@@ -30,7 +30,7 @@ const start = async () => {
         return db;
     });
 
-    const container = buildContainer(env, cacheClient, db);
+    const container = buildContainer(env, cacheClient, db, logger);
 
     const app = createHttpServer(env, container, logger);
     const server = app.listen(3000);
