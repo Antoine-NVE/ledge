@@ -6,9 +6,14 @@ import { createLogger } from './infrastructure/config/logger-config';
 import { connectToCache } from './infrastructure/config/cache-config';
 
 const start = async () => {
+    // .env is not verified yet, but we need a logger now
+    const logger = createLogger(
+        process.env.NODE_ENV === 'development' ? 'development' : 'production',
+    );
+
     try {
         const env = loadEnv();
-        const logger = createLogger(env.NODE_ENV);
+        logger.info('Environment validated');
 
         const cacheClient = await connectToCache();
         logger.info('Redis connected');
@@ -30,7 +35,7 @@ const start = async () => {
             process.exit(1);
         });
     } catch (err) {
-        console.error('Startup failed:', err);
+        logger.fatal({ err }, 'Startup failed');
         process.exit(1);
     }
 };
