@@ -18,6 +18,15 @@ services:
       - cache
     restart: unless-stopped
 
+  migrate:
+    image: ghcr.io/antoine-nve/ledge-backend:latest
+    profiles: ["migrations"]
+    env_file: ./.env
+    depends_on:
+      - database
+    entrypoint: ["npm", "run", "migrate"]
+    restart: "no"
+
   database:
     image: mongo:8.0
     ports:
