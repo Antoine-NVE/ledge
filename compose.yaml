@@ -50,3 +50,6 @@ services:
     volumes:
       - logs:/loki
     restart: unless-stopped
+
+volumes:
+  logs:
