@@ -6,6 +6,7 @@ import { AuthController } from '../../../src/presentation/auth/auth-controller';
 import { User } from '../../../src/domain/user/user-types';
 import { removePasswordHash } from '../../../src/infrastructure/utils/clean-utils';
 import { UnauthorizedError } from '../../../src/infrastructure/errors/unauthorized-error';
+import { Logger } from 'pino';
 
 jest.mock('../../../src/infrastructure/services/cookie-service');
 jest.mock('../../../src/infrastructure/utils/clean-utils');
@@ -25,6 +26,7 @@ describe('AuthController', () => {
     let removePasswordHashMock: jest.Mock;
     let cookieServiceMock: Partial<CookieService>;
     let authOrchestratorMock: Partial<AuthOrchestrator>;
+    let loggerMock: Partial<Logger>;
     let authController: AuthController;
 
     beforeEach(() => {
@@ -71,10 +73,16 @@ describe('AuthController', () => {
                 accessToken: ACCESS_TOKEN,
                 refreshToken: refreshTokenMock,
             }),
-            logout: jest.fn(),
+            logout: jest.fn().mockReturnValue({
+                catch: jest.fn(),
+            }),
+        };
+        loggerMock = {
+            info: jest.fn(),
         };
         authController = new AuthController(
             authOrchestratorMock as AuthOrchestrator,
+            loggerMock as Logger,
         );
     });
 
@@ -194,7 +202,7 @@ describe('AuthController', () => {
                 undefined,
             );
 
-            expect(
+            await expect(
                 authController.refresh(reqMock as Request, resMock as Response),
             ).rejects.toThrow(new UnauthorizedError('Required refresh token'));
         });

@@ -18,7 +18,7 @@ describe('RefreshTokenRepository', () => {
             insertOne: jest.fn(),
             findOne: jest.fn().mockResolvedValue(refreshToken),
             updateOne: jest.fn(),
-            deleteOne: jest.fn(),
+            findOneAndDelete: jest.fn(),
         } as unknown as Collection<RefreshToken>;
 
         refreshTokenRepository = new RefreshTokenRepository(
@@ -76,15 +76,22 @@ describe('RefreshTokenRepository', () => {
 
     describe('deleteOne', () => {
         it('should call refreshTokenCollection to deleteOne', async () => {
-            await refreshTokenRepository.deleteOne('_id', TEST_OBJECT_ID);
+            await refreshTokenRepository.findOneAndDelete(
+                '_id',
+                TEST_OBJECT_ID,
+            );
 
-            expect(refreshTokenCollection.deleteOne).toHaveBeenCalledWith({
+            expect(
+                refreshTokenCollection.findOneAndDelete,
+            ).toHaveBeenCalledWith({
                 ['_id']: TEST_OBJECT_ID,
             });
 
-            await refreshTokenRepository.deleteOne('token', TEST_TOKEN);
+            await refreshTokenRepository.findOneAndDelete('token', TEST_TOKEN);
 
-            expect(refreshTokenCollection.deleteOne).toHaveBeenCalledWith({
+            expect(
+                refreshTokenCollection.findOneAndDelete,
+            ).toHaveBeenCalledWith({
                 ['token']: TEST_TOKEN,
             });
         });

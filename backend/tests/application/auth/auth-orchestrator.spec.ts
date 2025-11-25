@@ -52,7 +52,7 @@ describe('AuthOrchestrator', () => {
             create: jest.fn().mockResolvedValue(refreshToken),
             findOneByToken: jest.fn().mockResolvedValue(refreshToken),
             extendExpiration: jest.fn().mockResolvedValue(refreshToken),
-            deleteOneByToken: jest.fn().mockResolvedValue(refreshToken),
+            findOneAndDeleteByToken: jest.fn().mockResolvedValue(refreshToken),
         } as unknown as RefreshTokenService;
 
         passwordService = {
@@ -319,9 +319,9 @@ describe('AuthOrchestrator', () => {
         it('should call refreshTokenService to deleteOneByToken', async () => {
             await authOrchestrator.logout(TEST_TOKEN);
 
-            expect(refreshTokenService.deleteOneByToken).toHaveBeenCalledWith(
-                TEST_TOKEN,
-            );
+            expect(
+                refreshTokenService.findOneAndDeleteByToken,
+            ).toHaveBeenCalledWith(TEST_TOKEN);
         });
     });
 });

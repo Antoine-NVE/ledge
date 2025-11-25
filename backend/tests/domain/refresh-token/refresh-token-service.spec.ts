@@ -23,7 +23,7 @@ describe('RefreshTokenService', () => {
             }),
             findOne: jest.fn().mockResolvedValue(refreshToken),
             updateOne: jest.fn(),
-            deleteOne: jest.fn(),
+            findOneAndDelete: jest.fn().mockResolvedValue(refreshToken),
         } as unknown as RefreshTokenRepository;
         refreshTokenService = new RefreshTokenService(refreshTokenRepository);
     });
@@ -151,12 +151,11 @@ describe('RefreshTokenService', () => {
 
     describe('deleteOneByToken', () => {
         it('should call refreshTokenRepository to deleteOne', async () => {
-            await refreshTokenService.deleteOneByToken(TEST_TOKEN);
+            await refreshTokenService.findOneAndDeleteByToken(TEST_TOKEN);
 
-            expect(refreshTokenRepository.deleteOne).toHaveBeenCalledWith(
-                'token',
-                TEST_TOKEN,
-            );
+            expect(
+                refreshTokenRepository.findOneAndDelete,
+            ).toHaveBeenCalledWith('token', TEST_TOKEN);
         });
     });
 });

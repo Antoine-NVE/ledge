@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
-import { authorize } from '../../../../../src/presentation/shared/middlewares/authorize/authorize-middleware';
 import { TransactionService } from '../../../../../src/domain/transaction/transaction-service';
 import { ForbiddenError } from '../../../../../src/infrastructure/errors/forbidden-error';
 import { Transaction } from '../../../../../src/domain/transaction/transaction-types';
 import { ObjectId } from 'mongodb';
 import { AuthorizeParams } from '../../../../../src/presentation/shared/middlewares/authorize/authorize-types';
+import { createAuthorizeMiddleware } from '../../../../../src/presentation/shared/middlewares/authorize/authorize-middleware';
 
 describe('authorize middleware', () => {
     const USER_ID = new ObjectId();
@@ -32,7 +32,8 @@ describe('authorize middleware', () => {
         const transaction = { userId: USER_ID } as Transaction;
         transactionService.read.mockResolvedValue(transaction);
 
-        await authorize(transactionService)(req, res, next);
+        const authorize = createAuthorizeMiddleware(transactionService);
+        await authorize(req, res, next);
 
         expect(transactionService.read).toHaveBeenCalledWith(
             new ObjectId(PARAM_ID),
@@ -46,9 +47,9 @@ describe('authorize middleware', () => {
             userId: OTHER_USER_ID,
         } as Transaction);
 
-        await expect(
-            authorize(transactionService)(req, res, next),
-        ).rejects.toThrow(ForbiddenError);
+        const authorize = createAuthorizeMiddleware(transactionService);
+
+        await expect(authorize(req, res, next)).rejects.toThrow(ForbiddenError);
         expect(next).not.toHaveBeenCalled();
     });
 });

@@ -132,11 +132,10 @@ describe('TransactionService', () => {
 
     describe('delete', () => {
         it('should call transactionRepository.deleteOne', async () => {
-            await transactionService.delete(TEST_TRANSACTION_ID);
+            await transactionService.delete(transaction);
 
             expect(transactionRepository.deleteOne).toHaveBeenCalledWith(
-                '_id',
-                TEST_TRANSACTION_ID,
+                transaction,
             );
         });
     });

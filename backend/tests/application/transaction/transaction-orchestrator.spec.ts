@@ -8,7 +8,6 @@ import {
 } from '../../../src/domain/transaction/transaction-types';
 
 describe('TransactionOrchestrator', () => {
-    const TEST_ID = new ObjectId();
     const TEST_USER_ID = new ObjectId();
 
     let transactionData: TransactionData;
@@ -95,9 +94,9 @@ describe('TransactionOrchestrator', () => {
 
     describe('delete', () => {
         it('should call transactionService to delete', async () => {
-            await transactionOrchestrator.delete(TEST_ID);
+            await transactionOrchestrator.delete(transaction);
 
-            expect(transactionService.delete).toHaveBeenCalledWith(TEST_ID);
+            expect(transactionService.delete).toHaveBeenCalledWith(transaction);
         });
     });
 });
