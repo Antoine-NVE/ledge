@@ -13,6 +13,12 @@ export const createLogger = (nodeEnv: Env['NODE_ENV']) => {
                       colorize: true,
                   },
               }
-            : undefined, // JSON in production
+            : {
+                  target: 'pino-loki',
+                  options: {
+                      host: 'http://logs:3100',
+                      batching: false,
+                  },
+              },
     });
 };
