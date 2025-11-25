@@ -16,6 +16,7 @@ services:
     depends_on:
       - database
       - cache
+      - logs
     restart: unless-stopped
 
   migrate:
@@ -24,6 +25,7 @@ services:
     env_file: ./.env
     depends_on:
       - database
+      - logs
     entrypoint: ["npm", "run", "migrate"]
     restart: "no"
 
@@ -40,3 +42,10 @@ services:
     ports:
       - "${CACHE_PORT}:6379"
     restart: unless-stopped
+
+  logs:
+    image: grafana/loki:3.5
+    volumes:
+      - logs:/loki
+    ports:
+      - "${LOGS_PORT}:3100"
