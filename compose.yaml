@@ -45,7 +45,8 @@ services:
 
   logs:
     image: grafana/loki:3.5
-    volumes:
-      - logs:/loki
     ports:
       - "${LOGS_PORT}:3100"
+    volumes:
+      - logs:/loki
+    restart: unless-stopped
