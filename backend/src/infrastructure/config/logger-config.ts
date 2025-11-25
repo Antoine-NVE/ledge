@@ -18,6 +18,9 @@ export const createLogger = (nodeEnv: Env['NODE_ENV']) => {
                   options: {
                       host: 'http://logs:3100',
                       batching: false,
+                      labels: {
+                          service_name: 'backend',
+                      },
                   },
               },
     });
