@@ -5,6 +5,7 @@ import { UserService } from '../../domain/user/user-service';
 import { JwtService } from '../../infrastructure/services/jwt-service';
 import { EmailService } from '../../infrastructure/services/email-service';
 import { CacheService } from '../../infrastructure/services/cache-service';
+import { Env } from '../../infrastructure/types/env-type';
 
 export class UserOrchestrator {
     constructor(
@@ -12,7 +13,7 @@ export class UserOrchestrator {
         private emailService: EmailService,
         private userService: UserService,
         private cacheService: CacheService,
-        private emailFrom: string,
+        private emailFrom: Env['EMAIL_FROM'],
     ) {}
 
     sendVerificationEmail = async (
@@ -41,7 +42,7 @@ export class UserOrchestrator {
         await this.cacheService.setVerificationEmailCooldown(user._id);
     };
 
-    verifyEmail = async (jwt: string): Promise<void> => {
+    verifyEmail = async (jwt: string): Promise<User> => {
         const { sub } = this.jwtService.verifyVerificationEmail(jwt);
         const user = await this.userService.findOneById(sub);
         if (user.isEmailVerified) {
@@ -49,5 +50,7 @@ export class UserOrchestrator {
         }
 
         await this.userService.markEmailAsVerified(user);
+
+        return user;
     };
 }

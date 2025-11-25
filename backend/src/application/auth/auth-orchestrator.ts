@@ -106,7 +106,7 @@ export class AuthOrchestrator {
         return { accessToken, refreshToken };
     };
 
-    logout = async (token: string): Promise<void> => {
-        await this.refreshTokenService.deleteOneByToken(token);
+    logout = async (token: string) => {
+        return await this.refreshTokenService.findOneAndDeleteByToken(token);
     };
 }

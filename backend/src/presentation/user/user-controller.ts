@@ -3,9 +3,13 @@ import { UserOrchestrator } from '../../application/user/user-orchestrator';
 import { removePasswordHash } from '../../infrastructure/utils/clean-utils';
 import { SendVerificationEmailBody, VerifyEmailBody } from './user-types';
 import { ParamsDictionary } from 'express-serve-static-core';
+import { Logger } from 'pino';
 
 export class UserController {
-    constructor(private userOrchestrator: UserOrchestrator) {}
+    constructor(
+        private userOrchestrator: UserOrchestrator,
+        private logger: Logger,
+    ) {}
 
     sendVerificationEmail = async (
         req: Request<ParamsDictionary, unknown, SendVerificationEmailBody>,
@@ -18,8 +22,10 @@ export class UserController {
             frontendBaseUrl,
         );
 
+        const message = 'Verification email sent successfully';
+        this.logger.info({ userId: req.user._id }, message);
         res.status(200).json({
-            message: 'Verification email sent successfully',
+            message,
         });
     };
 
@@ -29,10 +35,12 @@ export class UserController {
     ): Promise<void> => {
         const { jwt } = req.body;
 
-        await this.userOrchestrator.verifyEmail(jwt);
+        const user = await this.userOrchestrator.verifyEmail(jwt);
 
+        const message = 'Email verified successfully';
+        this.logger.info({ userId: user._id }, message);
         res.status(200).json({
-            message: 'Email verified successfully',
+            message,
         });
     };
 

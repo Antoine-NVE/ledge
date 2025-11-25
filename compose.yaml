@@ -15,7 +15,19 @@ services:
       - "${BACKEND_PORT}:3000"
     depends_on:
       - database
+      - cache
+      - logs
     restart: unless-stopped
+
+  migrate:
+    image: ghcr.io/antoine-nve/ledge-backend:latest
+    profiles: ["migrations"]
+    env_file: ./.env
+    depends_on:
+      - database
+      - logs
+    entrypoint: ["npm", "run", "migrate"]
+    restart: "no"
 
   database:
     image: mongo:8.0
@@ -29,4 +41,12 @@ services:
     image: redis:8.2
     ports:
       - "${CACHE_PORT}:6379"
+    restart: unless-stopped
+
+  logs:
+    image: grafana/loki:3.5
+    ports:
+      - "${LOGS_PORT}:3100"
+    volumes:
+      - logs:/loki
     restart: unless-stopped

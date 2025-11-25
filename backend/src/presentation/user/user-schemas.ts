@@ -1,9 +1,13 @@
 import z from 'zod';
-import { env } from '../../infrastructure/config/env-config';
+import { Env } from '../../infrastructure/types/env-type';
 
-export const sendVerificationEmailBodySchema = z.object({
-    frontendBaseUrl: z.url().refine((val) => env.ALLOWED_ORIGINS.includes(val)),
-});
+export const createSendVerificationEmailBodySchema = (
+    allowedOrigins: Env['ALLOWED_ORIGINS'],
+) => {
+    return z.object({
+        frontendBaseUrl: z.url().refine((val) => allowedOrigins.includes(val)),
+    });
+};
 
 export const verifyEmailBodySchema = z.object({
     jwt: z.jwt(),

@@ -1,16 +1,16 @@
 import { createClient, RedisClientType } from 'redis';
 
-export const client: RedisClientType = createClient({
-    url: 'redis://cache:6379',
-});
+const REDIS_URL = 'redis://cache:6379';
 
-(async () => {
-    try {
-        await client.connect();
+let client: RedisClientType | null = null;
 
-        console.log('Redis connected');
-    } catch (err) {
-        console.error('Redis connection failed:', err);
-        process.exit(1);
+export const connectToCache = async () => {
+    if (client) {
+        throw new Error('connectToCache() called multiple times — forbidden.');
     }
-})();
+
+    client = createClient({ url: REDIS_URL });
+    await client.connect();
+
+    return client;
+};

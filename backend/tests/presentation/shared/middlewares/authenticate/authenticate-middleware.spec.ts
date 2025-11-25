@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
-import { authenticate } from '../../../../../src/presentation/shared/middlewares/authenticate/authenticate-middleware';
 import { JwtService } from '../../../../../src/infrastructure/services/jwt-service';
 import { UserService } from '../../../../../src/domain/user/user-service';
 import { CookieService } from '../../../../../src/infrastructure/services/cookie-service';
 import { UnauthorizedError } from '../../../../../src/infrastructure/errors/unauthorized-error';
 import { NotFoundError } from '../../../../../src/infrastructure/errors/not-found-error';
 import { InternalServerError } from '../../../../../src/infrastructure/errors/internal-server-error';
+import { createAuthenticateMiddleware } from '../../../../../src/presentation/shared/middlewares/authenticate/authenticate-middleware';
 
 jest.mock('../../../../../src/infrastructure/services/cookie-service');
 
@@ -39,9 +39,12 @@ describe('authenticate middleware', () => {
             () => cookieServiceMock,
         );
 
-        const middleware = authenticate(jwtService, userService);
+        const authenticate = createAuthenticateMiddleware(
+            jwtService,
+            userService,
+        );
 
-        await expect(middleware(req, res, next)).rejects.toThrow(
+        await expect(authenticate(req, res, next)).rejects.toThrow(
             UnauthorizedError,
         );
         expect(next).not.toHaveBeenCalled();
@@ -62,17 +65,24 @@ describe('authenticate middleware', () => {
             new NotFoundError(),
         );
 
-        await expect(
-            authenticate(jwtService, userService)(req, res, next),
-        ).rejects.toThrow(UnauthorizedError);
+        let authenticate = createAuthenticateMiddleware(
+            jwtService,
+            userService,
+        );
+
+        await expect(authenticate(req, res, next)).rejects.toThrow(
+            UnauthorizedError,
+        );
 
         (userService.findOneById as jest.Mock).mockRejectedValue(
             new InternalServerError(),
         );
 
-        await expect(
-            authenticate(jwtService, userService)(req, res, next),
-        ).rejects.toThrow(InternalServerError);
+        authenticate = createAuthenticateMiddleware(jwtService, userService);
+
+        await expect(authenticate(req, res, next)).rejects.toThrow(
+            InternalServerError,
+        );
     });
 
     it('sets req.user and calls next if token is valid', async () => {
@@ -88,8 +98,11 @@ describe('authenticate middleware', () => {
         (jwtService.verifyAccess as jest.Mock).mockReturnValue({ sub: '123' });
         (userService.findOneById as jest.Mock).mockResolvedValue(user);
 
-        const middleware = authenticate(jwtService, userService);
-        await middleware(req, res, next);
+        const authenticate = createAuthenticateMiddleware(
+            jwtService,
+            userService,
+        );
+        await authenticate(req, res, next);
 
         expect(jwtService.verifyAccess).toHaveBeenCalledWith(token);
         expect(userService.findOneById).toHaveBeenCalledWith('123');

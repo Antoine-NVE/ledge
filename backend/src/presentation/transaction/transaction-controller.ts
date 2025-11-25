@@ -2,9 +2,13 @@ import { Request, Response } from 'express';
 import { TransactionOrchestrator } from '../../application/transaction/transaction-orchestrator';
 import { CreateBody, UpdateBody } from './transaction-types';
 import { ParamsDictionary } from 'express-serve-static-core';
+import { Logger } from 'pino';
 
 export class TransactionController {
-    constructor(private transactionOrchestrator: TransactionOrchestrator) {}
+    constructor(
+        private transactionOrchestrator: TransactionOrchestrator,
+        private logger: Logger,
+    ) {}
 
     create = async (
         req: Request<ParamsDictionary, unknown, CreateBody>,
@@ -15,8 +19,13 @@ export class TransactionController {
             userId: req.user._id,
         });
 
+        const message = 'Transaction created successfully';
+        this.logger.info(
+            { userId: req.user._id, transactionId: transaction._id },
+            message,
+        );
         res.status(201).json({
-            message: 'Transaction created successfully',
+            message,
             data: {
                 transaction,
             },
@@ -54,8 +63,13 @@ export class TransactionController {
             req.body,
         );
 
+        const message = 'Transaction updated successfully';
+        this.logger.info(
+            { userId: req.user._id, transactionId: req.transaction._id },
+            message,
+        );
         res.status(200).json({
-            message: 'Transaction updated successfully',
+            message,
             data: {
                 transaction,
             },
@@ -63,10 +77,15 @@ export class TransactionController {
     };
 
     delete = async (req: Request, res: Response) => {
-        await this.transactionOrchestrator.delete(req.transaction._id);
+        await this.transactionOrchestrator.delete(req.transaction);
 
+        const message = 'Transaction deleted successfully';
+        this.logger.info(
+            { userId: req.user._id, transactionId: req.transaction._id },
+            message,
+        );
         res.status(200).json({
-            message: 'Transaction deleted successfully',
+            message,
         });
     };
 }

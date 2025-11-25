@@ -4,6 +4,7 @@ import { Transaction } from '../../../src/domain/transaction/transaction-types';
 import { TransactionOrchestrator } from '../../../src/application/transaction/transaction-orchestrator';
 import { TransactionController } from '../../../src/presentation/transaction/transaction-controller';
 import { User } from '../../../src/domain/user/user-types';
+import { Logger } from 'pino';
 
 describe('TransactionController', () => {
     const USER_ID = new ObjectId();
@@ -18,6 +19,7 @@ describe('TransactionController', () => {
     let reqMock: Partial<Request>;
     let resMock: Partial<Response>;
     let transactionOrchestratorMock: Partial<TransactionOrchestrator>;
+    let loggerMock: Partial<Logger>;
 
     let transactionController: TransactionController;
 
@@ -46,9 +48,13 @@ describe('TransactionController', () => {
             update: jest.fn().mockResolvedValue(updatedTransactionMock),
             delete: jest.fn(),
         };
+        loggerMock = {
+            info: jest.fn(),
+        };
 
         transactionController = new TransactionController(
             transactionOrchestratorMock as TransactionOrchestrator,
+            loggerMock as Logger,
         );
     });
 
@@ -183,7 +189,7 @@ describe('TransactionController', () => {
             );
 
             expect(transactionOrchestratorMock.delete).toHaveBeenCalledWith(
-                TRANSACTION_ID,
+                transactionMock,
             );
         });
 

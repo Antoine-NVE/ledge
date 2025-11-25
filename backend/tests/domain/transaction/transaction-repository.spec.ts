@@ -114,7 +114,7 @@ describe('TransactionRepository', () => {
 
     describe('deleteOne', () => {
         it('should call transactionCollection to deleteOne', async () => {
-            await transactionRepository.deleteOne('_id', TEST_OBJECT_ID);
+            await transactionRepository.deleteOne(transaction);
 
             expect(transactionCollection.deleteOne).toHaveBeenCalledWith({
                 ['_id']: TEST_OBJECT_ID,

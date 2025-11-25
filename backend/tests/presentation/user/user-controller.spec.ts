@@ -3,10 +3,13 @@ import { User } from '../../../src/domain/user/user-types';
 import { UserOrchestrator } from '../../../src/application/user/user-orchestrator';
 import { UserController } from '../../../src/presentation/user/user-controller';
 import { removePasswordHash } from '../../../src/infrastructure/utils/clean-utils';
+import { Logger } from 'pino';
+import { ObjectId } from 'mongodb';
 
 jest.mock('../../../src/infrastructure/utils/clean-utils');
 
 describe('UserController', () => {
+    const USER_ID = new ObjectId();
     const URL = 'https://example.com';
     const JWT = 'json.web.token';
     const EMAIL = 'test@example.com';
@@ -18,6 +21,7 @@ describe('UserController', () => {
     let reqMock: Partial<Request>;
     let resMock: Partial<Response>;
     let userOrchestratorMock: Partial<UserOrchestrator>;
+    let loggerMock: Partial<Logger>;
 
     let userController: UserController;
 
@@ -28,6 +32,7 @@ describe('UserController', () => {
         });
 
         userMock = {
+            _id: USER_ID,
             email: EMAIL,
             passwordHash: PASSWORD_HASH,
         };
@@ -39,11 +44,15 @@ describe('UserController', () => {
 
         userOrchestratorMock = {
             sendVerificationEmail: jest.fn(),
-            verifyEmail: jest.fn(),
+            verifyEmail: jest.fn().mockResolvedValue(userMock),
+        };
+        loggerMock = {
+            info: jest.fn(),
         };
 
         userController = new UserController(
             userOrchestratorMock as UserOrchestrator,
+            loggerMock as Logger,
         );
     });
 

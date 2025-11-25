@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 import { BadRequestError } from '../../../../../src/infrastructure/errors/bad-request-error';
-import { validateParams } from '../../../../../src/presentation/shared/middlewares/validate-params/validate-params-middleware';
+import { createValidateParamsMiddleware } from '../../../../../src/presentation/shared/middlewares/validate-params/validate-params-middleware';
 
 describe('ValidateParamsMiddleware', () => {
     let mockRequest: Partial<Request>;
@@ -22,8 +22,8 @@ describe('ValidateParamsMiddleware', () => {
         });
         mockRequest.params = { id: '123' };
 
-        const middleware = validateParams(schema);
-        middleware(
+        const validateParams = createValidateParamsMiddleware(schema);
+        validateParams(
             mockRequest as Request,
             mockResponse as Response,
             nextFunction,
@@ -38,10 +38,10 @@ describe('ValidateParamsMiddleware', () => {
         });
         mockRequest.params = { id: 'not-a-number' };
 
-        const middleware = validateParams(schema);
+        const validateParams = createValidateParamsMiddleware(schema);
 
         expect(() => {
-            middleware(
+            validateParams(
                 mockRequest as Request,
                 mockResponse as Response,
                 nextFunction,
@@ -55,10 +55,10 @@ describe('ValidateParamsMiddleware', () => {
         });
         mockRequest.params = {};
 
-        const middleware = validateParams(schema);
+        const validateParams = createValidateParamsMiddleware(schema);
 
         expect(() => {
-            middleware(
+            validateParams(
                 mockRequest as Request,
                 mockResponse as Response,
                 nextFunction,

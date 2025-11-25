@@ -1,15 +1,13 @@
-import { sendVerificationEmailBodySchema } from '../../../src/presentation/user/user-schemas';
-
-jest.mock('../../../src/infrastructure/config/env-config', () => ({
-    env: {
-        ALLOWED_ORIGINS: ['https://mock-dev', 'https://mock-prod'],
-    },
-}));
+import { createSendVerificationEmailBodySchema } from '../../../src/presentation/user/user-schemas';
 
 describe('user schemas', () => {
+    const ALLOWED_ORIGINS = ['https://mock-dev', 'https://mock-prod'];
+
     describe('sendVerificationEmailBodySchema', () => {
         it('should reject a URL not in ALLOWED_ORIGINS', () => {
-            const result = sendVerificationEmailBodySchema.safeParse({
+            const result = createSendVerificationEmailBodySchema(
+                ALLOWED_ORIGINS,
+            ).safeParse({
                 frontendBaseUrl: 'https://evil.com',
             });
 
@@ -17,7 +15,9 @@ describe('user schemas', () => {
         });
 
         it('should accept a URL inside ALLOWED_ORIGINS', () => {
-            const result = sendVerificationEmailBodySchema.safeParse({
+            const result = createSendVerificationEmailBodySchema(
+                ALLOWED_ORIGINS,
+            ).safeParse({
                 frontendBaseUrl: 'https://mock-dev',
             });
 
