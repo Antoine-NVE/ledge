@@ -2,7 +2,6 @@ import { MongoDBStorage, Umzug } from 'umzug';
 import path from 'node:path';
 import { createLogger } from '../src/infrastructure/config/logger-config';
 import { connectToDb } from '../src/infrastructure/config/db-config';
-import { MongoClient } from 'mongodb';
 import { step } from '../src/infrastructure/utils/lifecycle-utils';
 
 const start = async () => {
@@ -39,14 +38,25 @@ const start = async () => {
 
     await step('Migration', logger, async () => {
         const direction = process.argv[2];
-        if (direction === 'up') await umzug.up();
-        if (direction === 'down') await umzug.down();
-        logger.info('Migrations done');
+        switch (direction) {
+            case 'up':
+                await umzug.up();
+                break;
+            case 'down':
+                await umzug.down();
+                break;
+            default:
+                logger.error('Invalid migration direction');
+        }
     });
 
-    return client;
+    return { client, logger };
 };
 
-start().then(async (client: MongoClient) => {
+start().then(async ({ client, logger }) => {
     await client.close();
+    logger.info('MongoDB disconnected');
+
+    // Without this, Pino doesn't always have time to send all the logs to Loki
+    await new Promise((r) => setTimeout(r, 100));
 });
