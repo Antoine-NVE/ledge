@@ -1,12 +1,12 @@
 import { ObjectId } from 'mongodb';
 import { JwtService } from '../../../src/infrastructure/services/jwt-service';
 import { sign, verify, TokenExpiredError, NotBeforeError } from 'jsonwebtoken';
-import { formatZodError } from '../../../src/infrastructure/utils/format-utils';
+import { formatZodError } from '../../../src/infrastructure/utils/format';
 import { verifySchema } from '../../../src/infrastructure/schemas/jwt-service-schemas';
 
 jest.mock('jsonwebtoken');
 jest.mock('../../../src/infrastructure/schemas/jwt-service-schemas');
-jest.mock('../../../src/infrastructure/utils/format-utils');
+jest.mock('../../../src/infrastructure/utils/format');
 
 describe('JwtService', () => {
     const secret = 'a-strong-secret';

@@ -15,20 +15,21 @@ import { EmailService } from '../services/email-service';
 import { PasswordService } from '../services/password-service';
 import { TokenService } from '../services/token-service';
 import { CacheService } from '../services/cache-service';
-import { Container } from '../types/container-type';
 import { Db } from 'mongodb';
 import { Env } from '../types/env-type';
 import { RedisClientType } from 'redis';
-import { createAuthenticateMiddleware } from '../../presentation/middlewares/business/auth/authenticate';
-import { createAuthorizeMiddleware } from '../../presentation/middlewares/business/auth/authorize';
 import { Logger } from 'pino';
+import { createAuthenticate } from '../../presentation/middlewares/business/auth/authenticate';
+import { createAuthorize } from '../../presentation/middlewares/business/auth/authorize';
+
+export type Container = ReturnType<typeof buildContainer>;
 
 export const buildContainer = (
     env: Env,
     cacheClient: RedisClientType,
     db: Db,
     logger: Logger,
-): Container => {
+) => {
     const secret = env.JWT_SECRET;
     const host = env.SMTP_HOST;
     const port = env.SMTP_PORT;
@@ -84,8 +85,8 @@ export const buildContainer = (
         logger,
     );
 
-    const authenticate = createAuthenticateMiddleware(jwtService, userService);
-    const authorize = createAuthorizeMiddleware(transactionService);
+    const authenticate = createAuthenticate(jwtService, userService);
+    const authorize = createAuthorize(transactionService);
 
     return {
         authController,

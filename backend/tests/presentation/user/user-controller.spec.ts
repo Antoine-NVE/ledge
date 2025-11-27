@@ -2,11 +2,11 @@ import { Request, Response } from 'express';
 import { User } from '../../../src/domain/user/user-types';
 import { UserOrchestrator } from '../../../src/application/user/user-orchestrator';
 import { UserController } from '../../../src/presentation/user/user-controller';
-import { removePasswordHash } from '../../../src/infrastructure/utils/clean-utils';
+import { removePasswordHash } from '../../../src/infrastructure/utils/clean';
 import { Logger } from 'pino';
 import { ObjectId } from 'mongodb';
 
-jest.mock('../../../src/infrastructure/utils/clean-utils');
+jest.mock('../../../src/infrastructure/utils/clean');
 
 describe('UserController', () => {
     const USER_ID = new ObjectId();

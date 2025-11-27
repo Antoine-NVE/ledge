@@ -1,7 +1,7 @@
 import express from 'express';
 import { loginBodySchema, registerBodySchema } from './auth-schemas';
-import { Container } from '../../infrastructure/types/container-type';
 import { createValidateBody } from '../middlewares/business/validation/validate-body';
+import { Container } from '../../infrastructure/config/container-config';
 
 export const createAuthRoutes = (container: Container) => {
     const router = express.Router();

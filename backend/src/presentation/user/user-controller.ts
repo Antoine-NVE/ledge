@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { UserOrchestrator } from '../../application/user/user-orchestrator';
-import { removePasswordHash } from '../../infrastructure/utils/clean-utils';
+import { removePasswordHash } from '../../infrastructure/utils/clean';
 import { SendVerificationEmailBody, VerifyEmailBody } from './user-types';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { Logger } from 'pino';

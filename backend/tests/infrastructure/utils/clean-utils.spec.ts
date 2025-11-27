@@ -1,6 +1,6 @@
 import { ObjectId } from 'mongodb';
 import { User } from '../../../src/domain/user/user-types';
-import { removePasswordHash } from '../../../src/infrastructure/utils/clean-utils';
+import { removePasswordHash } from '../../../src/infrastructure/utils/clean';
 
 describe('clean utils', () => {
     describe('removePasswordHash', () => {

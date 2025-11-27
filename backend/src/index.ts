@@ -4,7 +4,7 @@ import { buildContainer } from './infrastructure/config/container-config';
 import { loadEnv } from './infrastructure/config/env-config';
 import { createLogger } from './infrastructure/config/logger-config';
 import { connectToCache } from './infrastructure/config/cache-config';
-import { step, stop } from './infrastructure/utils/lifecycle-utils';
+import { step, stop } from './infrastructure/utils/lifecycle';
 
 const start = async () => {
     // .env is not verified yet, but we need a logger now
@@ -32,7 +32,11 @@ const start = async () => {
 
     const container = buildContainer(env, cacheClient, db, logger);
 
-    const app = createApp(env, container, logger);
+    const app = createApp(
+        { allowedOrigins: env.ALLOWED_ORIGINS, nodeEnv: env.NODE_ENV },
+        container,
+        logger,
+    );
     const server = app.listen(3000);
     server.on('listening', () => {
         logger.info('HTTP server started');

@@ -3,7 +3,7 @@ import { TransactionService } from '../../../../domain/transaction/transaction-s
 import { ForbiddenError } from '../../../../infrastructure/errors/forbidden-error';
 import { Transaction } from '../../../../domain/transaction/transaction-types';
 import { ObjectId } from 'mongodb';
-import z from 'zod/index';
+import z from 'zod';
 
 declare module 'express-serve-static-core' {
     interface Request {

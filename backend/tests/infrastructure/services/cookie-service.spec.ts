@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
 
-jest.mock('../../../src/infrastructure/utils/parse-utils', () => ({
+jest.mock('../../../src/infrastructure/utils/parse', () => ({
     parseBoolean: jest.fn(),
 }));
 
-import { parseBoolean } from '../../../src/infrastructure/utils/parse-utils';
+import { parseBoolean } from '../../../src/infrastructure/utils/parse';
 import { CookieService } from '../../../src/infrastructure/services/cookie-service';
 
 describe('CookieService', () => {

@@ -2,7 +2,7 @@ import { MongoDBStorage, Umzug } from 'umzug';
 import path from 'node:path';
 import { createLogger } from '../src/infrastructure/config/logger-config';
 import { connectToDb } from '../src/infrastructure/config/db-config';
-import { step } from '../src/infrastructure/utils/lifecycle-utils';
+import { step } from '../src/infrastructure/utils/lifecycle';
 
 const start = async () => {
     const logger = createLogger(

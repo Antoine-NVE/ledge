@@ -9,9 +9,9 @@ import {
 } from 'jsonwebtoken';
 import { ObjectId } from 'mongodb';
 import { UnauthorizedError } from '../errors/unauthorized-error';
-import { verifySchema } from '../schemas/jwt-service-schemas';
-import { formatZodError } from '../utils/format-utils';
+import { formatZodError } from '../utils/format';
 import { BadRequestError } from '../errors/bad-request-error';
+import z from 'zod';
 
 export class JwtService {
     constructor(private secret: Secret) {}
@@ -48,7 +48,17 @@ export class JwtService {
             throw new UnauthorizedError('Invalid JWT');
         }
 
-        const { success, data, error } = verifySchema.safeParse(payload);
+        const { success, data, error } = z
+            .object({
+                aud: z.string(),
+                sub: z
+                    .string()
+                    .refine((val) => ObjectId.isValid(val))
+                    .transform((val) => new ObjectId(val)),
+                iat: z.number(),
+                exp: z.number(),
+            })
+            .safeParse(payload);
 
         if (!success) {
             throw new BadRequestError(

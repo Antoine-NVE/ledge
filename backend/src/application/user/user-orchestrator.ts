@@ -5,7 +5,7 @@ import { UserService } from '../../domain/user/user-service';
 import { JwtService } from '../../infrastructure/services/jwt-service';
 import { EmailService } from '../../infrastructure/services/email-service';
 import { CacheService } from '../../infrastructure/services/cache-service';
-import { Env } from '../../infrastructure/types/env-type';
+import { Env } from '../../infrastructure/config/env-config';
 
 export class UserOrchestrator {
     constructor(

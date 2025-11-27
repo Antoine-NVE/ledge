@@ -1,5 +1,22 @@
-import { envSchema } from '../schemas/env-config-schemas';
-import { parseArray, parseBoolean, parseNumber } from '../utils/parse-utils';
+import { parseArray, parseBoolean, parseNumber } from '../utils/parse';
+import z from 'zod';
+
+export const envSchema = z.object({
+    NODE_ENV: z.enum(['development', 'production']),
+
+    JWT_SECRET: z.string(),
+
+    ALLOWED_ORIGINS: z.array(z.url()),
+
+    SMTP_HOST: z.string(),
+    SMTP_PORT: z.number(),
+    SMTP_SECURE: z.boolean(),
+    SMTP_USER: z.string(),
+    SMTP_PASS: z.string(),
+    EMAIL_FROM: z.string(),
+});
+
+export type Env = z.infer<typeof envSchema>;
 
 export const loadEnv = () => {
     return envSchema.parse({

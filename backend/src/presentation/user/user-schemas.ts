@@ -1,5 +1,5 @@
 import z from 'zod';
-import { Env } from '../../infrastructure/types/env-type';
+import { Env } from '../../infrastructure/config/env-config';
 
 export const createSendVerificationEmailBodySchema = (
     allowedOrigins: Env['ALLOWED_ORIGINS'],

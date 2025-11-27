@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { HttpError } from '../../../infrastructure/errors/http-error';
-import { Env } from '../../../infrastructure/types/env-type';
 import { Logger } from 'pino';
+import { Env } from '../../../infrastructure/config/env-config';
 
 export const createErrorHandler = (
     nodeEnv: Env['NODE_ENV'],

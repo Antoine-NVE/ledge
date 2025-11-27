@@ -3,9 +3,9 @@ import {
     createSendVerificationEmailBodySchema,
     verifyEmailBodySchema,
 } from './user-schemas';
-import { Container } from '../../infrastructure/types/container-type';
-import { Env } from '../../infrastructure/types/env-type';
 import { createValidateBody } from '../middlewares/business/validation/validate-body';
+import { Container } from '../../infrastructure/config/container-config';
+import { Env } from '../../infrastructure/config/env-config';
 
 export const createUserRoutes = (
     container: Container,

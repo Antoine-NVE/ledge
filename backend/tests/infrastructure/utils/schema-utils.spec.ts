@@ -1,5 +1,5 @@
 import z from 'zod';
-import { formatZodError } from '../../../src/infrastructure/utils/format-utils';
+import { formatZodError } from '../../../src/infrastructure/utils/format';
 
 describe('schema utils', () => {
     const schema = z.strictObject(

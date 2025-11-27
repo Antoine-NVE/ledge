@@ -4,12 +4,12 @@ import { CookieService } from '../../../src/infrastructure/services/cookie-servi
 import { AuthOrchestrator } from '../../../src/application/auth/auth-orchestrator';
 import { AuthController } from '../../../src/presentation/auth/auth-controller';
 import { User } from '../../../src/domain/user/user-types';
-import { removePasswordHash } from '../../../src/infrastructure/utils/clean-utils';
+import { removePasswordHash } from '../../../src/infrastructure/utils/clean';
 import { UnauthorizedError } from '../../../src/infrastructure/errors/unauthorized-error';
 import { Logger } from 'pino';
 
 jest.mock('../../../src/infrastructure/services/cookie-service');
-jest.mock('../../../src/infrastructure/utils/clean-utils');
+jest.mock('../../../src/infrastructure/utils/clean');
 
 describe('AuthController', () => {
     const EMAIL = 'test@example.com';

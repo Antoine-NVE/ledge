@@ -1,5 +1,5 @@
 import cors from 'cors';
-import { Env } from '../../../infrastructure/types/env-type';
+import { Env } from '../../../infrastructure/config/env-config';
 
 export const createCors = (allowedOrigins: Env['ALLOWED_ORIGINS']) => {
     return cors({

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { AuthOrchestrator } from '../../application/auth/auth-orchestrator';
 import { UnauthorizedError } from '../../infrastructure/errors/unauthorized-error';
 import { CookieService } from '../../infrastructure/services/cookie-service';
-import { removePasswordHash } from '../../infrastructure/utils/clean-utils';
+import { removePasswordHash } from '../../infrastructure/utils/clean';
 import { LoginBody, RegisterBody } from './auth-types';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { Logger } from 'pino';

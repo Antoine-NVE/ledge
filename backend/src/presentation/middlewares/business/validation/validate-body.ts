@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import z from 'zod';
 import { BadRequestError } from '../../../../infrastructure/errors/bad-request-error';
-import { formatZodError } from '../../../../infrastructure/utils/format-utils';
+import { formatZodError } from '../../../../infrastructure/utils/format';
 
 export const createValidateBody = (schema: z.ZodSchema) => {
     return (req: Request, res: Response, next: NextFunction) => {

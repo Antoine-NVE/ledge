@@ -1,5 +1,5 @@
 import { CookieOptions, Request, Response } from 'express';
-import { parseBoolean } from '../utils/parse-utils';
+import { parseBoolean } from '../utils/parse';
 
 export class CookieService {
     constructor(

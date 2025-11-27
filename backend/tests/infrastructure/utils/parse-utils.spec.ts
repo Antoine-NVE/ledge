@@ -2,7 +2,7 @@ import {
     parseArray,
     parseBoolean,
     parseNumber,
-} from '../../../src/infrastructure/utils/parse-utils';
+} from '../../../src/infrastructure/utils/parse';
 
 describe('parse utils', () => {
     describe('parseNumber', () => {
