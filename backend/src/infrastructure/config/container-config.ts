@@ -19,8 +19,8 @@ import { Container } from '../types/container-type';
 import { Db } from 'mongodb';
 import { Env } from '../types/env-type';
 import { RedisClientType } from 'redis';
-import { createAuthenticateMiddleware } from '../../presentation/shared/middlewares/authenticate/authenticate-middleware';
-import { createAuthorizeMiddleware } from '../../presentation/shared/middlewares/authorize/authorize-middleware';
+import { createAuthenticateMiddleware } from '../../presentation/middlewares/business/authenticate';
+import { createAuthorizeMiddleware } from '../../presentation/middlewares/business/authorize';
 import { Logger } from 'pino';
 
 export const buildContainer = (

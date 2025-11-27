@@ -1,15 +1,21 @@
 import { NextFunction, Request, Response } from 'express';
-import { TransactionService } from '../../../../domain/transaction/transaction-service';
-import { ForbiddenError } from '../../../../infrastructure/errors/forbidden-error';
-import { Transaction } from '../../../../domain/transaction/transaction-types';
+import { TransactionService } from '../../../domain/transaction/transaction-service';
+import { ForbiddenError } from '../../../infrastructure/errors/forbidden-error';
+import { Transaction } from '../../../domain/transaction/transaction-types';
 import { ObjectId } from 'mongodb';
-import { AuthorizeParams } from './authorize-types';
+import z from 'zod/index';
 
 declare module 'express-serve-static-core' {
     interface Request {
         transaction: Transaction;
     }
 }
+
+export const authorizeParamsSchema = z.object({
+    id: z.string().refine((val) => ObjectId.isValid(val)),
+});
+
+export type AuthorizeParams = z.infer<typeof authorizeParamsSchema>;
 
 export const createAuthorizeMiddleware = (
     transactionService: TransactionService,

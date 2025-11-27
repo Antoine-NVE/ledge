@@ -5,7 +5,7 @@ import { CookieService } from '../../../../../src/infrastructure/services/cookie
 import { UnauthorizedError } from '../../../../../src/infrastructure/errors/unauthorized-error';
 import { NotFoundError } from '../../../../../src/infrastructure/errors/not-found-error';
 import { InternalServerError } from '../../../../../src/infrastructure/errors/internal-server-error';
-import { createAuthenticateMiddleware } from '../../../../../src/presentation/shared/middlewares/authenticate/authenticate-middleware';
+import { createAuthenticateMiddleware } from '../../../../../src/presentation/middlewares/business/authenticate';
 
 jest.mock('../../../../../src/infrastructure/services/cookie-service');
 

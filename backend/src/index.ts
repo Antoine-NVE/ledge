@@ -1,5 +1,5 @@
 import { connectToDb } from './infrastructure/config/db-config';
-import { createHttpServer } from './presentation/http/http-server';
+import { createApp } from './presentation/app';
 import { buildContainer } from './infrastructure/config/container-config';
 import { loadEnv } from './infrastructure/config/env-config';
 import { createLogger } from './infrastructure/config/logger-config';
@@ -32,7 +32,7 @@ const start = async () => {
 
     const container = buildContainer(env, cacheClient, db, logger);
 
-    const app = createHttpServer(env, container, logger);
+    const app = createApp(env, container, logger);
     const server = app.listen(3000);
     server.on('listening', () => {
         logger.info('HTTP server started');

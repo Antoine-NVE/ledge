@@ -5,7 +5,7 @@ import {
 } from './user-schemas';
 import { Container } from '../../infrastructure/types/container-type';
 import { Env } from '../../infrastructure/types/env-type';
-import { createValidateBodyMiddleware } from '../shared/middlewares/validate-body/validate-body-middleware';
+import { createValidateBodyMiddleware } from '../middlewares/business/validate-body';
 
 export const createUserRoutes = (
     container: Container,

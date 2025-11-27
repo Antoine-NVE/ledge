@@ -1,23 +1,19 @@
 import express from 'express';
-import { createCorsMiddleware } from './middlewares/cors-middleware';
-import { rateLimitMiddleware } from './middlewares/rate-limit-middleware';
+import { createCorsMiddleware } from './middlewares/technical/cors';
+import { rateLimitMiddleware } from './middlewares/technical/rate-limit';
 import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
-import { swaggerMiddleware } from './middlewares/swagger-middleware';
-import { NotFoundError } from '../../infrastructure/errors/not-found-error';
-import { createErrorHandlerMiddleware } from './middlewares/error-handler-middleware';
-import { Container } from '../../infrastructure/types/container-type';
-import { Env } from '../../infrastructure/types/env-type';
+import { swaggerMiddleware } from './middlewares/technical/swagger';
+import { NotFoundError } from '../infrastructure/errors/not-found-error';
+import { createErrorHandlerMiddleware } from './middlewares/technical/error-handler';
+import { Container } from '../infrastructure/types/container-type';
+import { Env } from '../infrastructure/types/env-type';
 import { Logger } from 'pino';
-import { createAuthRoutes } from '../auth/auth-routes';
-import { createTransactionRoutes } from '../transaction/transaction-routes';
-import { createUserRoutes } from '../user/user-routes';
+import { createAuthRoutes } from './auth/auth-routes';
+import { createTransactionRoutes } from './transaction/transaction-routes';
+import { createUserRoutes } from './user/user-routes';
 
-export const createHttpServer = (
-    env: Env,
-    container: Container,
-    logger: Logger,
-) => {
+export const createApp = (env: Env, container: Container, logger: Logger) => {
     const app = express();
 
     // Security

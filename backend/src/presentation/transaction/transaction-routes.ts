@@ -1,9 +1,9 @@
 import express from 'express';
 import { createBodySchema, updateBodySchema } from './transaction-schemas';
-import { authorizeParamsSchema } from '../shared/middlewares/authorize/authorize-schemas';
 import { Container } from '../../infrastructure/types/container-type';
-import { createValidateParamsMiddleware } from '../shared/middlewares/validate-params/validate-params-middleware';
-import { createValidateBodyMiddleware } from '../shared/middlewares/validate-body/validate-body-middleware';
+import { createValidateParamsMiddleware } from '../middlewares/business/validate-params';
+import { createValidateBodyMiddleware } from '../middlewares/business/validate-body';
+import { authorizeParamsSchema } from '../middlewares/business/authorize';
 
 export const createTransactionRoutes = (container: Container) => {
     const router = express.Router();

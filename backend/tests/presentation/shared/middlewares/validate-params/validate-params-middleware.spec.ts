@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { z } from 'zod';
 import { BadRequestError } from '../../../../../src/infrastructure/errors/bad-request-error';
-import { createValidateParamsMiddleware } from '../../../../../src/presentation/shared/middlewares/validate-params/validate-params-middleware';
+import { createValidateParamsMiddleware } from '../../../../../src/presentation/middlewares/business/validate-params';
 
 describe('ValidateParamsMiddleware', () => {
     let mockRequest: Partial<Request>;
