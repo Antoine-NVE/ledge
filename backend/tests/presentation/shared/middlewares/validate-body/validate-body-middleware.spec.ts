@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 import { BadRequestError } from '../../../../../src/infrastructure/errors/bad-request-error';
-import { createValidateBodyMiddleware } from '../../../../../src/presentation/middlewares/business/validate-body';
+import { createValidateBodyMiddleware } from '../../../../../src/presentation/middlewares/business/validation/validate-body';
 
 describe('validateBody middleware', () => {
     const mockRequest = (body: unknown) =>

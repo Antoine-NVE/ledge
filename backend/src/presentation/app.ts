@@ -1,24 +1,24 @@
 import express from 'express';
-import { createCorsMiddleware } from './middlewares/technical/cors';
-import { rateLimitMiddleware } from './middlewares/technical/rate-limit';
 import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
-import { swaggerMiddleware } from './middlewares/technical/swagger';
 import { NotFoundError } from '../infrastructure/errors/not-found-error';
-import { createErrorHandlerMiddleware } from './middlewares/technical/error-handler';
 import { Container } from '../infrastructure/types/container-type';
 import { Env } from '../infrastructure/types/env-type';
 import { Logger } from 'pino';
 import { createAuthRoutes } from './auth/auth-routes';
 import { createTransactionRoutes } from './transaction/transaction-routes';
 import { createUserRoutes } from './user/user-routes';
+import { createCors } from './middlewares/technical/cors';
+import { rateLimiter } from './middlewares/technical/rate-limit';
+import { swagger } from './middlewares/technical/swagger';
+import { createErrorHandler } from './middlewares/technical/error-handler';
 
 export const createApp = (env: Env, container: Container, logger: Logger) => {
     const app = express();
 
     // Security
-    app.use(createCorsMiddleware(env.ALLOWED_ORIGINS));
-    app.use(rateLimitMiddleware);
+    app.use(createCors(env.ALLOWED_ORIGINS));
+    app.use(rateLimiter);
 
     // Parsing
     app.use(express.json());
@@ -26,7 +26,7 @@ export const createApp = (env: Env, container: Container, logger: Logger) => {
 
     // Routes
     if (env.NODE_ENV === 'development') {
-        app.use('/docs', swaggerUi.serve, swaggerMiddleware);
+        app.use('/docs', swaggerUi.serve, swagger);
     }
     app.use('/auth', createAuthRoutes(container));
     app.use('/transactions', createTransactionRoutes(container));
@@ -36,7 +36,7 @@ export const createApp = (env: Env, container: Container, logger: Logger) => {
     });
 
     // Error handler
-    app.use(createErrorHandlerMiddleware(env.NODE_ENV, logger));
+    app.use(createErrorHandler(env.NODE_ENV, logger));
 
     return app;
 };

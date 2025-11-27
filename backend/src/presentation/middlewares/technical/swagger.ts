@@ -14,4 +14,4 @@ const options = {
 
 const swaggerSpec = swaggerJsdoc(options);
 
-export const swaggerMiddleware = swaggerUi.setup(swaggerSpec);
+export const swagger = swaggerUi.setup(swaggerSpec);

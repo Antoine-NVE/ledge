@@ -4,7 +4,7 @@ import { ForbiddenError } from '../../../../../src/infrastructure/errors/forbidd
 import { Transaction } from '../../../../../src/domain/transaction/transaction-types';
 import { ObjectId } from 'mongodb';
 import { AuthorizeParams } from '../../../../../src/presentation/shared/middlewares/authorize/authorize-types';
-import { createAuthorizeMiddleware } from '../../../../../src/presentation/middlewares/business/authorize';
+import { createAuthorizeMiddleware } from '../../../../../src/presentation/middlewares/business/auth/authorize';
 
 describe('authorize middleware', () => {
     const USER_ID = new ObjectId();

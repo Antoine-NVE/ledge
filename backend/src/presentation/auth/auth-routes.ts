@@ -1,7 +1,7 @@
 import express from 'express';
 import { loginBodySchema, registerBodySchema } from './auth-schemas';
 import { Container } from '../../infrastructure/types/container-type';
-import { createValidateBodyMiddleware } from '../middlewares/business/validate-body';
+import { createValidateBody } from '../middlewares/business/validation/validate-body';
 
 export const createAuthRoutes = (container: Container) => {
     const router = express.Router();
@@ -42,11 +42,7 @@ export const createAuthRoutes = (container: Container) => {
      *       500:
      *         description: Internal server error
      */
-    router.post(
-        '/register',
-        createValidateBodyMiddleware(registerBodySchema),
-        register,
-    );
+    router.post('/register', createValidateBody(registerBodySchema), register);
 
     /**
      * @openapi
@@ -82,7 +78,7 @@ export const createAuthRoutes = (container: Container) => {
      *       500:
      *         description: Internal server error
      */
-    router.post('/login', createValidateBodyMiddleware(loginBodySchema), login);
+    router.post('/login', createValidateBody(loginBodySchema), login);
 
     /**
      * @openapi

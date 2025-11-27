@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
-import { UserService } from '../../../domain/user/user-service';
-import { JwtService } from '../../../infrastructure/services/jwt-service';
-import { CookieService } from '../../../infrastructure/services/cookie-service';
-import { UnauthorizedError } from '../../../infrastructure/errors/unauthorized-error';
-import { User } from '../../../domain/user/user-types';
-import { NotFoundError } from '../../../infrastructure/errors/not-found-error';
+import { UserService } from '../../../../domain/user/user-service';
+import { JwtService } from '../../../../infrastructure/services/jwt-service';
+import { CookieService } from '../../../../infrastructure/services/cookie-service';
+import { UnauthorizedError } from '../../../../infrastructure/errors/unauthorized-error';
+import { User } from '../../../../domain/user/user-types';
+import { NotFoundError } from '../../../../infrastructure/errors/not-found-error';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -12,7 +12,7 @@ declare module 'express-serve-static-core' {
     }
 }
 
-export const createAuthenticateMiddleware = (
+export const createAuthenticate = (
     jwtService: JwtService,
     userService: UserService,
 ) => {

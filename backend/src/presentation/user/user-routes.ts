@@ -5,7 +5,7 @@ import {
 } from './user-schemas';
 import { Container } from '../../infrastructure/types/container-type';
 import { Env } from '../../infrastructure/types/env-type';
-import { createValidateBodyMiddleware } from '../middlewares/business/validate-body';
+import { createValidateBody } from '../middlewares/business/validation/validate-body';
 
 export const createUserRoutes = (
     container: Container,
@@ -51,7 +51,7 @@ export const createUserRoutes = (
     router.post(
         '/send-verification-email',
         authenticate,
-        createValidateBodyMiddleware(
+        createValidateBody(
             createSendVerificationEmailBodySchema(allowedOrigins),
         ),
         sendVerificationEmail,
@@ -91,7 +91,7 @@ export const createUserRoutes = (
      */
     router.post(
         '/verify-email',
-        createValidateBodyMiddleware(verifyEmailBodySchema),
+        createValidateBody(verifyEmailBodySchema),
         verifyEmail,
     );
 

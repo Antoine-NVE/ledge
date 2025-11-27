@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
-import { TransactionService } from '../../../domain/transaction/transaction-service';
-import { ForbiddenError } from '../../../infrastructure/errors/forbidden-error';
-import { Transaction } from '../../../domain/transaction/transaction-types';
+import { TransactionService } from '../../../../domain/transaction/transaction-service';
+import { ForbiddenError } from '../../../../infrastructure/errors/forbidden-error';
+import { Transaction } from '../../../../domain/transaction/transaction-types';
 import { ObjectId } from 'mongodb';
 import z from 'zod/index';
 
@@ -17,9 +17,7 @@ export const authorizeParamsSchema = z.object({
 
 export type AuthorizeParams = z.infer<typeof authorizeParamsSchema>;
 
-export const createAuthorizeMiddleware = (
-    transactionService: TransactionService,
-) => {
+export const createAuthorize = (transactionService: TransactionService) => {
     return async (
         req: Request<AuthorizeParams>,
         res: Response,

@@ -1,9 +1,9 @@
 import express from 'express';
 import { createBodySchema, updateBodySchema } from './transaction-schemas';
 import { Container } from '../../infrastructure/types/container-type';
-import { createValidateParamsMiddleware } from '../middlewares/business/validate-params';
-import { createValidateBodyMiddleware } from '../middlewares/business/validate-body';
-import { authorizeParamsSchema } from '../middlewares/business/authorize';
+import { authorizeParamsSchema } from '../middlewares/business/auth/authorize';
+import { createValidateParams } from '../middlewares/business/validation/validate-params';
+import { createValidateBody } from '../middlewares/business/validation/validate-body';
 
 export const createTransactionRoutes = (container: Container) => {
     const router = express.Router();
@@ -16,9 +16,7 @@ export const createTransactionRoutes = (container: Container) => {
         update,
         delete: remove,
     } = container.transactionController;
-    const validateParams = createValidateParamsMiddleware(
-        authorizeParamsSchema,
-    );
+    const validateParams = createValidateParams(authorizeParamsSchema);
 
     /**
      * @openapi
@@ -61,7 +59,7 @@ export const createTransactionRoutes = (container: Container) => {
     router.post(
         '/',
         authenticate,
-        createValidateBodyMiddleware(createBodySchema),
+        createValidateBody(createBodySchema),
         create,
     );
 
@@ -151,7 +149,7 @@ export const createTransactionRoutes = (container: Container) => {
         authenticate,
         validateParams,
         authorize,
-        createValidateBodyMiddleware(updateBodySchema),
+        createValidateBody(updateBodySchema),
         update,
     );
 

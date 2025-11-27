@@ -3,7 +3,7 @@ import { HttpError } from '../../../infrastructure/errors/http-error';
 import { Env } from '../../../infrastructure/types/env-type';
 import { Logger } from 'pino';
 
-export const createErrorHandlerMiddleware = (
+export const createErrorHandler = (
     nodeEnv: Env['NODE_ENV'],
     logger: Logger,
 ) => {
