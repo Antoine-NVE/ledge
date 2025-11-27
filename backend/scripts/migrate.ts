@@ -6,7 +6,7 @@ import { step } from '../src/infrastructure/utils/lifecycle-utils';
 
 const start = async () => {
     const logger = createLogger(
-        process.env.NODE_ENV === 'development' ? 'development' : 'production',
+        process.env.NODE_ENV === 'production' ? 'production' : 'development',
     );
 
     const { db, client } = await step(

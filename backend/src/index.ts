@@ -9,7 +9,7 @@ import { step, stop } from './infrastructure/utils/lifecycle-utils';
 const start = async () => {
     // .env is not verified yet, but we need a logger now
     const logger = createLogger(
-        process.env.NODE_ENV === 'development' ? 'development' : 'production',
+        process.env.NODE_ENV === 'production' ? 'production' : 'development',
     );
 
     const env = await step('Environment validation', logger, async () => {
