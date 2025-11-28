@@ -1,5 +1,5 @@
 import { ObjectId } from 'mongodb';
-import { JwtService } from '../../../src/infrastructure/services/jwt-service';
+import { JwtService } from '../../../src/infrastructure/adapters/jwt-token-manager';
 import { sign, verify, TokenExpiredError, NotBeforeError } from 'jsonwebtoken';
 import { formatZodError } from '../../../src/infrastructure/utils/format';
 import { verifySchema } from '../../../src/infrastructure/schemas/jwt-service-schemas';

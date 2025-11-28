@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
-import { JwtService } from '../../../../../src/infrastructure/services/jwt-service';
+import { JwtService } from '../../../../../src/infrastructure/adapters/jwt-token-manager';
 import { UserService } from '../../../../../src/domain/user/user-service';
-import { CookieService } from '../../../../../src/infrastructure/services/cookie-service';
+import { CookieService } from '../../../../../src/infrastructure/adapters/cookie-service';
 import { UnauthorizedError } from '../../../../../src/infrastructure/errors/unauthorized-error';
 import { NotFoundError } from '../../../../../src/infrastructure/errors/not-found-error';
 import { InternalServerError } from '../../../../../src/infrastructure/errors/internal-server-error';
 import { createAuthenticateMiddleware } from '../../../../../src/presentation/middlewares/business/auth/authenticate';
 
-jest.mock('../../../../../src/infrastructure/services/cookie-service');
+jest.mock('../../../../../src/infrastructure/adapters/cookie-service');
 
 describe('authenticate middleware', () => {
     let req: Request;

@@ -3,9 +3,9 @@ import { AuthOrchestrator } from '../../../src/application/auth/auth-orchestrato
 import { RefreshTokenService } from '../../../src/domain/refresh-token/refresh-token-service';
 import { UserService } from '../../../src/domain/user/user-service';
 import { User } from '../../../src/domain/user/user-types';
-import { JwtService } from '../../../src/infrastructure/services/jwt-service';
-import { PasswordService } from '../../../src/infrastructure/services/password-service';
-import { TokenService } from '../../../src/infrastructure/services/token-service';
+import { JwtService } from '../../../src/infrastructure/adapters/jwt-token-manager';
+import { PasswordService } from '../../../src/infrastructure/adapters/bcrypt-hasher';
+import { TokenService } from '../../../src/infrastructure/adapters/token-service';
 import { RefreshToken } from '../../../src/domain/refresh-token/refresh-token-types';
 import { NotFoundError } from '../../../src/infrastructure/errors/not-found-error';
 import { UnauthorizedError } from '../../../src/infrastructure/errors/unauthorized-error';

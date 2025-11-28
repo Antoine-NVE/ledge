@@ -1,8 +1,7 @@
 import z from 'zod';
-import { Env } from '../../infrastructure/config/env-config';
 
 export const createSendVerificationEmailBodySchema = (
-    allowedOrigins: Env['ALLOWED_ORIGINS'],
+    allowedOrigins: string[],
 ) => {
     return z.object({
         frontendBaseUrl: z.url().refine((val) => allowedOrigins.includes(val)),

@@ -6,7 +6,9 @@ export const step = async <T>(
     fn: () => Promise<T>,
 ): Promise<T> => {
     try {
-        return await fn();
+        const result = await fn();
+        logger.info(name + ' succeeded');
+        return result;
     } catch (err) {
         return stop(logger, name, err); // Return nothing
     }

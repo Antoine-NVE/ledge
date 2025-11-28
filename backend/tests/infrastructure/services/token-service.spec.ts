@@ -1,4 +1,4 @@
-import { TokenService } from '../../../src/infrastructure/services/token-service';
+import { TokenService } from '../../../src/infrastructure/adapters/token-service';
 
 describe('TokenService', () => {
     let tokenService: TokenService;

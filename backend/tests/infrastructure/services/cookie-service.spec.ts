@@ -5,7 +5,7 @@ jest.mock('../../../src/infrastructure/utils/parse', () => ({
 }));
 
 import { parseBoolean } from '../../../src/infrastructure/utils/parse';
-import { CookieService } from '../../../src/infrastructure/services/cookie-service';
+import { CookieService } from '../../../src/infrastructure/adapters/cookie-service';
 
 describe('CookieService', () => {
     let reqMock: Request;

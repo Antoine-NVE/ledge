@@ -1,19 +1,12 @@
 import { Db, MongoClient } from 'mongodb';
 
-const MONGO_URL = 'mongodb://database:27017';
-const DB_NAME = 'ledge';
-
 let client: MongoClient | null = null;
 let db: Db | null = null;
 
-export const connectToDb = async () => {
-    if (client || db) {
-        throw new Error('connectToDb() called multiple times — forbidden.');
-    }
-
-    client = new MongoClient(MONGO_URL);
+export const connectToMongo = async () => {
+    client = new MongoClient('mongodb://database:27017');
     await client.connect();
-    db = client.db(DB_NAME);
+    db = client.db('ledge');
 
     await setupIndexes(db);
 

@@ -10,16 +10,12 @@ import { createCors } from './middlewares/technical/cors';
 import { rateLimiter } from './middlewares/technical/rate-limit';
 import { swagger } from './middlewares/technical/swagger';
 import { createErrorHandler } from './middlewares/technical/error-handler';
-import { Env } from '../infrastructure/config/env-config';
-import { Container } from '../infrastructure/config/container-config';
+import { Container } from '../infrastructure/config/container';
 
 export const createApp = (
-    {
-        allowedOrigins,
-        nodeEnv,
-    }: {
-        allowedOrigins: Env['ALLOWED_ORIGINS'];
-        nodeEnv: Env['NODE_ENV'];
+    options: {
+        allowedOrigins: string[];
+        nodeEnv: 'development' | 'production';
     },
     container: Container,
     logger: Logger,
@@ -27,7 +23,7 @@ export const createApp = (
     const app = express();
 
     // Security
-    app.use(createCors(allowedOrigins));
+    app.use(createCors(options.allowedOrigins));
     app.use(rateLimiter);
 
     // Parsing
@@ -35,18 +31,18 @@ export const createApp = (
     app.use(cookieParser());
 
     // Routes
-    if (nodeEnv === 'development') {
+    if (options.nodeEnv === 'development') {
         app.use('/docs', swaggerUi.serve, swagger);
     }
     app.use('/auth', createAuthRoutes(container));
     app.use('/transactions', createTransactionRoutes(container));
-    app.use('/users', createUserRoutes(container, allowedOrigins));
+    app.use('/users', createUserRoutes(container, options.allowedOrigins));
     app.all(/.*/, () => {
         throw new NotFoundError('Route not found');
     });
 
     // Error handler
-    app.use(createErrorHandler(nodeEnv, logger));
+    app.use(createErrorHandler(options.nodeEnv, logger));
 
     return app;
 };

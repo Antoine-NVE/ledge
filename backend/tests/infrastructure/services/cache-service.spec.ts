@@ -1,5 +1,5 @@
 import { RedisClientType } from 'redis';
-import { CacheService } from '../../../src/infrastructure/services/cache-service';
+import { CacheService } from '../../../src/infrastructure/adapters/redis-cache-store';
 import { ObjectId } from 'mongodb';
 
 describe('CacheService', () => {

@@ -3,7 +3,7 @@ import { UserOrchestrator } from '../../application/user/user-orchestrator';
 import { removePasswordHash } from '../../infrastructure/utils/clean';
 import { SendVerificationEmailBody, VerifyEmailBody } from './user-types';
 import { ParamsDictionary } from 'express-serve-static-core';
-import { Logger } from 'pino';
+import { Logger } from '../../application/ports/logger';
 
 export class UserController {
     constructor(
@@ -23,7 +23,7 @@ export class UserController {
         );
 
         const message = 'Verification email sent successfully';
-        this.logger.info({ userId: req.user._id }, message);
+        this.logger.info(message, { userId: req.user._id });
         res.status(200).json({
             message,
         });
@@ -38,7 +38,7 @@ export class UserController {
         const user = await this.userOrchestrator.verifyEmail(jwt);
 
         const message = 'Email verified successfully';
-        this.logger.info({ userId: user._id }, message);
+        this.logger.info(message, { userId: user._id });
         res.status(200).json({
             message,
         });

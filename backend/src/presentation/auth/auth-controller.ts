@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
 import { AuthOrchestrator } from '../../application/auth/auth-orchestrator';
 import { UnauthorizedError } from '../../infrastructure/errors/unauthorized-error';
-import { CookieService } from '../../infrastructure/services/cookie-service';
+import { CookieService } from '../../infrastructure/adapters/cookie-service';
 import { removePasswordHash } from '../../infrastructure/utils/clean';
 import { LoginBody, RegisterBody } from './auth-types';
 import { ParamsDictionary } from 'express-serve-static-core';
-import { Logger } from 'pino';
 import { RefreshToken } from '../../domain/refresh-token/refresh-token-types';
 import { NotFoundError } from '../../infrastructure/errors/not-found-error';
+import { Logger } from '../../application/ports/logger';
 
 export class AuthController {
     constructor(
@@ -32,10 +32,10 @@ export class AuthController {
         cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
 
         const message = 'User registered successfully';
-        this.logger.info(
-            { userId: user._id, refreshTokenId: refreshToken._id },
-            message,
-        );
+        this.logger.info(message, {
+            userId: user._id,
+            refreshTokenId: refreshToken._id,
+        });
         res.status(201).json({
             message,
             data: {
@@ -57,10 +57,10 @@ export class AuthController {
         cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
 
         const message = 'User logged in successfully';
-        this.logger.info(
-            { userId: user._id, refreshTokenId: refreshToken._id },
-            message,
-        );
+        this.logger.info(message, {
+            userId: user._id,
+            refreshTokenId: refreshToken._id,
+        });
         res.status(200).json({
             message,
             data: {
@@ -82,10 +82,10 @@ export class AuthController {
         cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
 
         const message = 'Tokens refreshed successfully';
-        this.logger.info(
-            { userId: refreshToken.userId, refreshTokenId: refreshToken._id },
-            message,
-        );
+        this.logger.info(message, {
+            userId: refreshToken.userId,
+            refreshTokenId: refreshToken._id,
+        });
         res.status(200).json({
             message,
         });
@@ -107,10 +107,10 @@ export class AuthController {
 
         const message = 'User logged out successfully';
         if (deleted) {
-            this.logger.info(
-                { userId: deleted.userId, refreshTokenId: deleted._id },
-                message,
-            );
+            this.logger.info(message, {
+                userId: deleted.userId,
+                refreshTokenId: deleted._id,
+            });
         }
         res.status(200).json({
             message,

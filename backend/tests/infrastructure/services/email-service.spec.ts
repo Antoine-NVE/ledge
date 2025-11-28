@@ -1,5 +1,5 @@
 import nodemailer from 'nodemailer';
-import { EmailService } from '../../../src/infrastructure/services/email-service';
+import { EmailService } from '../../../src/infrastructure/adapters/nodemailer-email-sender';
 
 jest.mock('nodemailer');
 

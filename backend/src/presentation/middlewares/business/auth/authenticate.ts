@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { UserService } from '../../../../domain/user/user-service';
-import { JwtService } from '../../../../infrastructure/services/jwt-service';
-import { CookieService } from '../../../../infrastructure/services/cookie-service';
+import { CookieService } from '../../../../infrastructure/adapters/cookie-service';
 import { UnauthorizedError } from '../../../../infrastructure/errors/unauthorized-error';
 import { User } from '../../../../domain/user/user-types';
 import { NotFoundError } from '../../../../infrastructure/errors/not-found-error';
+import { TokenManager } from '../../../../application/ports/token-manager';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -13,7 +13,7 @@ declare module 'express-serve-static-core' {
 }
 
 export const createAuthenticate = (
-    jwtService: JwtService,
+    tokenManager: TokenManager,
     userService: UserService,
 ) => {
     return async (req: Request, res: Response, next: NextFunction) => {
@@ -25,14 +25,16 @@ export const createAuthenticate = (
             });
         }
 
-        const { sub } = jwtService.verifyAccess(accessToken);
-        req.user = await userService.findOneById(sub).catch((err: unknown) => {
-            if (err instanceof NotFoundError) {
-                // If user is not found, refresh will probably don't work either
-                throw new UnauthorizedError();
-            }
-            throw err;
-        });
+        const userId = tokenManager.verifyAccess(accessToken);
+        req.user = await userService
+            .findOneById(userId)
+            .catch((err: unknown) => {
+                if (err instanceof NotFoundError) {
+                    // If user is not found, refresh will probably don't work either
+                    throw new UnauthorizedError();
+                }
+                throw err;
+            });
         next();
     };
 };

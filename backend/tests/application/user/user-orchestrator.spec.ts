@@ -3,10 +3,10 @@ import { UserService } from '../../../src/domain/user/user-service';
 import { User } from '../../../src/domain/user/user-types';
 import { ConflictError } from '../../../src/infrastructure/errors/conflict-error';
 import { TooManyRequestsError } from '../../../src/infrastructure/errors/too-many-requests-error';
-import { EmailService } from '../../../src/infrastructure/services/email-service';
-import { JwtService } from '../../../src/infrastructure/services/jwt-service';
+import { EmailService } from '../../../src/infrastructure/adapters/nodemailer-email-sender';
+import { JwtService } from '../../../src/infrastructure/adapters/jwt-token-manager';
 import { UserOrchestrator } from '../../../src/application/user/user-orchestrator';
-import { CacheService } from '../../../src/infrastructure/services/cache-service';
+import { CacheService } from '../../../src/infrastructure/adapters/redis-cache-store';
 
 describe('UserOrchestrator', () => {
     const TEST_URL = 'http://localhost:3000';

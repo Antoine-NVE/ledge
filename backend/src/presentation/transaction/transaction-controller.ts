@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { TransactionOrchestrator } from '../../application/transaction/transaction-orchestrator';
 import { CreateBody, UpdateBody } from './transaction-types';
 import { ParamsDictionary } from 'express-serve-static-core';
-import { Logger } from 'pino';
+import { Logger } from '../../application/ports/logger';
 
 export class TransactionController {
     constructor(
@@ -20,10 +20,10 @@ export class TransactionController {
         });
 
         const message = 'Transaction created successfully';
-        this.logger.info(
-            { userId: req.user._id, transactionId: transaction._id },
-            message,
-        );
+        this.logger.info(message, {
+            userId: req.user._id,
+            transactionId: transaction._id,
+        });
         res.status(201).json({
             message,
             data: {
@@ -64,10 +64,10 @@ export class TransactionController {
         );
 
         const message = 'Transaction updated successfully';
-        this.logger.info(
-            { userId: req.user._id, transactionId: req.transaction._id },
-            message,
-        );
+        this.logger.info(message, {
+            userId: req.user._id,
+            transactionId: req.transaction._id,
+        });
         res.status(200).json({
             message,
             data: {
@@ -80,10 +80,10 @@ export class TransactionController {
         await this.transactionOrchestrator.delete(req.transaction);
 
         const message = 'Transaction deleted successfully';
-        this.logger.info(
-            { userId: req.user._id, transactionId: req.transaction._id },
-            message,
-        );
+        this.logger.info(message, {
+            userId: req.user._id,
+            transactionId: req.transaction._id,
+        });
         res.status(200).json({
             message,
         });

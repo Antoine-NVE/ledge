@@ -4,18 +4,17 @@ import { UnauthorizedError } from '../../infrastructure/errors/unauthorized-erro
 import { User } from '../../domain/user/user-types';
 import { RefreshToken } from '../../domain/refresh-token/refresh-token-types';
 import { RefreshTokenService } from '../../domain/refresh-token/refresh-token-service';
-import { JwtService } from '../../infrastructure/services/jwt-service';
-import { PasswordService } from '../../infrastructure/services/password-service';
-import { TokenService } from '../../infrastructure/services/token-service';
 import { LoginInput, RegisterInput } from './auth-types';
+import { generateToken } from '../../infrastructure/utils/token';
+import { TokenManager } from '../ports/token-manager';
+import { Hasher } from '../ports/hasher';
 
 export class AuthOrchestrator {
     constructor(
         private userService: UserService,
-        private jwtService: JwtService,
+        private tokenManager: TokenManager,
         private refreshTokenService: RefreshTokenService,
-        private passwordService: PasswordService,
-        private tokenService: TokenService,
+        private hasher: Hasher,
     ) {}
 
     register = async ({
@@ -26,18 +25,18 @@ export class AuthOrchestrator {
         accessToken: string;
         refreshToken: RefreshToken;
     }> => {
-        const passwordHash = await this.passwordService.hash(password);
+        const passwordHash = await this.hasher.hash(password);
 
         const user = await this.userService.register({ email, passwordHash });
 
-        const token = this.tokenService.generate();
+        const token = generateToken();
 
         const refreshToken = await this.refreshTokenService.create({
             token,
             userId: user._id,
         });
 
-        const accessToken = this.jwtService.signAccess(user._id);
+        const accessToken = this.tokenManager.signAccess(user._id);
 
         return { user, accessToken, refreshToken };
     };
@@ -60,20 +59,20 @@ export class AuthOrchestrator {
                 throw err;
             });
 
-        const doesMatch = await this.passwordService.compare(
+        const doesMatch = await this.hasher.compare(
             password,
             user.passwordHash,
         );
         if (!doesMatch) throw new UnauthorizedError('Invalid credentials');
 
-        const token = this.tokenService.generate();
+        const token = generateToken();
 
         const refreshToken = await this.refreshTokenService.create({
             token,
             userId: user._id,
         });
 
-        const accessToken = this.jwtService.signAccess(user._id);
+        const accessToken = this.tokenManager.signAccess(user._id);
 
         return { user, accessToken, refreshToken };
     };
@@ -95,13 +94,13 @@ export class AuthOrchestrator {
             throw new UnauthorizedError('Expired refresh token');
         }
 
-        const newToken = this.tokenService.generate();
+        const newToken = generateToken();
         refreshToken = await this.refreshTokenService.extendExpiration(
             refreshToken,
             newToken,
         );
 
-        const accessToken = this.jwtService.signAccess(refreshToken.userId);
+        const accessToken = this.tokenManager.signAccess(refreshToken.userId);
 
         return { accessToken, refreshToken };
     };

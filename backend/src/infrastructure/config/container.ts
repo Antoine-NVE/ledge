@@ -10,50 +10,32 @@ import { TransactionController } from '../../presentation/transaction/transactio
 import { UserOrchestrator } from '../../application/user/user-orchestrator';
 import { TransactionOrchestrator } from '../../application/transaction/transaction-orchestrator';
 import { RefreshTokenService } from '../../domain/refresh-token/refresh-token-service';
-import { JwtService } from '../services/jwt-service';
-import { EmailService } from '../services/email-service';
-import { PasswordService } from '../services/password-service';
-import { TokenService } from '../services/token-service';
-import { CacheService } from '../services/cache-service';
 import { Db } from 'mongodb';
-import { Env } from '../types/env-type';
-import { RedisClientType } from 'redis';
-import { Logger } from 'pino';
 import { createAuthenticate } from '../../presentation/middlewares/business/auth/authenticate';
 import { createAuthorize } from '../../presentation/middlewares/business/auth/authorize';
+import { Logger } from '../../application/ports/logger';
+import { TokenManager } from '../../application/ports/token-manager';
+import { Hasher } from '../../application/ports/hasher';
+import { EmailSender } from '../../application/ports/email-sender';
+import { CacheStore } from '../../application/ports/cache-store';
 
 export type Container = ReturnType<typeof buildContainer>;
 
 export const buildContainer = (
-    env: Env,
-    cacheClient: RedisClientType,
-    db: Db,
+    mongoDb: Db,
     logger: Logger,
+    tokenManager: TokenManager,
+    hasher: Hasher,
+    emailSender: EmailSender,
+    cacheStore: CacheStore,
+    emailFrom: string,
 ) => {
-    const secret = env.JWT_SECRET;
-    const host = env.SMTP_HOST;
-    const port = env.SMTP_PORT;
-    const secure = env.SMTP_SECURE;
-    const user = env.SMTP_USER;
-    const pass = env.SMTP_PASS;
-
-    const jwtService = new JwtService(secret);
-    const emailService = new EmailService({
-        host,
-        port,
-        secure,
-        auth: { user, pass },
-    });
-    const passwordService = new PasswordService();
-    const tokenService = new TokenService();
-    const cacheService = new CacheService(cacheClient);
-
-    const userRepository = new UserRepository(db.collection('users'));
+    const userRepository = new UserRepository(mongoDb.collection('users'));
     const refreshTokenRepository = new RefreshTokenRepository(
-        db.collection('refreshtokens'),
+        mongoDb.collection('refreshtokens'),
     );
     const transactionRepository = new TransactionRepository(
-        db.collection('transactions'),
+        mongoDb.collection('transactions'),
     );
 
     const userService = new UserService(userRepository);
@@ -62,17 +44,16 @@ export const buildContainer = (
 
     const authOrchestrator = new AuthOrchestrator(
         userService,
-        jwtService,
+        tokenManager,
         refreshTokenService,
-        passwordService,
-        tokenService,
+        hasher,
     );
     const userOrchestrator = new UserOrchestrator(
-        jwtService,
-        emailService,
+        tokenManager,
+        emailSender,
         userService,
-        cacheService,
-        env.EMAIL_FROM,
+        cacheStore,
+        emailFrom,
     );
     const transactionOrchestrator = new TransactionOrchestrator(
         transactionService,
@@ -85,7 +66,7 @@ export const buildContainer = (
         logger,
     );
 
-    const authenticate = createAuthenticate(jwtService, userService);
+    const authenticate = createAuthenticate(tokenManager, userService);
     const authorize = createAuthorize(transactionService);
 
     return {

@@ -12,26 +12,13 @@ import { UnauthorizedError } from '../errors/unauthorized-error';
 import { formatZodError } from '../utils/format';
 import { BadRequestError } from '../errors/bad-request-error';
 import z from 'zod';
+import { TokenManager } from '../../application/ports/token-manager';
 
-export class JwtService {
+export class JwtTokenManager implements TokenManager {
     constructor(private secret: Secret) {}
 
     private sign = (payload: object, options?: SignOptions): string => {
         return sign(payload, this.secret, options);
-    };
-
-    signAccess = (userId: ObjectId): string => {
-        return this.sign(
-            { aud: 'access', sub: userId.toString() },
-            { expiresIn: '15m' },
-        );
-    };
-
-    signVerificationEmail = (userId: ObjectId): string => {
-        return this.sign(
-            { aud: 'verification-email', sub: userId.toString() },
-            { expiresIn: '1h' },
-        );
     };
 
     private verify = (jwt: string, options?: VerifyOptions) => {
@@ -48,26 +35,30 @@ export class JwtService {
             throw new UnauthorizedError('Invalid JWT');
         }
 
-        const { success, data, error } = z
+        const result = z
             .object({
-                aud: z.string(),
                 sub: z
                     .string()
                     .refine((val) => ObjectId.isValid(val))
                     .transform((val) => new ObjectId(val)),
-                iat: z.number(),
-                exp: z.number(),
             })
             .safeParse(payload);
 
-        if (!success) {
+        if (!result.success) {
             throw new BadRequestError(
                 'Invalid JWT payload',
-                formatZodError(error),
+                formatZodError(result.error),
             );
         }
 
-        return data;
+        return result.data.sub;
+    };
+
+    signAccess = (userId: ObjectId): string => {
+        return this.sign(
+            { aud: 'access', sub: userId.toString() },
+            { expiresIn: '15m' },
+        );
     };
 
     verifyAccess = (jwt: string) => {
@@ -81,6 +72,13 @@ export class JwtService {
 
             throw error;
         }
+    };
+
+    signVerificationEmail = (userId: ObjectId): string => {
+        return this.sign(
+            { aud: 'verification-email', sub: userId.toString() },
+            { expiresIn: '1h' },
+        );
     };
 
     verifyVerificationEmail = (jwt: string) => {

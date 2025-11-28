@@ -1,7 +1,8 @@
 import { RedisClientType } from 'redis';
 import { ObjectId } from 'mongodb';
+import { CacheStore } from '../../application/ports/cache-store';
 
-export class CacheService {
+export class RedisCacheStore implements CacheStore {
     constructor(private client: RedisClientType) {}
 
     setVerificationEmailCooldown = async (userId: ObjectId) => {
