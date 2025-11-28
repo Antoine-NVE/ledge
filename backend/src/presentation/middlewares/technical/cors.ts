@@ -1,7 +1,6 @@
 import cors from 'cors';
-import { Env } from '../../../infrastructure/config/env';
 
-export const createCors = (allowedOrigins: Env['ALLOWED_ORIGINS']) => {
+export const createCors = (allowedOrigins: string[]) => {
     return cors({
         origin: allowedOrigins,
         credentials: true,

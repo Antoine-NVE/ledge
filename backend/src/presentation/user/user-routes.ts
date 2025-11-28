@@ -5,11 +5,10 @@ import {
 } from './user-schemas';
 import { createValidateBody } from '../middlewares/business/validation/validate-body';
 import { Container } from '../../infrastructure/config/container';
-import { Env } from '../../infrastructure/config/env';
 
 export const createUserRoutes = (
     container: Container,
-    allowedOrigins: Env['ALLOWED_ORIGINS'],
+    allowedOrigins: string[],
 ) => {
     const router = express.Router();
 

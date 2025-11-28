@@ -1,11 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { HttpError } from '../../../infrastructure/errors/http-error';
 import { Logger } from 'pino';
-import { Env } from '../../../infrastructure/config/env';
 
 export const createErrorHandler = (
-    nodeEnv: Env['NODE_ENV'],
-    logger: Logger,
+    nodeEnv: 'development' | 'production',
+    pinoLogger: Logger,
 ) => {
     return (
         err: Error,
@@ -27,7 +26,7 @@ export const createErrorHandler = (
 
         if (isHttpError && status < 500) {
             const message = err.message;
-            logger.warn(
+            pinoLogger.warn(
                 {
                     err,
                     userId: req.user?._id,
@@ -44,7 +43,7 @@ export const createErrorHandler = (
         }
 
         const message = 'Internal server error';
-        logger.error(
+        pinoLogger.error(
             { err, userId: req.user?._id, transactionId: req.transaction?._id },
             message,
         );

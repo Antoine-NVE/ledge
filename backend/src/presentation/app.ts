@@ -18,7 +18,7 @@ export const createApp = (
         nodeEnv: 'development' | 'production';
     },
     container: Container,
-    logger: Logger,
+    pinoLogger: Logger,
 ) => {
     const app = express();
 
@@ -42,7 +42,7 @@ export const createApp = (
     });
 
     // Error handler
-    app.use(createErrorHandler(options.nodeEnv, logger));
+    app.use(createErrorHandler(options.nodeEnv, pinoLogger));
 
     return app;
 };

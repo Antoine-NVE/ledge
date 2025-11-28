@@ -4,7 +4,6 @@ import { UnauthorizedError } from '../../infrastructure/errors/unauthorized-erro
 import { User } from '../../domain/user/user-types';
 import { RefreshToken } from '../../domain/refresh-token/refresh-token-types';
 import { RefreshTokenService } from '../../domain/refresh-token/refresh-token-service';
-import { LoginInput, RegisterInput } from './auth-types';
 import { generateToken } from '../../infrastructure/utils/token';
 import { TokenManager } from '../ports/token-manager';
 import { Hasher } from '../ports/hasher';
@@ -20,7 +19,10 @@ export class AuthOrchestrator {
     register = async ({
         email,
         password,
-    }: RegisterInput): Promise<{
+    }: {
+        email: string;
+        password: string;
+    }): Promise<{
         user: User;
         accessToken: string;
         refreshToken: RefreshToken;
@@ -44,7 +46,10 @@ export class AuthOrchestrator {
     login = async ({
         email,
         password,
-    }: LoginInput): Promise<{
+    }: {
+        email: string;
+        password: string;
+    }): Promise<{
         user: User;
         accessToken: string;
         refreshToken: RefreshToken;
