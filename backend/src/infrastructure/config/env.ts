@@ -3,9 +3,7 @@ import z from 'zod';
 
 const envSchema = z.object({
     NODE_ENV: z.enum(['development', 'production']),
-
     JWT_SECRET: z.string(),
-
     ALLOWED_ORIGINS: z.array(z.url()),
 
     SMTP_HOST: z.string(),
@@ -21,9 +19,7 @@ const envSchema = z.object({
 export const loadEnv = () => {
     return envSchema.parse({
         NODE_ENV: process.env.NODE_ENV,
-
         JWT_SECRET: process.env.JWT_SECRET,
-
         ALLOWED_ORIGINS: parseArray(process.env.ALLOWED_ORIGINS),
 
         SMTP_HOST: process.env.SMTP_HOST,
