@@ -35,12 +35,15 @@ services:
     ports:
       - "${DATABASE_PORT}:27017"
     volumes:
-      - ./data/database:/data/db
+      - database:/data/db
+      - /data/configdb
 
   cache:
     image: redis:8.2
     ports:
       - "${CACHE_PORT}:6379"
+    volumes:
+      - cache:/data
 
   smtp:
     image: axllent/mailpit:v1.27
@@ -50,4 +53,9 @@ services:
     environment:
       MP_DATABASE: /data/mailpit.db # Use persistent storage
     volumes:
-      - ./data/smtp:/data
+      - smtp:/data
+
+volumes:
+  database:
+  cache:
+  smtp:
