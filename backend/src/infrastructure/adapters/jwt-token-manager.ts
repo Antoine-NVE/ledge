@@ -7,7 +7,6 @@ import {
     TokenExpiredError,
     NotBeforeError,
 } from 'jsonwebtoken';
-import { ObjectId } from 'mongodb';
 import { UnauthorizedError } from '../errors/unauthorized-error';
 import { formatZodError } from '../utils/format';
 import { BadRequestError } from '../errors/bad-request-error';
@@ -17,53 +16,55 @@ import { TokenManager } from '../../application/ports/token-manager';
 export class JwtTokenManager implements TokenManager {
     constructor(private secret: Secret) {}
 
-    private sign = (payload: object, options?: SignOptions): string => {
+    private sign = (
+        payload: { aud: string; sub: string },
+        options: SignOptions,
+    ) => {
         return sign(payload, this.secret, options);
     };
 
-    private verify = (jwt: string, options?: VerifyOptions) => {
+    private verify = (token: string, options: VerifyOptions) => {
         let payload;
-
         try {
-            payload = verify(jwt, this.secret, options);
+            payload = verify(token, this.secret, options);
         } catch (error: unknown) {
-            if (error instanceof NotBeforeError)
+            if (error instanceof NotBeforeError) {
                 throw new UnauthorizedError('Inactive JWT');
-            if (error instanceof TokenExpiredError)
+            }
+
+            if (error instanceof TokenExpiredError) {
                 throw new UnauthorizedError('Expired JWT');
+            }
 
             throw new UnauthorizedError('Invalid JWT');
         }
 
-        const result = z
+        const { success, data, error } = z
             .object({
-                sub: z
-                    .string()
-                    .refine((val) => ObjectId.isValid(val))
-                    .transform((val) => new ObjectId(val)),
+                sub: z.string(),
+                aud: z.string(),
+                iat: z.number(),
+                exp: z.number(),
             })
             .safeParse(payload);
 
-        if (!result.success) {
+        if (!success) {
             throw new BadRequestError(
                 'Invalid JWT payload',
-                formatZodError(result.error),
+                formatZodError(error),
             );
         }
 
-        return result.data.sub;
+        return data.sub;
     };
 
-    signAccess = (userId: ObjectId): string => {
-        return this.sign(
-            { aud: 'access', sub: userId.toString() },
-            { expiresIn: '15m' },
-        );
+    signAccess = (userId: string) => {
+        return this.sign({ aud: 'access', sub: userId }, { expiresIn: '15m' });
     };
 
-    verifyAccess = (jwt: string) => {
+    verifyAccess = (token: string) => {
         try {
-            return this.verify(jwt, { audience: 'access' });
+            return this.verify(token, { audience: 'access' });
         } catch (error: unknown) {
             if (error instanceof UnauthorizedError)
                 throw new UnauthorizedError(error.message, undefined, {
@@ -74,14 +75,14 @@ export class JwtTokenManager implements TokenManager {
         }
     };
 
-    signVerificationEmail = (userId: ObjectId): string => {
+    signVerificationEmail = (userId: string) => {
         return this.sign(
-            { aud: 'verification-email', sub: userId.toString() },
+            { aud: 'verification-email', sub: userId },
             { expiresIn: '1h' },
         );
     };
 
-    verifyVerificationEmail = (jwt: string) => {
-        return this.verify(jwt, { audience: 'verification-email' });
+    verifyVerificationEmail = (token: string) => {
+        return this.verify(token, { audience: 'verification-email' });
     };
 }
