@@ -14,6 +14,7 @@ export const createValidateBody = (schema: z.ZodSchema) => {
             );
         }
 
+        // Can be useful if data is updated by schema
         req.body = data;
         next();
     };

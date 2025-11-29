@@ -1,6 +1,8 @@
-import pino from 'pino';
+import pino, { BaseLogger } from 'pino';
 
-export const createLogger = (nodeEnv: 'development' | 'production') => {
+export const createBaseLogger = (
+    nodeEnv: 'development' | 'production',
+): BaseLogger => {
     const isDev = nodeEnv === 'development';
 
     return pino({

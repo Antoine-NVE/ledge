@@ -1,7 +1,7 @@
 import { createApp } from './presentation/app';
 import { buildContainer } from './infrastructure/config/container';
 import { loadEnv } from './infrastructure/config/env';
-import { createLogger } from './infrastructure/config/pino';
+import { createBaseLogger } from './infrastructure/config/pino';
 import { step, stop } from './infrastructure/utils/lifecycle';
 import { connectToRedis } from './infrastructure/config/redis';
 import { connectToMongo } from './infrastructure/config/mongo';
@@ -14,21 +14,34 @@ import { RedisCacheStore } from './infrastructure/adapters/redis-cache-store';
 
 const start = async () => {
     // .env is not verified yet, but we need a logger now
-    const pinoLogger = createLogger(
+    const pinoBaseLogger = createBaseLogger(
         process.env.NODE_ENV === 'production' ? 'production' : 'development',
     );
 
-    const env = await step('Environment validation', pinoLogger, async () => {
+    const {
+        SMTP_HOST: host,
+        SMTP_PORT: port,
+        SMTP_SECURE: secure,
+        SMTP_AUTH: auth,
+        JWT_SECRET: jwtSecret,
+        EMAIL_FROM: emailFrom,
+        NODE_ENV: nodeEnv,
+        ALLOWED_ORIGINS: allowedOrigins,
+    } = await step('Environment validation', pinoBaseLogger, async () => {
         return loadEnv();
     });
 
-    const redisClient = await step('Redis connection', pinoLogger, async () => {
-        return await connectToRedis();
-    });
+    const redisClient = await step(
+        'Redis connection',
+        pinoBaseLogger,
+        async () => {
+            return await connectToRedis();
+        },
+    );
 
     const { db: mongoDb } = await step(
         'Mongo connection',
-        pinoLogger,
+        pinoBaseLogger,
         async () => {
             return await connectToMongo();
         },
@@ -36,41 +49,50 @@ const start = async () => {
 
     const nodemailerTransporter = await step(
         'SMTP connection',
-        pinoLogger,
+        pinoBaseLogger,
         async () => {
             return await connectToSmtp({
-                host: env.SMTP_HOST,
-                port: env.SMTP_PORT,
-                secure: env.SMTP_SECURE,
-                auth: {
-                    user: env.SMTP_USER,
-                    pass: env.SMTP_PASS,
-                },
+                host,
+                port,
+                secure,
+                auth,
             });
         },
     );
 
-    const container = buildContainer(
+    const {
+        authController,
+        userController,
+        transactionController,
+        authenticate,
+        authorize,
+        logger,
+    } = buildContainer({
         mongoDb,
-        new PinoLogger(pinoLogger),
-        new JwtTokenManager(env.JWT_SECRET),
-        new BcryptHasher(),
-        new NodemailerEmailSender(nodemailerTransporter),
-        new RedisCacheStore(redisClient),
-        env.EMAIL_FROM,
-    );
+        logger: new PinoLogger(pinoBaseLogger),
+        tokenManager: new JwtTokenManager(jwtSecret),
+        hasher: new BcryptHasher(),
+        emailSender: new NodemailerEmailSender(nodemailerTransporter),
+        cacheStore: new RedisCacheStore(redisClient),
+        emailFrom,
+    });
 
-    const app = createApp(
-        { allowedOrigins: env.ALLOWED_ORIGINS, nodeEnv: env.NODE_ENV },
-        container,
-        pinoLogger,
-    );
+    const app = createApp({
+        allowedOrigins,
+        nodeEnv,
+        authController,
+        userController,
+        transactionController,
+        authenticate,
+        authorize,
+        logger,
+    });
     const server = app.listen(3000);
     server.on('listening', () => {
-        pinoLogger.info('Server started');
+        pinoBaseLogger.info('Server started');
     });
     server.on('error', (err) => {
-        stop(pinoLogger, 'Server startup', err);
+        stop(pinoBaseLogger, 'Server startup', err);
     });
 };
 

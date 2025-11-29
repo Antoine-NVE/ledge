@@ -4,16 +4,17 @@ import {
     verifyEmailBodySchema,
 } from './user-schemas';
 import { createValidateBody } from '../middlewares/business/validation/validate-body';
-import { Container } from '../../infrastructure/config/container';
+import { UserController } from './user-controller';
+import { Authenticate } from '../middlewares/business/auth/authenticate';
 
 export const createUserRoutes = (
-    container: Container,
+    userController: UserController,
+    authenticate: Authenticate,
     allowedOrigins: string[],
 ) => {
     const router = express.Router();
 
-    const { authenticate } = container;
-    const { sendVerificationEmail, verifyEmail, me } = container.userController;
+    const { sendVerificationEmail, verifyEmail, me } = userController;
 
     /**
      * @openapi

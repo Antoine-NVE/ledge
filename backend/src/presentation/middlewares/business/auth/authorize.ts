@@ -17,6 +17,8 @@ export const authorizeParamsSchema = z.object({
 
 export type AuthorizeParams = z.infer<typeof authorizeParamsSchema>;
 
+export type Authorize = ReturnType<typeof createAuthorize>;
+
 export const createAuthorize = (transactionService: TransactionService) => {
     return async (
         req: Request<AuthorizeParams>,

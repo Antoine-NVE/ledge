@@ -12,6 +12,8 @@ declare module 'express-serve-static-core' {
     }
 }
 
+export type Authenticate = ReturnType<typeof createAuthenticate>;
+
 export const createAuthenticate = (
     tokenManager: TokenManager,
     userService: UserService,

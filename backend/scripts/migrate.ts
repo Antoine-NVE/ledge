@@ -1,17 +1,17 @@
 import { MongoDBStorage, Umzug } from 'umzug';
 import path from 'node:path';
-import { createLogger } from '../src/infrastructure/config/pino';
+import { createBaseLogger } from '../src/infrastructure/config/pino';
 import { step } from '../src/infrastructure/utils/lifecycle';
 import { connectToMongo } from '../src/infrastructure/config/mongo';
 
 const start = async () => {
-    const pinoLogger = createLogger(
+    const pinoBaseLogger = createBaseLogger(
         process.env.NODE_ENV === 'production' ? 'production' : 'development',
     );
 
     const { db: mongoDb, client: mongoClient } = await step(
         'Mongo connection',
-        pinoLogger,
+        pinoBaseLogger,
         async () => {
             return await connectToMongo();
         },
@@ -28,16 +28,19 @@ const start = async () => {
         logger: undefined,
     });
     umzug.on('migrating', (migration) => {
-        pinoLogger.info({ migrationName: migration.name }, 'Migration started');
+        pinoBaseLogger.info(
+            { migrationName: migration.name },
+            'Migration started',
+        );
     });
     umzug.on('migrated', (migration) => {
-        pinoLogger.info(
+        pinoBaseLogger.info(
             { migrationName: migration.name },
             'Migration finished',
         );
     });
 
-    await step('Migration', pinoLogger, async () => {
+    await step('Migration', pinoBaseLogger, async () => {
         const direction = process.argv[2];
         switch (direction) {
             case 'up':
@@ -47,16 +50,16 @@ const start = async () => {
                 await umzug.down();
                 break;
             default:
-                pinoLogger.error('Invalid migration direction');
+                pinoBaseLogger.error('Invalid migration direction');
         }
     });
 
-    return { mongoClient, pinoLogger };
+    return { mongoClient, pinoBaseLogger };
 };
 
-start().then(async ({ mongoClient, pinoLogger }) => {
+start().then(async ({ mongoClient, pinoBaseLogger }) => {
     await mongoClient.close();
-    pinoLogger.info('Mongo disconnected');
+    pinoBaseLogger.info('Mongo disconnected');
 
     // Without this, Pino doesn't always have time to send all the logs to Loki
     await new Promise((r) => setTimeout(r, 100));

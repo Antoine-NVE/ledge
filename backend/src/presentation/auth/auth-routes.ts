@@ -1,12 +1,12 @@
 import express from 'express';
 import { loginBodySchema, registerBodySchema } from './auth-schemas';
 import { createValidateBody } from '../middlewares/business/validation/validate-body';
-import { Container } from '../../infrastructure/config/container';
+import { AuthController } from './auth-controller';
 
-export const createAuthRoutes = (container: Container) => {
+export const createAuthRoutes = (authController: AuthController) => {
     const router = express.Router();
 
-    const { register, login, refresh, logout } = container.authController;
+    const { register, login, refresh, logout } = authController;
 
     /**
      * @openapi

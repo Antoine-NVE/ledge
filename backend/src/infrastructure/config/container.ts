@@ -19,17 +19,23 @@ import { Hasher } from '../../application/ports/hasher';
 import { EmailSender } from '../../application/ports/email-sender';
 import { CacheStore } from '../../application/ports/cache-store';
 
-export type Container = ReturnType<typeof buildContainer>;
-
-export const buildContainer = (
-    mongoDb: Db,
-    logger: Logger,
-    tokenManager: TokenManager,
-    hasher: Hasher,
-    emailSender: EmailSender,
-    cacheStore: CacheStore,
-    emailFrom: string,
-) => {
+export const buildContainer = ({
+    mongoDb,
+    logger,
+    tokenManager,
+    hasher,
+    emailSender,
+    cacheStore,
+    emailFrom,
+}: {
+    mongoDb: Db;
+    logger: Logger;
+    tokenManager: TokenManager;
+    hasher: Hasher;
+    emailSender: EmailSender;
+    cacheStore: CacheStore;
+    emailFrom: string;
+}) => {
     const userRepository = new UserRepository(mongoDb.collection('users'));
     const refreshTokenRepository = new RefreshTokenRepository(
         mongoDb.collection('refreshtokens'),
@@ -70,6 +76,7 @@ export const buildContainer = (
     const authorize = createAuthorize(transactionService);
 
     return {
+        logger,
         authController,
         userController,
         transactionController,

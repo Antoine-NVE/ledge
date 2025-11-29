@@ -1,21 +1,28 @@
 import express from 'express';
 import { createBodySchema, updateBodySchema } from './transaction-schemas';
-import { authorizeParamsSchema } from '../middlewares/business/auth/authorize';
+import {
+    Authorize,
+    authorizeParamsSchema,
+} from '../middlewares/business/auth/authorize';
 import { createValidateParams } from '../middlewares/business/validation/validate-params';
 import { createValidateBody } from '../middlewares/business/validation/validate-body';
-import { Container } from '../../infrastructure/config/container';
+import { TransactionController } from './transaction-controller';
+import { Authenticate } from '../middlewares/business/auth/authenticate';
 
-export const createTransactionRoutes = (container: Container) => {
+export const createTransactionRoutes = (
+    transactionController: TransactionController,
+    authenticate: Authenticate,
+    authorize: Authorize,
+) => {
     const router = express.Router();
 
-    const { authenticate, authorize } = container;
     const {
         create,
         readAll,
         read,
         update,
         delete: remove,
-    } = container.transactionController;
+    } = transactionController;
     const validateParams = createValidateParams(authorizeParamsSchema);
 
     /**

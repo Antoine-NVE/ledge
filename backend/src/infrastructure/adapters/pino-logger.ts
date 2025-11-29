@@ -1,26 +1,26 @@
-import { Logger as LoggerType } from 'pino';
+import { BaseLogger } from 'pino';
 import { Logger } from '../../application/ports/logger';
 
 export class PinoLogger implements Logger {
-    constructor(private logger: LoggerType) {}
+    constructor(private baseLogger: BaseLogger) {}
 
     fatal(message: string, meta?: unknown): void {
-        this.logger.fatal(meta, message);
+        this.baseLogger.fatal(meta, message);
     }
 
     error(message: string, meta?: unknown): void {
-        this.logger.error(meta, message);
+        this.baseLogger.error(meta, message);
     }
 
     warn(message: string, meta?: unknown): void {
-        this.logger.warn(meta, message);
+        this.baseLogger.warn(meta, message);
     }
 
     info(message: string, meta?: unknown): void {
-        this.logger.info(meta, message);
+        this.baseLogger.info(meta, message);
     }
 
     debug(message: string, meta?: unknown): void {
-        this.logger.debug(meta, message);
+        this.baseLogger.debug(meta, message);
     }
 }

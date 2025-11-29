@@ -1,10 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 import { HttpError } from '../../../infrastructure/errors/http-error';
-import { Logger } from 'pino';
+import { Logger } from '../../../application/ports/logger';
 
 export const createErrorHandler = (
     nodeEnv: 'development' | 'production',
-    pinoLogger: Logger,
+    logger: Logger,
 ) => {
     return (
         err: Error,
@@ -26,14 +26,11 @@ export const createErrorHandler = (
 
         if (isHttpError && status < 500) {
             const message = err.message;
-            pinoLogger.warn(
-                {
-                    err,
-                    userId: req.user?._id,
-                    transactionId: req.transaction?._id,
-                },
-                message,
-            );
+            logger.warn(message, {
+                err,
+                userId: req.user?._id,
+                transactionId: req.transaction?._id,
+            });
             res.status(status).json({
                 message,
                 errors: err.errors,
@@ -43,10 +40,11 @@ export const createErrorHandler = (
         }
 
         const message = 'Internal server error';
-        pinoLogger.error(
-            { err, userId: req.user?._id, transactionId: req.transaction?._id },
-            message,
-        );
+        logger.error(message, {
+            err,
+            userId: req.user?._id,
+            transactionId: req.transaction?._id,
+        });
         res.status(status).json({
             message,
         });

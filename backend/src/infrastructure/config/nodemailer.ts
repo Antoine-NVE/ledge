@@ -1,6 +1,11 @@
 import { createTransport } from 'nodemailer';
 
-export const connectToSmtp = async (options: {
+export const connectToSmtp = async ({
+    host,
+    port,
+    secure,
+    auth,
+}: {
     host: string;
     port: number;
     secure: boolean;
@@ -9,7 +14,12 @@ export const connectToSmtp = async (options: {
         pass: string;
     };
 }) => {
-    const transporter = createTransport(options);
+    const transporter = createTransport({
+        host,
+        port,
+        secure,
+        auth,
+    });
     await transporter.verify();
     return transporter;
 };
