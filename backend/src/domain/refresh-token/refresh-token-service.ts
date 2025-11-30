@@ -2,12 +2,12 @@ import { RefreshTokenRepository } from './refresh-token-repository';
 import { NewRefreshToken, RefreshToken } from './refresh-token-types';
 import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 
-type CreateRefreshTokenInput = {
+type CreateInput = {
     userId: string;
     token: string;
 };
 
-type ExtendRefreshTokenExpirationInput = {
+type ExtendExpirationInput = {
     token: string;
 };
 
@@ -16,7 +16,7 @@ export class RefreshTokenService {
 
     constructor(private refreshTokenRepository: RefreshTokenRepository) {}
 
-    create = async (data: CreateRefreshTokenInput) => {
+    create = async (data: CreateInput) => {
         const newRefreshToken: NewRefreshToken = {
             ...data,
             expiresAt: new Date(Date.now() + this.TTL),
@@ -36,7 +36,7 @@ export class RefreshTokenService {
 
     extendExpiration = async (
         refreshToken: RefreshToken,
-        { token }: ExtendRefreshTokenExpirationInput,
+        { token }: ExtendExpirationInput,
     ) => {
         refreshToken.token = token;
         refreshToken.expiresAt = new Date(Date.now() + this.TTL);

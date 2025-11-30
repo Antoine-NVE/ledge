@@ -2,7 +2,7 @@ import { TransactionRepository } from './transaction-repository';
 import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 import { NewTransaction, Transaction } from './transaction-types';
 
-type CreateTransactionInput =
+type CreateInput =
     | {
           userId: string;
           month: string;
@@ -20,7 +20,7 @@ type CreateTransactionInput =
           expenseCategory: 'need' | 'want' | 'investment' | null;
       };
 
-type UpdateTransactionInput =
+type UpdateInput =
     | {
           month: string;
           name: string;
@@ -39,7 +39,7 @@ type UpdateTransactionInput =
 export class TransactionService {
     constructor(private transactionRepository: TransactionRepository) {}
 
-    create = async (data: CreateTransactionInput) => {
+    create = async (data: CreateInput) => {
         const newTransaction: NewTransaction = {
             ...data,
             createdAt: new Date(),
@@ -60,7 +60,7 @@ export class TransactionService {
 
     update = async (
         transaction: Transaction,
-        { month, name, value, type, expenseCategory }: UpdateTransactionInput,
+        { month, name, value, type, expenseCategory }: UpdateInput,
     ) => {
         transaction.month = month;
         transaction.name = name;

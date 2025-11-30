@@ -2,7 +2,7 @@ import { UserRepository } from './user-repository';
 import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 import { NewUser, User } from './user-types';
 
-type RegisterUserInput = {
+type RegisterInput = {
     email: string;
     passwordHash: string;
 };
@@ -10,7 +10,7 @@ type RegisterUserInput = {
 export class UserService {
     constructor(private userRepository: UserRepository) {}
 
-    register = async (data: RegisterUserInput) => {
+    register = async (data: RegisterInput) => {
         const newUser: NewUser = {
             ...data,
             isEmailVerified: false,
