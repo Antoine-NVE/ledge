@@ -1,22 +1,8 @@
-import { Collection } from 'mongodb';
-import { User } from './user-types';
+import { NewUser, User } from './user-types';
 
-export class UserRepository {
-    constructor(private userCollection: Collection<User>) {}
-
-    insertOne = async (user: User): Promise<void> => {
-        await this.userCollection.insertOne(user);
-    };
-
-    findOne = async <K extends keyof User>(
-        key: K,
-        value: User[K],
-    ): Promise<User | null> => {
-        return await this.userCollection.findOne({ [key]: value });
-    };
-
-    updateOne = async (user: User): Promise<void> => {
-        const { _id, ...rest } = user;
-        await this.userCollection.updateOne({ _id }, { $set: rest });
-    };
+export interface UserRepository {
+    create: (newUser: NewUser) => Promise<User>;
+    findById: (id: string) => Promise<User | null>;
+    findByEmail: (email: string) => Promise<User | null>;
+    save: (user: User) => Promise<void>;
 }
