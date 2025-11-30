@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
-import { TransactionOrchestrator } from '../../application/transaction/transaction-orchestrator';
 import { CreateBody, UpdateBody } from './transaction-types';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { Logger } from '../../application/ports/logger';
+import { TransactionService } from '../../domain/transaction/transaction-service';
 
 export class TransactionController {
     constructor(
-        private transactionOrchestrator: TransactionOrchestrator,
+        private transactionService: TransactionService,
         private logger: Logger,
     ) {}
 
@@ -14,7 +14,7 @@ export class TransactionController {
         req: Request<ParamsDictionary, unknown, CreateBody>,
         res: Response,
     ) => {
-        const transaction = await this.transactionOrchestrator.create({
+        const transaction = await this.transactionService.create({
             ...req.body,
             userId: req.user._id,
         });
@@ -33,7 +33,7 @@ export class TransactionController {
     };
 
     readAll = async (req: Request, res: Response) => {
-        const transactions = await this.transactionOrchestrator.readAll(
+        const transactions = await this.transactionService.readAll(
             req.user._id,
         );
 
@@ -58,7 +58,7 @@ export class TransactionController {
         req: Request<ParamsDictionary, unknown, UpdateBody>,
         res: Response,
     ) => {
-        const transaction = await this.transactionOrchestrator.update(
+        const transaction = await this.transactionService.update(
             req.transaction,
             req.body,
         );
@@ -77,7 +77,7 @@ export class TransactionController {
     };
 
     delete = async (req: Request, res: Response) => {
-        await this.transactionOrchestrator.delete(req.transaction);
+        await this.transactionService.delete(req.transaction);
 
         const message = 'Transaction deleted successfully';
         this.logger.info(message, {

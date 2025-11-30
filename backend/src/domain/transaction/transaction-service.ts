@@ -2,7 +2,7 @@ import { TransactionRepository } from './transaction-repository';
 import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 import { NewTransaction, Transaction } from './transaction-types';
 
-export type CreateInput =
+type CreateInput =
     | {
           userId: string;
           month: string;
@@ -20,7 +20,7 @@ export type CreateInput =
           expenseCategory: 'need' | 'want' | 'investment' | null;
       };
 
-export type FindManyByUserId = {
+type FindManyByUserId = {
     userId: string;
 };
 
@@ -28,7 +28,7 @@ type FindById = {
     id: string;
 };
 
-export type UpdateInput =
+type UpdateInput =
     | {
           transaction: Transaction;
           name: string;
@@ -44,7 +44,7 @@ export type UpdateInput =
           expenseCategory: 'need' | 'want' | 'investment' | null;
       };
 
-export type DeleteById = {
+type DeleteById = {
     id: string;
 };
 
