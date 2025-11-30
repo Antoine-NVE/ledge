@@ -24,4 +24,26 @@ type Expense = {
 
 export type Transaction = Income | Expense;
 
-export type NewTransaction = Omit<Transaction, 'id'>;
+type NewIncome = {
+    userId: string;
+    month: string;
+    name: string;
+    value: number;
+    type: 'income';
+    expenseCategory: undefined;
+    createdAt: Date;
+    updatedAt?: Date;
+};
+
+type NewExpense = {
+    userId: string;
+    month: string;
+    name: string;
+    value: number;
+    type: 'expense';
+    expenseCategory: 'need' | 'want' | 'investment' | null;
+    createdAt: Date;
+    updatedAt?: Date;
+};
+
+export type NewTransaction = NewIncome | NewExpense;
