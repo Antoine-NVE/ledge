@@ -60,7 +60,7 @@ export class JwtTokenManager implements TokenManager {
             );
         }
 
-        return { id: data.sub };
+        return { userId: data.sub };
     };
 
     signAccess = ({ userId }: SignAccessPayload): string => {
@@ -69,8 +69,7 @@ export class JwtTokenManager implements TokenManager {
 
     verifyAccess = (token: string): SignAccessPayload => {
         try {
-            const { id } = this.verify(token, { audience: 'access' });
-            return { userId: id };
+            return this.verify(token, { audience: 'access' });
         } catch (error: unknown) {
             if (error instanceof UnauthorizedError)
                 throw new UnauthorizedError(error.message, undefined, {
@@ -89,7 +88,6 @@ export class JwtTokenManager implements TokenManager {
     };
 
     verifyVerificationEmail = (token: string): VerificationEmailPayload => {
-        const { id } = this.verify(token, { audience: 'verification-email' });
-        return { userId: id };
+        return this.verify(token, { audience: 'verification-email' });
     };
 }
