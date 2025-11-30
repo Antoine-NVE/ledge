@@ -16,7 +16,7 @@ export class RefreshTokenService {
 
     constructor(private refreshTokenRepository: RefreshTokenRepository) {}
 
-    create = async (data: CreateRefreshTokenInput): Promise<RefreshToken> => {
+    create = async (data: CreateRefreshTokenInput) => {
         const newRefreshToken: NewRefreshToken = {
             ...data,
             expiresAt: new Date(Date.now() + this.TTL),
@@ -26,7 +26,7 @@ export class RefreshTokenService {
         return await this.refreshTokenRepository.create(newRefreshToken);
     };
 
-    findByToken = async (token: string): Promise<RefreshToken> => {
+    findByToken = async (token: string) => {
         const refreshToken =
             await this.refreshTokenRepository.findByToken(token);
         if (!refreshToken) throw new NotFoundError('Refresh token not found');
@@ -36,9 +36,9 @@ export class RefreshTokenService {
 
     extendExpiration = async (
         refreshToken: RefreshToken,
-        data: ExtendRefreshTokenExpirationInput,
-    ): Promise<RefreshToken> => {
-        Object.assign(refreshToken, data);
+        { token }: ExtendRefreshTokenExpirationInput,
+    ) => {
+        refreshToken.token = token;
         refreshToken.expiresAt = new Date(Date.now() + this.TTL);
         refreshToken.updatedAt = new Date();
 

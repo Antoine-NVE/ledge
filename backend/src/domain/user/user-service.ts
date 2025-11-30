@@ -10,7 +10,7 @@ type RegisterUserInput = {
 export class UserService {
     constructor(private userRepository: UserRepository) {}
 
-    register = async (data: RegisterUserInput): Promise<User> => {
+    register = async (data: RegisterUserInput) => {
         const newUser: NewUser = {
             ...data,
             isEmailVerified: false,
@@ -20,19 +20,19 @@ export class UserService {
         return await this.userRepository.create(newUser);
     };
 
-    findById = async (id: string): Promise<User> => {
+    findById = async (id: string) => {
         const user = await this.userRepository.findById(id);
         if (!user) throw new NotFoundError('User not found');
         return user;
     };
 
-    findByEmail = async (email: string): Promise<User> => {
+    findByEmail = async (email: string) => {
         const user = await this.userRepository.findByEmail(email);
         if (!user) throw new NotFoundError('User not found');
         return user;
     };
 
-    markEmailAsVerified = async (user: User): Promise<User> => {
+    markEmailAsVerified = async (user: User) => {
         user.isEmailVerified = true;
         user.updatedAt = new Date();
 

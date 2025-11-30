@@ -39,7 +39,7 @@ type UpdateTransactionInput =
 export class TransactionService {
     constructor(private transactionRepository: TransactionRepository) {}
 
-    create = async (data: CreateTransactionInput): Promise<Transaction> => {
+    create = async (data: CreateTransactionInput) => {
         const newTransaction: NewTransaction = {
             ...data,
             createdAt: new Date(),
@@ -48,11 +48,11 @@ export class TransactionService {
         return await this.transactionRepository.create(newTransaction);
     };
 
-    findManyByUserId = async (userId: string): Promise<Transaction[]> => {
+    findManyByUserId = async (userId: string) => {
         return await this.transactionRepository.findManyByUserId(userId);
     };
 
-    findById = async (id: string): Promise<Transaction> => {
+    findById = async (id: string) => {
         const transaction = await this.transactionRepository.findById(id);
         if (!transaction) throw new NotFoundError('Transaction not found');
         return transaction;
@@ -60,16 +60,20 @@ export class TransactionService {
 
     update = async (
         transaction: Transaction,
-        data: UpdateTransactionInput,
-    ): Promise<Transaction> => {
-        Object.assign(transaction, data);
+        { month, name, value, type, expenseCategory }: UpdateTransactionInput,
+    ) => {
+        transaction.month = month;
+        transaction.name = name;
+        transaction.value = value;
+        transaction.type = type;
+        transaction.expenseCategory = expenseCategory;
         transaction.updatedAt = new Date();
 
         await this.transactionRepository.save(transaction);
         return transaction;
     };
 
-    deleteById = async (id: string): Promise<Transaction> => {
+    deleteById = async (id: string) => {
         const transaction = await this.transactionRepository.deleteById(id);
         if (!transaction) throw new NotFoundError('Transaction not found');
         return transaction;
