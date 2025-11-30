@@ -1,22 +1,21 @@
 import { RedisClientType } from 'redis';
-import { ObjectId } from 'mongodb';
 import { CacheStore } from '../../application/ports/cache-store';
 
 export class RedisCacheStore implements CacheStore {
     constructor(private client: RedisClientType) {}
 
-    setVerificationEmailCooldown = async (userId: ObjectId) => {
+    setVerificationEmailCooldown = async (userId: string) => {
         await this.client.set(
-            `verification_email_cooldown:${userId.toString()}`,
-            '1',
+            `verification_email_cooldown:${userId}`,
+            '1', // Placeholder value
             { EX: 5 * 60 }, // 5 minutes
         );
     };
 
-    existsVerificationEmailCooldown = async (userId: ObjectId) => {
+    existsVerificationEmailCooldown = async (userId: string) => {
         return (
             (await this.client.exists(
-                `verification_email_cooldown:${userId.toString()}`,
+                `verification_email_cooldown:${userId}`,
             )) === 1
         );
     };

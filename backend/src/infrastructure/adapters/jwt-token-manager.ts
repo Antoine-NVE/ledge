@@ -39,6 +39,7 @@ export class JwtTokenManager implements TokenManager {
             throw new UnauthorizedError('Invalid JWT');
         }
 
+        // Only sub isn't yet verified, but it could be useful to have access to other values
         const { success, data, error } = z
             .object({
                 sub: z.string(),
@@ -55,7 +56,7 @@ export class JwtTokenManager implements TokenManager {
             );
         }
 
-        return data.sub;
+        return { userId: data.sub };
     };
 
     signAccess = (userId: string) => {

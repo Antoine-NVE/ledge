@@ -1,6 +1,4 @@
-import { ObjectId } from 'mongodb';
-
 export interface CacheStore {
-    setVerificationEmailCooldown: (userId: ObjectId) => Promise<void>;
-    existsVerificationEmailCooldown: (userId: ObjectId) => Promise<boolean>;
+    setVerificationEmailCooldown: (userId: string) => Promise<void>;
+    existsVerificationEmailCooldown: (userId: string) => Promise<boolean>;
 }
