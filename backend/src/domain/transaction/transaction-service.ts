@@ -2,7 +2,7 @@ import { TransactionRepository } from './transaction-repository';
 import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 import { NewTransaction, Transaction } from './transaction-types';
 
-type CreateInput =
+export type CreateInput =
     | {
           userId: string;
           month: string;
@@ -20,21 +20,33 @@ type CreateInput =
           expenseCategory: 'need' | 'want' | 'investment' | null;
       };
 
-type UpdateInput =
+export type FindManyByUserId = {
+    userId: string;
+};
+
+type FindById = {
+    id: string;
+};
+
+export type UpdateInput =
     | {
-          month: string;
+          transaction: Transaction;
           name: string;
           value: number;
           type: 'income';
           expenseCategory: undefined;
       }
     | {
-          month: string;
+          transaction: Transaction;
           name: string;
           value: number;
           type: 'expense';
           expenseCategory: 'need' | 'want' | 'investment' | null;
       };
+
+export type DeleteById = {
+    id: string;
+};
 
 export class TransactionService {
     constructor(private transactionRepository: TransactionRepository) {}
@@ -48,21 +60,23 @@ export class TransactionService {
         return await this.transactionRepository.create(newTransaction);
     };
 
-    findManyByUserId = async (userId: string) => {
+    findManyByUserId = async ({ userId }: FindManyByUserId) => {
         return await this.transactionRepository.findManyByUserId(userId);
     };
 
-    findById = async (id: string) => {
+    findById = async ({ id }: FindById) => {
         const transaction = await this.transactionRepository.findById(id);
         if (!transaction) throw new NotFoundError('Transaction not found');
         return transaction;
     };
 
-    update = async (
-        transaction: Transaction,
-        { month, name, value, type, expenseCategory }: UpdateInput,
-    ) => {
-        transaction.month = month;
+    update = async ({
+        transaction,
+        name,
+        value,
+        type,
+        expenseCategory,
+    }: UpdateInput) => {
         transaction.name = name;
         transaction.value = value;
         transaction.type = type;
@@ -73,7 +87,7 @@ export class TransactionService {
         return transaction;
     };
 
-    deleteById = async (id: string) => {
+    deleteById = async ({ id }: DeleteById) => {
         const transaction = await this.transactionRepository.deleteById(id);
         if (!transaction) throw new NotFoundError('Transaction not found');
         return transaction;

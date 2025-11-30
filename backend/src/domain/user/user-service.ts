@@ -7,6 +7,18 @@ type RegisterInput = {
     passwordHash: string;
 };
 
+type FindByIdInput = {
+    id: string;
+};
+
+type FindByEmailInput = {
+    email: string;
+};
+
+type MarkEmailAsVerifiedInput = {
+    user: User;
+};
+
 export class UserService {
     constructor(private userRepository: UserRepository) {}
 
@@ -20,19 +32,19 @@ export class UserService {
         return await this.userRepository.create(newUser);
     };
 
-    findById = async (id: string) => {
+    findById = async ({ id }: FindByIdInput) => {
         const user = await this.userRepository.findById(id);
         if (!user) throw new NotFoundError('User not found');
         return user;
     };
 
-    findByEmail = async (email: string) => {
+    findByEmail = async ({ email }: FindByEmailInput) => {
         const user = await this.userRepository.findByEmail(email);
         if (!user) throw new NotFoundError('User not found');
         return user;
     };
 
-    markEmailAsVerified = async (user: User) => {
+    markEmailAsVerified = async ({ user }: MarkEmailAsVerifiedInput) => {
         user.isEmailVerified = true;
         user.updatedAt = new Date();
 

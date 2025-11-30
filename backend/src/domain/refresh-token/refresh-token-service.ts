@@ -7,7 +7,16 @@ type CreateInput = {
     token: string;
 };
 
-type ExtendExpirationInput = {
+type FindByTokenInput = {
+    token: string;
+};
+
+type RotateTokenInput = {
+    refreshToken: RefreshToken;
+    token: string;
+};
+
+type DeleteByTokenInput = {
     token: string;
 };
 
@@ -26,7 +35,7 @@ export class RefreshTokenService {
         return await this.refreshTokenRepository.create(newRefreshToken);
     };
 
-    findByToken = async (token: string) => {
+    findByToken = async ({ token }: FindByTokenInput) => {
         const refreshToken =
             await this.refreshTokenRepository.findByToken(token);
         if (!refreshToken) throw new NotFoundError('Refresh token not found');
@@ -34,10 +43,7 @@ export class RefreshTokenService {
         return refreshToken;
     };
 
-    extendExpiration = async (
-        refreshToken: RefreshToken,
-        { token }: ExtendExpirationInput,
-    ) => {
+    rotateToken = async ({ refreshToken, token }: RotateTokenInput) => {
         refreshToken.token = token;
         refreshToken.expiresAt = new Date(Date.now() + this.TTL);
         refreshToken.updatedAt = new Date();
@@ -46,7 +52,7 @@ export class RefreshTokenService {
         return refreshToken;
     };
 
-    deleteByToken = async (token: string) => {
+    deleteByToken = async ({ token }: DeleteByTokenInput) => {
         const refreshToken =
             await this.refreshTokenRepository.deleteByToken(token);
         if (!refreshToken) throw new NotFoundError('Refresh token not found');

@@ -11,7 +11,11 @@ import { UnauthorizedError } from '../errors/unauthorized-error';
 import { formatZodError } from '../utils/format';
 import { BadRequestError } from '../errors/bad-request-error';
 import z from 'zod';
-import { TokenManager } from '../../application/ports/token-manager';
+import {
+    SignAccessPayload,
+    TokenManager,
+    VerificationEmailPayload,
+} from '../../application/ports/token-manager';
 
 export class JwtTokenManager implements TokenManager {
     constructor(private secret: Secret) {}
@@ -56,16 +60,17 @@ export class JwtTokenManager implements TokenManager {
             );
         }
 
-        return { userId: data.sub };
+        return { id: data.sub };
     };
 
-    signAccess = (userId: string) => {
+    signAccess = ({ userId }: SignAccessPayload): string => {
         return this.sign({ aud: 'access', sub: userId }, { expiresIn: '15m' });
     };
 
-    verifyAccess = (token: string) => {
+    verifyAccess = (token: string): SignAccessPayload => {
         try {
-            return this.verify(token, { audience: 'access' });
+            const { id } = this.verify(token, { audience: 'access' });
+            return { userId: id };
         } catch (error: unknown) {
             if (error instanceof UnauthorizedError)
                 throw new UnauthorizedError(error.message, undefined, {
@@ -76,14 +81,15 @@ export class JwtTokenManager implements TokenManager {
         }
     };
 
-    signVerificationEmail = (userId: string) => {
+    signVerificationEmail = ({ userId }: VerificationEmailPayload): string => {
         return this.sign(
             { aud: 'verification-email', sub: userId },
             { expiresIn: '1h' },
         );
     };
 
-    verifyVerificationEmail = (token: string) => {
-        return this.verify(token, { audience: 'verification-email' });
+    verifyVerificationEmail = (token: string): VerificationEmailPayload => {
+        const { id } = this.verify(token, { audience: 'verification-email' });
+        return { userId: id };
     };
 }

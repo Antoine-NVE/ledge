@@ -8,6 +8,45 @@ import { generateToken } from '../../infrastructure/utils/token';
 import { TokenManager } from '../ports/token-manager';
 import { Hasher } from '../ports/hasher';
 
+type RegisterInput = {
+    email: string;
+    password: string;
+};
+
+type RegisterOutput = {
+    user: User;
+    accessToken: string;
+    refreshToken: RefreshToken;
+};
+
+type LoginInput = {
+    email: string;
+    password: string;
+};
+
+type LoginOutput = {
+    user: User;
+    accessToken: string;
+    refreshToken: RefreshToken;
+};
+
+type RefreshInput = {
+    token: string;
+};
+
+type RefreshOutput = {
+    accessToken: string;
+    refreshToken: RefreshToken;
+};
+
+type LogoutInput = {
+    token: string;
+};
+
+type LogoutOutput = {
+    refreshToken: RefreshToken;
+};
+
 export class AuthOrchestrator {
     constructor(
         private userService: UserService,
@@ -19,48 +58,28 @@ export class AuthOrchestrator {
     register = async ({
         email,
         password,
-    }: {
-        email: string;
-        password: string;
-    }): Promise<{
-        user: User;
-        accessToken: string;
-        refreshToken: RefreshToken;
-    }> => {
+    }: RegisterInput): Promise<RegisterOutput> => {
         const passwordHash = await this.hasher.hash(password);
 
         const user = await this.userService.register({ email, passwordHash });
 
-        const token = generateToken();
-
         const refreshToken = await this.refreshTokenService.create({
-            token,
-            userId: user._id,
+            token: generateToken(),
+            userId: user.id,
         });
 
-        const accessToken = this.tokenManager.signAccess(user._id);
+        const accessToken = this.tokenManager.signAccess({ userId: user.id });
 
         return { user, accessToken, refreshToken };
     };
 
-    login = async ({
-        email,
-        password,
-    }: {
-        email: string;
-        password: string;
-    }): Promise<{
-        user: User;
-        accessToken: string;
-        refreshToken: RefreshToken;
-    }> => {
+    login = async ({ email, password }: LoginInput): Promise<LoginOutput> => {
         const user = await this.userService
-            .findOneByEmail(email)
-            .catch((err) => {
+            .findByEmail({ email })
+            .catch((err: unknown) => {
                 if (err instanceof NotFoundError) {
                     throw new UnauthorizedError('Invalid credentials');
                 }
-
                 throw err;
             });
 
@@ -70,28 +89,23 @@ export class AuthOrchestrator {
         );
         if (!doesMatch) throw new UnauthorizedError('Invalid credentials');
 
-        const token = generateToken();
-
         const refreshToken = await this.refreshTokenService.create({
-            token,
-            userId: user._id,
+            token: generateToken(),
+            userId: user.id,
         });
 
-        const accessToken = this.tokenManager.signAccess(user._id);
+        const accessToken = this.tokenManager.signAccess({ userId: user.id });
 
         return { user, accessToken, refreshToken };
     };
 
-    refresh = async (
-        token: string,
-    ): Promise<{ accessToken: string; refreshToken: RefreshToken }> => {
+    refresh = async ({ token }: RefreshInput): Promise<RefreshOutput> => {
         let refreshToken = await this.refreshTokenService
-            .findOneByToken(token)
-            .catch((err) => {
+            .findByToken({ token })
+            .catch((err: unknown) => {
                 if (err instanceof NotFoundError) {
                     throw new UnauthorizedError('Invalid refresh token');
                 }
-
                 throw err;
             });
 
@@ -99,18 +113,22 @@ export class AuthOrchestrator {
             throw new UnauthorizedError('Expired refresh token');
         }
 
-        const newToken = generateToken();
-        refreshToken = await this.refreshTokenService.extendExpiration(
+        refreshToken = await this.refreshTokenService.rotateToken({
             refreshToken,
-            newToken,
-        );
+            token: generateToken(),
+        });
 
-        const accessToken = this.tokenManager.signAccess(refreshToken.userId);
+        const accessToken = this.tokenManager.signAccess({
+            userId: refreshToken.userId,
+        });
 
         return { accessToken, refreshToken };
     };
 
-    logout = async (token: string) => {
-        return await this.refreshTokenService.findOneAndDeleteByToken(token);
+    logout = async ({ token }: LogoutInput): Promise<LogoutOutput> => {
+        const refreshToken = await this.refreshTokenService.deleteByToken({
+            token,
+        });
+        return { refreshToken };
     };
 }

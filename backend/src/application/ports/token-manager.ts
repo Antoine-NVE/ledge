@@ -1,7 +1,15 @@
-export interface TokenManager {
-    signAccess(userId: string): string;
-    verifyAccess(token: string): { userId: string };
+export type SignAccessPayload = {
+    userId: string;
+};
 
-    signVerificationEmail(userId: string): string;
-    verifyVerificationEmail(token: string): { userId: string };
+export type VerificationEmailPayload = {
+    userId: string;
+};
+
+export interface TokenManager {
+    signAccess(payload: SignAccessPayload): string;
+    verifyAccess(token: string): SignAccessPayload;
+
+    signVerificationEmail(payload: VerificationEmailPayload): string;
+    verifyVerificationEmail(token: string): VerificationEmailPayload;
 }

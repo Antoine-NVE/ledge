@@ -1,30 +1,27 @@
-import { ObjectId } from 'mongodb';
 import {
-    Transaction,
-    TransactionData,
-    UpdateTransactionData,
-} from '../../domain/transaction/transaction-types';
-import { TransactionService } from '../../domain/transaction/transaction-service';
+    CreateInput,
+    DeleteById,
+    FindManyByUserId,
+    TransactionService,
+    UpdateInput,
+} from '../../domain/transaction/transaction-service';
 
 export class TransactionOrchestrator {
     constructor(private transactionService: TransactionService) {}
 
-    create = async (data: TransactionData): Promise<Transaction> => {
+    create = async (data: CreateInput) => {
         return await this.transactionService.create(data);
     };
 
-    readAll = async (userId: ObjectId): Promise<Transaction[]> => {
-        return await this.transactionService.readAll(userId);
+    findManyByUserId = async (data: FindManyByUserId) => {
+        return await this.transactionService.findManyByUserId(data);
     };
 
-    update = async (
-        transaction: Transaction,
-        data: UpdateTransactionData,
-    ): Promise<Transaction> => {
-        return await this.transactionService.update(transaction, data);
+    update = async (data: UpdateInput) => {
+        return await this.transactionService.update(data);
     };
 
-    delete = async (transaction: Transaction): Promise<void> => {
-        await this.transactionService.delete(transaction);
+    deleteById = async (data: DeleteById) => {
+        return await this.transactionService.deleteById(data);
     };
 }
