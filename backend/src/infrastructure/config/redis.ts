@@ -1,9 +1,7 @@
 import { createClient, RedisClientType } from 'redis';
 
-let client: RedisClientType | null = null;
-
 export const connectToRedis = async () => {
-    client = createClient({ url: 'redis://cache:6379' });
+    const client: RedisClientType = createClient({ url: 'redis://cache:6379' });
     await client.connect();
-    return client;
+    return { client };
 };

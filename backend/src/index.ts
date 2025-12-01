@@ -17,24 +17,27 @@ import { MongoRefreshTokenRepository } from './infrastructure/repositories/mongo
 
 const start = async () => {
     // .env is not verified yet, but we need a logger now
-    const pinoBaseLogger = createBaseLogger(
-        process.env.NODE_ENV === 'production' ? 'production' : 'development',
-    );
+    const { baseLogger: pinoBaseLogger } = createBaseLogger({
+        nodeEnv:
+            process.env.NODE_ENV === 'production'
+                ? 'production'
+                : 'development',
+    });
 
     const {
-        SMTP_HOST: host,
-        SMTP_PORT: port,
-        SMTP_SECURE: secure,
-        SMTP_AUTH: auth,
-        JWT_SECRET: jwtSecret,
-        EMAIL_FROM: emailFrom,
-        NODE_ENV: nodeEnv,
-        ALLOWED_ORIGINS: allowedOrigins,
+        smtpHost,
+        smtpPort,
+        smtpSecure,
+        smtpAuth,
+        jwtSecret,
+        emailFrom,
+        nodeEnv,
+        allowedOrigins,
     } = await step('Environment validation', pinoBaseLogger, async () => {
         return loadEnv();
     });
 
-    const redisClient = await step(
+    const { client: redisClient } = await step(
         'Redis connection',
         pinoBaseLogger,
         async () => {
@@ -50,15 +53,15 @@ const start = async () => {
         },
     );
 
-    const nodemailerTransporter = await step(
+    const { transporter: nodemailerTransporter } = await step(
         'SMTP connection',
         pinoBaseLogger,
         async () => {
             return await connectToSmtp({
-                host,
-                port,
-                secure,
-                auth,
+                host: smtpHost,
+                port: smtpPort,
+                secure: smtpSecure,
+                auth: smtpAuth,
             });
         },
     );

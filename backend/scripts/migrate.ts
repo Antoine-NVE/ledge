@@ -5,9 +5,12 @@ import { step } from '../src/infrastructure/utils/lifecycle';
 import { connectToMongo } from '../src/infrastructure/config/mongo';
 
 const start = async () => {
-    const pinoBaseLogger = createBaseLogger(
-        process.env.NODE_ENV === 'production' ? 'production' : 'development',
-    );
+    const { baseLogger: pinoBaseLogger } = createBaseLogger({
+        nodeEnv:
+            process.env.NODE_ENV === 'production'
+                ? 'production'
+                : 'development',
+    });
 
     const { db: mongoDb, client: mongoClient } = await step(
         'Mongo connection',

@@ -1,12 +1,9 @@
 import { Db, MongoClient } from 'mongodb';
 
-let client: MongoClient | null = null;
-let db: Db | null = null;
-
 export const connectToMongo = async () => {
-    client = new MongoClient('mongodb://database:27017');
+    const client = new MongoClient('mongodb://database:27017');
     await client.connect();
-    db = client.db('ledge');
+    const db = client.db('ledge');
 
     await setupIndexes(db);
 

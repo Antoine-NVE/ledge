@@ -1,11 +1,13 @@
 import pino, { BaseLogger } from 'pino';
 
-export const createBaseLogger = (
-    nodeEnv: 'development' | 'production',
-): BaseLogger => {
+export const createBaseLogger = ({
+    nodeEnv,
+}: {
+    nodeEnv: 'development' | 'production';
+}) => {
     const isDev = nodeEnv === 'development';
 
-    return pino({
+    const baseLogger: BaseLogger = pino({
         level: isDev ? 'debug' : 'info', // Minimum level to show. List: fatal > error > warn > info > debug > trace
         transport: isDev
             ? {
@@ -25,4 +27,6 @@ export const createBaseLogger = (
                   },
               },
     });
+
+    return { baseLogger };
 };

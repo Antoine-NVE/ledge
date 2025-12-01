@@ -1,4 +1,4 @@
-import { createTransport } from 'nodemailer';
+import { createTransport, Transporter } from 'nodemailer';
 
 export const connectToSmtp = async (options: {
     host: string;
@@ -9,7 +9,7 @@ export const connectToSmtp = async (options: {
         pass: string;
     };
 }) => {
-    const transporter = createTransport(options);
+    const transporter: Transporter = createTransport(options);
     await transporter.verify();
-    return transporter;
+    return { transporter };
 };
