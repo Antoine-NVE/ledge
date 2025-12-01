@@ -20,11 +20,11 @@ type CreateInput =
           expenseCategory: 'need' | 'want' | 'investment' | null;
       };
 
-type FindManyByUserId = {
+type FindManyByUserIdInput = {
     userId: string;
 };
 
-type FindById = {
+type FindByIdInput = {
     id: string;
 };
 
@@ -44,7 +44,7 @@ type UpdateInput =
           expenseCategory: 'need' | 'want' | 'investment' | null;
       };
 
-type DeleteById = {
+type DeleteByIdInput = {
     id: string;
 };
 
@@ -60,11 +60,11 @@ export class TransactionService {
         return await this.transactionRepository.create(newTransaction);
     };
 
-    findManyByUserId = async ({ userId }: FindManyByUserId) => {
+    findManyByUserId = async ({ userId }: FindManyByUserIdInput) => {
         return await this.transactionRepository.findManyByUserId(userId);
     };
 
-    findById = async ({ id }: FindById) => {
+    findById = async ({ id }: FindByIdInput) => {
         const transaction = await this.transactionRepository.findById(id);
         if (!transaction) throw new NotFoundError('Transaction not found');
         return transaction;
@@ -87,7 +87,7 @@ export class TransactionService {
         return transaction;
     };
 
-    deleteById = async ({ id }: DeleteById) => {
+    deleteById = async ({ id }: DeleteByIdInput) => {
         const transaction = await this.transactionRepository.deleteById(id);
         if (!transaction) throw new NotFoundError('Transaction not found');
         return transaction;
