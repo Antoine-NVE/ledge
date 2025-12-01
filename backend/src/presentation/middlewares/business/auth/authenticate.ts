@@ -27,9 +27,9 @@ export const createAuthenticate = (
             });
         }
 
-        const userId = tokenManager.verifyAccess(accessToken);
+        const { userId } = tokenManager.verifyAccess(accessToken);
         req.user = await userService
-            .findOneById(userId)
+            .findById({ id: userId })
             .catch((err: unknown) => {
                 if (err instanceof NotFoundError) {
                     // If user is not found, refresh will probably don't work either
