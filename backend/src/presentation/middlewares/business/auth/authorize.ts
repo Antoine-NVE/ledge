@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from 'express';
 import { TransactionService } from '../../../../domain/transaction/transaction-service';
 import { ForbiddenError } from '../../../../infrastructure/errors/forbidden-error';
 import { Transaction } from '../../../../domain/transaction/transaction-types';
-import { ObjectId } from 'mongodb';
 import z from 'zod';
 
 declare module 'express-serve-static-core' {
@@ -12,7 +11,7 @@ declare module 'express-serve-static-core' {
 }
 
 export const authorizeParamsSchema = z.object({
-    id: z.string().refine((val) => ObjectId.isValid(val)),
+    id: z.string(),
 });
 
 export type AuthorizeParams = z.infer<typeof authorizeParamsSchema>;
@@ -25,11 +24,11 @@ export const createAuthorize = (transactionService: TransactionService) => {
         res: Response,
         next: NextFunction,
     ) => {
-        const transaction = await transactionService.read(
-            new ObjectId(req.params.id),
-        );
+        const transaction = await transactionService.findById({
+            id: req.params.id,
+        });
 
-        if (!req.user._id.equals(transaction.userId)) {
+        if (req.user.id !== transaction.userId) {
             throw new ForbiddenError('Forbidden access');
         }
 
