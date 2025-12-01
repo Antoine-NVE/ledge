@@ -11,6 +11,9 @@ import { BcryptHasher } from './infrastructure/adapters/bcrypt-hasher';
 import { NodemailerEmailSender } from './infrastructure/adapters/nodemailer-email-sender';
 import { connectToSmtp } from './infrastructure/config/nodemailer';
 import { RedisCacheStore } from './infrastructure/adapters/redis-cache-store';
+import { MongoUserRepository } from './infrastructure/repositories/mongo-user-repository';
+import { MongoTransactionRepository } from './infrastructure/repositories/mongo-transaction-repository';
+import { MongoRefreshTokenRepository } from './infrastructure/repositories/mongo-refresh-token-repository';
 
 const start = async () => {
     // .env is not verified yet, but we need a logger now
@@ -68,13 +71,19 @@ const start = async () => {
         authorize,
         logger,
     } = buildContainer({
-        mongoDb,
         logger: new PinoLogger(pinoBaseLogger),
         tokenManager: new JwtTokenManager(jwtSecret),
         hasher: new BcryptHasher(),
         emailSender: new NodemailerEmailSender(nodemailerTransporter),
         cacheStore: new RedisCacheStore(redisClient),
         emailFrom,
+        userRepository: new MongoUserRepository(mongoDb.collection('users')),
+        transactionRepository: new MongoTransactionRepository(
+            mongoDb.collection('transactions'),
+        ),
+        refreshTokenRepository: new MongoRefreshTokenRepository(
+            mongoDb.collection('refreshtokens'),
+        ),
     });
 
     const app = createApp({
