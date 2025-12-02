@@ -5,31 +5,17 @@ import {
     Transaction,
 } from '../../domain/transaction/transaction-types';
 
-type IncomeDocument = {
+type TransactionDocument = {
     _id: ObjectId;
     userId: ObjectId;
     month: string;
     name: string;
     value: number;
-    type: 'income';
-    expenseCategory: undefined;
+    type: 'income' | 'expense';
+    expenseCategory?: 'need' | 'want' | 'investment' | null;
     createdAt: Date;
     updatedAt?: Date;
 };
-
-type ExpenseDocument = {
-    _id: ObjectId;
-    userId: ObjectId;
-    month: string;
-    name: string;
-    value: number;
-    type: 'expense';
-    expenseCategory: 'need' | 'want' | 'investment' | null;
-    createdAt: Date;
-    updatedAt?: Date;
-};
-
-type TransactionDocument = IncomeDocument | ExpenseDocument;
 
 export class MongoTransactionRepository implements TransactionRepository {
     constructor(
@@ -47,33 +33,17 @@ export class MongoTransactionRepository implements TransactionRepository {
         createdAt,
         updatedAt,
     }: TransactionDocument): Transaction {
-        switch (type) {
-            case 'income':
-                return {
-                    id: _id.toString(),
-                    userId: userId.toString(),
-                    month,
-                    name,
-                    value,
-                    type,
-                    expenseCategory,
-                    createdAt,
-                    updatedAt,
-                };
-
-            case 'expense':
-                return {
-                    id: _id.toString(),
-                    userId: userId.toString(),
-                    month,
-                    name,
-                    value,
-                    type,
-                    expenseCategory,
-                    createdAt,
-                    updatedAt,
-                };
-        }
+        return {
+            id: _id.toString(),
+            userId: userId.toString(),
+            month,
+            name,
+            value,
+            type,
+            expenseCategory,
+            createdAt,
+            updatedAt,
+        };
     }
 
     create = async ({
@@ -84,38 +54,17 @@ export class MongoTransactionRepository implements TransactionRepository {
         type,
         expenseCategory,
         createdAt,
-        updatedAt,
     }: NewTransaction) => {
-        let document: TransactionDocument;
-        switch (type) {
-            case 'income':
-                document = {
-                    _id: new ObjectId(),
-                    userId: new ObjectId(userId),
-                    month,
-                    name,
-                    value,
-                    type,
-                    expenseCategory,
-                    createdAt,
-                    updatedAt,
-                };
-                break;
-
-            case 'expense':
-                document = {
-                    _id: new ObjectId(),
-                    userId: new ObjectId(userId),
-                    month,
-                    name,
-                    value,
-                    type,
-                    expenseCategory,
-                    createdAt,
-                    updatedAt,
-                };
-                break;
-        }
+        const document: TransactionDocument = {
+            _id: new ObjectId(),
+            userId: new ObjectId(userId),
+            month,
+            name,
+            value,
+            type,
+            ...(expenseCategory !== undefined ? { expenseCategory } : {}), // "undefined" is converted to "null" by MongoDB, and "undefined" isn't "not defined" for JS
+            createdAt,
+        };
         await this.transactionCollection.insertOne(document);
         return this.toDomain(document);
     };
@@ -142,37 +91,30 @@ export class MongoTransactionRepository implements TransactionRepository {
         expenseCategory,
         updatedAt,
     }: Transaction) => {
-        switch (type) {
-            case 'income':
-                await this.transactionCollection.updateOne(
-                    { _id: new ObjectId(id) },
-                    {
-                        $set: {
-                            name,
-                            value,
-                            type,
-                            expenseCategory,
-                            updatedAt,
-                        },
-                    },
-                );
-                break;
+        const query: {
+            $set: Record<string, unknown>;
+            $unset?: Record<string, 1>;
+        } = {
+            $set: {
+                name,
+                value,
+                type,
+                updatedAt,
+            },
+        };
 
-            case 'expense':
-                await this.transactionCollection.updateOne(
-                    { _id: new ObjectId(id) },
-                    {
-                        $set: {
-                            name,
-                            value,
-                            type,
-                            expenseCategory,
-                            updatedAt,
-                        },
-                    },
-                );
-                break;
+        // If expenseCategory is undefined, we need to tell Mongo to unset it
+        // Else, we just set it
+        if (expenseCategory === undefined) {
+            query.$unset = { expenseCategory: 1 };
+        } else {
+            query.$set.expenseCategory = expenseCategory;
         }
+
+        await this.transactionCollection.updateOne(
+            { _id: new ObjectId(id) },
+            query,
+        );
     };
 
     deleteById = async (id: string) => {

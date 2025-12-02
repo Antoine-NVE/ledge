@@ -1,49 +1,13 @@
-type Income = {
+export type Transaction = {
     id: string;
     userId: string;
     month: string;
     name: string;
     value: number;
-    type: 'income';
-    expenseCategory: undefined;
+    type: 'income' | 'expense';
+    expenseCategory?: 'need' | 'want' | 'investment' | null;
     createdAt: Date;
     updatedAt?: Date;
 };
 
-type Expense = {
-    id: string;
-    userId: string;
-    month: string;
-    name: string;
-    value: number;
-    type: 'expense';
-    expenseCategory: 'need' | 'want' | 'investment' | null;
-    createdAt: Date;
-    updatedAt?: Date;
-};
-
-export type Transaction = Income | Expense;
-
-type NewIncome = {
-    userId: string;
-    month: string;
-    name: string;
-    value: number;
-    type: 'income';
-    expenseCategory: undefined;
-    createdAt: Date;
-    updatedAt?: Date;
-};
-
-type NewExpense = {
-    userId: string;
-    month: string;
-    name: string;
-    value: number;
-    type: 'expense';
-    expenseCategory: 'need' | 'want' | 'investment' | null;
-    createdAt: Date;
-    updatedAt?: Date;
-};
-
-export type NewTransaction = NewIncome | NewExpense;
+export type NewTransaction = Omit<Transaction, 'id'>;

@@ -37,7 +37,6 @@ export class MongoUserRepository implements UserRepository {
         passwordHash,
         isEmailVerified,
         createdAt,
-        updatedAt,
     }: NewUser) => {
         const document: UserDocument = {
             _id: new ObjectId(),
@@ -45,7 +44,6 @@ export class MongoUserRepository implements UserRepository {
             passwordHash,
             isEmailVerified,
             createdAt,
-            updatedAt,
         };
         await this.userCollection.insertOne(document);
         return this.toDomain(document);

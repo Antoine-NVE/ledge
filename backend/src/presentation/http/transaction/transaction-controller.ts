@@ -3,7 +3,6 @@ import { CreateBody, UpdateBody } from './transaction-types';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { TransactionService } from '../../../domain/transaction/transaction-service';
 import { Logger } from '../../../application/ports/logger';
-import { Transaction } from '../../../domain/transaction/transaction-types';
 
 export class TransactionController {
     constructor(
@@ -59,28 +58,13 @@ export class TransactionController {
         req: Request<ParamsDictionary, unknown, UpdateBody>,
         res: Response,
     ) => {
-        let transaction: Transaction;
-        switch (req.body.type) {
-            case 'income':
-                transaction = await this.transactionService.update({
-                    transaction: req.transaction,
-                    name: req.body.name,
-                    value: req.body.value,
-                    type: req.body.type,
-                    expenseCategory: req.body.expenseCategory,
-                });
-                break;
-
-            case 'expense':
-                transaction = await this.transactionService.update({
-                    transaction: req.transaction,
-                    name: req.body.name,
-                    value: req.body.value,
-                    type: req.body.type,
-                    expenseCategory: req.body.expenseCategory,
-                });
-                break;
-        }
+        const transaction = await this.transactionService.update({
+            transaction: req.transaction,
+            name: req.body.name,
+            value: req.body.value,
+            type: req.body.type,
+            expenseCategory: req.body.expenseCategory,
+        });
 
         const message = 'Transaction updated successfully';
         this.logger.info(message, {

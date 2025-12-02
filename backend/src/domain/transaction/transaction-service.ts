@@ -28,21 +28,13 @@ type FindByIdInput = {
     id: string;
 };
 
-type UpdateInput =
-    | {
-          transaction: Transaction;
-          name: string;
-          value: number;
-          type: 'income';
-          expenseCategory: undefined;
-      }
-    | {
-          transaction: Transaction;
-          name: string;
-          value: number;
-          type: 'expense';
-          expenseCategory: 'need' | 'want' | 'investment' | null;
-      };
+type UpdateInput = {
+    transaction: Transaction;
+    name: string;
+    value: number;
+    type: 'income' | 'expense';
+    expenseCategory?: 'need' | 'want' | 'investment' | null;
+};
 
 type DeleteByIdInput = {
     id: string;

@@ -42,7 +42,6 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
         token,
         expiresAt,
         createdAt,
-        updatedAt,
     }: NewRefreshToken) => {
         const document: RefreshTokenDocument = {
             _id: new ObjectId(),
@@ -50,7 +49,6 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
             token,
             expiresAt,
             createdAt,
-            updatedAt,
         };
         await this.refreshTokenCollection.insertOne(document);
         return this.toDomain(document);
