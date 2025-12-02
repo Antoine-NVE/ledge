@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { parseBoolean } from '../../infrastructure/utils/parse';
+import { parseBoolean } from '../../../infrastructure/utils/parse';
 
 export class CookieManager {
     setAccessToken = (

@@ -9,5 +9,5 @@ export const createSendVerificationEmailBodySchema = (
 };
 
 export const verifyEmailBodySchema = z.object({
-    jwt: z.jwt(),
+    token: z.string(),
 });

@@ -4,6 +4,7 @@ import { TokenManager } from '../../../../../application/ports/token-manager';
 import { UserService } from '../../../../../domain/user/user-service';
 import { UnauthorizedError } from '../../../../../infrastructure/errors/unauthorized-error';
 import { NotFoundError } from '../../../../../infrastructure/errors/not-found-error';
+import { CookieManager } from '../../../support/cookie-manager';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -16,10 +17,10 @@ export type Authenticate = ReturnType<typeof createAuthenticate>;
 export const createAuthenticate = (
     tokenManager: TokenManager,
     userService: UserService,
+    cookieManager: CookieManager,
 ) => {
     return async (req: Request, res: Response, next: NextFunction) => {
-        const cookieService = new CookieService(req, res);
-        const accessToken = cookieService.getAccessToken();
+        const accessToken = cookieManager.getAccessToken(req);
         if (!accessToken) {
             throw new UnauthorizedError('Required access token', undefined, {
                 action: 'refresh',

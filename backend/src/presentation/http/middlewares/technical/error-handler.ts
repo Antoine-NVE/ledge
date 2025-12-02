@@ -16,6 +16,7 @@ export const createErrorHandler = (
         const status = isHttpError ? err.status : 500;
 
         if (nodeEnv === 'development') {
+            logger.debug(err.message, { err });
             res.status(status).json({
                 message: err.message,
                 errors: isHttpError ? err.errors : undefined,
@@ -28,8 +29,8 @@ export const createErrorHandler = (
             const message = err.message;
             logger.warn(message, {
                 err,
-                userId: req.user?._id,
-                transactionId: req.transaction?._id,
+                userId: req.user?.id,
+                transactionId: req.transaction?.id,
             });
             res.status(status).json({
                 message,
@@ -42,8 +43,8 @@ export const createErrorHandler = (
         const message = 'Internal server error';
         logger.error(message, {
             err,
-            userId: req.user?._id,
-            transactionId: req.transaction?._id,
+            userId: req.user?.id,
+            transactionId: req.transaction?.id,
         });
         res.status(status).json({
             message,

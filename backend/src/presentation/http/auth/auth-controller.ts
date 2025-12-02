@@ -4,11 +4,16 @@ import { ParamsDictionary } from 'express-serve-static-core';
 import { AuthOrchestrator } from '../../../application/auth/auth-orchestrator';
 import { Logger } from '../../../application/ports/logger';
 import { removePasswordHash } from '../../../infrastructure/utils/clean';
+import { CookieManager } from '../support/cookie-manager';
+import { UnauthorizedError } from '../../../infrastructure/errors/unauthorized-error';
+import { RefreshToken } from '../../../domain/refresh-token/refresh-token-types';
+import { NotFoundError } from '../../../infrastructure/errors/not-found-error';
 
 export class AuthController {
     constructor(
         private authOrchestrator: AuthOrchestrator,
         private logger: Logger,
+        private cookieManager: CookieManager,
     ) {}
 
     register = async (
@@ -24,13 +29,17 @@ export class AuthController {
         const { user, accessToken, refreshToken } =
             await this.authOrchestrator.register({ email, password });
 
-        const cookieService = new CookieService(req, res);
-        cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
+        this.cookieManager.setAuth(
+            res,
+            accessToken,
+            refreshToken.token,
+            rememberMe,
+        );
 
         const message = 'User registered successfully';
         this.logger.info(message, {
-            userId: user._id,
-            refreshTokenId: refreshToken._id,
+            userId: user.id,
+            refreshTokenId: refreshToken.id,
         });
         res.status(201).json({
             message,
@@ -49,13 +58,17 @@ export class AuthController {
         const { user, accessToken, refreshToken } =
             await this.authOrchestrator.login({ email, password });
 
-        const cookieService = new CookieService(req, res);
-        cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
+        this.cookieManager.setAuth(
+            res,
+            accessToken,
+            refreshToken.token,
+            rememberMe,
+        );
 
         const message = 'User logged in successfully';
         this.logger.info(message, {
-            userId: user._id,
-            refreshTokenId: refreshToken._id,
+            userId: user.id,
+            refreshTokenId: refreshToken.id,
         });
         res.status(200).json({
             message,
@@ -66,21 +79,26 @@ export class AuthController {
     };
 
     refresh = async (req: Request, res: Response) => {
-        const cookieService = new CookieService(req, res);
-        const token = cookieService.getRefreshToken();
+        const token = this.cookieManager.getRefreshToken(req);
         if (!token) throw new UnauthorizedError('Required refresh token');
 
-        const rememberMe = cookieService.getRememberMe();
+        let rememberMe = this.cookieManager.getRememberMe(req);
+        if (rememberMe === undefined) rememberMe = false;
 
         const { accessToken, refreshToken } =
-            await this.authOrchestrator.refresh(token);
+            await this.authOrchestrator.refresh({ token });
 
-        cookieService.setAuth(accessToken, refreshToken.token, rememberMe);
+        this.cookieManager.setAuth(
+            res,
+            accessToken,
+            refreshToken.token,
+            rememberMe,
+        );
 
         const message = 'Tokens refreshed successfully';
         this.logger.info(message, {
             userId: refreshToken.userId,
-            refreshTokenId: refreshToken._id,
+            refreshTokenId: refreshToken.id,
         });
         res.status(200).json({
             message,
@@ -88,24 +106,27 @@ export class AuthController {
     };
 
     logout = async (req: Request, res: Response) => {
-        const cookieService = new CookieService(req, res);
-        const token = cookieService.getRefreshToken();
+        const token = this.cookieManager.getRefreshToken(req);
 
-        let deleted: RefreshToken | null = null;
+        let refreshToken: RefreshToken | null = null;
         if (token) {
-            deleted = await this.authOrchestrator.logout(token).catch((err) => {
-                if (err instanceof NotFoundError) return null;
-                throw err;
-            });
+            const result = await this.authOrchestrator
+                .logout({ token })
+                .catch((err: unknown) => {
+                    if (err instanceof NotFoundError) return null;
+                    throw err;
+                });
+
+            refreshToken = result ? result.refreshToken : null;
         }
 
-        cookieService.clearAuth();
+        this.cookieManager.clearAuth(res);
 
         const message = 'User logged out successfully';
-        if (deleted) {
+        if (refreshToken) {
             this.logger.info(message, {
-                userId: deleted.userId,
-                refreshTokenId: deleted._id,
+                userId: refreshToken.userId,
+                refreshTokenId: refreshToken.id,
             });
         }
         res.status(200).json({

@@ -22,7 +22,7 @@ const TransactionListSection = ({ transactions, total, type, onEdit, onDelete }:
 
             {transactions.length > 0 ? (
                 transactions.map((transaction) => (
-                    <div key={transaction._id} className="bg-white p-3 rounded-md mb-2 shadow-sm">
+                    <div key={transaction.id} className="bg-white p-3 rounded-md mb-2 shadow-sm">
                         <div className="flex justify-between items-center">
                             <h4 className="text-gray-800 font-medium">{transaction.name}</h4>
                             <div>

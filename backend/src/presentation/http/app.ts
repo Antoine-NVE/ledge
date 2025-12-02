@@ -20,6 +20,7 @@ import { UserService } from '../../domain/user/user-service';
 import { Logger } from '../../application/ports/logger';
 import { createAuthorize } from './middlewares/business/auth/authorize';
 import { NotFoundError } from '../../infrastructure/errors/not-found-error';
+import { CookieManager } from './support/cookie-manager';
 
 export const createHttpApp = ({
     allowedOrigins,
@@ -51,13 +52,26 @@ export const createHttpApp = ({
     app.use(cookieParser());
 
     // Dependencies
-    const authController = new AuthController(authOrchestrator, logger);
+    const cookieManager = new CookieManager();
+    const authController = new AuthController(
+        authOrchestrator,
+        logger,
+        cookieManager,
+    );
     const transactionController = new TransactionController(
         transactionService,
         logger,
     );
-    const userController = new UserController(userOrchestrator, logger);
-    const authenticate = createAuthenticate(tokenManager, userService);
+    const userController = new UserController(
+        userOrchestrator,
+        logger,
+        cookieManager,
+    );
+    const authenticate = createAuthenticate(
+        tokenManager,
+        userService,
+        cookieManager,
+    );
     const authorize = createAuthorize(transactionService);
 
     // Routes

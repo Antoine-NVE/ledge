@@ -69,7 +69,7 @@ export const getTransactionById = async (
     transaction: Transaction
 ): Promise<[ApiResponse<{ transaction: Transaction } | null, null>, Response | null]> => {
     try {
-        const response = await customFetch(API_URL + '/' + transaction._id, {
+        const response = await customFetch(API_URL + '/' + transaction.id, {
             method: 'GET',
             credentials: 'include',
             headers: {
@@ -99,7 +99,7 @@ export const updateTransaction = async (
     transaction: Transaction
 ): Promise<[ApiResponse<{ transaction: Transaction } | null, object | null>, Response | null]> => {
     try {
-        const response = await customFetch(API_URL + '/' + transaction._id, {
+        const response = await customFetch(API_URL + '/' + transaction.id, {
             method: 'PUT',
             credentials: 'include',
             headers: {
@@ -135,7 +135,7 @@ export const deleteTransaction = async (
     transaction: Transaction
 ): Promise<[ApiResponse<{ transaction: Transaction } | null, null>, Response | null]> => {
     try {
-        const response = await customFetch(API_URL + '/' + transaction._id, {
+        const response = await customFetch(API_URL + '/' + transaction.id, {
             method: 'DELETE',
             credentials: 'include',
             headers: {

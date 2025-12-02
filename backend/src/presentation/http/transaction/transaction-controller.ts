@@ -3,6 +3,7 @@ import { CreateBody, UpdateBody } from './transaction-types';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { TransactionService } from '../../../domain/transaction/transaction-service';
 import { Logger } from '../../../application/ports/logger';
+import { Transaction } from '../../../domain/transaction/transaction-types';
 
 export class TransactionController {
     constructor(
@@ -16,13 +17,13 @@ export class TransactionController {
     ) => {
         const transaction = await this.transactionService.create({
             ...req.body,
-            userId: req.user._id,
+            userId: req.user.id,
         });
 
         const message = 'Transaction created successfully';
         this.logger.info(message, {
-            userId: req.user._id,
-            transactionId: transaction._id,
+            userId: req.user.id,
+            transactionId: transaction.id,
         });
         res.status(201).json({
             message,
@@ -33,9 +34,9 @@ export class TransactionController {
     };
 
     readAll = async (req: Request, res: Response) => {
-        const transactions = await this.transactionService.readAll(
-            req.user._id,
-        );
+        const transactions = await this.transactionService.findManyByUserId({
+            userId: req.user.id,
+        });
 
         res.status(200).json({
             message: 'Transactions retrieved successfully',
@@ -58,15 +59,33 @@ export class TransactionController {
         req: Request<ParamsDictionary, unknown, UpdateBody>,
         res: Response,
     ) => {
-        const transaction = await this.transactionService.update(
-            req.transaction,
-            req.body,
-        );
+        let transaction: Transaction;
+        switch (req.body.type) {
+            case 'income':
+                transaction = await this.transactionService.update({
+                    transaction: req.transaction,
+                    name: req.body.name,
+                    value: req.body.value,
+                    type: req.body.type,
+                    expenseCategory: req.body.expenseCategory,
+                });
+                break;
+
+            case 'expense':
+                transaction = await this.transactionService.update({
+                    transaction: req.transaction,
+                    name: req.body.name,
+                    value: req.body.value,
+                    type: req.body.type,
+                    expenseCategory: req.body.expenseCategory,
+                });
+                break;
+        }
 
         const message = 'Transaction updated successfully';
         this.logger.info(message, {
-            userId: req.user._id,
-            transactionId: req.transaction._id,
+            userId: req.user.id,
+            transactionId: req.transaction.id,
         });
         res.status(200).json({
             message,
@@ -77,12 +96,12 @@ export class TransactionController {
     };
 
     delete = async (req: Request, res: Response) => {
-        await this.transactionService.delete(req.transaction);
+        await this.transactionService.deleteById({ id: req.transaction.id });
 
         const message = 'Transaction deleted successfully';
         this.logger.info(message, {
-            userId: req.user._id,
-            transactionId: req.transaction._id,
+            userId: req.user.id,
+            transactionId: req.transaction.id,
         });
         res.status(200).json({
             message,

@@ -46,6 +46,7 @@ const updateIncomeSchema = z.object({
     name: nameSchema,
     value: valueSchema,
     type: incomeTypeSchema,
+    expenseCategory: z.undefined(),
 });
 
 const updateExpenseSchema = z.object({

@@ -3,6 +3,7 @@ import { SendVerificationEmailBody, VerifyEmailBody } from './user-types';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { UserOrchestrator } from '../../../application/user/user-orchestrator';
 import { Logger } from '../../../application/ports/logger';
+import { removePasswordHash } from '../../../infrastructure/utils/clean';
 
 export class UserController {
     constructor(
@@ -16,13 +17,13 @@ export class UserController {
     ): Promise<void> => {
         const { frontendBaseUrl } = req.body;
 
-        await this.userOrchestrator.sendVerificationEmail(
-            req.user,
+        await this.userOrchestrator.sendVerificationEmail({
+            user: req.user,
             frontendBaseUrl,
-        );
+        });
 
         const message = 'Verification email sent successfully';
-        this.logger.info(message, { userId: req.user._id });
+        this.logger.info(message, { userId: req.user.id });
         res.status(200).json({
             message,
         });
@@ -32,12 +33,12 @@ export class UserController {
         req: Request<ParamsDictionary, unknown, VerifyEmailBody>,
         res: Response,
     ): Promise<void> => {
-        const { jwt } = req.body;
+        const { token } = req.body;
 
-        const user = await this.userOrchestrator.verifyEmail(jwt);
+        const { user } = await this.userOrchestrator.verifyEmail({ token });
 
         const message = 'Email verified successfully';
-        this.logger.info(message, { userId: user._id });
+        this.logger.info(message, { userId: user.id });
         res.status(200).json({
             message,
         });
