@@ -1,7 +1,7 @@
 export interface Logger {
-    fatal(message: string, meta?: unknown): void;
-    error(message: string, meta?: unknown): void;
-    warn(message: string, meta?: unknown): void;
-    info(message: string, meta?: unknown): void;
-    debug(message: string, meta?: unknown): void;
+    fatal(message: string, meta?: Record<string, unknown>): void;
+    error(message: string, meta?: Record<string, unknown>): void;
+    warn(message: string, meta?: Record<string, unknown>): void;
+    info(message: string, meta?: Record<string, unknown>): void;
+    debug(message: string, meta?: Record<string, unknown>): void;
 }

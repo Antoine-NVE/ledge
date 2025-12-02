@@ -4,23 +4,23 @@ import { Logger } from '../../application/ports/logger';
 export class PinoLogger implements Logger {
     constructor(private baseLogger: BaseLogger) {}
 
-    fatal(message: string, meta?: unknown): void {
+    fatal(message: string, meta?: Record<string, unknown>): void {
         this.baseLogger.fatal(meta, message);
     }
 
-    error(message: string, meta?: unknown): void {
+    error(message: string, meta?: Record<string, unknown>): void {
         this.baseLogger.error(meta, message);
     }
 
-    warn(message: string, meta?: unknown): void {
+    warn(message: string, meta?: Record<string, unknown>): void {
         this.baseLogger.warn(meta, message);
     }
 
-    info(message: string, meta?: unknown): void {
+    info(message: string, meta?: Record<string, unknown>): void {
         this.baseLogger.info(meta, message);
     }
 
-    debug(message: string, meta?: unknown): void {
+    debug(message: string, meta?: Record<string, unknown>): void {
         this.baseLogger.debug(meta, message);
     }
 }
