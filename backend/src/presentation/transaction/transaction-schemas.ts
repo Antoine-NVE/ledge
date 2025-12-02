@@ -31,6 +31,7 @@ const createIncomeSchema = z.object({
     name: nameSchema,
     value: valueSchema,
     type: incomeTypeSchema,
+    expenseCategory: z.undefined(),
 });
 
 const createExpenseSchema = z.object({
