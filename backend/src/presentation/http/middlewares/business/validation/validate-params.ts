@@ -3,7 +3,7 @@ import z from 'zod';
 import { BadRequestError } from '../../../../../infrastructure/errors/bad-request-error';
 import { formatZodError } from '../../../../../infrastructure/utils/format';
 
-export const createValidateParams = (schema: z.ZodSchema) => {
+export const createValidateParams = ({ schema }: { schema: z.ZodSchema }) => {
     return (req: Request, res: Response, next: NextFunction) => {
         const { success, error } = schema.safeParse(req.params);
 

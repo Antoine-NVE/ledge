@@ -2,10 +2,13 @@ import { NextFunction, Request, Response } from 'express';
 import { Logger } from '../../../../application/ports/logger';
 import { HttpError } from '../../../../infrastructure/errors/http-error';
 
-export const createErrorHandler = (
-    nodeEnv: 'development' | 'production',
-    logger: Logger,
-) => {
+export const createErrorHandler = ({
+    nodeEnv,
+    logger,
+}: {
+    nodeEnv: 'development' | 'production';
+    logger: Logger;
+}) => {
     return (
         err: Error,
         req: Request,

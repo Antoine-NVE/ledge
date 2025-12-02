@@ -44,7 +44,7 @@ export const createHttpApp = ({
     const app = express();
 
     // Security
-    app.use(createCors(allowedOrigins));
+    app.use(createCors({ allowedOrigins }));
     app.use(rateLimiter);
 
     // Parsing
@@ -62,37 +62,37 @@ export const createHttpApp = ({
         transactionService,
         logger,
     );
-    const userController = new UserController(
-        userOrchestrator,
-        logger,
-        cookieManager,
-    );
-    const authenticate = createAuthenticate(
+    const userController = new UserController(userOrchestrator, logger);
+    const authenticate = createAuthenticate({
         tokenManager,
         userService,
         cookieManager,
-    );
-    const authorize = createAuthorize(transactionService);
+    });
+    const authorize = createAuthorize({ transactionService });
 
     // Routes
     if (nodeEnv === 'development') {
         app.use('/docs', swaggerUi.serve, swagger);
     }
-    app.use('/auth', createAuthRoutes(authController));
+    app.use('/auth', createAuthRoutes({ authController }));
     app.use(
         '/transactions',
-        createTransactionRoutes(transactionController, authenticate, authorize),
+        createTransactionRoutes({
+            transactionController,
+            authenticate,
+            authorize,
+        }),
     );
     app.use(
         '/users',
-        createUserRoutes(userController, authenticate, allowedOrigins),
+        createUserRoutes({ userController, authenticate, allowedOrigins }),
     );
     app.all(/.*/, () => {
         throw new NotFoundError('Route not found');
     });
 
     // Error handler
-    app.use(createErrorHandler(nodeEnv, logger));
+    app.use(createErrorHandler({ nodeEnv, logger }));
 
     return app;
 };

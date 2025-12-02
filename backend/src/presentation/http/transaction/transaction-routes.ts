@@ -9,11 +9,15 @@ import { createValidateBody } from '../middlewares/business/validation/validate-
 import { TransactionController } from './transaction-controller';
 import { Authenticate } from '../middlewares/business/auth/authenticate';
 
-export const createTransactionRoutes = (
-    transactionController: TransactionController,
-    authenticate: Authenticate,
-    authorize: Authorize,
-) => {
+export const createTransactionRoutes = ({
+    transactionController,
+    authenticate,
+    authorize,
+}: {
+    transactionController: TransactionController;
+    authenticate: Authenticate;
+    authorize: Authorize;
+}) => {
     const router = express.Router();
 
     const {
@@ -23,7 +27,9 @@ export const createTransactionRoutes = (
         update,
         delete: remove,
     } = transactionController;
-    const validateParams = createValidateParams(authorizeParamsSchema);
+    const validateParams = createValidateParams({
+        schema: authorizeParamsSchema,
+    });
 
     /**
      * @openapi
@@ -66,7 +72,7 @@ export const createTransactionRoutes = (
     router.post(
         '/',
         authenticate,
-        createValidateBody(createBodySchema),
+        createValidateBody({ schema: createBodySchema }),
         create,
     );
 
@@ -156,7 +162,7 @@ export const createTransactionRoutes = (
         authenticate,
         validateParams,
         authorize,
-        createValidateBody(updateBodySchema),
+        createValidateBody({ schema: updateBodySchema }),
         update,
     );
 

@@ -14,11 +14,15 @@ declare module 'express-serve-static-core' {
 
 export type Authenticate = ReturnType<typeof createAuthenticate>;
 
-export const createAuthenticate = (
-    tokenManager: TokenManager,
-    userService: UserService,
-    cookieManager: CookieManager,
-) => {
+export const createAuthenticate = ({
+    tokenManager,
+    userService,
+    cookieManager,
+}: {
+    tokenManager: TokenManager;
+    userService: UserService;
+    cookieManager: CookieManager;
+}) => {
     return async (req: Request, res: Response, next: NextFunction) => {
         const accessToken = cookieManager.getAccessToken(req);
         if (!accessToken) {

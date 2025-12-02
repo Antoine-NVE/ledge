@@ -7,11 +7,15 @@ import { createValidateBody } from '../middlewares/business/validation/validate-
 import { UserController } from './user-controller';
 import { Authenticate } from '../middlewares/business/auth/authenticate';
 
-export const createUserRoutes = (
-    userController: UserController,
-    authenticate: Authenticate,
-    allowedOrigins: string[],
-) => {
+export const createUserRoutes = ({
+    userController,
+    authenticate,
+    allowedOrigins,
+}: {
+    userController: UserController;
+    authenticate: Authenticate;
+    allowedOrigins: string[];
+}) => {
     const router = express.Router();
 
     const { sendVerificationEmail, verifyEmail, me } = userController;
@@ -51,9 +55,9 @@ export const createUserRoutes = (
     router.post(
         '/send-verification-email',
         authenticate,
-        createValidateBody(
-            createSendVerificationEmailBodySchema(allowedOrigins),
-        ),
+        createValidateBody({
+            schema: createSendVerificationEmailBodySchema({ allowedOrigins }),
+        }),
         sendVerificationEmail,
     );
 
@@ -91,7 +95,7 @@ export const createUserRoutes = (
      */
     router.post(
         '/verify-email',
-        createValidateBody(verifyEmailBodySchema),
+        createValidateBody({ schema: verifyEmailBodySchema }),
         verifyEmail,
     );
 
