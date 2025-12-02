@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import { HttpError } from '../../../infrastructure/errors/http-error';
-import { Logger } from '../../../application/ports/logger';
+import { Logger } from '../../../../application/ports/logger';
+import { HttpError } from '../../../../infrastructure/errors/http-error';
 
 export const createErrorHandler = (
     nodeEnv: 'development' | 'production',

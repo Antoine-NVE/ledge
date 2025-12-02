@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { CreateBody, UpdateBody } from './transaction-types';
 import { ParamsDictionary } from 'express-serve-static-core';
-import { Logger } from '../../application/ports/logger';
-import { TransactionService } from '../../domain/transaction/transaction-service';
+import { TransactionService } from '../../../domain/transaction/transaction-service';
+import { Logger } from '../../../application/ports/logger';
 
 export class TransactionController {
     constructor(

@@ -1,7 +1,6 @@
-import { createApp } from './presentation/app';
 import { loadEnv } from './infrastructure/config/env';
 import { createBaseLogger } from './infrastructure/config/pino';
-import { step, stop } from './infrastructure/utils/lifecycle';
+import { step } from './infrastructure/utils/lifecycle';
 import { connectToRedis } from './infrastructure/config/redis';
 import { connectToMongo } from './infrastructure/config/mongo';
 import { PinoLogger } from './infrastructure/adapters/pino-logger';
@@ -13,7 +12,9 @@ import { RedisCacheStore } from './infrastructure/adapters/redis-cache-store';
 import { MongoUserRepository } from './infrastructure/repositories/mongo-user-repository';
 import { MongoTransactionRepository } from './infrastructure/repositories/mongo-transaction-repository';
 import { MongoRefreshTokenRepository } from './infrastructure/repositories/mongo-refresh-token-repository';
-import { buildContainer } from './presentation/di/container';
+import { createHttpApp } from './presentation/http/app';
+import { buildContainer } from './presentation/container';
+import { startHttpServer } from './presentation/http/server';
 
 const start = async () => {
     // .env is not verified yet, but we need a logger now
@@ -67,44 +68,51 @@ const start = async () => {
     );
 
     const {
-        authController,
-        userController,
-        transactionController,
-        authenticate,
-        authorize,
+        transactionService,
+        authOrchestrator,
+        userOrchestrator,
         logger,
-    } = buildContainer({
-        logger: new PinoLogger(pinoBaseLogger),
-        tokenManager: new JwtTokenManager(jwtSecret),
-        hasher: new BcryptHasher(),
-        emailSender: new NodemailerEmailSender(nodemailerTransporter),
-        cacheStore: new RedisCacheStore(redisClient),
-        emailFrom,
-        userRepository: new MongoUserRepository(mongoDb.collection('users')),
-        transactionRepository: new MongoTransactionRepository(
-            mongoDb.collection('transactions'),
-        ),
-        refreshTokenRepository: new MongoRefreshTokenRepository(
-            mongoDb.collection('refreshtokens'),
-        ),
+        tokenManager,
+        userService,
+    } = await step('Container build', pinoBaseLogger, async () => {
+        return buildContainer({
+            logger: new PinoLogger(pinoBaseLogger),
+            tokenManager: new JwtTokenManager(jwtSecret),
+            hasher: new BcryptHasher(),
+            emailSender: new NodemailerEmailSender(nodemailerTransporter),
+            cacheStore: new RedisCacheStore(redisClient),
+            emailFrom,
+            userRepository: new MongoUserRepository(
+                mongoDb.collection('users'),
+            ),
+            transactionRepository: new MongoTransactionRepository(
+                mongoDb.collection('transactions'),
+            ),
+            refreshTokenRepository: new MongoRefreshTokenRepository(
+                mongoDb.collection('refreshtokens'),
+            ),
+        });
     });
 
-    const app = createApp({
-        allowedOrigins,
-        nodeEnv,
-        authController,
-        userController,
-        transactionController,
-        authenticate,
-        authorize,
-        logger,
-    });
-    const server = app.listen(3000);
-    server.on('listening', () => {
-        pinoBaseLogger.info('Server started');
-    });
-    server.on('error', (err) => {
-        stop(pinoBaseLogger, 'Server startup', err);
+    const httpApp = await step(
+        'HTTP app creation',
+        pinoBaseLogger,
+        async () => {
+            return createHttpApp({
+                allowedOrigins,
+                nodeEnv,
+                transactionService,
+                authOrchestrator,
+                userOrchestrator,
+                logger,
+                tokenManager,
+                userService,
+            });
+        },
+    );
+
+    await step('HTTP server startup', pinoBaseLogger, async () => {
+        return startHttpServer({ app: httpApp });
     });
 };
 

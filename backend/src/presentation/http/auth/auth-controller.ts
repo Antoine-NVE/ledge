@@ -1,13 +1,9 @@
 import { Request, Response } from 'express';
-import { AuthOrchestrator } from '../../application/auth/auth-orchestrator';
-import { UnauthorizedError } from '../../infrastructure/errors/unauthorized-error';
-import { CookieService } from '../../infrastructure/adapters/cookie-service';
-import { removePasswordHash } from '../../infrastructure/utils/clean';
 import { LoginBody, RegisterBody } from './auth-types';
 import { ParamsDictionary } from 'express-serve-static-core';
-import { RefreshToken } from '../../domain/refresh-token/refresh-token-types';
-import { NotFoundError } from '../../infrastructure/errors/not-found-error';
-import { Logger } from '../../application/ports/logger';
+import { AuthOrchestrator } from '../../../application/auth/auth-orchestrator';
+import { Logger } from '../../../application/ports/logger';
+import { removePasswordHash } from '../../../infrastructure/utils/clean';
 
 export class AuthController {
     constructor(

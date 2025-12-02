@@ -1,7 +1,6 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
 import swaggerUi from 'swagger-ui-express';
-import { NotFoundError } from '../infrastructure/errors/not-found-error';
 import { createAuthRoutes } from './auth/auth-routes';
 import { createTransactionRoutes } from './transaction/transaction-routes';
 import { createUserRoutes } from './user/user-routes';
@@ -12,27 +11,33 @@ import { createErrorHandler } from './middlewares/technical/error-handler';
 import { AuthController } from './auth/auth-controller';
 import { UserController } from './user/user-controller';
 import { TransactionController } from './transaction/transaction-controller';
-import { Authenticate } from './middlewares/business/auth/authenticate';
-import { Authorize } from './middlewares/business/auth/authorize';
-import { Logger } from '../application/ports/logger';
+import { createAuthenticate } from './middlewares/business/auth/authenticate';
+import { TransactionService } from '../../domain/transaction/transaction-service';
+import { UserOrchestrator } from '../../application/user/user-orchestrator';
+import { AuthOrchestrator } from '../../application/auth/auth-orchestrator';
+import { TokenManager } from '../../application/ports/token-manager';
+import { UserService } from '../../domain/user/user-service';
+import { Logger } from '../../application/ports/logger';
+import { createAuthorize } from './middlewares/business/auth/authorize';
+import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 
-export const createApp = ({
+export const createHttpApp = ({
     allowedOrigins,
     nodeEnv,
-    authController,
-    userController,
-    transactionController,
-    authenticate,
-    authorize,
+    transactionService,
+    userOrchestrator,
+    authOrchestrator,
+    tokenManager,
+    userService,
     logger,
 }: {
     allowedOrigins: string[];
     nodeEnv: 'development' | 'production';
-    authController: AuthController;
-    userController: UserController;
-    transactionController: TransactionController;
-    authenticate: Authenticate;
-    authorize: Authorize;
+    transactionService: TransactionService;
+    userOrchestrator: UserOrchestrator;
+    authOrchestrator: AuthOrchestrator;
+    tokenManager: TokenManager;
+    userService: UserService;
     logger: Logger;
 }) => {
     const app = express();
@@ -44,6 +49,16 @@ export const createApp = ({
     // Parsing
     app.use(express.json());
     app.use(cookieParser());
+
+    // Dependencies
+    const authController = new AuthController(authOrchestrator, logger);
+    const transactionController = new TransactionController(
+        transactionService,
+        logger,
+    );
+    const userController = new UserController(userOrchestrator, logger);
+    const authenticate = createAuthenticate(tokenManager, userService);
+    const authorize = createAuthorize(transactionService);
 
     // Routes
     if (nodeEnv === 'development') {
