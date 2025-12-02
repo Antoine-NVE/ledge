@@ -1,5 +1,4 @@
 import { createApp } from './presentation/app';
-import { buildContainer } from './infrastructure/config/container';
 import { loadEnv } from './infrastructure/config/env';
 import { createBaseLogger } from './infrastructure/config/pino';
 import { step, stop } from './infrastructure/utils/lifecycle';
@@ -14,6 +13,7 @@ import { RedisCacheStore } from './infrastructure/adapters/redis-cache-store';
 import { MongoUserRepository } from './infrastructure/repositories/mongo-user-repository';
 import { MongoTransactionRepository } from './infrastructure/repositories/mongo-transaction-repository';
 import { MongoRefreshTokenRepository } from './infrastructure/repositories/mongo-refresh-token-repository';
+import { buildContainer } from './presentation/di/container';
 
 const start = async () => {
     // .env is not verified yet, but we need a logger now
