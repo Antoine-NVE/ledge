@@ -1,24 +1,20 @@
-import { BaseLogger } from 'pino';
+import { Logger } from '../../application/ports/logger';
 
 export const step = async <T>(
     name: string,
-    pinoBaseLogger: BaseLogger,
+    logger: Logger,
     fn: () => Promise<T>,
 ): Promise<T> => {
     try {
         const result = await fn();
-        pinoBaseLogger.info(name + ' succeeded');
+        logger.info(name + ' succeeded');
         return result;
     } catch (err) {
-        return stop(pinoBaseLogger, name, err); // Return nothing
+        return stop(logger, name, err); // Return nothing
     }
 };
 
-export const stop = (
-    pinoBaseLogger: BaseLogger,
-    stepName: string,
-    err: unknown,
-) => {
-    pinoBaseLogger.fatal({ err }, `${stepName} failed`);
+export const stop = (logger: Logger, stepName: string, err: unknown) => {
+    logger.fatal(`${stepName} failed`, { err });
     process.exit(1);
 };

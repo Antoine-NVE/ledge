@@ -28,5 +28,5 @@ export const createBaseLogger = ({
               },
     });
 
-    return { baseLogger };
+    return baseLogger;
 };

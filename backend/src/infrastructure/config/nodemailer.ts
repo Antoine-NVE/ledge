@@ -11,5 +11,5 @@ export const connectToSmtp = async (options: {
 }) => {
     const transporter: Transporter = createTransport(options);
     await transporter.verify();
-    return { transporter };
+    return transporter;
 };

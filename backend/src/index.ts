@@ -18,12 +18,14 @@ import { startHttpServer } from './presentation/http/server';
 
 const start = async () => {
     // .env is not verified yet, but we need a logger now
-    const { baseLogger: pinoBaseLogger } = createBaseLogger({
-        nodeEnv:
-            process.env.NODE_ENV === 'production'
-                ? 'production'
-                : 'development',
-    });
+    const logger = new PinoLogger(
+        createBaseLogger({
+            nodeEnv:
+                process.env.NODE_ENV === 'production'
+                    ? 'production'
+                    : 'development',
+        }),
+    );
 
     const {
         smtpHost,
@@ -34,85 +36,65 @@ const start = async () => {
         emailFrom,
         nodeEnv,
         allowedOrigins,
-    } = await step('Environment validation', pinoBaseLogger, async () => {
+    } = await step('Environment validation', logger, async () => {
         return loadEnv();
     });
 
-    const { client: redisClient } = await step(
-        'Redis connection',
-        pinoBaseLogger,
-        async () => {
-            return await connectToRedis();
-        },
-    );
+    const client = await step('Redis connection', logger, async () => {
+        return await connectToRedis();
+    });
 
-    const { db: mongoDb } = await step(
-        'Mongo connection',
-        pinoBaseLogger,
-        async () => {
-            return await connectToMongo();
-        },
-    );
+    const { db } = await step('Mongo connection', logger, async () => {
+        return await connectToMongo();
+    });
 
-    const { transporter: nodemailerTransporter } = await step(
-        'SMTP connection',
-        pinoBaseLogger,
-        async () => {
-            return await connectToSmtp({
-                host: smtpHost,
-                port: smtpPort,
-                secure: smtpSecure,
-                auth: smtpAuth,
-            });
-        },
-    );
+    const transporter = await step('SMTP connection', logger, async () => {
+        return await connectToSmtp({
+            host: smtpHost,
+            port: smtpPort,
+            secure: smtpSecure,
+            auth: smtpAuth,
+        });
+    });
 
     const {
         transactionService,
         authOrchestrator,
         userOrchestrator,
-        logger,
         tokenManager,
         userService,
-    } = await step('Container build', pinoBaseLogger, async () => {
+    } = await step('Container build', logger, async () => {
         return buildContainer({
-            logger: new PinoLogger(pinoBaseLogger),
             tokenManager: new JwtTokenManager(jwtSecret),
             hasher: new BcryptHasher(),
-            emailSender: new NodemailerEmailSender(nodemailerTransporter),
-            cacheStore: new RedisCacheStore(redisClient),
+            emailSender: new NodemailerEmailSender(transporter),
+            cacheStore: new RedisCacheStore(client),
             emailFrom,
-            userRepository: new MongoUserRepository(
-                mongoDb.collection('users'),
-            ),
+            userRepository: new MongoUserRepository(db.collection('users')),
             transactionRepository: new MongoTransactionRepository(
-                mongoDb.collection('transactions'),
+                db.collection('transactions'),
             ),
             refreshTokenRepository: new MongoRefreshTokenRepository(
-                mongoDb.collection('refreshtokens'),
+                db.collection('refreshtokens'),
             ),
         });
     });
 
-    const httpApp = await step(
-        'HTTP app creation',
-        pinoBaseLogger,
-        async () => {
-            return createHttpApp({
-                allowedOrigins,
-                nodeEnv,
-                transactionService,
-                authOrchestrator,
-                userOrchestrator,
-                logger,
-                tokenManager,
-                userService,
-            });
-        },
-    );
+    const app = await step('HTTP app creation', logger, async () => {
+        return createHttpApp({
+            allowedOrigins,
+            nodeEnv,
+            transactionService,
+            authOrchestrator,
+            userOrchestrator,
+            logger,
+            tokenManager,
+            userService,
+        });
+    });
 
-    await step('HTTP server startup', pinoBaseLogger, async () => {
-        return startHttpServer({ app: httpApp });
+    await step('HTTP server startup', logger, async () => {
+        return startHttpServer({ app });
     });
 };
 

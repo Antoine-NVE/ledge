@@ -1,4 +1,3 @@
-import { Logger } from '../application/ports/logger';
 import { TokenManager } from '../application/ports/token-manager';
 import { Hasher } from '../application/ports/hasher';
 import { EmailSender } from '../application/ports/email-sender';
@@ -13,7 +12,6 @@ import { AuthOrchestrator } from '../application/auth/auth-orchestrator';
 import { UserOrchestrator } from '../application/user/user-orchestrator';
 
 export const buildContainer = ({
-    logger,
     tokenManager,
     hasher,
     emailSender,
@@ -23,7 +21,6 @@ export const buildContainer = ({
     transactionRepository,
     refreshTokenRepository,
 }: {
-    logger: Logger;
     tokenManager: TokenManager;
     hasher: Hasher;
     emailSender: EmailSender;
@@ -52,7 +49,6 @@ export const buildContainer = ({
     );
 
     return {
-        logger,
         transactionService,
         authOrchestrator,
         userOrchestrator,
