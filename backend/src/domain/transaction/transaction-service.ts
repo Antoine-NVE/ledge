@@ -2,23 +2,14 @@ import { TransactionRepository } from './transaction-repository';
 import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 import { NewTransaction, Transaction } from './transaction-types';
 
-type CreateInput =
-    | {
-          userId: string;
-          month: string;
-          name: string;
-          value: number;
-          type: 'income';
-          expenseCategory: undefined;
-      }
-    | {
-          userId: string;
-          month: string;
-          name: string;
-          value: number;
-          type: 'expense';
-          expenseCategory: 'need' | 'want' | 'investment' | null;
-      };
+type CreateInput = {
+    userId: string;
+    month: string;
+    name: string;
+    value: number;
+    type: 'income' | 'expense';
+    expenseCategory?: 'need' | 'want' | 'investment' | null;
+};
 
 type FindManyByUserIdInput = {
     userId: string;
