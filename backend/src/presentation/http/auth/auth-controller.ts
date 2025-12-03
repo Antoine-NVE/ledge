@@ -3,11 +3,11 @@ import { LoginBody, RegisterBody } from './auth-types';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { AuthOrchestrator } from '../../../application/auth/auth-orchestrator';
 import { Logger } from '../../../application/ports/logger';
-import { removePasswordHash } from '../../../infrastructure/utils/clean';
 import { CookieManager } from '../support/cookie-manager';
 import { RefreshToken } from '../../../domain/refresh-token/refresh-token-types';
 import { UnauthorizedError } from '../../../core/errors/unauthorized-error';
 import { NotFoundError } from '../../../core/errors/not-found-error';
+import { removePasswordHash } from '../../../core/utils/clean';
 
 export class AuthController {
     constructor(

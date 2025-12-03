@@ -1,9 +1,9 @@
 import { MongoDBStorage, Umzug } from 'umzug';
 import path from 'node:path';
 import { createBaseLogger } from '../src/infrastructure/config/pino';
-import { step } from '../src/infrastructure/utils/lifecycle';
 import { connectToMongo } from '../src/infrastructure/config/mongo';
 import { PinoLogger } from '../src/infrastructure/adapters/pino-logger';
+import { step } from '../src/core/utils/lifecycle';
 
 const start = async () => {
     const logger = new PinoLogger(

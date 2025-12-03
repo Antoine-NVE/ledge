@@ -10,11 +10,7 @@ export const step = async <T>(
         logger.info(name + ' succeeded');
         return result;
     } catch (err) {
-        return stop(logger, name, err); // Return nothing
+        logger.fatal(`${name} failed`, { err });
+        process.exit(1);
     }
-};
-
-export const stop = (logger: Logger, stepName: string, err: unknown) => {
-    logger.fatal(`${stepName} failed`, { err });
-    process.exit(1);
 };

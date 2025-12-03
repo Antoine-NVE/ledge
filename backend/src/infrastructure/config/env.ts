@@ -1,5 +1,5 @@
-import { parseArray, parseBoolean, parseNumber } from '../utils/parse';
 import z from 'zod';
+import { parseArray, parseBoolean, parseNumber } from '../../core/utils/parse';
 
 const envSchema = z.object({
     NODE_ENV: z.enum(['development', 'production']),

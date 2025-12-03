@@ -3,7 +3,7 @@ import { SendVerificationEmailBody, VerifyEmailBody } from './user-types';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { UserOrchestrator } from '../../../application/user/user-orchestrator';
 import { Logger } from '../../../application/ports/logger';
-import { removePasswordHash } from '../../../infrastructure/utils/clean';
+import { removePasswordHash } from '../../../core/utils/clean';
 
 export class UserController {
     constructor(

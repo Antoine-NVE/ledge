@@ -1,6 +1,5 @@
 import { loadEnv } from './infrastructure/config/env';
 import { createBaseLogger } from './infrastructure/config/pino';
-import { step } from './infrastructure/utils/lifecycle';
 import { connectToRedis } from './infrastructure/config/redis';
 import { connectToMongo } from './infrastructure/config/mongo';
 import { PinoLogger } from './infrastructure/adapters/pino-logger';
@@ -15,6 +14,7 @@ import { MongoRefreshTokenRepository } from './infrastructure/repositories/mongo
 import { createHttpApp } from './presentation/http/app';
 import { buildContainer } from './presentation/container';
 import { startHttpServer } from './presentation/http/server';
+import { step } from './core/utils/lifecycle';
 
 const start = async () => {
     // .env is not verified yet, but we need a logger now
