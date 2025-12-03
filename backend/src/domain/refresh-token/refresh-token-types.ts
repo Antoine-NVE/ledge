@@ -7,4 +7,4 @@ export type RefreshToken = {
     updatedAt?: Date;
 };
 
-export type NewRefreshToken = Omit<RefreshToken, 'id'>;
+export type NewRefreshToken = Omit<RefreshToken, 'id' | 'updatedAt'>;

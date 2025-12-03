@@ -62,7 +62,7 @@ export class MongoTransactionRepository implements TransactionRepository {
             name,
             value,
             type,
-            ...(expenseCategory !== undefined ? { expenseCategory } : {}), // "undefined" is converted to "null" by MongoDB, and "undefined" isn't "not defined" for JS
+            ...(expenseCategory !== undefined ? { expenseCategory } : {}), // "undefined" is converted to "null" by MongoDB
             createdAt,
         };
         await this.transactionCollection.insertOne(document);

@@ -10,4 +10,4 @@ export type Transaction = {
     updatedAt?: Date;
 };
 
-export type NewTransaction = Omit<Transaction, 'id'>;
+export type NewTransaction = Omit<Transaction, 'id' | 'updatedAt'>;

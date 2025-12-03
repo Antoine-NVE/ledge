@@ -7,4 +7,4 @@ export type User = {
     updatedAt?: Date;
 };
 
-export type NewUser = Omit<User, 'id'>;
+export type NewUser = Omit<User, 'id' | 'updatedAt'>;
