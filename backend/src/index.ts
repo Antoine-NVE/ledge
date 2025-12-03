@@ -34,7 +34,6 @@ const start = async () => {
         smtpAuth,
         jwtSecret,
         emailFrom,
-        nodeEnv,
         allowedOrigins,
     } = await step('Environment validation', logger, async () => {
         return loadEnv();
@@ -83,7 +82,6 @@ const start = async () => {
     const app = await step('HTTP app creation', logger, async () => {
         return createHttpApp({
             allowedOrigins,
-            nodeEnv,
             transactionService,
             authOrchestrator,
             userOrchestrator,

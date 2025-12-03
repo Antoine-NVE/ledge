@@ -1,12 +1,10 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import swaggerUi from 'swagger-ui-express';
 import { createAuthRoutes } from './auth/auth-routes';
 import { createTransactionRoutes } from './transaction/transaction-routes';
 import { createUserRoutes } from './user/user-routes';
 import { createCors } from './middlewares/technical/cors';
 import { rateLimiter } from './middlewares/technical/rate-limit';
-import { swagger } from './middlewares/technical/swagger';
 import { createErrorHandler } from './middlewares/technical/error-handler';
 import { AuthController } from './auth/auth-controller';
 import { UserController } from './user/user-controller';
@@ -21,10 +19,10 @@ import { Logger } from '../../application/ports/logger';
 import { createAuthorize } from './middlewares/business/auth/authorize';
 import { CookieManager } from './support/cookie-manager';
 import { NotFoundError } from '../../core/errors/not-found-error';
+import { createDocsRoutes } from './docs/docs-routes';
 
 export const createHttpApp = ({
     allowedOrigins,
-    nodeEnv,
     transactionService,
     userOrchestrator,
     authOrchestrator,
@@ -33,7 +31,6 @@ export const createHttpApp = ({
     logger,
 }: {
     allowedOrigins: string[];
-    nodeEnv: 'development' | 'production';
     transactionService: TransactionService;
     userOrchestrator: UserOrchestrator;
     authOrchestrator: AuthOrchestrator;
@@ -71,9 +68,7 @@ export const createHttpApp = ({
     const authorize = createAuthorize({ transactionService });
 
     // Routes
-    if (nodeEnv === 'development') {
-        app.use('/docs', swaggerUi.serve, swagger);
-    }
+    app.use('/docs', createDocsRoutes());
     app.use('/auth', createAuthRoutes({ authController }));
     app.use(
         '/transactions',
@@ -87,7 +82,7 @@ export const createHttpApp = ({
         '/users',
         createUserRoutes({ userController, authenticate, allowedOrigins }),
     );
-    app.all(/.*/, () => {
+    app.use(() => {
         throw new NotFoundError('Route not found');
     });
 
