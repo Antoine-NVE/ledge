@@ -1,10 +1,10 @@
 import { User } from '../../domain/user/user-types';
-import { ConflictError } from '../../infrastructure/errors/conflict-error';
-import { TooManyRequestsError } from '../../infrastructure/errors/too-many-requests-error';
 import { UserService } from '../../domain/user/user-service';
 import { TokenManager } from '../ports/token-manager';
 import { EmailSender } from '../ports/email-sender';
 import { CacheStore } from '../ports/cache-store';
+import { ConflictError } from '../../core/errors/conflict-error';
+import { TooManyRequestsError } from '../../core/errors/too-many-requests-error';
 
 type SendVerificationEmailInput = {
     user: User;

@@ -1,6 +1,6 @@
 import { UserRepository } from './user-repository';
-import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 import { NewUser, User } from './user-types';
+import { NotFoundError } from '../../core/errors/not-found-error';
 
 type RegisterInput = {
     email: string;

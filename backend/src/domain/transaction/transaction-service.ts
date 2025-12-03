@@ -1,6 +1,6 @@
 import { TransactionRepository } from './transaction-repository';
-import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 import { NewTransaction, Transaction } from './transaction-types';
+import { NotFoundError } from '../../core/errors/not-found-error';
 
 type CreateInput = {
     userId: string;

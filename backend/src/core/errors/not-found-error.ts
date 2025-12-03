@@ -1,11 +1,11 @@
-import { HttpError } from './http-error';
+import { AppError } from './app-error';
 
-export class NotFoundError extends HttpError {
+export class NotFoundError extends AppError {
     constructor(
         message: string = 'Not found',
         errors?: Record<string, string[]>,
         meta?: Record<string, unknown>,
     ) {
-        super(message, 404, errors, meta);
+        super(message, errors, meta);
     }
 }

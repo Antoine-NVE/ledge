@@ -1,55 +1,62 @@
 import { NextFunction, Request, Response } from 'express';
 import { Logger } from '../../../../application/ports/logger';
-import { HttpError } from '../../../../infrastructure/errors/http-error';
+import { AppError } from '../../../../core/errors/app-error';
+import { BadRequestError } from '../../../../core/errors/bad-request-error';
+import { UnauthorizedError } from '../../../../core/errors/unauthorized-error';
+import { ForbiddenError } from '../../../../core/errors/forbidden-error';
+import { NotFoundError } from '../../../../core/errors/not-found-error';
+import { ConflictError } from '../../../../core/errors/conflict-error';
+import { TooManyRequestsError } from '../../../../core/errors/too-many-requests-error';
 
-export const createErrorHandler = ({
-    nodeEnv,
-    logger,
-}: {
-    nodeEnv: 'development' | 'production';
-    logger: Logger;
-}) => {
+const httpErrorMap = new Map<
+    new (
+        message?: string,
+        errors?: Record<string, string[]>,
+        meta?: Record<string, unknown>,
+    ) => AppError,
+    number
+>([
+    [BadRequestError, 400],
+    [UnauthorizedError, 401],
+    [ForbiddenError, 403],
+    [NotFoundError, 404],
+    [ConflictError, 409],
+    [TooManyRequestsError, 429],
+]);
+
+export const createErrorHandler = ({ logger }: { logger: Logger }) => {
     return (
         err: Error,
         req: Request,
         res: Response,
         next: NextFunction, // eslint-disable-line @typescript-eslint/no-unused-vars
     ): void => {
-        const isHttpError = err instanceof HttpError;
-        const status = isHttpError ? err.status : 500;
-
-        if (nodeEnv === 'development') {
-            logger.debug(err.message, { err });
-            res.status(status).json({
-                message: err.message,
-                errors: isHttpError ? err.errors : undefined,
-                meta: isHttpError ? err.meta : undefined,
-            });
-            return;
+        // We check if it's a "normal" error
+        for (const [errorClass, status] of httpErrorMap) {
+            if (err instanceof errorClass) {
+                const message = err.message;
+                logger.warn(message, {
+                    err,
+                    userId: req.user?.id,
+                    transactionId: req.transaction?.id,
+                });
+                res.status(status).json({
+                    message,
+                    errors: err.errors,
+                    meta: err.meta,
+                });
+                return;
+            }
         }
 
-        if (isHttpError && status < 500) {
-            const message = err.message;
-            logger.warn(message, {
-                err,
-                userId: req.user?.id,
-                transactionId: req.transaction?.id,
-            });
-            res.status(status).json({
-                message,
-                errors: err.errors,
-                meta: err.meta,
-            });
-            return;
-        }
-
+        // All others errors
         const message = 'Internal server error';
         logger.error(message, {
             err,
             userId: req.user?.id,
             transactionId: req.transaction?.id,
         });
-        res.status(status).json({
+        res.status(500).json({
             message,
         });
     };

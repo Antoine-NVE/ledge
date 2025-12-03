@@ -1,6 +1,6 @@
 import { RefreshTokenRepository } from './refresh-token-repository';
 import { NewRefreshToken, RefreshToken } from './refresh-token-types';
-import { NotFoundError } from '../../infrastructure/errors/not-found-error';
+import { NotFoundError } from '../../core/errors/not-found-error';
 
 type CreateInput = {
     userId: string;

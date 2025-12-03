@@ -1,11 +1,11 @@
-import { HttpError } from './http-error';
+import { AppError } from './app-error';
 
-export class TooManyRequestsError extends HttpError {
+export class TooManyRequestsError extends AppError {
     constructor(
         message: string = 'Too many requests',
         errors?: Record<string, string[]>,
         meta?: Record<string, unknown>,
     ) {
-        super(message, 429, errors, meta);
+        super(message, errors, meta);
     }
 }

@@ -1,11 +1,11 @@
-import { HttpError } from './http-error';
+import { AppError } from './app-error';
 
-export class UnauthorizedError extends HttpError {
+export class UnauthorizedError extends AppError {
     constructor(
         message: string = 'Unauthorized',
         errors?: Record<string, string[]>,
         meta?: Record<string, unknown>,
     ) {
-        super(message, 401, errors, meta);
+        super(message, errors, meta);
     }
 }

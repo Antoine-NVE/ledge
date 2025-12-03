@@ -5,9 +5,9 @@ import { AuthOrchestrator } from '../../../application/auth/auth-orchestrator';
 import { Logger } from '../../../application/ports/logger';
 import { removePasswordHash } from '../../../infrastructure/utils/clean';
 import { CookieManager } from '../support/cookie-manager';
-import { UnauthorizedError } from '../../../infrastructure/errors/unauthorized-error';
 import { RefreshToken } from '../../../domain/refresh-token/refresh-token-types';
-import { NotFoundError } from '../../../infrastructure/errors/not-found-error';
+import { UnauthorizedError } from '../../../core/errors/unauthorized-error';
+import { NotFoundError } from '../../../core/errors/not-found-error';
 
 export class AuthController {
     constructor(

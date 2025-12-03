@@ -7,15 +7,15 @@ import {
     TokenExpiredError,
     NotBeforeError,
 } from 'jsonwebtoken';
-import { UnauthorizedError } from '../errors/unauthorized-error';
 import { formatZodError } from '../utils/format';
-import { BadRequestError } from '../errors/bad-request-error';
 import z from 'zod';
 import {
     SignAccessPayload,
     TokenManager,
     VerificationEmailPayload,
 } from '../../application/ports/token-manager';
+import { UnauthorizedError } from '../../core/errors/unauthorized-error';
+import { BadRequestError } from '../../core/errors/bad-request-error';
 
 export class JwtTokenManager implements TokenManager {
     constructor(private secret: Secret) {}

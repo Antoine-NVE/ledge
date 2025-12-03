@@ -1,6 +1,7 @@
-import { Collection, ObjectId } from 'mongodb';
+import { Collection, MongoServerError, ObjectId } from 'mongodb';
 import { UserRepository } from '../../domain/user/user-repository';
 import { NewUser, User } from '../../domain/user/user-types';
+import { ConflictError } from '../../core/errors/conflict-error';
 
 type UserDocument = {
     _id: ObjectId;
@@ -45,7 +46,12 @@ export class MongoUserRepository implements UserRepository {
             isEmailVerified,
             createdAt,
         };
-        await this.userCollection.insertOne(document);
+        await this.userCollection.insertOne(document).catch((err) => {
+            if (err instanceof MongoServerError && err.code === 11000) {
+                throw new ConflictError('Email already in use');
+            }
+            throw err;
+        });
         return this.toDomain(document);
     };
 

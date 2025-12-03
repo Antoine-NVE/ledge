@@ -1,11 +1,11 @@
-import { HttpError } from './http-error';
+import { AppError } from './app-error';
 
-export class ForbiddenError extends HttpError {
+export class ForbiddenError extends AppError {
     constructor(
         message: string = 'Forbidden',
         errors?: Record<string, string[]>,
         meta?: Record<string, unknown>,
     ) {
-        super(message, 403, errors, meta);
+        super(message, errors, meta);
     }
 }

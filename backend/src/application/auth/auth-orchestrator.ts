@@ -1,12 +1,12 @@
 import { UserService } from '../../domain/user/user-service';
-import { NotFoundError } from '../../infrastructure/errors/not-found-error';
-import { UnauthorizedError } from '../../infrastructure/errors/unauthorized-error';
 import { User } from '../../domain/user/user-types';
 import { RefreshToken } from '../../domain/refresh-token/refresh-token-types';
 import { RefreshTokenService } from '../../domain/refresh-token/refresh-token-service';
 import { generateToken } from '../../infrastructure/utils/token';
 import { TokenManager } from '../ports/token-manager';
 import { Hasher } from '../ports/hasher';
+import { NotFoundError } from '../../core/errors/not-found-error';
+import { UnauthorizedError } from '../../core/errors/unauthorized-error';
 
 type RegisterInput = {
     email: string;

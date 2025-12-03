@@ -1,11 +1,10 @@
-export abstract class HttpError extends Error {
-    constructor(
+export abstract class AppError extends Error {
+    protected constructor(
         message: string,
-        public status: number,
         public errors?: Record<string, string[]>,
         public meta?: Record<string, unknown>,
     ) {
         super(message);
-        this.name = new.target.name;
+        this.name = this.constructor.name;
     }
 }

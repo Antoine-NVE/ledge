@@ -1,11 +1,11 @@
-import { HttpError } from './http-error';
+import { AppError } from './app-error';
 
-export class ConflictError extends HttpError {
+export class ConflictError extends AppError {
     constructor(
         message: string = 'Conflict',
         errors?: Record<string, string[]>,
         meta?: Record<string, unknown>,
     ) {
-        super(message, 409, errors, meta);
+        super(message, errors, meta);
     }
 }

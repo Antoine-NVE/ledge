@@ -19,8 +19,8 @@ import { TokenManager } from '../../application/ports/token-manager';
 import { UserService } from '../../domain/user/user-service';
 import { Logger } from '../../application/ports/logger';
 import { createAuthorize } from './middlewares/business/auth/authorize';
-import { NotFoundError } from '../../infrastructure/errors/not-found-error';
 import { CookieManager } from './support/cookie-manager';
+import { NotFoundError } from '../../core/errors/not-found-error';
 
 export const createHttpApp = ({
     allowedOrigins,
@@ -92,7 +92,7 @@ export const createHttpApp = ({
     });
 
     // Error handler
-    app.use(createErrorHandler({ nodeEnv, logger }));
+    app.use(createErrorHandler({ logger }));
 
     return app;
 };
