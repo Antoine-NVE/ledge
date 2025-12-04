@@ -29,7 +29,7 @@ export const createErrorHandler = ({ logger }: { logger: Logger }) => {
         err: Error,
         req: Request,
         res: Response,
-        next: NextFunction, // eslint-disable-line @typescript-eslint/no-unused-vars
+        _next: NextFunction, // eslint-disable-line @typescript-eslint/no-unused-vars
     ): void => {
         // We check if it's a "normal" error
         for (const [errorClass, status] of httpErrorMap) {
