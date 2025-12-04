@@ -4,7 +4,10 @@ services:
       context: ./frontend
       dockerfile: Dockerfile.local
     env_file:
-      - frontend/.env
+      - path: ./frontend/.env.example
+        required: true
+      - path: ./frontend/.env
+        required: false
     ports:
       - "${FRONTEND_DEV_PORT}:5173"
       - "${FRONTEND_PREVIEW_PORT}:4173"
@@ -19,7 +22,10 @@ services:
       context: ./backend
       dockerfile: Dockerfile.local
     env_file:
-      - backend/.env
+      - path: ./backend/.env.example
+        required: true
+      - path: ./backend/.env
+        required: false
     ports:
       - "${BACKEND_PORT}:3000"
     volumes:
