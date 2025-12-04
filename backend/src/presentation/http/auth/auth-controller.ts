@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { LoginBody, RegisterBody } from './auth-types';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { AuthOrchestrator } from '../../../application/auth/auth-orchestrator';
 import { Logger } from '../../../application/ports/logger';
@@ -8,6 +7,12 @@ import { RefreshToken } from '../../../domain/refresh-token/refresh-token-types'
 import { UnauthorizedError } from '../../../core/errors/unauthorized-error';
 import { NotFoundError } from '../../../core/errors/not-found-error';
 import { removePasswordHash } from '../../../core/utils/clean';
+import z from 'zod';
+import { loginBodySchema, registerBodySchema } from './auth-schemas';
+
+type RegisterBody = z.infer<typeof registerBodySchema>;
+
+type LoginBody = z.infer<typeof loginBodySchema>;
 
 export class AuthController {
     constructor(

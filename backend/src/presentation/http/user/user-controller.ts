@@ -1,9 +1,19 @@
 import { Request, Response } from 'express';
-import { SendVerificationEmailBody, VerifyEmailBody } from './user-types';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { UserOrchestrator } from '../../../application/user/user-orchestrator';
 import { Logger } from '../../../application/ports/logger';
 import { removePasswordHash } from '../../../core/utils/clean';
+import z from 'zod/index';
+import {
+    createSendVerificationEmailBodySchema,
+    verifyEmailBodySchema,
+} from './user-schemas';
+
+type SendVerificationEmailBody = z.infer<
+    ReturnType<typeof createSendVerificationEmailBodySchema>
+>;
+
+type VerifyEmailBody = z.infer<typeof verifyEmailBodySchema>;
 
 export class UserController {
     constructor(

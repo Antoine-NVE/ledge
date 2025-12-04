@@ -1,8 +1,13 @@
 import { Request, Response } from 'express';
-import { CreateBody, UpdateBody } from './transaction-types';
 import { ParamsDictionary } from 'express-serve-static-core';
 import { TransactionService } from '../../../domain/transaction/transaction-service';
 import { Logger } from '../../../application/ports/logger';
+import z from 'zod';
+import { createBodySchema, updateBodySchema } from './transaction-schemas';
+
+type CreateBody = z.infer<typeof createBodySchema>;
+
+type UpdateBody = z.infer<typeof updateBodySchema>;
 
 export class TransactionController {
     constructor(
