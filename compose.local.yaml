@@ -3,8 +3,8 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.local
-      args:
-        VITE_API_URL: ${VITE_API_URL}
+    env_file:
+      - frontend/.env
     ports:
       - "${FRONTEND_DEV_PORT}:5173"
       - "${FRONTEND_PREVIEW_PORT}:4173"
@@ -19,7 +19,7 @@ services:
       context: ./backend
       dockerfile: Dockerfile.local
     env_file:
-      - ./.env
+      - backend/.env
     ports:
       - "${BACKEND_PORT}:3000"
     volumes:
