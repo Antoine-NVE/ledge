@@ -4,7 +4,7 @@ import { createAuthRoutes } from './auth/auth-routes';
 import { createTransactionRoutes } from './transaction/transaction-routes';
 import { createUserRoutes } from './user/user-routes';
 import { createCors } from './middlewares/technical/cors';
-import { rateLimiter } from './middlewares/technical/rate-limit';
+import { rateLimiter } from './middlewares/technical/rate-limiter';
 import { createErrorHandler } from './middlewares/technical/error-handler';
 import { AuthController } from './auth/auth-controller';
 import { UserController } from './user/user-controller';
