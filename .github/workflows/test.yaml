@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  backend-ci:
+  backend:
     name: Backend checks (format, lint, tests)
     runs-on: ubuntu-latest
 
@@ -31,6 +31,6 @@ jobs:
         run: npm run lint
         working-directory: ./backend
 
-      - name: Run tests
-        run: npm run test
+      - name: Run unit tests
+        run: npm run test:unit
         working-directory: ./backend

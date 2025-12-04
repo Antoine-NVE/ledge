@@ -10,7 +10,7 @@
         "format": "prettier --write .",
         "format:check": "prettier --check .",
         "lint": "eslint",
-        "test": "jest"
+        "test:unit": "jest"
     },
     "author": "",
     "license": "ISC",
