@@ -25,8 +25,7 @@ services:
     depends_on:
       - database
       - logs
-    entrypoint: ["npm", "run", "migrate"]
-    restart: "no"
+    entrypoint: ["node", "dist/scripts/migrate.js", "up"]
 
   database:
     image: mongo:8.0

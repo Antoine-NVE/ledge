@@ -36,6 +36,20 @@ services:
       - cache
       - smtp
 
+  migrate:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.local
+    profiles: [ "migrations" ]
+    env_file:
+      - path: ./backend/.env.example
+        required: true
+      - path: ./backend/.env
+        required: false
+    depends_on:
+      - database
+    entrypoint: [ "node_modules/.bin/tsx", "scripts/migrate.ts", "up" ]
+
   database:
     image: mongo:8.0
     ports:

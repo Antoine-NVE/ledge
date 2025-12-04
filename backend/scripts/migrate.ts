@@ -21,7 +21,7 @@ const start = async () => {
 
     const umzug = new Umzug({
         migrations: {
-            glob: path.join(__dirname, 'migrations', `*.js`),
+            glob: path.join(__dirname, 'migrations', `*.{js,ts}`),
         },
         context: db,
         storage: new MongoDBStorage({
