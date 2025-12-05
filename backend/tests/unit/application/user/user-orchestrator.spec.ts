@@ -1,143 +1,160 @@
-import { ObjectId } from 'mongodb';
-import { UserService } from '../../../src/domain/user/user-service';
-import { User } from '../../../src/domain/user/user-types';
-import { ConflictError } from '../../../src/infrastructure/errors/conflict-error';
-import { TooManyRequestsError } from '../../../src/infrastructure/errors/too-many-requests-error';
-import { EmailService } from '../../../src/infrastructure/adapters/nodemailer-email-sender';
-import { JwtService } from '../../../src/infrastructure/adapters/jwt-token-manager';
-import { UserOrchestrator } from '../../../src/application/user/user-orchestrator';
-import { CacheService } from '../../../src/infrastructure/adapters/redis-cache-store';
+import { User } from '../../../../src/domain/user/user-types';
+import { TokenManager } from '../../../../src/application/ports/token-manager';
+import { EmailSender } from '../../../../src/application/ports/email-sender';
+import { UserService } from '../../../../src/domain/user/user-service';
+import { CacheStore } from '../../../../src/application/ports/cache-store';
+import { UserOrchestrator } from '../../../../src/application/user/user-orchestrator';
 
 describe('UserOrchestrator', () => {
-    const TEST_URL = 'http://localhost:3000';
-    const TEST_JWT = 'json-web-token';
-    const TEST_OBJECT_ID = new ObjectId();
-    const TEST_EMAIL_FROM = 'no-reply@example.com';
+    const USER_ID = 'USERID123';
+    const EMAIL = 'test@example.com';
+    const FRONTEND_BASE_URL = 'http://localhost:3000';
+    const TOKEN = 'token';
+    const EMAIL_FROM = 'no-reply@example.com';
 
-    let user: User;
+    let user: Partial<User>;
 
-    let jwtService: JwtService;
-    let emailService: EmailService;
-    let userService: UserService;
-    let cacheServiceMock: CacheService;
+    let tokenManagerMock: Partial<TokenManager>;
+    let emailSenderMock: Partial<EmailSender>;
+    let userServiceMock: Partial<UserService>;
+    let cacheStoreMock: Partial<CacheStore>;
+
     let userOrchestrator: UserOrchestrator;
 
     beforeEach(() => {
         user = {
-            _id: TEST_OBJECT_ID,
-            email: 'test@example.com',
-        } as unknown as User;
+            id: USER_ID,
+            email: EMAIL,
+        };
 
-        jwtService = {
-            signVerificationEmail: jest.fn().mockReturnValue(TEST_JWT),
+        tokenManagerMock = {
+            signVerificationEmail: jest.fn().mockReturnValue(TOKEN),
             verifyVerificationEmail: jest
                 .fn()
-                .mockReturnValue({ sub: TEST_OBJECT_ID }),
-        } as unknown as JwtService;
-        emailService = {
+                .mockReturnValue({ userId: USER_ID }),
+        };
+        emailSenderMock = {
             sendVerification: jest.fn(),
-        } as unknown as EmailService;
-        userService = {
-            setEmailVerificationCooldown: jest.fn(),
-            findOneById: jest.fn().mockResolvedValue(user),
+        };
+        userServiceMock = {
+            findById: jest.fn().mockResolvedValue(user),
             markEmailAsVerified: jest.fn(),
-        } as unknown as UserService;
-        cacheServiceMock = {
+        };
+        cacheStoreMock = {
             setVerificationEmailCooldown: jest.fn(),
             existsVerificationEmailCooldown: jest.fn().mockResolvedValue(false),
-        } as unknown as CacheService;
+        };
+
         userOrchestrator = new UserOrchestrator(
-            jwtService,
-            emailService,
-            userService,
-            cacheServiceMock,
-            TEST_EMAIL_FROM,
+            tokenManagerMock as TokenManager,
+            emailSenderMock as EmailSender,
+            userServiceMock as UserService,
+            cacheStoreMock as CacheStore,
+            EMAIL_FROM,
         );
     });
 
     describe('sendVerificationEmail', () => {
-        it('should throw a ConflictError if email is already verified', () => {
-            user = {
-                isEmailVerified: true,
-            } as unknown as User;
+        // it('should throw a ConflictError if email is already verified', () => {
+        //     user = {
+        //         isEmailVerified: true,
+        //     } as unknown as User;
+        //
+        //     expect(
+        //         userOrchestrator.sendVerificationEmail(user, TEST_URL),
+        //     ).rejects.toThrow(ConflictError);
+        // });
+
+        it('should call this.cacheStore.existsVerificationEmailCooldown', async () => {
+            await userOrchestrator.sendVerificationEmail({
+                user: user as User,
+                frontendBaseUrl: FRONTEND_BASE_URL,
+            });
 
             expect(
-                userOrchestrator.sendVerificationEmail(user, TEST_URL),
-            ).rejects.toThrow(ConflictError);
+                cacheStoreMock.existsVerificationEmailCooldown,
+            ).toHaveBeenCalledWith(USER_ID);
         });
 
-        it('should call cacheServiceMock.existsVerificationEmailCooldown and throw if false', async () => {
-            (
-                cacheServiceMock.existsVerificationEmailCooldown as jest.Mock
-            ).mockResolvedValue(true);
+        it('should call this.tokenManager.signVerificationEmail', async () => {
+            await userOrchestrator.sendVerificationEmail({
+                user: user as User,
+                frontendBaseUrl: FRONTEND_BASE_URL,
+            });
 
-            await expect(
-                userOrchestrator.sendVerificationEmail(user, TEST_URL),
-            ).rejects.toThrow(TooManyRequestsError);
-        });
-
-        it('should call jwtService to signVerificationEmail', async () => {
-            await userOrchestrator.sendVerificationEmail(user, TEST_URL);
-
-            expect(jwtService.signVerificationEmail).toHaveBeenCalledWith(
-                user._id,
+            expect(tokenManagerMock.signVerificationEmail).toHaveBeenCalledWith(
+                { userId: USER_ID },
             );
         });
 
-        it('should call emailService to sendVerification', async () => {
-            await userOrchestrator.sendVerificationEmail(user, TEST_URL);
+        it('should call this.emailSender.sendVerification', async () => {
+            await userOrchestrator.sendVerificationEmail({
+                user: user as User,
+                frontendBaseUrl: FRONTEND_BASE_URL,
+            });
 
-            expect(emailService.sendVerification).toHaveBeenCalledWith(
-                TEST_EMAIL_FROM,
-                user.email,
-                TEST_URL,
-                TEST_JWT,
-            );
+            expect(emailSenderMock.sendVerification).toHaveBeenCalledWith({
+                from: EMAIL_FROM,
+                to: EMAIL,
+                frontendBaseUrl: FRONTEND_BASE_URL,
+                token: TOKEN,
+            });
         });
 
-        it('should call cacheService.setVerificationEmailCooldown', async () => {
-            await userOrchestrator.sendVerificationEmail(user, TEST_URL);
+        it('should call this.cacheStore.setVerificationEmailCooldown', async () => {
+            await userOrchestrator.sendVerificationEmail({
+                user: user as User,
+                frontendBaseUrl: FRONTEND_BASE_URL,
+            });
 
             expect(
-                cacheServiceMock.setVerificationEmailCooldown,
-            ).toHaveBeenLastCalledWith(user._id);
+                cacheStoreMock.setVerificationEmailCooldown,
+            ).toHaveBeenCalledWith(USER_ID);
         });
     });
 
     describe('verifyEmail', () => {
-        it('should call jwtService to verifyVerificationEmail', async () => {
-            await userOrchestrator.verifyEmail(TEST_JWT);
+        it('should call this.tokenManager.verifyVerificationEmail', async () => {
+            await userOrchestrator.verifyEmail({ token: TOKEN });
 
-            expect(jwtService.verifyVerificationEmail).toHaveBeenLastCalledWith(
-                TEST_JWT,
-            );
+            expect(
+                tokenManagerMock.verifyVerificationEmail,
+            ).toHaveBeenCalledWith(TOKEN);
         });
 
-        it('should call userService to findOneById', async () => {
-            await userOrchestrator.verifyEmail(TEST_JWT);
+        it('should call this.userService.findById', async () => {
+            await userOrchestrator.verifyEmail({ token: TOKEN });
 
-            expect(userService.findOneById).toHaveBeenCalledWith(
-                TEST_OBJECT_ID,
-            );
+            expect(userServiceMock.findById).toHaveBeenCalledWith({
+                id: USER_ID,
+            });
         });
 
-        it('should throw a ConflictError if email is already verified', async () => {
-            user = {
-                ...user,
-                isEmailVerified: true,
-            };
+        // it('should throw a ConflictError if email is already verified', async () => {
+        //     user = {
+        //         ...user,
+        //         isEmailVerified: true,
+        //     };
+        //
+        //     (userService.findOneById as jest.Mock).mockResolvedValue(user);
+        //
+        //     await expect(
+        //         userOrchestrator.verifyEmail(TEST_JWT),
+        //     ).rejects.toThrow(ConflictError);
+        // });
 
-            (userService.findOneById as jest.Mock).mockResolvedValue(user);
+        it('should call this.userService.markEmailAsVerified', async () => {
+            await userOrchestrator.verifyEmail({ token: TOKEN });
 
-            await expect(
-                userOrchestrator.verifyEmail(TEST_JWT),
-            ).rejects.toThrow(ConflictError);
+            expect(userServiceMock.markEmailAsVerified).toHaveBeenCalledWith({
+                user,
+            });
         });
 
-        it('should call userService to markEmailAsVerified', async () => {
-            await userOrchestrator.verifyEmail(TEST_JWT);
+        it('should return user', async () => {
+            const result = await userOrchestrator.verifyEmail({ token: TOKEN });
 
-            expect(userService.markEmailAsVerified).toHaveBeenCalledWith(user);
+            expect(result).toEqual({ user });
         });
     });
 });

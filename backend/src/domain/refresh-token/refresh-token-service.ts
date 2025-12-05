@@ -13,7 +13,7 @@ type FindByTokenInput = {
 
 type RotateTokenInput = {
     refreshToken: RefreshToken;
-    token: string;
+    newToken: string;
 };
 
 type DeleteByTokenInput = {
@@ -43,8 +43,8 @@ export class RefreshTokenService {
         return refreshToken;
     };
 
-    rotateToken = async ({ refreshToken, token }: RotateTokenInput) => {
-        refreshToken.token = token;
+    rotateToken = async ({ refreshToken, newToken }: RotateTokenInput) => {
+        refreshToken.token = newToken;
         refreshToken.expiresAt = new Date(Date.now() + this.TTL);
         refreshToken.updatedAt = new Date();
 

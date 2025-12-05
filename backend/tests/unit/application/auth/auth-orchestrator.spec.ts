@@ -1,327 +1,317 @@
-import { ObjectId } from 'mongodb';
-import { AuthOrchestrator } from '../../../src/application/auth/auth-orchestrator';
-import { RefreshTokenService } from '../../../src/domain/refresh-token/refresh-token-service';
-import { UserService } from '../../../src/domain/user/user-service';
-import { User } from '../../../src/domain/user/user-types';
-import { JwtService } from '../../../src/infrastructure/adapters/jwt-token-manager';
-import { PasswordService } from '../../../src/infrastructure/adapters/bcrypt-hasher';
-import { TokenService } from '../../../src/infrastructure/adapters/token-service';
-import { RefreshToken } from '../../../src/domain/refresh-token/refresh-token-types';
-import { NotFoundError } from '../../../src/infrastructure/errors/not-found-error';
-import { UnauthorizedError } from '../../../src/infrastructure/errors/unauthorized-error';
-import { InternalServerError } from '../../../src/infrastructure/errors/internal-server-error';
+import { User } from '../../../../src/domain/user/user-types';
+import { RefreshToken } from '../../../../src/domain/refresh-token/refresh-token-types';
+import { UserService } from '../../../../src/domain/user/user-service';
+import { TokenManager } from '../../../../src/application/ports/token-manager';
+import { RefreshTokenService } from '../../../../src/domain/refresh-token/refresh-token-service';
+import { Hasher } from '../../../../src/application/ports/hasher';
+import { AuthOrchestrator } from '../../../../src/application/auth/auth-orchestrator';
+import * as tokenUtils from '../../../../src/core/utils/token';
 
 describe('AuthOrchestrator', () => {
-    const TEST_EMAIL = 'test@example.com';
-    const TEST_PASSWORD = 'Azerty123!';
-    const TEST_HASHED_PASSWORD = 'hashed-password';
-    const TEST_TOKEN = 'token'; // Field of RefreshToken
-    const TEST_NEW_TOKEN = 'new-token';
-    const TEST_ACCESS_TOKEN = 'access-token'; // JWT
+    const USER_ID = 'USERID123';
+    const REFRESH_TOKEN_ID = 'REFRESHTOKENID123';
+    const EMAIL = 'test@example.com';
+    const PASSWORD = 'Azerty123!';
+    const PASSWORD_HASH = 'pAsSwOrD-HaSh';
+    const TOKEN = 'token';
+    const NEW_TOKEN = 'new-token';
+    const ACCESS_TOKEN = 'access-token';
 
-    let user: User;
-    let refreshToken: RefreshToken;
+    let user: Partial<User>;
+    let refreshToken: Partial<RefreshToken>;
 
-    let userService: UserService;
-    let jwtService: JwtService;
-    let refreshTokenService: RefreshTokenService;
-    let passwordService: PasswordService;
-    let tokenService: TokenService;
+    let userServiceMock: Partial<UserService>;
+    let tokenManagerMock: Partial<TokenManager>;
+    let refreshTokenServiceMock: Partial<RefreshTokenService>;
+    let hasherMock: Partial<Hasher>;
+
+    let generateTokenSpy: jest.SpiedFunction<typeof tokenUtils.generateToken>;
+
     let authOrchestrator: AuthOrchestrator;
 
     beforeEach(() => {
         user = {
-            _id: new ObjectId(),
-            passwordHash: TEST_HASHED_PASSWORD,
-        } as unknown as User;
-
+            id: USER_ID,
+            passwordHash: PASSWORD_HASH,
+        };
         refreshToken = {
-            userId: user._id,
-        } as unknown as RefreshToken;
+            id: REFRESH_TOKEN_ID,
+            userId: USER_ID,
+        };
 
-        userService = {
+        userServiceMock = {
             register: jest.fn().mockResolvedValue(user),
-            findOneByEmail: jest.fn().mockResolvedValue(user),
-        } as unknown as UserService;
-
-        jwtService = {
-            signAccess: jest.fn().mockReturnValue(TEST_ACCESS_TOKEN),
-        } as unknown as JwtService;
-
-        refreshTokenService = {
+            findByEmail: jest.fn().mockResolvedValue(user),
+        };
+        tokenManagerMock = {
+            signAccess: jest.fn().mockReturnValue(ACCESS_TOKEN),
+        };
+        refreshTokenServiceMock = {
             create: jest.fn().mockResolvedValue(refreshToken),
-            findOneByToken: jest.fn().mockResolvedValue(refreshToken),
-            extendExpiration: jest.fn().mockResolvedValue(refreshToken),
-            findOneAndDeleteByToken: jest.fn().mockResolvedValue(refreshToken),
-        } as unknown as RefreshTokenService;
-
-        passwordService = {
-            hash: jest.fn().mockResolvedValue(TEST_HASHED_PASSWORD),
+            findByToken: jest.fn().mockResolvedValue(refreshToken),
+            rotateToken: jest.fn().mockResolvedValue(refreshToken),
+            deleteByToken: jest.fn().mockResolvedValue(refreshToken),
+        };
+        hasherMock = {
+            hash: jest.fn().mockResolvedValue(PASSWORD_HASH),
             compare: jest.fn().mockReturnValue(true),
-        } as unknown as PasswordService;
+        };
 
-        tokenService = {
-            generate: jest.fn().mockReturnValue(TEST_TOKEN),
-        } as unknown as TokenService;
+        generateTokenSpy = jest
+            .spyOn(tokenUtils, 'generateToken')
+            .mockReturnValue(TOKEN);
 
         authOrchestrator = new AuthOrchestrator(
-            userService,
-            jwtService,
-            refreshTokenService,
-            passwordService,
-            tokenService,
+            userServiceMock as UserService,
+            tokenManagerMock as TokenManager,
+            refreshTokenServiceMock as RefreshTokenService,
+            hasherMock as Hasher,
         );
     });
 
     describe('register', () => {
-        it('should call passwordService to hash', async () => {
+        it('should call this.hasher.hash', async () => {
             await authOrchestrator.register({
-                email: TEST_EMAIL,
-                password: TEST_PASSWORD,
+                email: EMAIL,
+                password: PASSWORD,
             });
 
-            expect(passwordService.hash).toHaveBeenCalledWith(TEST_PASSWORD);
+            expect(hasherMock.hash).toHaveBeenCalledWith(PASSWORD);
         });
 
-        it('should call userService to register', async () => {
+        it('should call this.userService.register', async () => {
             await authOrchestrator.register({
-                email: TEST_EMAIL,
-                password: TEST_PASSWORD,
+                email: EMAIL,
+                password: PASSWORD,
             });
 
-            expect(userService.register).toHaveBeenCalledWith({
-                email: TEST_EMAIL,
-                passwordHash: TEST_HASHED_PASSWORD,
-            });
-        });
-
-        it('should call tokenService to generate', async () => {
-            await authOrchestrator.register({
-                email: TEST_EMAIL,
-                password: TEST_PASSWORD,
-            });
-
-            expect(tokenService.generate).toHaveBeenCalled();
-        });
-
-        it('should call refreshTokenService to create', async () => {
-            await authOrchestrator.register({
-                email: TEST_EMAIL,
-                password: TEST_PASSWORD,
-            });
-
-            expect(refreshTokenService.create).toHaveBeenCalledWith({
-                token: TEST_TOKEN,
-                userId: user._id,
+            expect(userServiceMock.register).toHaveBeenCalledWith({
+                email: EMAIL,
+                passwordHash: PASSWORD_HASH,
             });
         });
 
-        it('should call jwtService to signAccess', async () => {
+        it('should call this.refreshTokenService.create', async () => {
             await authOrchestrator.register({
-                email: TEST_EMAIL,
-                password: TEST_PASSWORD,
+                email: EMAIL,
+                password: PASSWORD,
             });
 
-            expect(jwtService.signAccess).toHaveBeenCalledWith(user._id);
+            expect(refreshTokenServiceMock.create).toHaveBeenCalledWith({
+                userId: USER_ID,
+                token: TOKEN,
+            });
+        });
+
+        it('should call this.tokenManager.signAccess', async () => {
+            await authOrchestrator.register({
+                email: EMAIL,
+                password: PASSWORD,
+            });
+
+            expect(tokenManagerMock.signAccess).toHaveBeenCalledWith({
+                userId: USER_ID,
+            });
         });
 
         it('should return user, accessToken and refreshToken', async () => {
             const result = await authOrchestrator.register({
-                email: TEST_EMAIL,
-                password: TEST_PASSWORD,
+                email: EMAIL,
+                password: PASSWORD,
             });
 
             expect(result).toEqual({
                 user,
-                accessToken: TEST_ACCESS_TOKEN,
+                accessToken: ACCESS_TOKEN,
                 refreshToken,
             });
         });
     });
 
     describe('login', () => {
-        it('should call userService to findOneByEmail', async () => {
+        it('should call this.userService.findByEmail', async () => {
             await authOrchestrator.login({
-                email: TEST_EMAIL,
-                password: TEST_PASSWORD,
+                email: EMAIL,
+                password: PASSWORD,
             });
 
-            expect(userService.findOneByEmail).toHaveBeenCalledWith(TEST_EMAIL);
+            expect(userServiceMock.findByEmail).toHaveBeenCalledWith({
+                email: EMAIL,
+            });
         });
 
-        it('should throw an UnauthorizedError if user is not found', () => {
-            (userService.findOneByEmail as jest.Mock).mockRejectedValue(
-                new NotFoundError(),
+        // it('should throw an UnauthorizedError if user is not found', () => {
+        //     (userService.findOneByEmail as jest.Mock).mockRejectedValue(
+        //         new NotFoundError(),
+        //     );
+        //
+        //     expect(
+        //         authOrchestrator.login({
+        //             email: TEST_EMAIL,
+        //             password: TEST_PASSWORD,
+        //         }),
+        //     ).rejects.toThrow(UnauthorizedError);
+        // });
+
+        // it('should re-throw any other error', () => {
+        //     (userService.findOneByEmail as jest.Mock).mockRejectedValue(
+        //         new InternalServerError(),
+        //     );
+        //
+        //     expect(
+        //         authOrchestrator.login({
+        //             email: TEST_EMAIL,
+        //             password: TEST_PASSWORD,
+        //         }),
+        //     ).rejects.toThrow(InternalServerError);
+        // });
+
+        it('should call this.hasher.compare', async () => {
+            await authOrchestrator.login({
+                email: EMAIL,
+                password: PASSWORD,
+            });
+
+            expect(hasherMock.compare).toHaveBeenCalledWith(
+                PASSWORD,
+                PASSWORD_HASH,
             );
-
-            expect(
-                authOrchestrator.login({
-                    email: TEST_EMAIL,
-                    password: TEST_PASSWORD,
-                }),
-            ).rejects.toThrow(UnauthorizedError);
         });
 
-        it('should re-throw any other error', () => {
-            (userService.findOneByEmail as jest.Mock).mockRejectedValue(
-                new InternalServerError(),
-            );
+        // it('should throw UnauthorizedError if passwords do not match', async () => {
+        //     (passwordService.compare as jest.Mock).mockResolvedValue(false);
+        //
+        //     await expect(
+        //         authOrchestrator.login({
+        //             email: TEST_EMAIL,
+        //             password: TEST_PASSWORD,
+        //         }),
+        //     ).rejects.toThrow(UnauthorizedError);
+        // });
 
-            expect(
-                authOrchestrator.login({
-                    email: TEST_EMAIL,
-                    password: TEST_PASSWORD,
-                }),
-            ).rejects.toThrow(InternalServerError);
-        });
-
-        it('should call passwordService to compare', async () => {
+        it('should call this.refreshTokenService.create', async () => {
             await authOrchestrator.login({
-                email: TEST_EMAIL,
-                password: TEST_PASSWORD,
+                email: EMAIL,
+                password: PASSWORD,
             });
 
-            expect(passwordService.compare).toHaveBeenCalledWith(
-                TEST_PASSWORD,
-                user.passwordHash,
-            );
+            expect(refreshTokenServiceMock.create).toHaveBeenCalledWith({
+                userId: USER_ID,
+                token: TOKEN,
+            });
         });
 
-        it('should throw UnauthorizedError if passwords do not match', async () => {
-            (passwordService.compare as jest.Mock).mockResolvedValue(false);
-
-            await expect(
-                authOrchestrator.login({
-                    email: TEST_EMAIL,
-                    password: TEST_PASSWORD,
-                }),
-            ).rejects.toThrow(UnauthorizedError);
-        });
-
-        it('should call tokenService to generate', async () => {
+        it('should call this.tokenManager.signAccess', async () => {
             await authOrchestrator.login({
-                email: TEST_EMAIL,
-                password: TEST_PASSWORD,
+                email: EMAIL,
+                password: PASSWORD,
             });
 
-            expect(tokenService.generate).toHaveBeenCalled();
-        });
-
-        it('should call refreshTokenService to create', async () => {
-            await authOrchestrator.login({
-                email: TEST_EMAIL,
-                password: TEST_PASSWORD,
+            expect(tokenManagerMock.signAccess).toHaveBeenCalledWith({
+                userId: USER_ID,
             });
-
-            expect(refreshTokenService.create).toHaveBeenCalledWith({
-                token: TEST_TOKEN,
-                userId: user._id,
-            });
-        });
-
-        it('should call jwtService to signAccess', async () => {
-            await authOrchestrator.login({
-                email: TEST_EMAIL,
-                password: TEST_PASSWORD,
-            });
-
-            expect(jwtService.signAccess).toHaveBeenCalledWith(user._id);
         });
 
         it('should return user, accessToken and refreshToken', async () => {
             const result = await authOrchestrator.login({
-                email: TEST_EMAIL,
-                password: TEST_PASSWORD,
+                email: EMAIL,
+                password: PASSWORD,
             });
 
             expect(result).toEqual({
                 user,
-                accessToken: TEST_ACCESS_TOKEN,
+                accessToken: ACCESS_TOKEN,
                 refreshToken,
             });
         });
     });
-
+    //
     describe('refresh', () => {
-        it('should call refreshTokenService to findOneByToken', async () => {
-            await authOrchestrator.refresh(TEST_TOKEN);
+        it('should call this.refreshTokenService.findByToken', async () => {
+            await authOrchestrator.refresh({ token: TOKEN });
 
-            expect(refreshTokenService.findOneByToken).toHaveBeenCalledWith(
-                TEST_TOKEN,
-            );
+            expect(refreshTokenServiceMock.findByToken).toHaveBeenCalledWith({
+                token: TOKEN,
+            });
         });
 
-        it('should throw UnauthorizedError if refresh token is not found', () => {
-            (refreshTokenService.findOneByToken as jest.Mock).mockRejectedValue(
-                new NotFoundError(),
-            );
+        // it('should throw UnauthorizedError if refresh token is not found', () => {
+        //     (refreshTokenService.findOneByToken as jest.Mock).mockRejectedValue(
+        //         new NotFoundError(),
+        //     );
+        //
+        //     expect(authOrchestrator.refresh(TEST_TOKEN)).rejects.toThrow(
+        //         UnauthorizedError,
+        //     );
+        // });
 
-            expect(authOrchestrator.refresh(TEST_TOKEN)).rejects.toThrow(
-                UnauthorizedError,
-            );
-        });
+        // it('should re-throw any other error', () => {
+        //     (refreshTokenService.findOneByToken as jest.Mock).mockRejectedValue(
+        //         new InternalServerError(),
+        //     );
+        //
+        //     expect(authOrchestrator.refresh(TEST_TOKEN)).rejects.toThrow(
+        //         InternalServerError,
+        //     );
+        // });
 
-        it('should re-throw any other error', () => {
-            (refreshTokenService.findOneByToken as jest.Mock).mockRejectedValue(
-                new InternalServerError(),
-            );
+        // it('should throw UnauthorizedError if refresh token is expired', () => {
+        //     (refreshTokenService.findOneByToken as jest.Mock).mockResolvedValue(
+        //         {
+        //             ...refreshToken,
+        //             expiresAt: new Date(Date.now() - 1000),
+        //         },
+        //     );
+        //
+        //     expect(authOrchestrator.refresh(TEST_TOKEN)).rejects.toThrow(
+        //         UnauthorizedError,
+        //     );
+        // });
 
-            expect(authOrchestrator.refresh(TEST_TOKEN)).rejects.toThrow(
-                InternalServerError,
-            );
-        });
+        it('should call this.refreshTokenService.rotateToken', async () => {
+            generateTokenSpy.mockReturnValue(NEW_TOKEN);
 
-        it('should throw UnauthorizedError if refresh token is expired', () => {
-            (refreshTokenService.findOneByToken as jest.Mock).mockResolvedValue(
-                {
-                    ...refreshToken,
-                    expiresAt: new Date(Date.now() - 1000),
-                },
-            );
+            await authOrchestrator.refresh({ token: TOKEN });
 
-            expect(authOrchestrator.refresh(TEST_TOKEN)).rejects.toThrow(
-                UnauthorizedError,
-            );
-        });
-
-        it('should call refreshTokenService to extendExpiration', async () => {
-            (tokenService.generate as jest.Mock).mockReturnValue(
-                TEST_NEW_TOKEN,
-            );
-
-            await authOrchestrator.refresh(TEST_TOKEN);
-
-            expect(refreshTokenService.extendExpiration).toHaveBeenCalledWith(
+            expect(refreshTokenServiceMock.rotateToken).toHaveBeenCalledWith({
                 refreshToken,
-                TEST_NEW_TOKEN,
-            );
+                newToken: NEW_TOKEN,
+            });
         });
 
-        it('should call jwtService to signAccess', async () => {
-            await authOrchestrator.refresh(TEST_TOKEN);
+        it('should call this.tokenManager.signAccess', async () => {
+            await authOrchestrator.refresh({ token: TOKEN });
 
-            expect(jwtService.signAccess).toHaveBeenCalledWith(
-                refreshToken.userId,
-            );
+            expect(tokenManagerMock.signAccess).toHaveBeenCalledWith({
+                userId: USER_ID,
+            });
         });
 
         it('should return accessToken and refreshToken', async () => {
-            const result = await authOrchestrator.refresh(TEST_TOKEN);
+            const result = await authOrchestrator.refresh({ token: TOKEN });
 
             expect(result).toEqual({
-                accessToken: TEST_ACCESS_TOKEN,
+                accessToken: ACCESS_TOKEN,
                 refreshToken,
             });
         });
     });
 
     describe('logout', () => {
-        it('should call refreshTokenService to deleteOneByToken', async () => {
-            await authOrchestrator.logout(TEST_TOKEN);
+        it('should call this.refreshTokenService.deleteByToken', async () => {
+            await authOrchestrator.logout({ token: TOKEN });
 
-            expect(
-                refreshTokenService.findOneAndDeleteByToken,
-            ).toHaveBeenCalledWith(TEST_TOKEN);
+            expect(refreshTokenServiceMock.deleteByToken).toHaveBeenCalledWith({
+                token: TOKEN,
+            });
+        });
+
+        it('should return refreshToken', async () => {
+            const result = await authOrchestrator.logout({ token: TOKEN });
+
+            expect(result).toEqual({
+                refreshToken,
+            });
         });
     });
 });

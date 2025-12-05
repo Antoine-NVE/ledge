@@ -64,8 +64,8 @@ export class AuthOrchestrator {
         const user = await this.userService.register({ email, passwordHash });
 
         const refreshToken = await this.refreshTokenService.create({
-            token: generateToken(),
             userId: user.id,
+            token: generateToken(),
         });
 
         const accessToken = this.tokenManager.signAccess({ userId: user.id });
@@ -90,8 +90,8 @@ export class AuthOrchestrator {
         if (!doesMatch) throw new UnauthorizedError('Invalid credentials');
 
         const refreshToken = await this.refreshTokenService.create({
-            token: generateToken(),
             userId: user.id,
+            token: generateToken(),
         });
 
         const accessToken = this.tokenManager.signAccess({ userId: user.id });
@@ -115,7 +115,7 @@ export class AuthOrchestrator {
 
         refreshToken = await this.refreshTokenService.rotateToken({
             refreshToken,
-            token: generateToken(),
+            newToken: generateToken(),
         });
 
         const accessToken = this.tokenManager.signAccess({
