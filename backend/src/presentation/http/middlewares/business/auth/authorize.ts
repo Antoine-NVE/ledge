@@ -11,7 +11,7 @@ declare module 'express-serve-static-core' {
 }
 
 export const authorizeParamsSchema = z.object({
-    id: z.string(),
+    id: z.string().regex(/^[a-fA-F0-9]{24}$/),
 });
 
 export type AuthorizeParams = z.infer<typeof authorizeParamsSchema>;
