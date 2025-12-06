@@ -2,32 +2,32 @@ import { TransactionRepository } from './transaction-repository';
 import { NewTransaction, Transaction } from './transaction-types';
 import { NotFoundError } from '../../core/errors/not-found-error';
 
-export type CreateInput = {
+type CreateInput = {
     userId: string;
     month: string;
     name: string;
     value: number;
     type: 'income' | 'expense';
-    expenseCategory?: 'need' | 'want' | 'investment' | null;
+    expenseCategory: 'need' | 'want' | 'investment' | null | undefined;
 };
 
-export type FindManyByUserIdInput = {
+type FindManyByUserIdInput = {
     userId: string;
 };
 
-export type FindByIdInput = {
+type FindByIdInput = {
     id: string;
 };
 
-export type UpdateInput = {
+type UpdateInput = {
     transaction: Transaction;
     newName: string;
     newValue: number;
     newType: 'income' | 'expense';
-    newExpenseCategory?: 'need' | 'want' | 'investment' | null;
+    newExpenseCategory: 'need' | 'want' | 'investment' | null | undefined;
 };
 
-export type DeleteByIdInput = {
+type DeleteByIdInput = {
     id: string;
 };
 

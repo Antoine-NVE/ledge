@@ -2,20 +2,20 @@ import { UserRepository } from './user-repository';
 import { NewUser, User } from './user-types';
 import { NotFoundError } from '../../core/errors/not-found-error';
 
-export type RegisterInput = {
+type RegisterInput = {
     email: string;
     passwordHash: string;
 };
 
-export type FindByIdInput = {
+type FindByIdInput = {
     id: string;
 };
 
-export type FindByEmailInput = {
+type FindByEmailInput = {
     email: string;
 };
 
-export type MarkEmailAsVerifiedInput = {
+type MarkEmailAsVerifiedInput = {
     user: User;
 };
 

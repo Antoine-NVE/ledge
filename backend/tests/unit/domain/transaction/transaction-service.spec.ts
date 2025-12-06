@@ -1,9 +1,5 @@
 import { TransactionRepository } from '../../../../src/domain/transaction/transaction-repository';
-import {
-    CreateInput,
-    TransactionService,
-    UpdateInput,
-} from '../../../../src/domain/transaction/transaction-service';
+import { TransactionService } from '../../../../src/domain/transaction/transaction-service';
 import { Transaction } from '../../../../src/domain/transaction/transaction-types';
 
 describe('TransactionService', () => {
@@ -11,6 +7,9 @@ describe('TransactionService', () => {
     const TRANSACTION_ID = 'TRANSACTIONID123';
     const MONTH = '2025-12';
     const NAME = 'name';
+    const VALUE = 123;
+    const TYPE = 'income';
+    const EXPENSE_CATEGORY = undefined;
     const NEW_NAME = 'new-name';
     const NEW_VALUE = 456;
     const NEW_TYPE = 'expense';
@@ -44,24 +43,26 @@ describe('TransactionService', () => {
     });
 
     describe('create', () => {
-        let createInput: Partial<CreateInput>;
-
-        beforeEach(() => {
-            createInput = {
-                userId: USER_ID,
-                month: MONTH,
-                name: NAME,
-            };
-        });
-
         it('should call this.transactionRepository.create', async () => {
             const now = new Date();
             jest.useFakeTimers().setSystemTime(now);
 
-            await transactionService.create(createInput as CreateInput);
+            await transactionService.create({
+                userId: USER_ID,
+                month: MONTH,
+                name: NAME,
+                value: VALUE,
+                type: TYPE,
+                expenseCategory: EXPENSE_CATEGORY,
+            });
 
             expect(transactionRepositoryMock.create).toHaveBeenCalledWith({
-                ...createInput,
+                userId: USER_ID,
+                month: MONTH,
+                name: NAME,
+                value: VALUE,
+                type: TYPE,
+                expenseCategory: EXPENSE_CATEGORY,
                 createdAt: now,
             });
         });
@@ -98,23 +99,17 @@ describe('TransactionService', () => {
     });
 
     describe('update', () => {
-        let updateInput: Partial<UpdateInput>;
+        it('should call this.transactionRepository.save', async () => {
+            const now = new Date();
+            jest.useFakeTimers().setSystemTime(now);
 
-        beforeEach(() => {
-            updateInput = {
+            await transactionService.update({
                 transaction: transaction as Transaction,
                 newName: NEW_NAME,
                 newValue: NEW_VALUE,
                 newType: NEW_TYPE,
                 newExpenseCategory: NEW_EXPENSE_CATEGORY,
-            };
-        });
-
-        it('should call this.transactionRepository.save', async () => {
-            const now = new Date();
-            jest.useFakeTimers().setSystemTime(now);
-
-            await transactionService.update(updateInput as UpdateInput);
+            });
 
             expect(transactionRepositoryMock.save).toHaveBeenCalledWith({
                 id: TRANSACTION_ID,
