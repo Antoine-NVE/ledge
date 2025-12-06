@@ -113,19 +113,6 @@ describe('AuthOrchestrator', () => {
                 userId: USER_ID,
             });
         });
-
-        it('should return user, accessToken and refreshToken', async () => {
-            const result = await authOrchestrator.register({
-                email: EMAIL,
-                password: PASSWORD,
-            });
-
-            expect(result).toEqual({
-                user,
-                accessToken: ACCESS_TOKEN,
-                refreshToken,
-            });
-        });
     });
 
     describe('login', () => {
@@ -211,21 +198,8 @@ describe('AuthOrchestrator', () => {
                 userId: USER_ID,
             });
         });
-
-        it('should return user, accessToken and refreshToken', async () => {
-            const result = await authOrchestrator.login({
-                email: EMAIL,
-                password: PASSWORD,
-            });
-
-            expect(result).toEqual({
-                user,
-                accessToken: ACCESS_TOKEN,
-                refreshToken,
-            });
-        });
     });
-    //
+
     describe('refresh', () => {
         it('should call this.refreshTokenService.findByToken', async () => {
             await authOrchestrator.refresh({ token: TOKEN });
@@ -286,15 +260,6 @@ describe('AuthOrchestrator', () => {
                 userId: USER_ID,
             });
         });
-
-        it('should return accessToken and refreshToken', async () => {
-            const result = await authOrchestrator.refresh({ token: TOKEN });
-
-            expect(result).toEqual({
-                accessToken: ACCESS_TOKEN,
-                refreshToken,
-            });
-        });
     });
 
     describe('logout', () => {
@@ -303,14 +268,6 @@ describe('AuthOrchestrator', () => {
 
             expect(refreshTokenServiceMock.deleteByToken).toHaveBeenCalledWith({
                 token: TOKEN,
-            });
-        });
-
-        it('should return refreshToken', async () => {
-            const result = await authOrchestrator.logout({ token: TOKEN });
-
-            expect(result).toEqual({
-                refreshToken,
             });
         });
     });

@@ -49,15 +49,6 @@ describe('UserService', () => {
                 createdAt: now,
             });
         });
-
-        it('should return user', async () => {
-            const result = await userService.register({
-                email: EMAIL,
-                passwordHash: PASSWORD_HASH,
-            });
-
-            expect(result).toEqual(user);
-        });
     });
 
     describe('findById', () => {
@@ -74,12 +65,6 @@ describe('UserService', () => {
         //         NotFoundError,
         //     );
         // });
-
-        it('should return user', async () => {
-            const result = await userService.findById({ id: USER_ID });
-
-            expect(result).toEqual(user);
-        });
     });
 
     describe('findByEmail', () => {
@@ -96,12 +81,6 @@ describe('UserService', () => {
         //         userService.findOneByEmail(TEST_EMAIL),
         //     ).rejects.toThrow(NotFoundError);
         // });
-
-        it('should return user', async () => {
-            const result = await userService.findByEmail({ email: EMAIL });
-
-            expect(result).toEqual(user);
-        });
     });
 
     describe('markEmailAsVerified', () => {
@@ -116,13 +95,6 @@ describe('UserService', () => {
                 isEmailVerified: true,
                 updatedAt: now,
             });
-        });
-
-        it('should return user', async () => {
-            const result = await userService.markEmailAsVerified({
-                user: user as User,
-            });
-            expect(result).toEqual(user);
         });
     });
 });

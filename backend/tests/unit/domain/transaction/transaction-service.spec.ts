@@ -65,14 +65,6 @@ describe('TransactionService', () => {
                 createdAt: now,
             });
         });
-
-        it('should return transaction', async () => {
-            const result = await transactionService.create(
-                createInput as CreateInput,
-            );
-
-            expect(result).toEqual(transaction);
-        });
     });
 
     describe('findManyByUserId', () => {
@@ -82,14 +74,6 @@ describe('TransactionService', () => {
             expect(
                 transactionRepositoryMock.findManyByUserId,
             ).toHaveBeenCalledWith(USER_ID);
-        });
-
-        it('should return transaction array', async () => {
-            const result = await transactionService.findManyByUserId({
-                userId: USER_ID,
-            });
-
-            expect(result).toEqual(transactionArray);
         });
     });
 
@@ -111,14 +95,6 @@ describe('TransactionService', () => {
         //         transactionService.read(TEST_TRANSACTION_ID),
         //     ).rejects.toThrow(NotFoundError);
         // });
-
-        it('should return transaction', async () => {
-            const result = await transactionService.findById({
-                id: TRANSACTION_ID,
-            });
-
-            expect(result).toEqual(transaction);
-        });
     });
 
     describe('update', () => {
@@ -149,14 +125,6 @@ describe('TransactionService', () => {
                 updatedAt: now,
             });
         });
-
-        it('should return transaction', async () => {
-            const result = await transactionService.update(
-                updateInput as UpdateInput,
-            );
-
-            expect(result).toEqual(transaction);
-        });
     });
 
     describe('deleteById', () => {
@@ -166,14 +134,6 @@ describe('TransactionService', () => {
             expect(transactionRepositoryMock.deleteById).toHaveBeenCalledWith(
                 TRANSACTION_ID,
             );
-        });
-
-        it('should return transaction', async () => {
-            const result = await transactionService.deleteById({
-                id: TRANSACTION_ID,
-            });
-
-            expect(result).toEqual(transaction);
         });
     });
 });

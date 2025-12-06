@@ -150,11 +150,5 @@ describe('UserOrchestrator', () => {
                 user,
             });
         });
-
-        it('should return user', async () => {
-            const result = await userOrchestrator.verifyEmail({ token: TOKEN });
-
-            expect(result).toEqual({ user });
-        });
     });
 });

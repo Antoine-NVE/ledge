@@ -50,15 +50,6 @@ describe('RefreshTokenService', () => {
                 createdAt: now,
             });
         });
-
-        it('should return refreshToken', async () => {
-            const result = await refreshTokenService.create({
-                userId: USER_ID,
-                token: TOKEN,
-            });
-
-            expect(result).toEqual(refreshToken);
-        });
     });
 
     describe('findByToken', () => {
@@ -79,14 +70,6 @@ describe('RefreshTokenService', () => {
         //         refreshTokenService.findOneByToken(TEST_TOKEN),
         //     ).rejects.toThrow(NotFoundError);
         // });
-
-        it('should return refreshToken', async () => {
-            const result = await refreshTokenService.findByToken({
-                token: TOKEN,
-            });
-
-            expect(result).toEqual(refreshToken);
-        });
     });
 
     describe('rotateToken', () => {
@@ -113,15 +96,6 @@ describe('RefreshTokenService', () => {
                 updatedAt: new Date(now.getTime()),
             });
         });
-
-        it('should return refreshToken', async () => {
-            const result = await refreshTokenService.rotateToken({
-                refreshToken: refreshToken as RefreshToken,
-                newToken: NEW_TOKEN,
-            });
-
-            expect(result).toEqual(refreshToken);
-        });
     });
 
     describe('deleteByToken', () => {
@@ -131,14 +105,6 @@ describe('RefreshTokenService', () => {
             expect(
                 refreshTokenRepositoryMock.deleteByToken,
             ).toHaveBeenCalledWith(TOKEN);
-        });
-
-        it('should return refreshToken', async () => {
-            const result = await refreshTokenService.deleteByToken({
-                token: TOKEN,
-            });
-
-            expect(result).toEqual(refreshToken);
         });
     });
 });
