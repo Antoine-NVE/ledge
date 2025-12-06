@@ -53,16 +53,7 @@ export class JwtTokenManager implements TokenManager {
     };
 
     verifyAccess = (token: string): SignAccessPayload => {
-        try {
-            return this.verify(token, { audience: 'access' });
-        } catch (err: unknown) {
-            if (err instanceof UnauthorizedError) {
-                throw new UnauthorizedError(err.message, undefined, {
-                    action: 'refresh',
-                });
-            }
-            throw err;
-        }
+        return this.verify(token, { audience: 'access' });
     };
 
     signVerificationEmail = ({ userId }: VerificationEmailPayload): string => {
