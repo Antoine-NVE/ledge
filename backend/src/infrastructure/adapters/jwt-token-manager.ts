@@ -14,8 +14,6 @@ import {
     VerificationEmailPayload,
 } from '../../application/ports/token-manager';
 import { UnauthorizedError } from '../../core/errors/unauthorized-error';
-import { BadRequestError } from '../../core/errors/bad-request-error';
-import { formatZodError } from '../../core/utils/format';
 
 export class JwtTokenManager implements TokenManager {
     constructor(private secret: Secret) {}
@@ -28,39 +26,26 @@ export class JwtTokenManager implements TokenManager {
     };
 
     private verify = (token: string, options: VerifyOptions) => {
-        let payload;
         try {
-            payload = verify(token, this.secret, options);
-        } catch (error: unknown) {
-            if (error instanceof NotBeforeError) {
+            const data = z
+                .object({
+                    sub: z.string(),
+                    aud: z.string(),
+                    iat: z.number(),
+                    exp: z.number(),
+                })
+                .parse(verify(token, this.secret, options));
+
+            return { userId: data.sub };
+        } catch (err: unknown) {
+            if (err instanceof NotBeforeError) {
                 throw new UnauthorizedError('Inactive JWT');
             }
-
-            if (error instanceof TokenExpiredError) {
+            if (err instanceof TokenExpiredError) {
                 throw new UnauthorizedError('Expired JWT');
             }
-
             throw new UnauthorizedError('Invalid JWT');
         }
-
-        // Only sub isn't yet verified, but it could be useful to have access to other values
-        const { success, data, error } = z
-            .object({
-                sub: z.string(),
-                aud: z.string(),
-                iat: z.number(),
-                exp: z.number(),
-            })
-            .safeParse(payload);
-
-        if (!success) {
-            throw new BadRequestError(
-                'Invalid JWT payload',
-                formatZodError(error),
-            );
-        }
-
-        return { userId: data.sub };
     };
 
     signAccess = ({ userId }: SignAccessPayload): string => {
@@ -70,13 +55,13 @@ export class JwtTokenManager implements TokenManager {
     verifyAccess = (token: string): SignAccessPayload => {
         try {
             return this.verify(token, { audience: 'access' });
-        } catch (error: unknown) {
-            if (error instanceof UnauthorizedError)
-                throw new UnauthorizedError(error.message, undefined, {
+        } catch (err: unknown) {
+            if (err instanceof UnauthorizedError) {
+                throw new UnauthorizedError(err.message, undefined, {
                     action: 'refresh',
                 });
-
-            throw error;
+            }
+            throw err;
         }
     };
 
