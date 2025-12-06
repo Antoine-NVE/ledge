@@ -2,7 +2,7 @@ import { TransactionRepository } from './transaction-repository';
 import { NewTransaction, Transaction } from './transaction-types';
 import { NotFoundError } from '../../core/errors/not-found-error';
 
-type CreateInput = {
+export type CreateInput = {
     userId: string;
     month: string;
     name: string;
@@ -11,23 +11,23 @@ type CreateInput = {
     expenseCategory?: 'need' | 'want' | 'investment' | null;
 };
 
-type FindManyByUserIdInput = {
+export type FindManyByUserIdInput = {
     userId: string;
 };
 
-type FindByIdInput = {
+export type FindByIdInput = {
     id: string;
 };
 
-type UpdateInput = {
+export type UpdateInput = {
     transaction: Transaction;
-    name: string;
-    value: number;
-    type: 'income' | 'expense';
-    expenseCategory?: 'need' | 'want' | 'investment' | null;
+    newName: string;
+    newValue: number;
+    newType: 'income' | 'expense';
+    newExpenseCategory?: 'need' | 'want' | 'investment' | null;
 };
 
-type DeleteByIdInput = {
+export type DeleteByIdInput = {
     id: string;
 };
 
@@ -55,15 +55,15 @@ export class TransactionService {
 
     update = async ({
         transaction,
-        name,
-        value,
-        type,
-        expenseCategory,
+        newName,
+        newValue,
+        newType,
+        newExpenseCategory,
     }: UpdateInput) => {
-        transaction.name = name;
-        transaction.value = value;
-        transaction.type = type;
-        transaction.expenseCategory = expenseCategory;
+        transaction.name = newName;
+        transaction.value = newValue;
+        transaction.type = newType;
+        transaction.expenseCategory = newExpenseCategory;
         transaction.updatedAt = new Date();
 
         await this.transactionRepository.save(transaction);

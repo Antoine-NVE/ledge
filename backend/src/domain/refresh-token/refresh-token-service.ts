@@ -2,21 +2,21 @@ import { RefreshTokenRepository } from './refresh-token-repository';
 import { NewRefreshToken, RefreshToken } from './refresh-token-types';
 import { NotFoundError } from '../../core/errors/not-found-error';
 
-type CreateInput = {
+export type CreateInput = {
     userId: string;
     token: string;
 };
 
-type FindByTokenInput = {
+export type FindByTokenInput = {
     token: string;
 };
 
-type RotateTokenInput = {
+export type RotateTokenInput = {
     refreshToken: RefreshToken;
     newToken: string;
 };
 
-type DeleteByTokenInput = {
+export type DeleteByTokenInput = {
     token: string;
 };
 

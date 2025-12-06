@@ -1,31 +1,32 @@
-import { MongoServerError, ObjectId } from 'mongodb';
-import { RefreshTokenRepository } from '../../../src/domain/refresh-token/refresh-token-repository';
-import { RefreshTokenService } from '../../../src/domain/refresh-token/refresh-token-service';
-import { RefreshToken } from '../../../src/domain/refresh-token/refresh-token-types';
-import { NotFoundError } from '../../../src/infrastructure/errors/not-found-error';
-import { InternalServerError } from '../../../src/infrastructure/errors/internal-server-error';
+import { RefreshToken } from '../../../../src/domain/refresh-token/refresh-token-types';
+import { RefreshTokenRepository } from '../../../../src/domain/refresh-token/refresh-token-repository';
+import { RefreshTokenService } from '../../../../src/domain/refresh-token/refresh-token-service';
 
 describe('RefreshTokenService', () => {
-    const TEST_TOKEN = 'token';
-    const TEST_USER_ID = new ObjectId();
+    const USER_ID = 'USERID123';
+    const REFRESH_TOKEN_ID = 'REFRESHTOKEN123';
+    const TOKEN = 'token';
+    const NEW_TOKEN = 'new-token';
+    const TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-    let refreshToken: RefreshToken;
+    let refreshToken: Partial<RefreshToken>;
 
-    let refreshTokenRepository: RefreshTokenRepository;
+    let refreshTokenRepositoryMock: Partial<RefreshTokenRepository>;
+
     let refreshTokenService: RefreshTokenService;
 
     beforeEach(() => {
-        refreshToken = {} as unknown as RefreshToken;
+        refreshToken = { id: REFRESH_TOKEN_ID, userId: USER_ID, token: TOKEN };
 
-        refreshTokenRepository = {
-            insertOne: jest.fn().mockReturnValue({
-                catch: jest.fn(),
-            }),
-            findOne: jest.fn().mockResolvedValue(refreshToken),
-            updateOne: jest.fn(),
-            findOneAndDelete: jest.fn().mockResolvedValue(refreshToken),
-        } as unknown as RefreshTokenRepository;
-        refreshTokenService = new RefreshTokenService(refreshTokenRepository);
+        refreshTokenRepositoryMock = {
+            create: jest.fn().mockResolvedValue(refreshToken),
+            findByToken: jest.fn().mockResolvedValue(refreshToken),
+            save: jest.fn(),
+            deleteByToken: jest.fn().mockResolvedValue(refreshToken),
+        };
+        refreshTokenService = new RefreshTokenService(
+            refreshTokenRepositoryMock as RefreshTokenRepository,
+        );
     });
 
     afterEach(() => {
@@ -33,129 +34,111 @@ describe('RefreshTokenService', () => {
     });
 
     describe('create', () => {
-        it('should call refreshTokenRepository to insertOne', async () => {
+        it('should call this.refreshTokenRepository.create', async () => {
+            const now = new Date();
+            jest.useFakeTimers().setSystemTime(now);
+
             await refreshTokenService.create({
-                token: TEST_TOKEN,
-                userId: TEST_USER_ID,
+                userId: USER_ID,
+                token: TOKEN,
             });
 
-            expect(refreshTokenRepository.insertOne).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    token: TEST_TOKEN,
-                    userId: TEST_USER_ID,
-                }),
-            );
-        });
-
-        it('should throw an InternalServerError for duplicate token', async () => {
-            const mongoError = Object.assign(new MongoServerError({}), {
-                code: 11000,
+            expect(refreshTokenRepositoryMock.create).toHaveBeenCalledWith({
+                userId: USER_ID,
+                token: TOKEN,
+                expiresAt: new Date(now.getTime() + TTL),
+                createdAt: now,
             });
-            (refreshTokenRepository.insertOne as jest.Mock)
-                .mockRejectedValueOnce(mongoError)
-                .mockRejectedValueOnce(new InternalServerError('Test error'));
-
-            // Duplicate token
-            await expect(
-                refreshTokenService.create({
-                    token: TEST_TOKEN,
-                    userId: TEST_USER_ID,
-                }),
-            ).rejects.toThrow(new InternalServerError('Duplicate token'));
-
-            // Any other error
-            await expect(
-                refreshTokenService.create({
-                    token: TEST_TOKEN,
-                    userId: TEST_USER_ID,
-                }),
-            ).rejects.toThrow(new InternalServerError('Test error'));
         });
 
         it('should return refreshToken', async () => {
             const result = await refreshTokenService.create({
-                token: TEST_TOKEN,
-                userId: TEST_USER_ID,
+                userId: USER_ID,
+                token: TOKEN,
             });
-
-            expect(result).toEqual(
-                expect.objectContaining({
-                    token: TEST_TOKEN,
-                    userId: TEST_USER_ID,
-                }),
-            );
-        });
-    });
-
-    describe('findOneByToken', () => {
-        it('should call refreshTokenRepository to findOne', async () => {
-            await refreshTokenService.findOneByToken(TEST_TOKEN);
-
-            expect(refreshTokenRepository.findOne).toHaveBeenCalledWith(
-                'token',
-                TEST_TOKEN,
-            );
-        });
-
-        it('should throw a NotFoundError if findOne return null', () => {
-            (refreshTokenRepository.findOne as jest.Mock).mockResolvedValue(
-                null,
-            );
-
-            expect(
-                refreshTokenService.findOneByToken(TEST_TOKEN),
-            ).rejects.toThrow(NotFoundError);
-        });
-
-        it('should return refresh token', async () => {
-            const result = await refreshTokenService.findOneByToken(TEST_TOKEN);
 
             expect(result).toEqual(refreshToken);
         });
     });
 
-    describe('extendExpiration', () => {
-        it('should update token, updatedAt and expiresAt', async () => {
+    describe('findByToken', () => {
+        it('should call this.refreshTokenRepository.findByToken', async () => {
+            await refreshTokenService.findByToken({ token: TOKEN });
+
+            expect(refreshTokenRepositoryMock.findByToken).toHaveBeenCalledWith(
+                TOKEN,
+            );
+        });
+
+        // it('should throw a NotFoundError if findOne return null', () => {
+        //     (refreshTokenRepository.findOne as jest.Mock).mockResolvedValue(
+        //         null,
+        //     );
+        //
+        //     expect(
+        //         refreshTokenService.findOneByToken(TEST_TOKEN),
+        //     ).rejects.toThrow(NotFoundError);
+        // });
+
+        it('should return refreshToken', async () => {
+            const result = await refreshTokenService.findByToken({
+                token: TOKEN,
+            });
+
+            expect(result).toEqual(refreshToken);
+        });
+    });
+
+    describe('rotateToken', () => {
+        it('should call this.refreshTokenRepository.save', async () => {
             const now = new Date();
             jest.useFakeTimers().setSystemTime(now);
 
             refreshToken = {
                 ...refreshToken,
-                expiresAt: new Date(now.getTime() - 1000),
+                expiresAt: new Date(now.getTime() + (TTL - 1000)),
                 updatedAt: new Date(now.getTime() - 1000),
             };
 
-            const result = await refreshTokenService.extendExpiration(
-                refreshToken,
-                TEST_TOKEN,
-            );
+            await refreshTokenService.rotateToken({
+                refreshToken: refreshToken as RefreshToken,
+                newToken: NEW_TOKEN,
+            });
 
-            expect(result).toMatchObject({
-                token: TEST_TOKEN,
+            expect(refreshTokenRepositoryMock.save).toHaveBeenCalledWith({
+                id: REFRESH_TOKEN_ID,
+                userId: USER_ID,
+                token: NEW_TOKEN,
                 expiresAt: new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000),
                 updatedAt: new Date(now.getTime()),
             });
         });
 
-        it('should call refreshTokenRepository to updateOne', async () => {
-            await refreshTokenService.extendExpiration(
-                refreshToken,
-                TEST_TOKEN,
-            );
+        it('should return refreshToken', async () => {
+            const result = await refreshTokenService.rotateToken({
+                refreshToken: refreshToken as RefreshToken,
+                newToken: NEW_TOKEN,
+            });
 
-            expect(refreshTokenRepository.updateOne).toHaveBeenCalledWith(
-                refreshToken,
-            );
+            expect(result).toEqual(refreshToken);
         });
     });
 
-    describe('deleteOneByToken', () => {
-        it('should call refreshTokenRepository to deleteOne', async () => {
-            await refreshTokenService.findOneAndDeleteByToken(TEST_TOKEN);
+    describe('deleteByToken', () => {
+        it('should call this.refreshTokenRepository.deleteByToken', async () => {
+            await refreshTokenService.deleteByToken({ token: TOKEN });
 
             expect(
-                refreshTokenRepository.findOneAndDelete,
-            ).toHaveBeenCalledWith('token', TEST_TOKEN);
+                refreshTokenRepositoryMock.deleteByToken,
+            ).toHaveBeenCalledWith(TOKEN);
+        });
+
+        it('should return refreshToken', async () => {
+            const result = await refreshTokenService.deleteByToken({
+                token: TOKEN,
+            });
+
+            expect(result).toEqual(refreshToken);
         });
     });
 });

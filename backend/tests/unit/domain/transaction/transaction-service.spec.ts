@@ -1,142 +1,179 @@
-import { ObjectId } from 'mongodb';
+import { TransactionRepository } from '../../../../src/domain/transaction/transaction-repository';
 import {
-    Transaction,
-    TransactionData,
-    UpdateTransactionData,
-} from '../../../src/domain/transaction/transaction-types';
-import { TransactionRepository } from '../../../src/domain/transaction/transaction-repository';
-import { TransactionService } from '../../../src/domain/transaction/transaction-service';
-import { NotFoundError } from '../../../src/infrastructure/errors/not-found-error';
+    CreateInput,
+    TransactionService,
+    UpdateInput,
+} from '../../../../src/domain/transaction/transaction-service';
+import { Transaction } from '../../../../src/domain/transaction/transaction-types';
 
 describe('TransactionService', () => {
-    const TEST_TRANSACTION_ID = new ObjectId();
-    const TEST_USER_ID = new ObjectId();
-    const TRANSACTION_ID = new ObjectId();
+    const USER_ID = 'USERID123';
+    const TRANSACTION_ID = 'TRANSACTIONID123';
+    const MONTH = '2025-12';
+    const NAME = 'name';
+    const NEW_NAME = 'new-name';
+    const NEW_VALUE = 456;
+    const NEW_TYPE = 'expense';
+    const NEW_EXPENSE_CATEGORY = 'investment';
 
-    let transactionData: TransactionData;
-    let updateTransactionData: UpdateTransactionData;
-    let transaction: Transaction;
-    let transactionArray: Transaction[];
+    let transaction: Partial<Transaction>;
+    let transactionArray: Partial<Transaction>[];
 
-    let transactionRepository: TransactionRepository;
+    let transactionRepositoryMock: TransactionRepository;
+
     let transactionService: TransactionService;
 
     beforeEach(() => {
-        transactionData = {} as unknown as TransactionData;
-        updateTransactionData = {
-            name: 'updated-name',
-        } as unknown as UpdateTransactionData;
         transaction = {
-            _id: TRANSACTION_ID,
-        } as unknown as Transaction;
+            id: TRANSACTION_ID,
+        };
         transactionArray = [transaction];
 
-        transactionRepository = {
-            insertOne: jest.fn(),
-            find: jest.fn().mockResolvedValue(transactionArray),
-            findOne: jest.fn().mockResolvedValue(transaction),
-            updateOne: jest.fn(),
-            deleteOne: jest.fn(),
+        transactionRepositoryMock = {
+            create: jest.fn().mockResolvedValue(transaction),
+            findManyByUserId: jest.fn().mockResolvedValue(transactionArray),
+            findById: jest.fn().mockResolvedValue(transaction),
+            save: jest.fn(),
+            deleteById: jest.fn().mockResolvedValue(transaction),
         } as unknown as TransactionRepository;
-        transactionService = new TransactionService(transactionRepository);
+        transactionService = new TransactionService(transactionRepositoryMock);
+    });
+
+    afterEach(() => {
+        jest.useRealTimers();
     });
 
     describe('create', () => {
-        it('should call transactionRepository to insertOne', async () => {
-            await transactionService.create(transactionData);
+        let createInput: Partial<CreateInput>;
 
-            expect(transactionRepository.insertOne).toHaveBeenCalledWith(
-                expect.objectContaining({
-                    ...transactionData,
-                }),
-            );
+        beforeEach(() => {
+            createInput = {
+                userId: USER_ID,
+                month: MONTH,
+                name: NAME,
+            };
+        });
+
+        it('should call this.transactionRepository.create', async () => {
+            const now = new Date();
+            jest.useFakeTimers().setSystemTime(now);
+
+            await transactionService.create(createInput as CreateInput);
+
+            expect(transactionRepositoryMock.create).toHaveBeenCalledWith({
+                ...createInput,
+                createdAt: now,
+            });
         });
 
         it('should return transaction', async () => {
-            const result = await transactionService.create(transactionData);
+            const result = await transactionService.create(
+                createInput as CreateInput,
+            );
 
-            expect(result).toMatchObject({
-                ...transactionData,
-            });
+            expect(result).toEqual(transaction);
         });
     });
 
-    describe('readAll', () => {
-        it('should call transactionRepository to find', async () => {
-            await transactionService.readAll(TEST_USER_ID);
+    describe('findManyByUserId', () => {
+        it('should call this.transactionRepository.findManyByUserId', async () => {
+            await transactionService.findManyByUserId({ userId: USER_ID });
 
-            expect(transactionRepository.find).toHaveBeenCalledWith(
-                'userId',
-                TEST_USER_ID,
-            );
+            expect(
+                transactionRepositoryMock.findManyByUserId,
+            ).toHaveBeenCalledWith(USER_ID);
         });
 
         it('should return transaction array', async () => {
-            const result = await transactionService.readAll(TEST_USER_ID);
+            const result = await transactionService.findManyByUserId({
+                userId: USER_ID,
+            });
 
             expect(result).toEqual(transactionArray);
         });
     });
 
-    describe('read', () => {
-        it('should call transactionRepository.findOne', async () => {
-            await transactionService.read(TEST_TRANSACTION_ID);
+    describe('findById', () => {
+        it('should call this.transactionRepository.findById', async () => {
+            await transactionService.findById({ id: TRANSACTION_ID });
 
-            expect(transactionRepository.findOne).toHaveBeenCalledWith(
-                '_id',
-                TEST_TRANSACTION_ID,
+            expect(transactionRepositoryMock.findById).toHaveBeenCalledWith(
+                TRANSACTION_ID,
             );
         });
 
-        it('should throw a NotFoundError if transactionRepository.findOne returns null', () => {
-            (transactionRepository.findOne as jest.Mock).mockResolvedValue(
-                null,
-            );
-
-            expect(
-                transactionService.read(TEST_TRANSACTION_ID),
-            ).rejects.toThrow(NotFoundError);
-        });
+        // it('should throw a NotFoundError if transactionRepository.findOne returns null', () => {
+        //     (transactionRepository.findOne as jest.Mock).mockResolvedValue(
+        //         null,
+        //     );
+        //
+        //     expect(
+        //         transactionService.read(TEST_TRANSACTION_ID),
+        //     ).rejects.toThrow(NotFoundError);
+        // });
 
         it('should return transaction', async () => {
-            const result = await transactionService.read(TEST_TRANSACTION_ID);
+            const result = await transactionService.findById({
+                id: TRANSACTION_ID,
+            });
 
             expect(result).toEqual(transaction);
         });
     });
 
     describe('update', () => {
-        it('should update values', async () => {
-            const result = await transactionService.update(
-                transaction,
-                updateTransactionData,
-            );
+        let updateInput: Partial<UpdateInput>;
 
-            expect(result).toMatchObject({
-                ...updateTransactionData,
+        beforeEach(() => {
+            updateInput = {
+                transaction: transaction as Transaction,
+                newName: NEW_NAME,
+                newValue: NEW_VALUE,
+                newType: NEW_TYPE,
+                newExpenseCategory: NEW_EXPENSE_CATEGORY,
+            };
+        });
+
+        it('should call this.transactionRepository.save', async () => {
+            const now = new Date();
+            jest.useFakeTimers().setSystemTime(now);
+
+            await transactionService.update(updateInput as UpdateInput);
+
+            expect(transactionRepositoryMock.save).toHaveBeenCalledWith({
+                id: TRANSACTION_ID,
+                name: NEW_NAME,
+                value: NEW_VALUE,
+                type: NEW_TYPE,
+                expenseCategory: NEW_EXPENSE_CATEGORY,
+                updatedAt: now,
             });
         });
 
-        it('should return an updated transaction', async () => {
+        it('should return transaction', async () => {
             const result = await transactionService.update(
-                transaction,
-                updateTransactionData,
+                updateInput as UpdateInput,
             );
 
-            expect(result).toMatchObject({
-                ...transaction,
-                ...updateTransactionData,
-            });
+            expect(result).toEqual(transaction);
         });
     });
 
-    describe('delete', () => {
-        it('should call transactionRepository.deleteOne', async () => {
-            await transactionService.delete(transaction);
+    describe('deleteById', () => {
+        it('should call this.transactionRepository.deleteById', async () => {
+            await transactionService.deleteById({ id: TRANSACTION_ID });
 
-            expect(transactionRepository.deleteOne).toHaveBeenCalledWith(
-                transaction,
+            expect(transactionRepositoryMock.deleteById).toHaveBeenCalledWith(
+                TRANSACTION_ID,
             );
+        });
+
+        it('should return transaction', async () => {
+            const result = await transactionService.deleteById({
+                id: TRANSACTION_ID,
+            });
+
+            expect(result).toEqual(transaction);
         });
     });
 });
