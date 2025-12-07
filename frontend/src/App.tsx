@@ -23,7 +23,10 @@ function App() {
                     <Route element={<Public />}>
                         <Route path="/register" element={<Register />} />
                         <Route path="/login" element={<Login />} />
-                        <Route path="/verify-email/:token" element={<VerifyEmail />} />
+                        <Route
+                            path="/verify-email/:token"
+                            element={<VerifyEmail />}
+                        />
                     </Route>
                 </Routes>
             </BrowserRouter>

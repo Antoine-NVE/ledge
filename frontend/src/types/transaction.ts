@@ -3,10 +3,13 @@ export type Transaction = {
     month: string;
     name: string;
     value: number;
-    type: "expense" | 'income';
-    expenseCategory: "need" | "want" | "investment" | null | undefined;
+    type: 'expense' | 'income';
+    expenseCategory: 'need' | 'want' | 'investment' | null | undefined;
     createdAt: string;
     updatedAt: string;
 };
 
-export type NewTransaction = Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>
+export type NewTransaction = Omit<
+    Transaction,
+    'id' | 'createdAt' | 'updatedAt'
+>;
