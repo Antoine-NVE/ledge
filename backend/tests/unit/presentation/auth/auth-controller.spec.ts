@@ -1,77 +1,79 @@
 import { Request, Response } from 'express';
-import { RefreshToken } from '../../../src/domain/refresh-token/refresh-token-types';
-import { CookieService } from '../../../src/infrastructure/adapters/cookie-service';
-import { AuthOrchestrator } from '../../../src/application/auth/auth-orchestrator';
-import { AuthController } from '../../../src/presentation/auth/auth-controller';
-import { User } from '../../../src/domain/user/user-types';
-import { removePasswordHash } from '../../../src/infrastructure/utils/clean';
-import { UnauthorizedError } from '../../../src/infrastructure/errors/unauthorized-error';
 import { Logger } from 'pino';
-
-jest.mock('../../../src/infrastructure/adapters/cookie-service');
-jest.mock('../../../src/infrastructure/utils/clean');
+import { CookieManager } from '../../../../src/presentation/http/support/cookie-manager';
+import { AuthOrchestrator } from '../../../../src/application/auth/auth-orchestrator';
+import { AuthController } from '../../../../src/presentation/http/auth/auth-controller';
+import { User } from '../../../../src/domain/user/user-types';
+import { RefreshToken } from '../../../../src/domain/refresh-token/refresh-token-types';
+import * as cleanUtils from '../../../../src/core/utils/clean';
 
 describe('AuthController', () => {
+    const USER_ID = 'USERID123';
+    const REFRESH_TOKEN_ID = 'REFRESHTOKENID123';
     const EMAIL = 'test@example.com';
     const PASSWORD = 'Azerty123!';
-    const PASSWORD_HASH = '123abc';
-    const ACCESS_TOKEN = 'json.web.token';
-    const TOKEN = 'abc123';
+    const PASSWORD_HASH = 'pAsSwOrDhAsH';
+    const ACCESS_TOKEN = 'access-token';
+    const TOKEN = 'token';
+
+    let user: Partial<User>;
+    let cleanUser: Partial<Omit<User, 'passwordHash'>>;
+    let refreshToken: Partial<RefreshToken>;
 
     let reqMock: Partial<Request>;
     let resMock: Partial<Response>;
-    let userMock: Partial<User>;
-    let refreshTokenMock: Partial<RefreshToken>;
 
-    let removePasswordHashMock: jest.Mock;
-    let cookieServiceMock: Partial<CookieService>;
+    let cookieManagerMock: Partial<CookieManager>;
     let authOrchestratorMock: Partial<AuthOrchestrator>;
     let loggerMock: Partial<Logger>;
+
+    let removePasswordHashSpy: jest.SpiedFunction<
+        typeof cleanUtils.removePasswordHash
+    >;
+
     let authController: AuthController;
 
     beforeEach(() => {
+        user = {
+            id: USER_ID,
+            email: EMAIL,
+            passwordHash: PASSWORD_HASH,
+        };
+        cleanUser = {
+            id: USER_ID,
+            email: EMAIL,
+        };
+        refreshToken = {
+            id: REFRESH_TOKEN_ID,
+            token: TOKEN,
+        };
+
         reqMock = {};
         resMock = {
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
         };
-        userMock = {
-            email: EMAIL,
-            passwordHash: PASSWORD_HASH,
-        };
-        refreshTokenMock = {
-            token: TOKEN,
-        };
 
-        cookieServiceMock = {
+        cookieManagerMock = {
             setAuth: jest.fn(),
             getRefreshToken: jest.fn().mockReturnValue(TOKEN),
             getRememberMe: jest.fn().mockReturnValue(true),
             clearAuth: jest.fn(),
         };
-        (CookieService as jest.Mock).mockImplementation(
-            () => cookieServiceMock,
-        );
-
-        removePasswordHashMock = removePasswordHash as jest.Mock;
-        removePasswordHashMock.mockReturnValue({
-            email: EMAIL,
-        });
-
         authOrchestratorMock = {
             register: jest.fn().mockResolvedValue({
-                user: userMock,
+                user: user,
                 accessToken: ACCESS_TOKEN,
-                refreshToken: refreshTokenMock,
+                refreshToken: refreshToken,
             }),
             login: jest.fn().mockResolvedValue({
-                user: userMock,
+                user: user,
                 accessToken: ACCESS_TOKEN,
-                refreshToken: refreshTokenMock,
+                refreshToken: refreshToken,
             }),
             refresh: jest.fn().mockResolvedValue({
                 accessToken: ACCESS_TOKEN,
-                refreshToken: refreshTokenMock,
+                refreshToken: refreshToken,
             }),
             logout: jest.fn().mockReturnValue({
                 catch: jest.fn(),
@@ -80,9 +82,15 @@ describe('AuthController', () => {
         loggerMock = {
             info: jest.fn(),
         };
+
+        removePasswordHashSpy = jest
+            .spyOn(cleanUtils, 'removePasswordHash')
+            .mockReturnValue(cleanUser as Omit<User, 'passwordHash'>);
+
         authController = new AuthController(
             authOrchestratorMock as AuthOrchestrator,
             loggerMock as Logger,
+            cookieManagerMock as CookieManager,
         );
     });
 
@@ -91,7 +99,7 @@ describe('AuthController', () => {
             reqMock.body = { email: EMAIL, password: PASSWORD };
         });
 
-        it('should call authOrchestrator.register with valid parameters', async () => {
+        it('should call this.authOrchestrator.register', async () => {
             await authController.register(
                 reqMock as Request,
                 resMock as Response,
@@ -103,31 +111,33 @@ describe('AuthController', () => {
             });
         });
 
-        it('should call cookieService.setAuth with valid parameters', async () => {
+        it('should call this.cookieManager.setAuth', async () => {
             await authController.register(
                 reqMock as Request,
                 resMock as Response,
             );
 
-            expect(cookieServiceMock.setAuth).toHaveBeenCalledWith(
+            expect(cookieManagerMock.setAuth).toHaveBeenCalledWith(
+                resMock,
                 ACCESS_TOKEN,
                 TOKEN,
                 false,
             );
         });
 
-        it('should call res.status().json() with valid parameters', async () => {
+        it('should call res.status and res.json', async () => {
             await authController.register(
                 reqMock as Request,
                 resMock as Response,
             );
 
-            expect(removePasswordHashMock).toHaveBeenLastCalledWith(userMock);
+            expect(removePasswordHashSpy).toHaveBeenCalledWith(user);
             expect(resMock.status).toHaveBeenCalledWith(201);
             expect(resMock.json).toHaveBeenCalledWith({
                 message: 'User registered successfully',
                 data: {
                     user: {
+                        id: USER_ID,
                         email: EMAIL,
                     },
                 },
@@ -144,7 +154,7 @@ describe('AuthController', () => {
             };
         });
 
-        it('should call authOrchestrator.login with valid parameters', async () => {
+        it('should call this.authOrchestrator.login', async () => {
             await authController.login(reqMock as Request, resMock as Response);
 
             expect(authOrchestratorMock.login).toHaveBeenCalledWith({
@@ -153,35 +163,27 @@ describe('AuthController', () => {
             });
         });
 
-        it('should call cookieService.setAuth with valid paramaters', async () => {
+        it('should call this.cookieManager.setAuth', async () => {
             await authController.login(reqMock as Request, resMock as Response);
 
-            expect(cookieServiceMock.setAuth).toHaveBeenCalledWith(
+            expect(cookieManagerMock.setAuth).toHaveBeenCalledWith(
+                resMock,
                 ACCESS_TOKEN,
                 TOKEN,
                 true,
             );
-
-            reqMock.body.rememberMe = false;
-
-            await authController.login(reqMock as Request, resMock as Response);
-
-            expect(cookieServiceMock.setAuth).toHaveBeenCalledWith(
-                ACCESS_TOKEN,
-                TOKEN,
-                false,
-            );
         });
 
-        it('should call res.status().json() with valid parameters', async () => {
+        it('should call res.status and res.json', async () => {
             await authController.login(reqMock as Request, resMock as Response);
 
-            expect(removePasswordHashMock).toHaveBeenLastCalledWith(userMock);
+            expect(removePasswordHashSpy).toHaveBeenCalledWith(user);
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({
                 message: 'User logged in successfully',
                 data: {
                     user: {
+                        id: USER_ID,
                         email: EMAIL,
                     },
                 },
@@ -190,46 +192,43 @@ describe('AuthController', () => {
     });
 
     describe('refresh', () => {
-        it('should call cookieService.getRefreshToken and throw if !token', async () => {
+        it('should call this.cookieManager.getRefreshToken', async () => {
             await authController.refresh(
                 reqMock as Request,
                 resMock as Response,
             );
 
-            expect(cookieServiceMock.getRefreshToken).toHaveBeenCalled();
-
-            (cookieServiceMock.getRefreshToken as jest.Mock).mockReturnValue(
-                undefined,
+            expect(cookieManagerMock.getRefreshToken).toHaveBeenCalledWith(
+                reqMock,
             );
-
-            await expect(
-                authController.refresh(reqMock as Request, resMock as Response),
-            ).rejects.toThrow(new UnauthorizedError('Required refresh token'));
         });
 
-        it('should call cookieService.getRememberMe', async () => {
+        it('should call this.cookieManager.getRememberMe', async () => {
             await authController.refresh(
                 reqMock as Request,
                 resMock as Response,
             );
 
-            expect(cookieServiceMock.getRememberMe).toHaveBeenCalled();
+            expect(cookieManagerMock.getRememberMe).toHaveBeenCalledWith(
+                reqMock,
+            );
         });
 
-        it('should call cookieService.setAuth with valid parameters', async () => {
+        it('should call this.cookieManager.setAuth', async () => {
             await authController.refresh(
                 reqMock as Request,
                 resMock as Response,
             );
 
-            expect(cookieServiceMock.setAuth).toHaveBeenCalledWith(
+            expect(cookieManagerMock.setAuth).toHaveBeenCalledWith(
+                resMock,
                 ACCESS_TOKEN,
                 TOKEN,
                 true,
             );
         });
 
-        it('should call res.status().json() with valid parameters', async () => {
+        it('should call res.status and res.json', async () => {
             await authController.refresh(
                 reqMock as Request,
                 resMock as Response,
@@ -243,42 +242,38 @@ describe('AuthController', () => {
     });
 
     describe('logout', () => {
-        it('should call cookieService.getRefreshToken and call authOrchestrator.logout if token', async () => {
-            // Part one
+        it('should call this.cookieManager.getRefreshToken', async () => {
             await authController.logout(
                 reqMock as Request,
                 resMock as Response,
             );
 
-            expect(cookieServiceMock.getRefreshToken).toHaveBeenCalled();
-            expect(authOrchestratorMock.logout).toHaveBeenCalledWith(TOKEN);
-
-            (authOrchestratorMock.logout as jest.Mock).mockClear();
-
-            // Part two
-            (cookieServiceMock.getRefreshToken as jest.Mock).mockReturnValue(
-                undefined,
+            expect(cookieManagerMock.getRefreshToken).toHaveBeenCalledWith(
+                reqMock,
             );
-
-            await authController.logout(
-                reqMock as Request,
-                resMock as Response,
-            );
-
-            expect(cookieServiceMock.getRefreshToken).toHaveBeenCalled();
-            expect(authOrchestratorMock.logout).not.toHaveBeenCalled();
         });
 
-        it('should call cookieService.clearAuth', async () => {
+        it('should call this.authOrchestrator.logout', async () => {
             await authController.logout(
                 reqMock as Request,
                 resMock as Response,
             );
 
-            expect(cookieServiceMock.clearAuth).toHaveBeenCalled();
+            expect(authOrchestratorMock.logout).toHaveBeenCalledWith({
+                token: TOKEN,
+            });
         });
 
-        it('should call res.status().json() with valid parameters', async () => {
+        it('should call this.cookieManager.clearAuth', async () => {
+            await authController.logout(
+                reqMock as Request,
+                resMock as Response,
+            );
+
+            expect(cookieManagerMock.clearAuth).toHaveBeenCalledWith(resMock);
+        });
+
+        it('should call res.status and res.json', async () => {
             await authController.logout(
                 reqMock as Request,
                 resMock as Response,

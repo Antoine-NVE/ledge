@@ -65,10 +65,10 @@ export class TransactionController {
     ) => {
         const transaction = await this.transactionService.update({
             transaction: req.transaction,
-            name: req.body.name,
-            value: req.body.value,
-            type: req.body.type,
-            expenseCategory: req.body.expenseCategory,
+            newName: req.body.name,
+            newValue: req.body.value,
+            newType: req.body.type,
+            newExpenseCategory: req.body.expenseCategory,
         });
 
         const message = 'Transaction updated successfully';

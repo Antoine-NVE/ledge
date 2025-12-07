@@ -1,59 +1,69 @@
 import { Request, Response } from 'express';
-import { ObjectId } from 'mongodb';
-import { Transaction } from '../../../src/domain/transaction/transaction-types';
-import { TransactionOrchestrator } from '../../../src/application/transaction/transaction-orchestrator';
-import { TransactionController } from '../../../src/presentation/transaction/transaction-controller';
-import { User } from '../../../src/domain/user/user-types';
 import { Logger } from 'pino';
+import { User } from '../../../../src/domain/user/user-types';
+import { Transaction } from '../../../../src/domain/transaction/transaction-types';
+import { TransactionController } from '../../../../src/presentation/http/transaction/transaction-controller';
+import { TransactionService } from '../../../../src/domain/transaction/transaction-service';
+
+declare module 'express-serve-static-core' {
+    interface Request {
+        transaction: Transaction;
+        user: User;
+    }
+}
 
 describe('TransactionController', () => {
-    const USER_ID = new ObjectId();
-    const TRANSACTION_ID = new ObjectId();
+    const USER_ID = 'USERID123';
+    const TRANSACTION_ID = 'TRANSACTIONID123';
     const NAME = 'Example';
     const UPDATED_NAME = 'Updated example';
 
-    let userMock: Partial<User>;
-    let transactionMock: Partial<Transaction>;
-    let updatedTransactionMock: Partial<Transaction>;
-    let transactionArrayMock: Partial<Transaction>[];
+    let user: Partial<User>;
+    let transaction: Partial<Transaction>;
+    let updatedTransaction: Partial<Transaction>;
+    let transactionArray: Partial<Transaction>[];
+
     let reqMock: Partial<Request>;
     let resMock: Partial<Response>;
-    let transactionOrchestratorMock: Partial<TransactionOrchestrator>;
+
+    let transactionServiceMock: Partial<TransactionService>;
     let loggerMock: Partial<Logger>;
 
     let transactionController: TransactionController;
 
     beforeEach(() => {
-        userMock = {
-            _id: USER_ID,
+        user = {
+            id: USER_ID,
         };
-        transactionMock = {
-            _id: TRANSACTION_ID,
+        transaction = {
+            id: TRANSACTION_ID,
             name: NAME,
         };
-        updatedTransactionMock = {
-            _id: TRANSACTION_ID,
+        updatedTransaction = {
+            id: TRANSACTION_ID,
             name: UPDATED_NAME,
         };
-        transactionArrayMock = [transactionMock];
+        transactionArray = [transaction];
+
         reqMock = {};
-        reqMock.user = userMock as User;
+        reqMock.user = user as User;
         resMock = {
             status: jest.fn().mockReturnThis(),
             json: jest.fn(),
         };
-        transactionOrchestratorMock = {
-            create: jest.fn().mockResolvedValue(transactionMock),
-            readAll: jest.fn().mockResolvedValue(transactionArrayMock),
-            update: jest.fn().mockResolvedValue(updatedTransactionMock),
-            delete: jest.fn(),
+
+        transactionServiceMock = {
+            create: jest.fn().mockResolvedValue(transaction),
+            findManyByUserId: jest.fn().mockResolvedValue(transactionArray),
+            update: jest.fn().mockResolvedValue(updatedTransaction),
+            deleteById: jest.fn(),
         };
         loggerMock = {
             info: jest.fn(),
         };
 
         transactionController = new TransactionController(
-            transactionOrchestratorMock as TransactionOrchestrator,
+            transactionServiceMock as TransactionService,
             loggerMock as Logger,
         );
     });
@@ -65,19 +75,19 @@ describe('TransactionController', () => {
             };
         });
 
-        it('should call transactionOrchestrator.create with valid parameters', async () => {
+        it('should call this.transactionService.create', async () => {
             await transactionController.create(
                 reqMock as Request,
                 resMock as Response,
             );
 
-            expect(transactionOrchestratorMock.create).toHaveBeenCalledWith({
-                name: NAME,
+            expect(transactionServiceMock.create).toHaveBeenCalledWith({
                 userId: USER_ID,
+                name: NAME,
             });
         });
 
-        it('should call res.status().json() with valid parameters', async () => {
+        it('should call res.status and res.json', async () => {
             await transactionController.create(
                 reqMock as Request,
                 resMock as Response,
@@ -87,25 +97,28 @@ describe('TransactionController', () => {
             expect(resMock.json).toHaveBeenCalledWith({
                 message: 'Transaction created successfully',
                 data: {
-                    transaction: transactionMock,
+                    transaction: {
+                        id: TRANSACTION_ID,
+                        name: NAME,
+                    },
                 },
             });
         });
     });
 
     describe('readAll', () => {
-        it('should call transactionOrchestrator.readAll with valid parameters', async () => {
+        it('should call this.transactionService.findManyByUserId', async () => {
             await transactionController.readAll(
                 reqMock as Request,
                 resMock as Response,
             );
 
-            expect(transactionOrchestratorMock.readAll).toHaveBeenCalledWith(
-                USER_ID,
-            );
+            expect(
+                transactionServiceMock.findManyByUserId,
+            ).toHaveBeenCalledWith({ userId: USER_ID });
         });
 
-        it('should call res.status().json() with valid parameters', async () => {
+        it('should call res.status and res.json', async () => {
             await transactionController.readAll(
                 reqMock as Request,
                 resMock as Response,
@@ -115,7 +128,7 @@ describe('TransactionController', () => {
             expect(resMock.json).toHaveBeenCalledWith({
                 message: 'Transactions retrieved successfully',
                 data: {
-                    transactions: transactionArrayMock,
+                    transactions: [{ id: TRANSACTION_ID, name: NAME }],
                 },
             });
         });
@@ -123,17 +136,20 @@ describe('TransactionController', () => {
 
     describe('read', () => {
         beforeEach(() => {
-            reqMock.transaction = transactionMock as Transaction;
+            reqMock.transaction = transaction as Transaction;
         });
 
-        it('should call res.status().json() with valid parameters', () => {
+        it('should call res.status and res.json', () => {
             transactionController.read(reqMock as Request, resMock as Response);
 
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({
                 message: 'Transaction retrieved successfully',
                 data: {
-                    transaction: transactionMock,
+                    transaction: {
+                        id: TRANSACTION_ID,
+                        name: NAME,
+                    },
                 },
             });
         });
@@ -141,27 +157,28 @@ describe('TransactionController', () => {
 
     describe('update', () => {
         beforeEach(() => {
-            reqMock.transaction = transactionMock as Transaction;
+            reqMock.transaction = transaction as Transaction;
             reqMock.body = {
                 name: UPDATED_NAME,
             };
         });
 
-        it('should call transactionOrchestrator.update with valid parameters', async () => {
+        it('should call this.transactionService.update', async () => {
             await transactionController.update(
                 reqMock as Request,
                 resMock as Response,
             );
 
-            expect(transactionOrchestratorMock.update).toHaveBeenCalledWith(
-                transactionMock,
-                {
-                    name: UPDATED_NAME,
-                },
-            );
+            expect(transactionServiceMock.update).toHaveBeenCalledWith({
+                transaction,
+                newName: UPDATED_NAME,
+                newValue: undefined,
+                newType: undefined,
+                newExpenseCategory: undefined,
+            });
         });
 
-        it('should call res.status().json() with valid parameters', async () => {
+        it('should call res.status and res.json', async () => {
             await transactionController.update(
                 reqMock as Request,
                 resMock as Response,
@@ -171,7 +188,10 @@ describe('TransactionController', () => {
             expect(resMock.json).toHaveBeenCalledWith({
                 message: 'Transaction updated successfully',
                 data: {
-                    transaction: updatedTransactionMock,
+                    transaction: {
+                        id: TRANSACTION_ID,
+                        name: UPDATED_NAME,
+                    },
                 },
             });
         });
@@ -179,21 +199,21 @@ describe('TransactionController', () => {
 
     describe('delete', () => {
         beforeEach(() => {
-            reqMock.transaction = transactionMock as Transaction;
+            reqMock.transaction = transaction as Transaction;
         });
 
-        it('should call transactionOrchestrator.delete with valid parameters', async () => {
+        it('should call this.transactionService.deleteById', async () => {
             await transactionController.delete(
                 reqMock as Request,
                 resMock as Response,
             );
 
-            expect(transactionOrchestratorMock.delete).toHaveBeenCalledWith(
-                transactionMock,
-            );
+            expect(transactionServiceMock.deleteById).toHaveBeenCalledWith({
+                id: TRANSACTION_ID,
+            });
         });
 
-        it('should call res.status().json() with valid parameters', async () => {
+        it('should call res.status and res.json', async () => {
             await transactionController.delete(
                 reqMock as Request,
                 resMock as Response,
