@@ -21,10 +21,10 @@ const Month = () => {
         setTransactions((prev) => [...prev, transaction]);
     };
     const updateTransaction = (updatedTransaction: Transaction) => {
-        setTransactions((prev) => prev.map((t) => (t._id === updatedTransaction._id ? updatedTransaction : t)));
+        setTransactions((prev) => prev.map((t) => (t.id === updatedTransaction.id ? updatedTransaction : t)));
     };
     const deleteTransaction = (transaction: Transaction) => {
-        setTransactions((prev) => prev.filter((t) => t._id !== transaction._id));
+        setTransactions((prev) => prev.filter((t) => t.id !== transaction.id));
     };
 
     useEffect(() => {

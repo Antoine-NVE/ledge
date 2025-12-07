@@ -3,8 +3,11 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile.local
-      args:
-        VITE_API_URL: ${VITE_API_URL}
+    env_file:
+      - path: ./frontend/.env.example
+        required: true
+      - path: ./frontend/.env
+        required: false
     ports:
       - "${FRONTEND_DEV_PORT}:5173"
       - "${FRONTEND_PREVIEW_PORT}:4173"
@@ -19,7 +22,10 @@ services:
       context: ./backend
       dockerfile: Dockerfile.local
     env_file:
-      - ./.env
+      - path: ./backend/.env.example
+        required: true
+      - path: ./backend/.env
+        required: false
     ports:
       - "${BACKEND_PORT}:3000"
     volumes:
@@ -30,17 +36,34 @@ services:
       - cache
       - smtp
 
+  migrate:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.local
+    profiles: [ "migrations" ]
+    env_file:
+      - path: ./backend/.env.example
+        required: true
+      - path: ./backend/.env
+        required: false
+    depends_on:
+      - database
+    entrypoint: [ "node_modules/.bin/tsx", "scripts/migrate.ts", "up" ]
+
   database:
     image: mongo:8.0
     ports:
       - "${DATABASE_PORT}:27017"
     volumes:
-      - ./data/database:/data/db
+      - database:/data/db
+      - /data/configdb
 
   cache:
     image: redis:8.2
     ports:
       - "${CACHE_PORT}:6379"
+    volumes:
+      - cache:/data
 
   smtp:
     image: axllent/mailpit:v1.27
@@ -50,4 +73,9 @@ services:
     environment:
       MP_DATABASE: /data/mailpit.db # Use persistent storage
     volumes:
-      - ./data/smtp:/data
+      - smtp:/data
+
+volumes:
+  database:
+  cache:
+  smtp:

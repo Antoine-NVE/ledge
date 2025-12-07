@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  backend-ci:
+  backend:
     name: Backend checks (format, lint, tests)
     runs-on: ubuntu-latest
 
@@ -14,10 +14,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Use Node 22.18.0
+      - name: Use Node 24
         uses: actions/setup-node@v4
         with:
-          node-version: 22.18.0
+          node-version: 24
 
       - name: Install dependencies
         run: npm ci
@@ -31,6 +31,6 @@ jobs:
         run: npm run lint
         working-directory: ./backend
 
-      - name: Run tests
-        run: npm run test
+      - name: Run unit tests
+        run: npm run test:unit
         working-directory: ./backend

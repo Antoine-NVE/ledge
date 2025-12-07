@@ -14,7 +14,7 @@ interface FormTransaction {
     name: string;
     value: string;
     type: 'income' | 'expense' | null;
-    expenseCategory: 'need' | 'want' | 'investment' | null;
+    expenseCategory?: 'need' | 'want' | 'investment' | null;
 }
 
 interface FormErrors {
@@ -28,7 +28,7 @@ const EMPTY_FORM: FormTransaction = {
     name: '',
     value: '',
     type: null,
-    expenseCategory: null,
+    expenseCategory: undefined,
 };
 
 const EMPTY_ERRORS: FormErrors = {
@@ -82,7 +82,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                 expenseCategory:
                     form.type === 'expense'
                         ? form.expenseCategory
-                        : null,
+                        : undefined,
             };
             handleUpdate(transaction);
         } else {
@@ -94,7 +94,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                 expenseCategory:
                     form.type === 'expense'
                         ? form.expenseCategory
-                        : null,
+                        : undefined,
             };
             handleCreate(transaction);
         }
@@ -265,7 +265,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                                         type="radio"
                                         name="transactionTypeModal"
                                         checked={form.type === 'income'}
-                                        onChange={() => setForm({ ...form, type: 'income', expenseCategory: null })}
+                                        onChange={() => setForm({ ...form, type: 'income', expenseCategory: undefined })}
                                     />
                                     <span>Income</span>
                                 </label>
@@ -275,7 +275,7 @@ const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }
                                         type="radio"
                                         name="transactionTypeModal"
                                         checked={form.type === 'expense'}
-                                        onChange={() => setForm({ ...form, type: 'expense' })}
+                                        onChange={() => setForm({ ...form, type: 'expense', expenseCategory: null })}
                                     />
                                     <span>Expense</span>
                                 </label>

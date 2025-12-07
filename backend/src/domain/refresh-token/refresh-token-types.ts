@@ -1,12 +1,10 @@
-import { ObjectId } from 'mongodb';
-import { BaseDocument } from '../shared/shared-types';
-
-export type RefreshTokenData = {
+export type RefreshToken = {
+    id: string;
+    userId: string;
     token: string;
-    userId: ObjectId;
     expiresAt: Date;
+    createdAt: Date;
+    updatedAt?: Date;
 };
 
-export type RefreshToken = RefreshTokenData & BaseDocument;
-
-export type CreateRefreshTokenData = Pick<RefreshTokenData, 'token' | 'userId'>;
+export type NewRefreshToken = Omit<RefreshToken, 'id' | 'updatedAt'>;

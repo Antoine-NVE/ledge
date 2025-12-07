@@ -1,93 +1,111 @@
 import { UserService } from '../../domain/user/user-service';
-import { NotFoundError } from '../../infrastructure/errors/not-found-error';
-import { UnauthorizedError } from '../../infrastructure/errors/unauthorized-error';
 import { User } from '../../domain/user/user-types';
 import { RefreshToken } from '../../domain/refresh-token/refresh-token-types';
 import { RefreshTokenService } from '../../domain/refresh-token/refresh-token-service';
-import { JwtService } from '../../infrastructure/services/jwt-service';
-import { PasswordService } from '../../infrastructure/services/password-service';
-import { TokenService } from '../../infrastructure/services/token-service';
-import { LoginInput, RegisterInput } from './auth-types';
+import { TokenManager } from '../ports/token-manager';
+import { Hasher } from '../ports/hasher';
+import { NotFoundError } from '../../core/errors/not-found-error';
+import { UnauthorizedError } from '../../core/errors/unauthorized-error';
+import { generateToken } from '../../core/utils/token';
+
+type RegisterInput = {
+    email: string;
+    password: string;
+};
+
+type RegisterOutput = {
+    user: User;
+    accessToken: string;
+    refreshToken: RefreshToken;
+};
+
+type LoginInput = {
+    email: string;
+    password: string;
+};
+
+type LoginOutput = {
+    user: User;
+    accessToken: string;
+    refreshToken: RefreshToken;
+};
+
+type RefreshInput = {
+    token: string;
+};
+
+type RefreshOutput = {
+    accessToken: string;
+    refreshToken: RefreshToken;
+};
+
+type LogoutInput = {
+    token: string;
+};
+
+type LogoutOutput = {
+    refreshToken: RefreshToken;
+};
 
 export class AuthOrchestrator {
     constructor(
         private userService: UserService,
-        private jwtService: JwtService,
+        private tokenManager: TokenManager,
         private refreshTokenService: RefreshTokenService,
-        private passwordService: PasswordService,
-        private tokenService: TokenService,
+        private hasher: Hasher,
     ) {}
 
     register = async ({
         email,
         password,
-    }: RegisterInput): Promise<{
-        user: User;
-        accessToken: string;
-        refreshToken: RefreshToken;
-    }> => {
-        const passwordHash = await this.passwordService.hash(password);
+    }: RegisterInput): Promise<RegisterOutput> => {
+        const passwordHash = await this.hasher.hash(password);
 
         const user = await this.userService.register({ email, passwordHash });
 
-        const token = this.tokenService.generate();
-
         const refreshToken = await this.refreshTokenService.create({
-            token,
-            userId: user._id,
+            userId: user.id,
+            token: generateToken(),
         });
 
-        const accessToken = this.jwtService.signAccess(user._id);
+        const accessToken = this.tokenManager.signAccess({ userId: user.id });
 
         return { user, accessToken, refreshToken };
     };
 
-    login = async ({
-        email,
-        password,
-    }: LoginInput): Promise<{
-        user: User;
-        accessToken: string;
-        refreshToken: RefreshToken;
-    }> => {
+    login = async ({ email, password }: LoginInput): Promise<LoginOutput> => {
         const user = await this.userService
-            .findOneByEmail(email)
-            .catch((err) => {
+            .findByEmail({ email })
+            .catch((err: unknown) => {
                 if (err instanceof NotFoundError) {
                     throw new UnauthorizedError('Invalid credentials');
                 }
-
                 throw err;
             });
 
-        const doesMatch = await this.passwordService.compare(
+        const doesMatch = await this.hasher.compare(
             password,
             user.passwordHash,
         );
         if (!doesMatch) throw new UnauthorizedError('Invalid credentials');
 
-        const token = this.tokenService.generate();
-
         const refreshToken = await this.refreshTokenService.create({
-            token,
-            userId: user._id,
+            userId: user.id,
+            token: generateToken(),
         });
 
-        const accessToken = this.jwtService.signAccess(user._id);
+        const accessToken = this.tokenManager.signAccess({ userId: user.id });
 
         return { user, accessToken, refreshToken };
     };
 
-    refresh = async (
-        token: string,
-    ): Promise<{ accessToken: string; refreshToken: RefreshToken }> => {
+    refresh = async ({ token }: RefreshInput): Promise<RefreshOutput> => {
         let refreshToken = await this.refreshTokenService
-            .findOneByToken(token)
-            .catch((err) => {
+            .findByToken({ token })
+            .catch((err: unknown) => {
                 if (err instanceof NotFoundError) {
                     throw new UnauthorizedError('Invalid refresh token');
                 }
-
                 throw err;
             });
 
@@ -95,18 +113,22 @@ export class AuthOrchestrator {
             throw new UnauthorizedError('Expired refresh token');
         }
 
-        const newToken = this.tokenService.generate();
-        refreshToken = await this.refreshTokenService.extendExpiration(
+        refreshToken = await this.refreshTokenService.rotateToken({
             refreshToken,
-            newToken,
-        );
+            newToken: generateToken(),
+        });
 
-        const accessToken = this.jwtService.signAccess(refreshToken.userId);
+        const accessToken = this.tokenManager.signAccess({
+            userId: refreshToken.userId,
+        });
 
         return { accessToken, refreshToken };
     };
 
-    logout = async (token: string) => {
-        return await this.refreshTokenService.findOneAndDeleteByToken(token);
+    logout = async ({ token }: LogoutInput): Promise<LogoutOutput> => {
+        const refreshToken = await this.refreshTokenService.deleteByToken({
+            token,
+        });
+        return { refreshToken };
     };
 }

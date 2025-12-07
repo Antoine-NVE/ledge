@@ -1,56 +1,74 @@
 import { User } from '../../domain/user/user-types';
-import { ConflictError } from '../../infrastructure/errors/conflict-error';
-import { TooManyRequestsError } from '../../infrastructure/errors/too-many-requests-error';
 import { UserService } from '../../domain/user/user-service';
-import { JwtService } from '../../infrastructure/services/jwt-service';
-import { EmailService } from '../../infrastructure/services/email-service';
-import { CacheService } from '../../infrastructure/services/cache-service';
-import { Env } from '../../infrastructure/types/env-type';
+import { TokenManager } from '../ports/token-manager';
+import { EmailSender } from '../ports/email-sender';
+import { CacheStore } from '../ports/cache-store';
+import { ConflictError } from '../../core/errors/conflict-error';
+import { TooManyRequestsError } from '../../core/errors/too-many-requests-error';
+
+type SendVerificationEmailInput = {
+    user: User;
+    frontendBaseUrl: string;
+};
+
+type SendVerificationEmailOutput = void;
+
+type VerifyEmailInput = {
+    token: string;
+};
+
+type VerifyEmailOutput = {
+    user: User;
+};
 
 export class UserOrchestrator {
     constructor(
-        private jwtService: JwtService,
-        private emailService: EmailService,
+        private tokenManager: TokenManager,
+        private emailSender: EmailSender,
         private userService: UserService,
-        private cacheService: CacheService,
-        private emailFrom: Env['EMAIL_FROM'],
+        private cacheStore: CacheStore,
+        private emailFrom: string,
     ) {}
 
-    sendVerificationEmail = async (
-        user: User,
-        frontendBaseUrl: string,
-    ): Promise<void> => {
+    sendVerificationEmail = async ({
+        user,
+        frontendBaseUrl,
+    }: SendVerificationEmailInput): Promise<SendVerificationEmailOutput> => {
         if (user.isEmailVerified) {
             throw new ConflictError('Email already verified');
         }
 
-        if (await this.cacheService.existsVerificationEmailCooldown(user._id)) {
+        if (await this.cacheStore.existsVerificationEmailCooldown(user.id)) {
             throw new TooManyRequestsError(
                 'Please wait before requesting another verification email',
             );
         }
 
-        const jwt = this.jwtService.signVerificationEmail(user._id);
+        const token = this.tokenManager.signVerificationEmail({
+            userId: user.id,
+        });
 
-        await this.emailService.sendVerification(
-            this.emailFrom,
-            user.email,
+        await this.emailSender.sendVerification({
+            from: this.emailFrom,
+            to: user.email,
             frontendBaseUrl,
-            jwt,
-        );
+            token,
+        });
 
-        await this.cacheService.setVerificationEmailCooldown(user._id);
+        await this.cacheStore.setVerificationEmailCooldown(user.id);
     };
 
-    verifyEmail = async (jwt: string): Promise<User> => {
-        const { sub } = this.jwtService.verifyVerificationEmail(jwt);
-        const user = await this.userService.findOneById(sub);
+    verifyEmail = async ({
+        token,
+    }: VerifyEmailInput): Promise<VerifyEmailOutput> => {
+        const { userId } = this.tokenManager.verifyVerificationEmail(token);
+        const user = await this.userService.findById({ id: userId });
         if (user.isEmailVerified) {
             throw new ConflictError('Email already verified');
         }
 
-        await this.userService.markEmailAsVerified(user);
+        await this.userService.markEmailAsVerified({ user });
 
-        return user;
+        return { user };
     };
 }

@@ -1,27 +1,27 @@
 import { MongoDBStorage, Umzug } from 'umzug';
 import path from 'node:path';
-import { createLogger } from '../src/infrastructure/config/logger-config';
-import { connectToDb } from '../src/infrastructure/config/db-config';
-import { step } from '../src/infrastructure/utils/lifecycle-utils';
+import { createBaseLogger } from '../src/infrastructure/config/pino';
+import { connectToMongo } from '../src/infrastructure/config/mongo';
+import { PinoLogger } from '../src/infrastructure/adapters/pino-logger';
+import { step } from '../src/core/utils/lifecycle';
 
 const start = async () => {
-    const logger = createLogger(
-        process.env.NODE_ENV === 'development' ? 'development' : 'production',
+    const logger = new PinoLogger(
+        createBaseLogger({
+            nodeEnv:
+                process.env.NODE_ENV === 'production'
+                    ? 'production'
+                    : 'development',
+        }),
     );
 
-    const { db, client } = await step(
-        'MongoDB connection',
-        logger,
-        async () => {
-            const { db, client } = await connectToDb();
-            logger.info('MongoDB connected');
-            return { db, client };
-        },
-    );
+    const { db, client } = await step('Mongo connection', logger, async () => {
+        return await connectToMongo();
+    });
 
     const umzug = new Umzug({
         migrations: {
-            glob: path.join(__dirname, 'migrations', `*.js`),
+            glob: path.join(__dirname, 'migrations', `*.{js,ts}`),
         },
         context: db,
         storage: new MongoDBStorage({
@@ -30,10 +30,10 @@ const start = async () => {
         logger: undefined,
     });
     umzug.on('migrating', (migration) => {
-        logger.info({ migrationName: migration.name }, 'Migration started');
+        logger.info('Migration started', { migrationName: migration.name });
     });
     umzug.on('migrated', (migration) => {
-        logger.info({ migrationName: migration.name }, 'Migration finished');
+        logger.info('Migration finished', { migrationName: migration.name });
     });
 
     await step('Migration', logger, async () => {
@@ -55,7 +55,7 @@ const start = async () => {
 
 start().then(async ({ client, logger }) => {
     await client.close();
-    logger.info('MongoDB disconnected');
+    logger.info('Mongo disconnected');
 
     // Without this, Pino doesn't always have time to send all the logs to Loki
     await new Promise((r) => setTimeout(r, 100));

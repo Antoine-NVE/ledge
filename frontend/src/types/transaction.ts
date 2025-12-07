@@ -3,6 +3,7 @@ type Income = {
     name: string;
     value: number;
     type: "income";
+    expenseCategory: undefined;
 };
 
 type Expense = {
@@ -16,7 +17,7 @@ type Expense = {
 export type NewTransaction = Income | Expense;
 
 export type Transaction = NewTransaction & {
-    _id: string;
+    id: string;
     createdAt: string;
     updatedAt: string;
 };

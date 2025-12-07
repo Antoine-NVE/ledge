@@ -52,7 +52,7 @@ jobs:
       - name: Run migrations
         run: |
           cd "$TARGET_PATH"
-          docker compose --profile migrations run --rm migrate
+          docker compose run --rm migrate
 
       - name: Start full stack
         run: |

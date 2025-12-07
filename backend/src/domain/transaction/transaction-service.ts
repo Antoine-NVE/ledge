@@ -1,71 +1,78 @@
-import { ObjectId } from 'mongodb';
 import { TransactionRepository } from './transaction-repository';
-import { NotFoundError } from '../../infrastructure/errors/not-found-error';
-import {
-    Transaction,
-    TransactionData,
-    UpdateTransactionData,
-} from './transaction-types';
+import { NewTransaction, Transaction } from './transaction-types';
+import { NotFoundError } from '../../core/errors/not-found-error';
+
+type CreateInput = {
+    userId: string;
+    month: string;
+    name: string;
+    value: number;
+    type: 'income' | 'expense';
+    expenseCategory: 'need' | 'want' | 'investment' | null | undefined;
+};
+
+type FindManyByUserIdInput = {
+    userId: string;
+};
+
+type FindByIdInput = {
+    id: string;
+};
+
+type UpdateInput = {
+    transaction: Transaction;
+    newName: string;
+    newValue: number;
+    newType: 'income' | 'expense';
+    newExpenseCategory: 'need' | 'want' | 'investment' | null | undefined;
+};
+
+type DeleteByIdInput = {
+    id: string;
+};
 
 export class TransactionService {
     constructor(private transactionRepository: TransactionRepository) {}
 
-    create = async (data: TransactionData): Promise<Transaction> => {
-        const transaction: Transaction = {
-            _id: new ObjectId(),
+    create = async (data: CreateInput) => {
+        const newTransaction: NewTransaction = {
             ...data,
             createdAt: new Date(),
         };
 
-        await this.transactionRepository.insertOne(transaction);
-
-        return transaction;
+        return await this.transactionRepository.create(newTransaction);
     };
 
-    readAll = async (userId: ObjectId): Promise<Transaction[]> => {
-        return await this.transactionRepository.find('userId', userId);
+    findManyByUserId = async ({ userId }: FindManyByUserIdInput) => {
+        return await this.transactionRepository.findManyByUserId(userId);
     };
 
-    read = async (id: ObjectId): Promise<Transaction> => {
-        const transaction = await this.transactionRepository.findOne('_id', id);
+    findById = async ({ id }: FindByIdInput) => {
+        const transaction = await this.transactionRepository.findById(id);
         if (!transaction) throw new NotFoundError('Transaction not found');
-
         return transaction;
     };
 
-    update = async (
-        transaction: Transaction,
-        data: UpdateTransactionData,
-    ): Promise<Transaction> => {
-        // I previously used Object.assign(transaction, data), but this can create invalid Transaction objects
-        // TypeScript cannot reliably understand this mutation pattern and may not warn about inconsistent states
-        // Example: switching from "expense" to "income" would keep the old expenseCategory, which should not exist
-        // To avoid this, we rebuild a new Transaction object based on the new type
-        const base = {
-            _id: transaction._id,
-            month: transaction.month,
-            name: data.name,
-            value: data.value,
-            userId: transaction.userId,
-            createdAt: transaction.createdAt,
-            updatedAt: new Date(),
-        };
+    update = async ({
+        transaction,
+        newName,
+        newValue,
+        newType,
+        newExpenseCategory,
+    }: UpdateInput) => {
+        transaction.name = newName;
+        transaction.value = newValue;
+        transaction.type = newType;
+        transaction.expenseCategory = newExpenseCategory;
+        transaction.updatedAt = new Date();
 
-        const updated: Transaction =
-            data.type === 'income'
-                ? { ...base, type: 'income' }
-                : {
-                      ...base,
-                      type: 'expense',
-                      expenseCategory: data.expenseCategory,
-                  };
-
-        await this.transactionRepository.updateOne(updated);
-
-        return updated;
+        await this.transactionRepository.save(transaction);
+        return transaction;
     };
 
-    delete = async (transaction: Transaction): Promise<void> => {
-        await this.transactionRepository.deleteOne(transaction);
+    deleteById = async ({ id }: DeleteByIdInput) => {
+        const transaction = await this.transactionRepository.deleteById(id);
+        if (!transaction) throw new NotFoundError('Transaction not found');
+        return transaction;
     };
 }

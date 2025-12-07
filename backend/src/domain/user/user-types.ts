@@ -1,11 +1,10 @@
-import { BaseDocument } from '../shared/shared-types';
-
-export type UserData = {
+export type User = {
+    id: string;
     email: string;
     passwordHash: string;
     isEmailVerified: boolean;
+    createdAt: Date;
+    updatedAt?: Date;
 };
 
-export type User = UserData & BaseDocument;
-
-export type RegisterUserData = Pick<UserData, 'email' | 'passwordHash'>;
+export type NewUser = Omit<User, 'id' | 'updatedAt'>;
