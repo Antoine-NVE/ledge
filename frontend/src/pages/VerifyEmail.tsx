@@ -40,11 +40,14 @@ export default function VerifyEmail() {
                 <h1 className="text-2xl font-bold mb-4">Verify your email</h1>
                 {success === null && (
                     <>
-                        <p className="mb-4">Click the button below to verify your email address.</p>
+                        <p className="mb-4">
+                            Click the button below to verify your email address.
+                        </p>
                         <button
                             onClick={handleClick}
                             className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 cursor-pointer"
-                            disabled={isLoading}>
+                            disabled={isLoading}
+                        >
                             {isLoading ? 'Verifying...' : 'Verify Email'}
                         </button>
                     </>

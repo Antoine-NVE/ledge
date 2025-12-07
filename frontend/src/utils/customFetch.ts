@@ -4,7 +4,7 @@ import { navigateToLogin } from './navigation';
 export const customFetch = async (
     input: RequestInfo | URL,
     init?: RequestInit,
-    retryOn401: boolean = true
+    retryOn401: boolean = true,
 ): Promise<Response> => {
     const response = await fetch(input, init);
 
