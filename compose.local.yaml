@@ -56,7 +56,6 @@ services:
       - "${DATABASE_PORT}:27017"
     volumes:
       - database:/data/db
-      - /data/configdb
 
   cache:
     image: redis:8.2

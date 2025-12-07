@@ -32,13 +32,15 @@ services:
     ports:
       - "${DATABASE_PORT}:27017"
     volumes:
-      - ./data/database:/data/db
+      - database:/data/db
     restart: unless-stopped
 
   cache:
     image: redis:8.2
     ports:
       - "${CACHE_PORT}:6379"
+    volumes:
+      - cache:/data
     restart: unless-stopped
 
   logs:
@@ -50,4 +52,6 @@ services:
     restart: unless-stopped
 
 volumes:
+  database:
+  cache:
   logs:
