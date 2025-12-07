@@ -37,8 +37,8 @@ jobs:
             --push \
             backend
 
-  frontend-dev:
-    name: Frontend (dev)
+  frontend:
+    name: Frontend
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
 
@@ -55,40 +55,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build & push frontend (dev) multi-arch
+      - name: Build & push frontend multi-arch
         run: |
           docker buildx build \
             --platform linux/amd64,linux/arm64 \
-            -t ghcr.io/antoine-nve/ledge-frontend:dev \
-            --build-arg VITE_API_URL=https://dev-ledge-api.antoine-navette.fr \
-            -f frontend/Dockerfile \
-            --push \
-            frontend
-
-  frontend-prod:
-    name: Frontend (prod)
-    if: github.event.pull_request.merged == true
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Login to GHCR
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u antoine-nve --password-stdin
-
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
-      - name: Build & push frontend (prod) multi-arch
-        run: |
-          docker buildx build \
-            --platform linux/amd64,linux/arm64 \
-            -t ghcr.io/antoine-nve/ledge-frontend:prod \
-            --build-arg VITE_API_URL=https://ledge-api.antoine-navette.fr \
+            -t ghcr.io/antoine-nve/ledge-frontend:latest \
             -f frontend/Dockerfile \
             --push \
             frontend
