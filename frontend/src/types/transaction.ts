@@ -1,23 +1,12 @@
-type Income = {
-    month: string;
-    name: string;
-    value: number;
-    type: "income";
-    expenseCategory: undefined;
-};
-
-type Expense = {
-    month: string;
-    name: string;
-    value: number;
-    type: "expense";
-    expenseCategory: "need" | "want" | "investment" | null;
-};
-
-export type NewTransaction = Income | Expense;
-
-export type Transaction = NewTransaction & {
+export type Transaction = {
     id: string;
+    month: string;
+    name: string;
+    value: number;
+    type: "expense" | 'income';
+    expenseCategory: "need" | "want" | "investment" | null | undefined;
     createdAt: string;
     updatedAt: string;
 };
+
+export type NewTransaction = Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>
