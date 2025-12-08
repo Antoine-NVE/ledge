@@ -1,8 +1,8 @@
 import { AppError } from './app-error';
 
-export class NotFoundError extends AppError {
+export class BadRequestError extends AppError {
     constructor(
-        message: string = 'Not found',
+        message = 'Bad request',
         fields?: Record<string, string[]>,
         cause?: unknown,
         action?: 'REFRESH',

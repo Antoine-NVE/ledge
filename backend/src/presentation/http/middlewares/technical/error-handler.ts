@@ -7,15 +7,10 @@ import { NotFoundError } from '../../../../core/errors/not-found-error';
 import { ConflictError } from '../../../../core/errors/conflict-error';
 import { TooManyRequestsError } from '../../../../core/errors/too-many-requests-error';
 import { flattenError, ZodError } from 'zod';
+import { BadRequestError } from '../../../../core/errors/bad-request-error';
 
-const httpErrorMap = new Map<
-    new (
-        message?: string,
-        errors?: Record<string, string[]>,
-        meta?: Record<string, unknown>,
-    ) => AppError,
-    number
->([
+const httpErrorMap = new Map<new () => AppError, number>([
+    [BadRequestError, 400],
     [UnauthorizedError, 401],
     [ForbiddenError, 403],
     [NotFoundError, 404],
