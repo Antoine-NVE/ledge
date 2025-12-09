@@ -39,12 +39,12 @@ export class JwtTokenManager implements TokenManager {
             return { userId: data.sub };
         } catch (err: unknown) {
             if (err instanceof NotBeforeError) {
-                throw new UnauthorizedError('Inactive JWT');
+                throw new UnauthorizedError('Inactive JWT', err);
             }
             if (err instanceof TokenExpiredError) {
-                throw new UnauthorizedError('Expired JWT');
+                throw new UnauthorizedError('Expired JWT', err);
             }
-            throw new UnauthorizedError('Invalid JWT');
+            throw new UnauthorizedError('Invalid JWT', err);
         }
     };
 
