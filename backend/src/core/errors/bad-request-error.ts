@@ -3,10 +3,10 @@ import { AppError } from './app-error';
 export class BadRequestError extends AppError {
     constructor(
         message = 'Bad request',
-        fields?: Record<string, string[]>,
         cause?: unknown,
+        fields?: Record<string, string[]>,
         action?: 'REFRESH',
     ) {
-        super(message, fields, cause, action);
+        super(message, cause, fields, action);
     }
 }

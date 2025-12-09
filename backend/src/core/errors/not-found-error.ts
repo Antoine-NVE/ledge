@@ -3,10 +3,10 @@ import { AppError } from './app-error';
 export class NotFoundError extends AppError {
     constructor(
         message: string = 'Not found',
-        fields?: Record<string, string[]>,
         cause?: unknown,
+        fields?: Record<string, string[]>,
         action?: 'REFRESH',
     ) {
-        super(message, fields, cause, action);
+        super(message, cause, fields, action);
     }
 }
