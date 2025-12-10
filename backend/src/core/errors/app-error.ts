@@ -1,12 +1,21 @@
+export type AppErrorOptions = {
+    message?: string;
+    fields?: Record<string, string[]>;
+    cause?: unknown;
+    action?: 'REFRESH';
+};
+
 export abstract class AppError extends Error {
-    protected constructor(
-        message: string,
-        public cause?: unknown, // I think cause is supported by default in newer versions of TS
-        public fields?: Record<string, string[]>,
-        public action?: 'REFRESH',
-        // public code?: string,
-    ) {
-        super(message);
+    public fields?: Record<string, string[]>;
+    public cause?: unknown;
+    public action?: 'REFRESH';
+
+    protected constructor(defaultMessage: string, options?: AppErrorOptions) {
+        super(options?.message ?? defaultMessage);
         this.name = this.constructor.name;
+
+        if (options?.fields) this.fields = options.fields;
+        if (options?.cause) this.cause = options.cause;
+        if (options?.action) this.action = options.action;
     }
 }
