@@ -1,12 +1,7 @@
-import { AppError } from './app-error';
+import { AppError, AppErrorOptions } from './app-error';
 
 export class NotFoundError extends AppError {
-    constructor(
-        message: string = 'Not found',
-        cause?: unknown,
-        fields?: Record<string, string[]>,
-        action?: 'REFRESH',
-    ) {
-        super(message, cause, fields, action);
+    constructor(options?: AppErrorOptions) {
+        super('Not found', options);
     }
 }

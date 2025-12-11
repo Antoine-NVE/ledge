@@ -1,12 +1,7 @@
-import { AppError } from './app-error';
+import { AppError, AppErrorOptions } from './app-error';
 
 export class ConflictError extends AppError {
-    constructor(
-        message: string = 'Conflict',
-        cause?: unknown,
-        fields?: Record<string, string[]>,
-        action?: 'REFRESH',
-    ) {
-        super(message, cause, fields, action);
+    constructor(options?: AppErrorOptions) {
+        super('Conflict', options);
     }
 }

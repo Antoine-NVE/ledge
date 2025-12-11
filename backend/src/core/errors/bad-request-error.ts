@@ -1,12 +1,7 @@
-import { AppError } from './app-error';
+import { AppError, AppErrorOptions } from './app-error';
 
 export class BadRequestError extends AppError {
-    constructor(
-        message = 'Bad request',
-        cause?: unknown,
-        fields?: Record<string, string[]>,
-        action?: 'REFRESH',
-    ) {
-        super(message, cause, fields, action);
+    constructor(options?: AppErrorOptions) {
+        super('Bad request', options);
     }
 }
