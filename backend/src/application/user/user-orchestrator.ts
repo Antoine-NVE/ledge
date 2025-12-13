@@ -35,13 +35,14 @@ export class UserOrchestrator {
         frontendBaseUrl,
     }: SendVerificationEmailInput): Promise<SendVerificationEmailOutput> => {
         if (user.isEmailVerified) {
-            throw new ConflictError('Email already verified');
+            throw new ConflictError({ message: 'Email already verified' });
         }
 
         if (await this.cacheStore.existsVerificationEmailCooldown(user.id)) {
-            throw new TooManyRequestsError(
-                'Please wait before requesting another verification email',
-            );
+            throw new TooManyRequestsError({
+                message:
+                    'Please wait before requesting another verification email',
+            });
         }
 
         const token = this.tokenManager.signVerificationEmail({
@@ -64,7 +65,7 @@ export class UserOrchestrator {
         const { userId } = this.tokenManager.verifyVerificationEmail(token);
         const user = await this.userService.findById({ id: userId });
         if (user.isEmailVerified) {
-            throw new ConflictError('Email already verified');
+            throw new ConflictError({ message: 'Email already verified' });
         }
 
         await this.userService.markEmailAsVerified({ user });

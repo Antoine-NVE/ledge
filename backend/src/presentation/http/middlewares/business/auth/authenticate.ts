@@ -26,7 +26,7 @@ export const createAuthenticate = ({
     return async (req: Request, res: Response, next: NextFunction) => {
         const accessToken = cookieManager.getAccessToken(req);
         if (!accessToken) {
-            throw new UnauthorizedError('Required access token');
+            throw new UnauthorizedError({ message: 'Required access token' });
         }
 
         const { userId } = tokenManager.verifyAccess(accessToken);

@@ -85,7 +85,8 @@ export class AuthController {
 
     refresh = async (req: Request, res: Response) => {
         const token = this.cookieManager.getRefreshToken(req);
-        if (!token) throw new UnauthorizedError('Required refresh token');
+        if (!token)
+            throw new UnauthorizedError({ message: 'Required refresh token' });
 
         let rememberMe = this.cookieManager.getRememberMe(req);
         if (rememberMe === undefined) rememberMe = false;

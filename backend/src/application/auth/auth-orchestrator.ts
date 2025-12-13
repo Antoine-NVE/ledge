@@ -78,7 +78,9 @@ export class AuthOrchestrator {
             .findByEmail({ email })
             .catch((err: unknown) => {
                 if (err instanceof NotFoundError) {
-                    throw new UnauthorizedError('Invalid credentials');
+                    throw new UnauthorizedError({
+                        message: 'Invalid credentials',
+                    });
                 }
                 throw err;
             });
@@ -87,7 +89,8 @@ export class AuthOrchestrator {
             password,
             user.passwordHash,
         );
-        if (!doesMatch) throw new UnauthorizedError('Invalid credentials');
+        if (!doesMatch)
+            throw new UnauthorizedError({ message: 'Invalid credentials' });
 
         const refreshToken = await this.refreshTokenService.create({
             userId: user.id,
@@ -104,13 +107,15 @@ export class AuthOrchestrator {
             .findByToken({ token })
             .catch((err: unknown) => {
                 if (err instanceof NotFoundError) {
-                    throw new UnauthorizedError('Invalid refresh token');
+                    throw new UnauthorizedError({
+                        message: 'Invalid refresh token',
+                    });
                 }
                 throw err;
             });
 
         if (refreshToken.expiresAt < new Date()) {
-            throw new UnauthorizedError('Expired refresh token');
+            throw new UnauthorizedError({ message: 'Expired refresh token' });
         }
 
         refreshToken = await this.refreshTokenService.rotateToken({
