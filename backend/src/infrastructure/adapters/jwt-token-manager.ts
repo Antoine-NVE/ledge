@@ -40,18 +40,18 @@ export class JwtTokenManager implements TokenManager {
         } catch (err: unknown) {
             if (err instanceof NotBeforeError) {
                 throw new UnauthorizedError({
-                    message: 'Token not yet valid',
+                    message: 'Inactive token',
                     cause: err,
                 });
             }
             if (err instanceof TokenExpiredError) {
                 throw new UnauthorizedError({
-                    message: 'Token expired',
+                    message: 'Expired token',
                     cause: err,
                 });
             }
             throw new UnauthorizedError({
-                message: 'Token invalid',
+                message: 'Invalid token',
                 cause: err,
             });
         }

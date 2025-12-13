@@ -26,7 +26,10 @@ export const createAuthenticate = ({
     return async (req: Request, res: Response, next: NextFunction) => {
         const accessToken = cookieManager.getAccessToken(req);
         if (!accessToken) {
-            throw new UnauthorizedError({ message: 'Required access token' });
+            throw new UnauthorizedError({
+                message: 'Required access token',
+                action: 'REFRESH',
+            });
         }
 
         const { userId } = tokenManager.verifyAccess(accessToken);
@@ -35,7 +38,7 @@ export const createAuthenticate = ({
             .catch((err: unknown) => {
                 if (err instanceof NotFoundError) {
                     // If user is not found, refresh will probably don't work either
-                    throw new UnauthorizedError();
+                    throw new UnauthorizedError({ action: 'REFRESH' });
                 }
                 throw err;
             });
