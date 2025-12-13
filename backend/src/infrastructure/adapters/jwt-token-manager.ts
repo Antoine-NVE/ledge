@@ -39,12 +39,21 @@ export class JwtTokenManager implements TokenManager {
             return { userId: data.sub };
         } catch (err: unknown) {
             if (err instanceof NotBeforeError) {
-                throw new UnauthorizedError('Inactive JWT', err);
+                throw new UnauthorizedError({
+                    message: 'Token not yet valid',
+                    cause: err,
+                });
             }
             if (err instanceof TokenExpiredError) {
-                throw new UnauthorizedError('Expired JWT', err);
+                throw new UnauthorizedError({
+                    message: 'Token expired',
+                    cause: err,
+                });
             }
-            throw new UnauthorizedError('Invalid JWT', err);
+            throw new UnauthorizedError({
+                message: 'Token invalid',
+                cause: err,
+            });
         }
     };
 
@@ -57,12 +66,8 @@ export class JwtTokenManager implements TokenManager {
             return this.verify(token, { audience: 'access' });
         } catch (err: unknown) {
             if (err instanceof UnauthorizedError) {
-                throw new UnauthorizedError(
-                    err.message,
-                    err,
-                    undefined,
-                    'REFRESH',
-                );
+                err.action = 'REFRESH';
+                throw err;
             }
             throw err; // Shouldn't happen
         }
