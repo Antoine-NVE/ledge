@@ -31,7 +31,7 @@ export const register = async (
             {
                 message: 'An error occurred while registering',
                 data: null,
-                errors: null,
+                fields: null,
             },
             null, // In this case, we didn't receive a response from the server
         ];
@@ -69,7 +69,7 @@ export const login = async (
             {
                 message: 'An error occurred while logging in',
                 data: null,
-                errors: null,
+                fields: null,
             },
             null, // In this case, we didn't receive a response from the server
         ];
@@ -104,7 +104,7 @@ export const refresh = async (): Promise<
             {
                 message: 'An error occurred while refreshing the session',
                 data: null,
-                errors: null,
+                fields: null,
             },
             null, // In this case, we didn't receive a response from the server
         ];
@@ -134,7 +134,7 @@ export const logout = async (): Promise<
             {
                 message: 'An error occurred while logging out',
                 data: null,
-                errors: null,
+                fields: null,
             },
             null, // In this case, we didn't receive a response from the server
         ];

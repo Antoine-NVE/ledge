@@ -34,7 +34,7 @@ export const createTransaction = async (
             {
                 message: 'An error occurred while creating the transaction',
                 data: null,
-                errors: null,
+                fields: null,
             },
             null, // In this case, we didn't receive a response from the server
         ];
@@ -67,7 +67,7 @@ export const getAllTransactions = async (): Promise<
             {
                 message: 'An error occurred while fetching transactions',
                 data: null,
-                errors: null,
+                fields: null,
             },
             null, // In this case, we didn't receive a response from the server
         ];
@@ -100,7 +100,7 @@ export const getTransactionById = async (
             {
                 message: 'An error occurred while fetching the transaction',
                 data: null,
-                errors: null,
+                fields: null,
             },
             null, // In this case, we didn't receive a response from the server
         ];
@@ -144,7 +144,7 @@ export const updateTransaction = async (
             {
                 message: 'An error occurred while updating the transaction',
                 data: null,
-                errors: null,
+                fields: null,
             },
             null, // In this case, we didn't receive a response from the server
         ];
@@ -177,7 +177,7 @@ export const deleteTransaction = async (
             {
                 message: 'An error occurred while deleting the transaction',
                 data: null,
-                errors: null,
+                fields: null,
             },
             null, // In this case, we didn't receive a response from the server
         ];
