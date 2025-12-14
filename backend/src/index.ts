@@ -29,6 +29,7 @@ const start = async () => {
 
     const {
         databaseUrl,
+        port,
         smtpHost,
         smtpPort,
         smtpSecure,
@@ -93,7 +94,7 @@ const start = async () => {
     });
 
     await step('HTTP server startup', logger, async () => {
-        return startHttpServer({ app });
+        return startHttpServer({ app, port });
     });
 };
 
