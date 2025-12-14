@@ -83,7 +83,7 @@ export const createHttpApp = ({
         createUserRoutes({ userController, authenticate, allowedOrigins }),
     );
     app.use(() => {
-        throw new NotFoundError('Route not found');
+        throw new NotFoundError({ message: 'Route not found' });
     });
 
     // Error handler

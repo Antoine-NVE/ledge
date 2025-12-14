@@ -119,10 +119,10 @@ const TransactionModal = ({
 
         if (!response || !response.ok) {
             setIsLoading(false);
-            if (result.errors) {
+            if (result.fields) {
                 setFormErrors((prev) => ({
                     ...prev,
-                    ...result.errors,
+                    ...result.fields,
                     general: result.message,
                 }));
             } else {
@@ -141,10 +141,10 @@ const TransactionModal = ({
         const [result, response] = await updateTransaction(transaction);
         if (!response || !response.ok) {
             setIsLoading(false);
-            if (result.errors) {
+            if (result.fields) {
                 setFormErrors((prev) => ({
                     ...prev,
-                    ...result.errors,
+                    ...result.fields,
                     general: result.message,
                 }));
             } else {

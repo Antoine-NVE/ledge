@@ -1,7 +1,7 @@
-import { AppError } from './app-error';
+import { AppError, AppErrorOptions } from './app-error';
 
 export class ConflictError extends AppError {
-    constructor(message: string = 'Conflict') {
-        super(message);
+    constructor(options?: AppErrorOptions) {
+        super('Conflict', options);
     }
 }

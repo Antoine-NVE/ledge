@@ -95,6 +95,7 @@ describe('TransactionController', () => {
 
             expect(resMock.status).toHaveBeenCalledWith(201);
             expect(resMock.json).toHaveBeenCalledWith({
+                success: true,
                 message: 'Transaction created successfully',
                 data: {
                     transaction: {
@@ -126,6 +127,7 @@ describe('TransactionController', () => {
 
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({
+                success: true,
                 message: 'Transactions retrieved successfully',
                 data: {
                     transactions: [{ id: TRANSACTION_ID, name: NAME }],
@@ -144,6 +146,7 @@ describe('TransactionController', () => {
 
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({
+                success: true,
                 message: 'Transaction retrieved successfully',
                 data: {
                     transaction: {
@@ -186,6 +189,7 @@ describe('TransactionController', () => {
 
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({
+                success: true,
                 message: 'Transaction updated successfully',
                 data: {
                     transaction: {
@@ -221,6 +225,7 @@ describe('TransactionController', () => {
 
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({
+                success: true,
                 message: 'Transaction deleted successfully',
             });
         });

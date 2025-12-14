@@ -38,7 +38,8 @@ export class RefreshTokenService {
     findByToken = async ({ token }: FindByTokenInput) => {
         const refreshToken =
             await this.refreshTokenRepository.findByToken(token);
-        if (!refreshToken) throw new NotFoundError('Refresh token not found');
+        if (!refreshToken)
+            throw new NotFoundError({ message: 'Refresh token not found' });
 
         return refreshToken;
     };
@@ -55,7 +56,8 @@ export class RefreshTokenService {
     deleteByToken = async ({ token }: DeleteByTokenInput) => {
         const refreshToken =
             await this.refreshTokenRepository.deleteByToken(token);
-        if (!refreshToken) throw new NotFoundError('Refresh token not found');
+        if (!refreshToken)
+            throw new NotFoundError({ message: 'Refresh token not found' });
         return refreshToken;
     };
 }

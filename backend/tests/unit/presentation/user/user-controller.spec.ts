@@ -98,6 +98,7 @@ describe('UserController', () => {
 
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({
+                success: true,
                 message: 'Verification email sent successfully',
             });
         });
@@ -129,6 +130,7 @@ describe('UserController', () => {
 
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({
+                success: true,
                 message: 'Email verified successfully',
             });
         });
@@ -139,12 +141,13 @@ describe('UserController', () => {
             reqMock.user = user as User;
         });
 
-        it('should call res.status().json() with valid parameters', () => {
+        it('should call res.status and res.json', () => {
             userController.me(reqMock as Request, resMock as Response);
 
             expect(removePasswordHashSpy).toHaveBeenCalledWith(user);
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({
+                success: true,
                 message: 'User retrieved successfully',
                 data: {
                     user: {

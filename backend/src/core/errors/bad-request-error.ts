@@ -1,7 +1,7 @@
 import { AppError, AppErrorOptions } from './app-error';
 
-export class NotFoundError extends AppError {
+export class BadRequestError extends AppError {
     constructor(options?: AppErrorOptions) {
-        super('Not found', options);
+        super('Bad request', options);
     }
 }

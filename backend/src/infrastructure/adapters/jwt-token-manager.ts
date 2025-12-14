@@ -39,12 +39,21 @@ export class JwtTokenManager implements TokenManager {
             return { userId: data.sub };
         } catch (err: unknown) {
             if (err instanceof NotBeforeError) {
-                throw new UnauthorizedError('Inactive JWT');
+                throw new UnauthorizedError({
+                    message: 'Inactive token',
+                    cause: err,
+                });
             }
             if (err instanceof TokenExpiredError) {
-                throw new UnauthorizedError('Expired JWT');
+                throw new UnauthorizedError({
+                    message: 'Expired token',
+                    cause: err,
+                });
             }
-            throw new UnauthorizedError('Invalid JWT');
+            throw new UnauthorizedError({
+                message: 'Invalid token',
+                cause: err,
+            });
         }
     };
 
@@ -53,7 +62,15 @@ export class JwtTokenManager implements TokenManager {
     };
 
     verifyAccess = (token: string): SignAccessPayload => {
-        return this.verify(token, { audience: 'access' });
+        try {
+            return this.verify(token, { audience: 'access' });
+        } catch (err: unknown) {
+            if (err instanceof UnauthorizedError) {
+                err.action = 'REFRESH';
+                throw err;
+            }
+            throw err; // Shouldn't happen
+        }
     };
 
     signVerificationEmail = ({ userId }: VerificationEmailPayload): string => {

@@ -30,6 +30,7 @@ export class TransactionController {
             transactionId: transaction.id,
         });
         res.status(201).json({
+            success: true,
             message,
             data: {
                 transaction,
@@ -43,6 +44,7 @@ export class TransactionController {
         });
 
         res.status(200).json({
+            success: true,
             message: 'Transactions retrieved successfully',
             data: {
                 transactions,
@@ -52,6 +54,7 @@ export class TransactionController {
 
     read = (req: Request, res: Response) => {
         res.status(200).json({
+            success: true,
             message: 'Transaction retrieved successfully',
             data: {
                 transaction: req.transaction,
@@ -77,6 +80,7 @@ export class TransactionController {
             transactionId: req.transaction.id,
         });
         res.status(200).json({
+            success: true,
             message,
             data: {
                 transaction,
@@ -93,6 +97,7 @@ export class TransactionController {
             transactionId: req.transaction.id,
         });
         res.status(200).json({
+            success: true,
             message,
         });
     };

@@ -33,7 +33,7 @@ export const createAuthorize = ({
         });
 
         if (req.user.id !== transaction.userId) {
-            throw new ForbiddenError('Forbidden access');
+            throw new ForbiddenError();
         }
 
         req.transaction = transaction;

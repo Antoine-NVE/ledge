@@ -48,7 +48,7 @@ export class MongoUserRepository implements UserRepository {
         };
         await this.userCollection.insertOne(document).catch((err) => {
             if (err instanceof MongoServerError && err.code === 11000) {
-                throw new ConflictError('Email already in use');
+                throw new ConflictError({ message: 'Email already in use' });
             }
             throw err;
         });

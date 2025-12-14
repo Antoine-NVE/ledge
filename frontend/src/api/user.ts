@@ -29,7 +29,7 @@ export const getCurrentUser = async (): Promise<
             {
                 message: 'An error occurred while fetching user data',
                 data: null,
-                errors: null,
+                fields: null,
             },
             null, // In this case, we didn't receive a response from the server
         ];
@@ -65,7 +65,7 @@ export const sendVerificationEmail = async (): Promise<
             {
                 message: 'An error occurred while sending verification email',
                 data: null,
-                errors: null,
+                fields: null,
             },
             null,
         ]; // In this case, we didn't receive a response from the server
@@ -99,7 +99,7 @@ export const verifyEmail = async (
             {
                 message: 'An error occurred while verifying email',
                 data: null,
-                errors: null,
+                fields: null,
             },
             null,
         ]; // In this case, we didn't receive a response from the server

@@ -51,7 +51,7 @@ const Register = () => {
 
         if (!response || !response.ok) {
             setError(result.message);
-            setFormErrors(result.errors || {});
+            setFormErrors(result.fields || {});
             setIsLoading(false);
             return;
         }
