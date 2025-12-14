@@ -141,7 +141,7 @@ describe('UserController', () => {
             reqMock.user = user as User;
         });
 
-        it('should call res.status().json() with valid parameters', () => {
+        it('should call res.status and res.json', () => {
             userController.me(reqMock as Request, resMock as Response);
 
             expect(removePasswordHashSpy).toHaveBeenCalledWith(user);
