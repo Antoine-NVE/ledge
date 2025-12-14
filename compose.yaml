@@ -37,10 +37,21 @@ services:
 
   logstore:
     image: grafana/loki:3.5
-    ports:
-      - "${LOGSTORE_PORT}:3100"
     volumes:
       - logstore:/loki
+    restart: unless-stopped
+
+  dashboard:
+    image: grafana/grafana-oss:12.4
+    ports:
+      - "${DASHBOARD_PORT}:3000"
+    volumes:
+      - dashboard:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${DASHBOARD_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${DASHBOARD_PASSWORD}
+    depends_on:
+      - logstore
     restart: unless-stopped
 
   migrate:
@@ -56,3 +67,4 @@ volumes:
   database:
   cache:
   logstore:
+  dashboard:
