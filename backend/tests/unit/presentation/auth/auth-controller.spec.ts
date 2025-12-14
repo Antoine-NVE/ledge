@@ -134,6 +134,7 @@ describe('AuthController', () => {
             expect(removePasswordHashSpy).toHaveBeenCalledWith(user);
             expect(resMock.status).toHaveBeenCalledWith(201);
             expect(resMock.json).toHaveBeenCalledWith({
+                success: true,
                 message: 'User registered successfully',
                 data: {
                     user: {
@@ -180,6 +181,7 @@ describe('AuthController', () => {
             expect(removePasswordHashSpy).toHaveBeenCalledWith(user);
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({
+                success: true,
                 message: 'User logged in successfully',
                 data: {
                     user: {
@@ -236,6 +238,7 @@ describe('AuthController', () => {
 
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({
+                success: true,
                 message: 'Tokens refreshed successfully',
             });
         });
@@ -281,6 +284,7 @@ describe('AuthController', () => {
 
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({
+                success: true,
                 message: 'User logged out successfully',
             });
         });

@@ -34,6 +34,7 @@ export const createErrorHandler = ({ logger }: { logger: Logger }) => {
                     transactionId: req.transaction?.id,
                 });
                 res.status(status).json({
+                    success: false,
                     message,
                     fields: err.fields,
                     action: err.action,
@@ -50,6 +51,7 @@ export const createErrorHandler = ({ logger }: { logger: Logger }) => {
             transactionId: req.transaction?.id,
         });
         res.status(500).json({
+            success: false,
             message,
         });
     };

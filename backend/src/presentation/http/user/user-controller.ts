@@ -35,6 +35,7 @@ export class UserController {
         const message = 'Verification email sent successfully';
         this.logger.info(message, { userId: req.user.id });
         res.status(200).json({
+            success: true,
             message,
         });
     };
@@ -50,12 +51,14 @@ export class UserController {
         const message = 'Email verified successfully';
         this.logger.info(message, { userId: user.id });
         res.status(200).json({
+            success: true,
             message,
         });
     };
 
     me = (req: Request, res: Response): void => {
         res.status(200).json({
+            success: true,
             message: 'User retrieved successfully',
             data: {
                 user: removePasswordHash(req.user),
