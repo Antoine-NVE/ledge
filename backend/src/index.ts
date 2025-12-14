@@ -29,6 +29,7 @@ const start = async () => {
 
     const {
         databaseUrl,
+        cacheUrl,
         port,
         smtpHost,
         smtpPort,
@@ -42,7 +43,7 @@ const start = async () => {
     });
 
     const client = await step('Redis connection', logger, async () => {
-        return await connectToRedis();
+        return await connectToRedis({ url: cacheUrl });
     });
 
     const { db } = await step('Mongo connection', logger, async () => {
