@@ -1,5 +1,5 @@
 import z from 'zod';
-import { parseArray, parseBoolean, parseNumber } from '../../core/utils/parse';
+import { parseArray, parseNumber } from '../../core/utils/parse';
 
 const envSchema = z.object({
     NODE_ENV: z.enum(['development', 'production']),
@@ -8,13 +8,7 @@ const envSchema = z.object({
     PORT: z.number().optional(),
     DATABASE_URL: z.url(),
     CACHE_URL: z.url(),
-    SMTP_HOST: z.string(),
-    SMTP_PORT: z.number(),
-    SMTP_SECURE: z.boolean(),
-    SMTP_AUTH: z.object({
-        user: z.string(),
-        pass: z.string(),
-    }),
+    SMTP_URL: z.url(),
     EMAIL_FROM: z.string(),
 });
 
@@ -26,13 +20,7 @@ export const loadEnv = () => {
         PORT: parseNumber(process.env.PORT),
         DATABASE_URL: process.env.DATABASE_URL,
         CACHE_URL: process.env.CACHE_URL,
-        SMTP_HOST: process.env.SMTP_HOST,
-        SMTP_PORT: parseNumber(process.env.SMTP_PORT),
-        SMTP_SECURE: parseBoolean(process.env.SMTP_SECURE),
-        SMTP_AUTH: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-        },
+        SMTP_URL: process.env.SMTP_URL,
         EMAIL_FROM: process.env.EMAIL_FROM,
     });
 
@@ -43,10 +31,7 @@ export const loadEnv = () => {
         port: env.PORT,
         databaseUrl: env.DATABASE_URL,
         cacheUrl: env.CACHE_URL,
-        smtpHost: env.SMTP_HOST,
-        smtpPort: env.SMTP_PORT,
-        smtpSecure: env.SMTP_SECURE,
-        smtpAuth: env.SMTP_AUTH,
+        smtpUrl: env.SMTP_URL,
         emailFrom: env.EMAIL_FROM,
     };
 };

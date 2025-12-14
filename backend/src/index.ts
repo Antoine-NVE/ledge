@@ -31,10 +31,7 @@ const start = async () => {
         databaseUrl,
         cacheUrl,
         port,
-        smtpHost,
-        smtpPort,
-        smtpSecure,
-        smtpAuth,
+        smtpUrl,
         tokenSecret,
         emailFrom,
         allowedOrigins,
@@ -51,12 +48,7 @@ const start = async () => {
     });
 
     const transporter = await step('SMTP connection', logger, async () => {
-        return await connectToSmtp({
-            host: smtpHost,
-            port: smtpPort,
-            secure: smtpSecure,
-            auth: smtpAuth,
-        });
+        return await connectToSmtp({ url: smtpUrl });
     });
 
     const {
