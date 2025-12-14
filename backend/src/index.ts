@@ -28,6 +28,8 @@ const start = async () => {
     );
 
     const {
+        databaseUser,
+        databasePassword,
         smtpHost,
         smtpPort,
         smtpSecure,
@@ -44,7 +46,10 @@ const start = async () => {
     });
 
     const { db } = await step('Mongo connection', logger, async () => {
-        return await connectToMongo();
+        return await connectToMongo({
+            user: databaseUser,
+            password: databasePassword,
+        });
     });
 
     const transporter = await step('SMTP connection', logger, async () => {

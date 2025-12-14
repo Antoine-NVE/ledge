@@ -39,6 +39,9 @@ services:
     image: mongo:8.0
     ports:
       - "${DATABASE_PORT}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
       - database:/data/db
 
