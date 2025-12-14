@@ -34,7 +34,7 @@ const start = async () => {
         smtpPort,
         smtpSecure,
         smtpAuth,
-        jwtSecret,
+        tokenSecret,
         emailFrom,
         allowedOrigins,
     } = await step('Environment validation', logger, async () => {
@@ -69,7 +69,7 @@ const start = async () => {
         userService,
     } = await step('Container build', logger, async () => {
         return buildContainer({
-            tokenManager: new JwtTokenManager(jwtSecret),
+            tokenManager: new JwtTokenManager(tokenSecret),
             hasher: new BcryptHasher(),
             emailSender: new NodemailerEmailSender(transporter),
             cacheStore: new RedisCacheStore(client),

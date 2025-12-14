@@ -3,7 +3,7 @@ import { parseArray, parseBoolean, parseNumber } from '../../core/utils/parse';
 
 const envSchema = z.object({
     NODE_ENV: z.enum(['development', 'production']),
-    JWT_SECRET: z.string(),
+    TOKEN_SECRET: z.string(),
     ALLOWED_ORIGINS: z.array(z.url()),
     DATABASE_USER: z.string(),
     DATABASE_PASSWORD: z.string(),
@@ -20,7 +20,7 @@ const envSchema = z.object({
 export const loadEnv = () => {
     const env = envSchema.parse({
         NODE_ENV: process.env.NODE_ENV,
-        JWT_SECRET: process.env.JWT_SECRET,
+        TOKEN_SECRET: process.env.TOKEN_SECRET,
         ALLOWED_ORIGINS: parseArray(process.env.ALLOWED_ORIGINS),
         DATABASE_USER: process.env.DATABASE_USER,
         DATABASE_PASSWORD: process.env.DATABASE_PASSWORD,
@@ -36,7 +36,7 @@ export const loadEnv = () => {
 
     return {
         nodeEnv: env.NODE_ENV,
-        jwtSecret: env.JWT_SECRET,
+        tokenSecret: env.TOKEN_SECRET,
         allowedOrigins: env.ALLOWED_ORIGINS,
         databaseUser: env.DATABASE_USER,
         databasePassword: env.DATABASE_PASSWORD,
