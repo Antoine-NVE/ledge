@@ -28,6 +28,8 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
       - database:/data/db
+    tmpfs:
+      - /data/configdb
     restart: unless-stopped
 
   cache:
