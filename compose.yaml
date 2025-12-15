@@ -48,7 +48,7 @@ services:
     restart: unless-stopped
 
   dashboard:
-    image: grafana/grafana-oss:12.2
+    image: grafana/grafana:12.3
     ports:
       - "${DASHBOARD_PORT}:3000"
     volumes:
