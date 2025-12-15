@@ -4,6 +4,7 @@ import { createBaseLogger } from '../src/infrastructure/config/pino';
 import { connectToMongo } from '../src/infrastructure/config/mongo';
 import { PinoLogger } from '../src/infrastructure/adapters/pino-logger';
 import { step } from '../src/core/utils/lifecycle';
+import { loadEnv } from '../src/infrastructure/config/env';
 
 const start = async () => {
     const logger = new PinoLogger(
@@ -15,8 +16,16 @@ const start = async () => {
         }),
     );
 
+    const { databaseUrl } = await step(
+        'Environment validation',
+        logger,
+        async () => {
+            return loadEnv();
+        },
+    );
+
     const { db, client } = await step('Mongo connection', logger, async () => {
-        return await connectToMongo();
+        return await connectToMongo({ url: databaseUrl });
     });
 
     const umzug = new Umzug({
