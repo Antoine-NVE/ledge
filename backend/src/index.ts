@@ -28,11 +28,11 @@ const start = async () => {
     );
 
     const {
-        smtpHost,
-        smtpPort,
-        smtpSecure,
-        smtpAuth,
-        jwtSecret,
+        databaseUrl,
+        cacheUrl,
+        port,
+        smtpUrl,
+        tokenSecret,
         emailFrom,
         allowedOrigins,
     } = await step('Environment validation', logger, async () => {
@@ -40,20 +40,15 @@ const start = async () => {
     });
 
     const client = await step('Redis connection', logger, async () => {
-        return await connectToRedis();
+        return await connectToRedis({ url: cacheUrl });
     });
 
     const { db } = await step('Mongo connection', logger, async () => {
-        return await connectToMongo();
+        return await connectToMongo({ url: databaseUrl });
     });
 
     const transporter = await step('SMTP connection', logger, async () => {
-        return await connectToSmtp({
-            host: smtpHost,
-            port: smtpPort,
-            secure: smtpSecure,
-            auth: smtpAuth,
-        });
+        return await connectToSmtp({ url: smtpUrl });
     });
 
     const {
@@ -64,7 +59,7 @@ const start = async () => {
         userService,
     } = await step('Container build', logger, async () => {
         return buildContainer({
-            tokenManager: new JwtTokenManager(jwtSecret),
+            tokenManager: new JwtTokenManager(tokenSecret),
             hasher: new BcryptHasher(),
             emailSender: new NodemailerEmailSender(transporter),
             cacheStore: new RedisCacheStore(client),
@@ -92,7 +87,7 @@ const start = async () => {
     });
 
     await step('HTTP server startup', logger, async () => {
-        return startHttpServer({ app });
+        return startHttpServer({ app, port });
     });
 };
 

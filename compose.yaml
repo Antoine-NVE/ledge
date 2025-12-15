@@ -16,7 +16,48 @@ services:
     depends_on:
       - database
       - cache
-      - logs
+      - logstore
+    restart: unless-stopped
+
+  database:
+    image: mongo:8.0
+    ports:
+      - "${DATABASE_PORT}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
+    volumes:
+      - database:/data/db
+    tmpfs:
+      - /data/configdb
+    restart: unless-stopped
+
+  cache:
+    image: redis:8.2
+    command: redis-server --requirepass "${CACHE_PASSWORD}"
+    ports:
+      - "${CACHE_PORT}:6379"
+    volumes:
+      - cache:/data
+    restart: unless-stopped
+
+  logstore:
+    image: grafana/loki:3.5
+    volumes:
+      - logstore:/loki
+    restart: unless-stopped
+
+  dashboard:
+    image: grafana/grafana-oss:12.4
+    ports:
+      - "${DASHBOARD_PORT}:3000"
+    volumes:
+      - dashboard:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_USER=${DASHBOARD_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${DASHBOARD_PASSWORD}
+    depends_on:
+      - logstore
     restart: unless-stopped
 
   migrate:
@@ -25,34 +66,11 @@ services:
     env_file: ./backend/.env
     depends_on:
       - database
-      - logs
+      - logstore
     entrypoint: ["node", "dist/scripts/migrate.js", "up"]
-
-  database:
-    image: mongo:8.0
-    ports:
-      - "${DATABASE_PORT}:27017"
-    volumes:
-      - database:/data/db
-    restart: unless-stopped
-
-  cache:
-    image: redis:8.2
-    ports:
-      - "${CACHE_PORT}:6379"
-    volumes:
-      - cache:/data
-    restart: unless-stopped
-
-  logs:
-    image: grafana/loki:3.5
-    ports:
-      - "${LOGS_PORT}:3100"
-    volumes:
-      - logs:/loki
-    restart: unless-stopped
 
 volumes:
   database:
   cache:
-  logs:
+  logstore:
+  dashboard:

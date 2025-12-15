@@ -44,10 +44,10 @@ jobs:
           cd "$TARGET_PATH"
           docker compose down --remove-orphans
 
-      - name: Start database and logs only
+      - name: Start database and logstore only
         run: |
           cd "$TARGET_PATH"
-          docker compose up -d database logs
+          docker compose up -d database logstore
 
       - name: Run migrations
         run: |

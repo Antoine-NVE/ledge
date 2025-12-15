@@ -19,7 +19,7 @@ export const createBaseLogger = ({
             : {
                   target: 'pino-loki',
                   options: {
-                      host: 'http://logs:3100',
+                      host: 'http://logstore:3100',
                       batching: false,
                       labels: {
                           service_name: 'backend',

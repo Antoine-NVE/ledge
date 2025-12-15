@@ -1,9 +1,9 @@
 import { Db, MongoClient } from 'mongodb';
 
-export const connectToMongo = async () => {
-    const client = new MongoClient('mongodb://database:27017');
+export const connectToMongo = async ({ url }: { url: string }) => {
+    const client = new MongoClient(url);
     await client.connect();
-    const db = client.db('ledge');
+    const db = client.db();
 
     await setupIndexes(db);
 

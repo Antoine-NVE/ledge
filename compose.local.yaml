@@ -12,7 +12,7 @@ services:
       - "${FRONTEND_PORT}:5173"
     volumes:
       - ./frontend:/app
-      - /app/node_modules
+      - frontend-modules:/app/node_modules
     depends_on:
       - backend
 
@@ -29,35 +29,27 @@ services:
       - "${BACKEND_PORT}:3000"
     volumes:
       - ./backend:/app
-      - /app/node_modules
+      - backend-modules:/app/node_modules
     depends_on:
       - database
       - cache
       - smtp
 
-  migrate:
-    build:
-      context: ./backend
-      dockerfile: Dockerfile.local
-    profiles: [ "migrations" ]
-    env_file:
-      - path: ./backend/.env.example
-        required: true
-      - path: ./backend/.env
-        required: false
-    depends_on:
-      - database
-    entrypoint: [ "node_modules/.bin/tsx", "scripts/migrate.ts", "up" ]
-
   database:
     image: mongo:8.0
     ports:
       - "${DATABASE_PORT}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${DATABASE_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${DATABASE_PASSWORD}
     volumes:
       - database:/data/db
+    tmpfs:
+      - /data/configdb
 
   cache:
     image: redis:8.2
+    command: redis-server --requirepass "${CACHE_PASSWORD}"
     ports:
       - "${CACHE_PORT}:6379"
     volumes:
@@ -73,7 +65,23 @@ services:
     volumes:
       - smtp:/data
 
+  migrate:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.local
+    profiles: [ "migrations" ]
+    env_file:
+      - path: ./backend/.env.example
+        required: true
+      - path: ./backend/.env
+        required: false
+    depends_on:
+      - database
+    entrypoint: [ "node_modules/.bin/tsx", "scripts/migrate.ts", "up" ]
+
 volumes:
+  frontend-modules:
+  backend-modules:
   database:
   cache:
   smtp:
