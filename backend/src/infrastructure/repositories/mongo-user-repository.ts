@@ -104,9 +104,9 @@ export class MongoUserRepository implements UserRepository {
         id,
         isEmailVerified,
         updatedAt,
-    }: User): Promise<Result<void, Error>> => {
+    }: User): Promise<Result<void, NotFoundError | Error>> => {
         try {
-            await this.userCollection.updateOne(
+            const document = await this.userCollection.updateOne(
                 { _id: new ObjectId(id) },
                 {
                     $set: {
@@ -115,6 +115,9 @@ export class MongoUserRepository implements UserRepository {
                     },
                 },
             );
+            if (!document) {
+                return fail(new NotFoundError({ message: 'User not found' }));
+            }
             return ok(undefined);
         } catch (err: unknown) {
             return fail(

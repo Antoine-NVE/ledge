@@ -9,5 +9,5 @@ export interface UserRepository {
     findByEmail: (
         email: string,
     ) => Promise<Result<User, NotFoundError | Error>>;
-    save: (user: User) => Promise<Result<void, Error>>;
+    save: (user: User) => Promise<Result<void, NotFoundError | Error>>;
 }
