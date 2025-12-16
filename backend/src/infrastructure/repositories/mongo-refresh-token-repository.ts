@@ -4,6 +4,8 @@ import {
     NewRefreshToken,
     RefreshToken,
 } from '../../domain/refresh-token/refresh-token-types';
+import { fail, ok, Result } from '../../core/result';
+import { NotFoundError } from '../../core/errors/not-found-error';
 
 type RefreshTokenDocument = {
     _id: ObjectId;
@@ -42,7 +44,7 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
         token,
         expiresAt,
         createdAt,
-    }: NewRefreshToken) => {
+    }: NewRefreshToken): Promise<Result<RefreshToken, Error>> => {
         const document: RefreshTokenDocument = {
             _id: new ObjectId(),
             userId: new ObjectId(userId),
@@ -50,34 +52,85 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
             expiresAt,
             createdAt,
         };
-        await this.refreshTokenCollection.insertOne(document);
-        return this.toDomain(document);
+        try {
+            await this.refreshTokenCollection.insertOne(document);
+            return ok(this.toDomain(document));
+        } catch (err: unknown) {
+            return fail(
+                err instanceof Error ? err : new Error('Unknown error'),
+            );
+        }
     };
 
-    findByToken = async (token: string) => {
-        const document = await this.refreshTokenCollection.findOne({
-            token,
-        });
-        return document ? this.toDomain(document) : null;
+    findByToken = async (
+        token: string,
+    ): Promise<Result<RefreshToken, NotFoundError | Error>> => {
+        try {
+            const document = await this.refreshTokenCollection.findOne({
+                token,
+            });
+            if (!document) {
+                return fail(
+                    new NotFoundError({ message: 'Refresh token not found' }),
+                );
+            }
+            return ok(this.toDomain(document));
+        } catch (err: unknown) {
+            return fail(
+                err instanceof Error ? err : new Error('Unknown error'),
+            );
+        }
     };
 
-    save = async ({ id, token, expiresAt, updatedAt }: RefreshToken) => {
-        await this.refreshTokenCollection.updateOne(
-            { _id: new ObjectId(id) },
-            {
-                $set: {
-                    token,
-                    expiresAt,
-                    updatedAt,
+    save = async ({
+        id,
+        token,
+        expiresAt,
+        updatedAt,
+    }: RefreshToken): Promise<Result<void, NotFoundError | Error>> => {
+        try {
+            const document = await this.refreshTokenCollection.findOneAndUpdate(
+                { _id: new ObjectId(id) },
+                {
+                    $set: {
+                        token,
+                        expiresAt,
+                        updatedAt,
+                    },
                 },
-            },
-        );
+            );
+            if (!document) {
+                return fail(
+                    new NotFoundError({ message: 'Refresh token not found' }),
+                );
+            }
+            return ok(undefined);
+        } catch (err: unknown) {
+            return fail(
+                err instanceof Error ? err : new Error('Unknown error'),
+            );
+        }
     };
 
-    deleteByToken = async (token: string) => {
-        const document = await this.refreshTokenCollection.findOneAndDelete({
-            token,
-        });
-        return document ? this.toDomain(document) : null;
+    deleteByToken = async (
+        token: string,
+    ): Promise<Result<RefreshToken, NotFoundError | Error>> => {
+        try {
+            const document = await this.refreshTokenCollection.findOneAndDelete(
+                {
+                    token,
+                },
+            );
+            if (!document) {
+                return fail(
+                    new NotFoundError({ message: 'Refresh token not found' }),
+                );
+            }
+            return ok(this.toDomain(document));
+        } catch (err: unknown) {
+            return fail(
+                err instanceof Error ? err : new Error('Unknown error'),
+            );
+        }
     };
 }

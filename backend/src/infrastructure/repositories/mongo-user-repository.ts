@@ -106,7 +106,7 @@ export class MongoUserRepository implements UserRepository {
         updatedAt,
     }: User): Promise<Result<void, NotFoundError | Error>> => {
         try {
-            const document = await this.userCollection.updateOne(
+            const document = await this.userCollection.findOneAndUpdate(
                 { _id: new ObjectId(id) },
                 {
                     $set: {
