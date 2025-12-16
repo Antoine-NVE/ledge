@@ -2,8 +2,8 @@ import { Collection, MongoServerError, ObjectId } from 'mongodb';
 import { UserRepository } from '../../domain/user/user-repository';
 import { NewUser, User } from '../../domain/user/user-types';
 import { ConflictError } from '../../core/errors/conflict-error';
-import { err, ok, ResultAsync } from 'neverthrow';
 import { NotFoundError } from '../../core/errors/not-found-error';
+import { fail, ok, Result } from '../../core/result';
 
 type UserDocument = {
     _id: ObjectId;
@@ -35,12 +35,12 @@ export class MongoUserRepository implements UserRepository {
         };
     }
 
-    create = ({
+    create = async ({
         email,
         passwordHash,
         isEmailVerified,
         createdAt,
-    }: NewUser): ResultAsync<User, ConflictError | Error> => {
+    }: NewUser): Promise<Result<User, ConflictError | Error>> => {
         const document: UserDocument = {
             _id: new ObjectId(),
             email,
@@ -49,56 +49,64 @@ export class MongoUserRepository implements UserRepository {
             createdAt,
         };
 
-        return ResultAsync.fromPromise(
-            this.userCollection.insertOne(document),
-            (err: unknown) => {
-                if (err instanceof MongoServerError && err.code === 11000) {
-                    return new ConflictError({
+        try {
+            await this.userCollection.insertOne(document);
+            return ok(this.toDomain(document));
+        } catch (err: unknown) {
+            if (err instanceof MongoServerError && err.code === 11000) {
+                return fail(
+                    new ConflictError({
                         message: 'Email already in use',
-                    });
-                }
-                return err instanceof Error ? err : new Error('Unknown error');
-            },
-        ).map(() => {
-            return this.toDomain(document);
-        });
+                    }),
+                );
+            }
+            return fail(
+                err instanceof Error ? err : new Error('Unknown error'),
+            );
+        }
     };
 
-    findById = (id: string): ResultAsync<User, NotFoundError | Error> => {
-        return ResultAsync.fromPromise(
-            this.userCollection.findOne({ _id: new ObjectId(id) }),
-            (err: unknown) => {
-                return err instanceof Error ? err : new Error('Unknown error');
-            },
-        ).andThen((document) => {
+    findById = async (
+        id: string,
+    ): Promise<Result<User, NotFoundError | Error>> => {
+        try {
+            const document = await this.userCollection.findOne({
+                _id: new ObjectId(id),
+            });
             if (!document) {
-                return err(new NotFoundError({ message: 'User not found' }));
+                return fail(new NotFoundError({ message: 'User not found' }));
             }
             return ok(this.toDomain(document));
-        });
+        } catch (err: unknown) {
+            return fail(
+                err instanceof Error ? err : new Error('Unknown error'),
+            );
+        }
     };
 
-    findByEmail = (email: string): ResultAsync<User, NotFoundError | Error> => {
-        return ResultAsync.fromPromise(
-            this.userCollection.findOne({ email }),
-            (err: unknown) => {
-                return err instanceof Error ? err : new Error('Unknown error');
-            },
-        ).andThen((document) => {
+    findByEmail = async (
+        email: string,
+    ): Promise<Result<User, NotFoundError | Error>> => {
+        try {
+            const document = await this.userCollection.findOne({ email });
             if (!document) {
-                return err(new NotFoundError({ message: 'User not found' }));
+                return fail(new NotFoundError({ message: 'User not found' }));
             }
             return ok(this.toDomain(document));
-        });
+        } catch (err: unknown) {
+            return fail(
+                err instanceof Error ? err : new Error('Unknown error'),
+            );
+        }
     };
 
-    save = ({
+    save = async ({
         id,
         isEmailVerified,
         updatedAt,
-    }: User): ResultAsync<void, Error> => {
-        return ResultAsync.fromPromise(
-            this.userCollection.updateOne(
+    }: User): Promise<Result<void, Error>> => {
+        try {
+            await this.userCollection.updateOne(
                 { _id: new ObjectId(id) },
                 {
                     $set: {
@@ -106,12 +114,12 @@ export class MongoUserRepository implements UserRepository {
                         updatedAt,
                     },
                 },
-            ),
-            (err: unknown) => {
-                return err instanceof Error ? err : new Error('Unknown error');
-            },
-        ).map(() => {
-            return undefined;
-        });
+            );
+            return ok(undefined);
+        } catch (err: unknown) {
+            return fail(
+                err instanceof Error ? err : new Error('Unknown error'),
+            );
+        }
     };
 }
