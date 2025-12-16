@@ -4,6 +4,8 @@ import {
     NewTransaction,
     Transaction,
 } from '../../domain/transaction/transaction-types';
+import { fail, ok, Result } from '../../core/result';
+import { NotFoundError } from '../../core/errors/not-found-error';
 
 type TransactionDocument = {
     _id: ObjectId;
@@ -54,7 +56,7 @@ export class MongoTransactionRepository implements TransactionRepository {
         type,
         expenseCategory,
         createdAt,
-    }: NewTransaction) => {
+    }: NewTransaction): Promise<Result<Transaction, Error>> => {
         const document: TransactionDocument = {
             _id: new ObjectId(),
             userId: new ObjectId(userId),
@@ -65,22 +67,50 @@ export class MongoTransactionRepository implements TransactionRepository {
             ...(expenseCategory !== undefined ? { expenseCategory } : {}), // "undefined" is converted to "null" by MongoDB
             createdAt,
         };
-        await this.transactionCollection.insertOne(document);
-        return this.toDomain(document);
+
+        try {
+            await this.transactionCollection.insertOne(document);
+            return ok(this.toDomain(document));
+        } catch (err: unknown) {
+            return fail(
+                err instanceof Error ? err : new Error('Unknown error'),
+            );
+        }
     };
 
-    findManyByUserId = async (userId: string) => {
-        const documents = await this.transactionCollection
-            .find({ userId: new ObjectId(userId) })
-            .toArray();
-        return documents.map((document) => this.toDomain(document));
+    findManyByUserId = async (
+        userId: string,
+    ): Promise<Result<Transaction[], Error>> => {
+        try {
+            const documents = await this.transactionCollection
+                .find({ userId: new ObjectId(userId) })
+                .toArray();
+            return ok(documents.map((document) => this.toDomain(document)));
+        } catch (err: unknown) {
+            return fail(
+                err instanceof Error ? err : new Error('Unknown error'),
+            );
+        }
     };
 
-    findById = async (id: string) => {
-        const document = await this.transactionCollection.findOne({
-            _id: new ObjectId(id),
-        });
-        return document ? this.toDomain(document) : null;
+    findById = async (
+        id: string,
+    ): Promise<Result<Transaction, NotFoundError | Error>> => {
+        try {
+            const document = await this.transactionCollection.findOne({
+                _id: new ObjectId(id),
+            });
+            if (!document) {
+                return fail(
+                    new NotFoundError({ message: 'Transaction not found' }),
+                );
+            }
+            return ok(this.toDomain(document));
+        } catch (err: unknown) {
+            return fail(
+                err instanceof Error ? err : new Error('Unknown error'),
+            );
+        }
     };
 
     save = async ({
@@ -90,7 +120,7 @@ export class MongoTransactionRepository implements TransactionRepository {
         type,
         expenseCategory,
         updatedAt,
-    }: Transaction) => {
+    }: Transaction): Promise<Result<void, NotFoundError | Error>> => {
         const query: {
             $set: Record<string, unknown>;
             $unset?: Record<string, 1>;
@@ -111,16 +141,41 @@ export class MongoTransactionRepository implements TransactionRepository {
             query.$set.expenseCategory = expenseCategory;
         }
 
-        await this.transactionCollection.updateOne(
-            { _id: new ObjectId(id) },
-            query,
-        );
+        try {
+            const document = await this.transactionCollection.findOneAndUpdate(
+                { _id: new ObjectId(id) },
+                query,
+            );
+            if (!document) {
+                return fail(
+                    new NotFoundError({ message: 'Transaction not found' }),
+                );
+            }
+            return ok(undefined);
+        } catch (err: unknown) {
+            return fail(
+                err instanceof Error ? err : new Error('Unknown error'),
+            );
+        }
     };
 
-    deleteById = async (id: string) => {
-        const document = await this.transactionCollection.findOneAndDelete({
-            _id: new ObjectId(id),
-        });
-        return document ? this.toDomain(document) : null;
+    deleteById = async (
+        id: string,
+    ): Promise<Result<Transaction, NotFoundError | Error>> => {
+        try {
+            const document = await this.transactionCollection.findOneAndDelete({
+                _id: new ObjectId(id),
+            });
+            if (!document) {
+                return fail(
+                    new NotFoundError({ message: 'Transaction not found' }),
+                );
+            }
+            return ok(this.toDomain(document));
+        } catch (err: unknown) {
+            return fail(
+                err instanceof Error ? err : new Error('Unknown error'),
+            );
+        }
     };
 }
