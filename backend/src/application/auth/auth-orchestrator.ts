@@ -7,7 +7,7 @@ import { UnauthorizedError } from '../../core/errors/unauthorized-error';
 import { generateToken } from '../../core/utils/token';
 import { UserRepository } from '../../domain/user/user-repository';
 import { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository';
-import { ok, Result } from '../../core/result';
+import { fail, ok, Result } from '../../core/result';
 import { ConflictError } from '../../core/errors/conflict-error';
 
 type RegisterInput = {
@@ -146,9 +146,7 @@ export class AuthOrchestrator {
             const err = findResult.error;
             if (err instanceof NotFoundError) {
                 return fail(
-                    new UnauthorizedError({
-                        message: 'Invalid refresh token',
-                    }),
+                    new UnauthorizedError({ message: 'Invalid refresh token' }),
                 );
             }
             return fail(err);

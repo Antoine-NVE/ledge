@@ -3,9 +3,7 @@ import { ParamsDictionary } from 'express-serve-static-core';
 import { AuthOrchestrator } from '../../../application/auth/auth-orchestrator';
 import { Logger } from '../../../application/ports/logger';
 import { CookieManager } from '../support/cookie-manager';
-import { RefreshToken } from '../../../domain/refresh-token/refresh-token-types';
 import { UnauthorizedError } from '../../../core/errors/unauthorized-error';
-import { NotFoundError } from '../../../core/errors/not-found-error';
 import { removePasswordHash } from '../../../core/utils/clean';
 import z from 'zod';
 import { loginBodySchema, registerBodySchema } from './auth-schemas';
@@ -31,8 +29,12 @@ export class AuthController {
         // Next time the user logs in, they can choose to be remembered
         const rememberMe = false;
 
-        const { user, accessToken, refreshToken } =
-            await this.authOrchestrator.register({ email, password });
+        const result = await this.authOrchestrator.register({
+            email,
+            password,
+        });
+        if (!result.success) throw result.error;
+        const { user, accessToken, refreshToken } = result.value;
 
         this.cookieManager.setAuth(
             res,
@@ -61,8 +63,9 @@ export class AuthController {
     ) => {
         const { email, password, rememberMe } = req.body;
 
-        const { user, accessToken, refreshToken } =
-            await this.authOrchestrator.login({ email, password });
+        const result = await this.authOrchestrator.login({ email, password });
+        if (!result.success) throw result.error;
+        const { user, accessToken, refreshToken } = result.value;
 
         this.cookieManager.setAuth(
             res,
@@ -94,8 +97,9 @@ export class AuthController {
         let rememberMe = this.cookieManager.getRememberMe(req);
         if (rememberMe === undefined) rememberMe = false;
 
-        const { accessToken, refreshToken } =
-            await this.authOrchestrator.refresh({ token });
+        const result = await this.authOrchestrator.refresh({ token });
+        if (!result.success) throw result.error;
+        const { accessToken, refreshToken } = result.value;
 
         this.cookieManager.setAuth(
             res,
@@ -117,28 +121,21 @@ export class AuthController {
 
     logout = async (req: Request, res: Response) => {
         const token = this.cookieManager.getRefreshToken(req);
-
-        let refreshToken: RefreshToken | null = null;
-        if (token) {
-            const result = await this.authOrchestrator
-                .logout({ token })
-                .catch((err: unknown) => {
-                    if (err instanceof NotFoundError) return null;
-                    throw err;
-                });
-
-            refreshToken = result ? result.refreshToken : null;
+        if (!token) {
+            throw new UnauthorizedError({ message: 'Required refresh token' });
         }
+
+        const result = await this.authOrchestrator.logout({ token });
+        if (!result.success) throw result.error;
+        const { refreshToken } = result.value;
 
         this.cookieManager.clearAuth(res);
 
         const message = 'User logged out successfully';
-        if (refreshToken) {
-            this.logger.info(message, {
-                userId: refreshToken.userId,
-                refreshTokenId: refreshToken.id,
-            });
-        }
+        this.logger.info(message, {
+            userId: refreshToken.userId,
+            refreshTokenId: refreshToken.id,
+        });
         res.status(200).json({
             success: true,
             message,
