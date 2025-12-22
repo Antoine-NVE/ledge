@@ -22,30 +22,33 @@ export class UserController {
     ): Promise<void> => {
         const { frontendBaseUrl } = req.body;
 
-        await this.userOrchestrator.sendVerificationEmail({
+        const result = await this.userOrchestrator.sendVerificationEmail({
             user: req.user,
             frontendBaseUrl,
         });
+        if (!result.success) throw result.error;
 
         const message = 'Verification email sent successfully';
-        this.logger.info(message, { userId: req.user.id });
         res.status(200).json({
             success: true,
             message,
         });
+        this.logger.info(message, { userId: req.user.id });
     };
 
     verifyEmail = async (req: Request<ParamsDictionary, unknown, VerifyEmailBody>, res: Response): Promise<void> => {
         const { token } = req.body;
 
-        const { user } = await this.userOrchestrator.verifyEmail({ token });
+        const result = await this.userOrchestrator.verifyEmail({ token });
+        if (!result.success) throw result.error;
+        const { user } = result.value;
 
         const message = 'Email verified successfully';
-        this.logger.info(message, { userId: user.id });
         res.status(200).json({
             success: true,
             message,
         });
+        this.logger.info(message, { userId: user.id });
     };
 
     me = (req: Request, res: Response): void => {
