@@ -4,10 +4,8 @@ export type Transaction = {
     month: string;
     name: string;
     value: number;
-    type: 'income' | 'expense';
-    expenseCategory?: 'need' | 'want' | 'investment' | null;
+    type: 'expense' | 'income';
+    expenseCategory: ('need' | 'want' | 'investment' | null) | undefined;
     createdAt: Date;
-    updatedAt?: Date;
+    updatedAt: Date;
 };
-
-export type NewTransaction = Omit<Transaction, 'id' | 'updatedAt'>;

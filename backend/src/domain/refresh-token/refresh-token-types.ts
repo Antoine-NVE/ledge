@@ -1,10 +1,8 @@
 export type RefreshToken = {
     id: string;
     userId: string;
-    token: string;
+    value: string;
     expiresAt: Date;
     createdAt: Date;
-    updatedAt?: Date;
+    updatedAt: Date;
 };
-
-export type NewRefreshToken = Omit<RefreshToken, 'id' | 'updatedAt'>;
