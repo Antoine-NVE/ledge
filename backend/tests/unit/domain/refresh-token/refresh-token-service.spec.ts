@@ -24,9 +24,7 @@ describe('RefreshTokenService', () => {
             save: jest.fn(),
             deleteByToken: jest.fn().mockResolvedValue(refreshToken),
         };
-        refreshTokenService = new RefreshTokenService(
-            refreshTokenRepositoryMock as RefreshTokenRepository,
-        );
+        refreshTokenService = new RefreshTokenService(refreshTokenRepositoryMock as RefreshTokenRepository);
     });
 
     afterEach(() => {
@@ -56,9 +54,7 @@ describe('RefreshTokenService', () => {
         it('should call this.refreshTokenRepository.findByToken', async () => {
             await refreshTokenService.findByToken({ token: TOKEN });
 
-            expect(refreshTokenRepositoryMock.findByToken).toHaveBeenCalledWith(
-                TOKEN,
-            );
+            expect(refreshTokenRepositoryMock.findByToken).toHaveBeenCalledWith(TOKEN);
         });
 
         // it('should throw a NotFoundError if findOne return null', () => {
@@ -102,9 +98,7 @@ describe('RefreshTokenService', () => {
         it('should call this.refreshTokenRepository.deleteByToken', async () => {
             await refreshTokenService.deleteByToken({ token: TOKEN });
 
-            expect(
-                refreshTokenRepositoryMock.deleteByToken,
-            ).toHaveBeenCalledWith(TOKEN);
+            expect(refreshTokenRepositoryMock.deleteByToken).toHaveBeenCalledWith(TOKEN);
         });
     });
 });

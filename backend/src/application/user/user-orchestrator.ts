@@ -40,8 +40,7 @@ export class UserOrchestrator {
 
         if (await this.cacheStore.existsVerificationEmailCooldown(user.id)) {
             throw new TooManyRequestsError({
-                message:
-                    'Please wait before requesting another verification email',
+                message: 'Please wait before requesting another verification email',
             });
         }
 
@@ -59,9 +58,7 @@ export class UserOrchestrator {
         await this.cacheStore.setVerificationEmailCooldown(user.id);
     };
 
-    verifyEmail = async ({
-        token,
-    }: VerifyEmailInput): Promise<VerifyEmailOutput> => {
+    verifyEmail = async ({ token }: VerifyEmailInput): Promise<VerifyEmailOutput> => {
         const { userId } = this.tokenManager.verifyVerificationEmail(token);
         const user = await this.userService.findById({ id: userId });
         if (user.isEmailVerified) {

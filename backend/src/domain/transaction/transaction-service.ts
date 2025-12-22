@@ -49,18 +49,11 @@ export class TransactionService {
 
     findById = async ({ id }: FindByIdInput) => {
         const transaction = await this.transactionRepository.findById(id);
-        if (!transaction)
-            throw new NotFoundError({ message: 'Transaction not found' });
+        if (!transaction) throw new NotFoundError({ message: 'Transaction not found' });
         return transaction;
     };
 
-    update = async ({
-        transaction,
-        newName,
-        newValue,
-        newType,
-        newExpenseCategory,
-    }: UpdateInput) => {
+    update = async ({ transaction, newName, newValue, newType, newExpenseCategory }: UpdateInput) => {
         transaction.name = newName;
         transaction.value = newValue;
         transaction.type = newType;
@@ -73,8 +66,7 @@ export class TransactionService {
 
     deleteById = async ({ id }: DeleteByIdInput) => {
         const transaction = await this.transactionRepository.deleteById(id);
-        if (!transaction)
-            throw new NotFoundError({ message: 'Transaction not found' });
+        if (!transaction) throw new NotFoundError({ message: 'Transaction not found' });
         return transaction;
     };
 }

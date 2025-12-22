@@ -20,24 +20,17 @@ const start = async () => {
     // .env is not verified yet, but we need a logger now
     const logger = new PinoLogger(
         createBaseLogger({
-            nodeEnv:
-                process.env.NODE_ENV === 'production'
-                    ? 'production'
-                    : 'development',
+            nodeEnv: process.env.NODE_ENV === 'production' ? 'production' : 'development',
         }),
     );
 
-    const {
-        databaseUrl,
-        cacheUrl,
-        port,
-        smtpUrl,
-        tokenSecret,
-        emailFrom,
-        allowedOrigins,
-    } = await step('Environment validation', logger, async () => {
-        return loadEnv();
-    });
+    const { databaseUrl, cacheUrl, port, smtpUrl, tokenSecret, emailFrom, allowedOrigins } = await step(
+        'Environment validation',
+        logger,
+        async () => {
+            return loadEnv();
+        },
+    );
 
     const client = await step('Redis connection', logger, async () => {
         return await connectToRedis({ url: cacheUrl });
@@ -51,28 +44,22 @@ const start = async () => {
         return await connectToSmtp({ url: smtpUrl });
     });
 
-    const {
-        transactionService,
-        authOrchestrator,
-        userOrchestrator,
-        tokenManager,
-        userService,
-    } = await step('Container build', logger, async () => {
-        return buildContainer({
-            tokenManager: new JwtTokenManager(tokenSecret),
-            hasher: new BcryptHasher(),
-            emailSender: new NodemailerEmailSender(transporter),
-            cacheStore: new RedisCacheStore(client),
-            emailFrom,
-            userRepository: new MongoUserRepository(db.collection('users')),
-            transactionRepository: new MongoTransactionRepository(
-                db.collection('transactions'),
-            ),
-            refreshTokenRepository: new MongoRefreshTokenRepository(
-                db.collection('refreshtokens'),
-            ),
-        });
-    });
+    const { transactionService, authOrchestrator, userOrchestrator, tokenManager, userService } = await step(
+        'Container build',
+        logger,
+        async () => {
+            return buildContainer({
+                tokenManager: new JwtTokenManager(tokenSecret),
+                hasher: new BcryptHasher(),
+                emailSender: new NodemailerEmailSender(transporter),
+                cacheStore: new RedisCacheStore(client),
+                emailFrom,
+                userRepository: new MongoUserRepository(db.collection('users')),
+                transactionRepository: new MongoTransactionRepository(db.collection('transactions')),
+                refreshTokenRepository: new MongoRefreshTokenRepository(db.collection('refreshtokens')),
+            });
+        },
+    );
 
     const app = await step('HTTP app creation', logger, async () => {
         return createHttpApp({

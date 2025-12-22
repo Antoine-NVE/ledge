@@ -59,12 +59,7 @@ export class AuthOrchestrator {
         private hasher: Hasher,
     ) {}
 
-    register = async ({
-        email,
-        password,
-    }: RegisterInput): Promise<
-        Result<RegisterOutput, ConflictError | Error>
-    > => {
+    register = async ({ email, password }: RegisterInput): Promise<Result<RegisterOutput, ConflictError | Error>> => {
         const now = new Date();
 
         const passwordHash = await this.hasher.hash(password);
@@ -92,32 +87,22 @@ export class AuthOrchestrator {
         return ok({ user, accessToken, refreshToken });
     };
 
-    login = async ({
-        email,
-        password,
-    }: LoginInput): Promise<Result<LoginOutput, UnauthorizedError | Error>> => {
+    login = async ({ email, password }: LoginInput): Promise<Result<LoginOutput, UnauthorizedError | Error>> => {
         const now = new Date();
 
         const userResult = await this.userRepository.findByEmail(email);
         if (!userResult.success) {
             const err = userResult.error;
             if (err instanceof NotFoundError) {
-                return fail(
-                    new UnauthorizedError({ message: 'Invalid credentials' }),
-                );
+                return fail(new UnauthorizedError({ message: 'Invalid credentials' }));
             }
             return fail(err);
         }
         const user = userResult.value;
 
-        const doesMatch = await this.hasher.compare(
-            password,
-            user.passwordHash,
-        );
+        const doesMatch = await this.hasher.compare(password, user.passwordHash);
         if (!doesMatch) {
-            return fail(
-                new UnauthorizedError({ message: 'Invalid credentials' }),
-            );
+            return fail(new UnauthorizedError({ message: 'Invalid credentials' }));
         }
 
         const refreshTokenResult = await this.refreshTokenRepository.create({
@@ -134,35 +119,25 @@ export class AuthOrchestrator {
         return ok({ user, accessToken, refreshToken });
     };
 
-    refresh = async ({
-        token,
-    }: RefreshInput): Promise<
-        Result<RefreshOutput, UnauthorizedError | Error>
-    > => {
+    refresh = async ({ token }: RefreshInput): Promise<Result<RefreshOutput, UnauthorizedError | Error>> => {
         const now = new Date();
 
         const findResult = await this.refreshTokenRepository.findByToken(token);
         if (!findResult.success) {
             const err = findResult.error;
             if (err instanceof NotFoundError) {
-                return fail(
-                    new UnauthorizedError({ message: 'Invalid refresh token' }),
-                );
+                return fail(new UnauthorizedError({ message: 'Invalid refresh token' }));
             }
             return fail(err);
         }
         const refreshToken = findResult.value;
 
         if (refreshToken.expiresAt < now) {
-            return fail(
-                new UnauthorizedError({ message: 'Expired refresh token' }),
-            );
+            return fail(new UnauthorizedError({ message: 'Expired refresh token' }));
         }
 
         refreshToken.token = generateToken();
-        refreshToken.expiresAt = new Date(
-            now.getTime() + this.REFRESH_TOKEN_DURATION,
-        );
+        refreshToken.expiresAt = new Date(now.getTime() + this.REFRESH_TOKEN_DURATION);
         refreshToken.updatedAt = now;
         const saveResult = await this.refreshTokenRepository.save(refreshToken);
         if (!saveResult.success) return fail(saveResult.error);
@@ -174,9 +149,7 @@ export class AuthOrchestrator {
         return ok({ accessToken, refreshToken });
     };
 
-    logout = async ({
-        token,
-    }: LogoutInput): Promise<Result<LogoutOutput, NotFoundError | Error>> => {
+    logout = async ({ token }: LogoutInput): Promise<Result<LogoutOutput, NotFoundError | Error>> => {
         const result = await this.refreshTokenRepository.deleteByToken(token);
         if (!result.success) return fail(result.error);
         const refreshToken = result.value;

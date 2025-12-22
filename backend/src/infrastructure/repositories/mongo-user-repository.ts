@@ -17,14 +17,7 @@ type UserDocument = {
 export class MongoUserRepository implements UserRepository {
     constructor(private userCollection: Collection<UserDocument>) {}
 
-    private toDomain({
-        _id,
-        email,
-        passwordHash,
-        isEmailVerified,
-        createdAt,
-        updatedAt,
-    }: UserDocument): User {
+    private toDomain({ _id, email, passwordHash, isEmailVerified, createdAt, updatedAt }: UserDocument): User {
         return {
             id: _id.toString(),
             email,
@@ -60,15 +53,11 @@ export class MongoUserRepository implements UserRepository {
                     }),
                 );
             }
-            return fail(
-                err instanceof Error ? err : new Error('Unknown error'),
-            );
+            return fail(err instanceof Error ? err : new Error('Unknown error'));
         }
     };
 
-    findById = async (
-        id: string,
-    ): Promise<Result<User, NotFoundError | Error>> => {
+    findById = async (id: string): Promise<Result<User, NotFoundError | Error>> => {
         try {
             const document = await this.userCollection.findOne({
                 _id: new ObjectId(id),
@@ -78,15 +67,11 @@ export class MongoUserRepository implements UserRepository {
             }
             return ok(this.toDomain(document));
         } catch (err: unknown) {
-            return fail(
-                err instanceof Error ? err : new Error('Unknown error'),
-            );
+            return fail(err instanceof Error ? err : new Error('Unknown error'));
         }
     };
 
-    findByEmail = async (
-        email: string,
-    ): Promise<Result<User, NotFoundError | Error>> => {
+    findByEmail = async (email: string): Promise<Result<User, NotFoundError | Error>> => {
         try {
             const document = await this.userCollection.findOne({ email });
             if (!document) {
@@ -94,17 +79,11 @@ export class MongoUserRepository implements UserRepository {
             }
             return ok(this.toDomain(document));
         } catch (err: unknown) {
-            return fail(
-                err instanceof Error ? err : new Error('Unknown error'),
-            );
+            return fail(err instanceof Error ? err : new Error('Unknown error'));
         }
     };
 
-    save = async ({
-        id,
-        isEmailVerified,
-        updatedAt,
-    }: User): Promise<Result<void, NotFoundError | Error>> => {
+    save = async ({ id, isEmailVerified, updatedAt }: User): Promise<Result<void, NotFoundError | Error>> => {
         try {
             const document = await this.userCollection.findOneAndUpdate(
                 { _id: new ObjectId(id) },
@@ -120,9 +99,7 @@ export class MongoUserRepository implements UserRepository {
             }
             return ok(undefined);
         } catch (err: unknown) {
-            return fail(
-                err instanceof Error ? err : new Error('Unknown error'),
-            );
+            return fail(err instanceof Error ? err : new Error('Unknown error'));
         }
     };
 }

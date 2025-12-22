@@ -1,27 +1,12 @@
-import {
-    sign,
-    verify,
-    Secret,
-    SignOptions,
-    VerifyOptions,
-    TokenExpiredError,
-    NotBeforeError,
-} from 'jsonwebtoken';
+import { sign, verify, Secret, SignOptions, VerifyOptions, TokenExpiredError, NotBeforeError } from 'jsonwebtoken';
 import z from 'zod';
-import {
-    SignAccessPayload,
-    TokenManager,
-    VerificationEmailPayload,
-} from '../../application/ports/token-manager';
+import { SignAccessPayload, TokenManager, VerificationEmailPayload } from '../../application/ports/token-manager';
 import { UnauthorizedError } from '../../core/errors/unauthorized-error';
 
 export class JwtTokenManager implements TokenManager {
     constructor(private secret: Secret) {}
 
-    private sign = (
-        payload: { aud: string; sub: string },
-        options: SignOptions,
-    ) => {
+    private sign = (payload: { aud: string; sub: string }, options: SignOptions) => {
         return sign(payload, this.secret, options);
     };
 
@@ -74,10 +59,7 @@ export class JwtTokenManager implements TokenManager {
     };
 
     signVerificationEmail = ({ userId }: VerificationEmailPayload): string => {
-        return this.sign(
-            { aud: 'verification-email', sub: userId },
-            { expiresIn: '1h' },
-        );
+        return this.sign({ aud: 'verification-email', sub: userId }, { expiresIn: '1h' });
     };
 
     verifyVerificationEmail = (token: string): VerificationEmailPayload => {

@@ -34,19 +34,8 @@ export const buildContainer = ({
     const refreshTokenService = new RefreshTokenService(refreshTokenRepository);
     const transactionService = new TransactionService(transactionRepository);
 
-    const authOrchestrator = new AuthOrchestrator(
-        userRepository,
-        tokenManager,
-        refreshTokenRepository,
-        hasher,
-    );
-    const userOrchestrator = new UserOrchestrator(
-        tokenManager,
-        emailSender,
-        userService,
-        cacheStore,
-        emailFrom,
-    );
+    const authOrchestrator = new AuthOrchestrator(userRepository, tokenManager, refreshTokenRepository, hasher);
+    const userOrchestrator = new UserOrchestrator(tokenManager, emailSender, userService, cacheStore, emailFrom);
 
     return {
         transactionService,

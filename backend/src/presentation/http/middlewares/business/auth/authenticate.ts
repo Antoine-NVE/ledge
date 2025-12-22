@@ -33,15 +33,13 @@ export const createAuthenticate = ({
         }
 
         const { userId } = tokenManager.verifyAccess(accessToken);
-        req.user = await userService
-            .findById({ id: userId })
-            .catch((err: unknown) => {
-                if (err instanceof NotFoundError) {
-                    // If user is not found, refresh will probably don't work either
-                    throw new UnauthorizedError({ action: 'REFRESH' });
-                }
-                throw err;
-            });
+        req.user = await userService.findById({ id: userId }).catch((err: unknown) => {
+            if (err instanceof NotFoundError) {
+                // If user is not found, refresh will probably don't work either
+                throw new UnauthorizedError({ action: 'REFRESH' });
+            }
+            throw err;
+        });
         next();
     };
 };

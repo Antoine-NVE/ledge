@@ -1,8 +1,5 @@
 import express from 'express';
-import {
-    createSendVerificationEmailBodySchema,
-    verifyEmailBodySchema,
-} from './user-schemas';
+import { createSendVerificationEmailBodySchema, verifyEmailBodySchema } from './user-schemas';
 import { createValidateBody } from '../middlewares/business/validation/validate-body';
 import { UserController } from './user-controller';
 import { Authenticate } from '../middlewares/business/auth/authenticate';
@@ -93,11 +90,7 @@ export const createUserRoutes = ({
      *       500:
      *         description: Internal server error
      */
-    router.post(
-        '/verify-email',
-        createValidateBody({ schema: verifyEmailBodySchema }),
-        verifyEmail,
-    );
+    router.post('/verify-email', createValidateBody({ schema: verifyEmailBodySchema }), verifyEmail);
 
     /**
      * @openapi

@@ -2,11 +2,7 @@ import z from 'zod';
 
 const monthSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
 
-const nameSchema = z
-    .string()
-    .trim()
-    .min(1, 'Name is required')
-    .max(99, 'Name is too long');
+const nameSchema = z.string().trim().min(1, 'Name is required').max(99, 'Name is too long');
 
 const valueSchema = z
     .number()
@@ -56,12 +52,6 @@ const updateExpenseSchema = z.object({
     expenseCategory: expenseCategorySchema,
 });
 
-export const createBodySchema = z.discriminatedUnion('type', [
-    createIncomeSchema,
-    createExpenseSchema,
-]);
+export const createBodySchema = z.discriminatedUnion('type', [createIncomeSchema, createExpenseSchema]);
 
-export const updateBodySchema = z.discriminatedUnion('type', [
-    updateIncomeSchema,
-    updateExpenseSchema,
-]);
+export const updateBodySchema = z.discriminatedUnion('type', [updateIncomeSchema, updateExpenseSchema]);

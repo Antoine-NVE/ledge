@@ -50,15 +50,8 @@ export const createHttpApp = ({
 
     // Dependencies
     const cookieManager = new CookieManager();
-    const authController = new AuthController(
-        authOrchestrator,
-        logger,
-        cookieManager,
-    );
-    const transactionController = new TransactionController(
-        transactionService,
-        logger,
-    );
+    const authController = new AuthController(authOrchestrator, logger, cookieManager);
+    const transactionController = new TransactionController(transactionService, logger);
     const userController = new UserController(userOrchestrator, logger);
     const authenticate = createAuthenticate({
         tokenManager,
@@ -78,10 +71,7 @@ export const createHttpApp = ({
             authorize,
         }),
     );
-    app.use(
-        '/users',
-        createUserRoutes({ userController, authenticate, allowedOrigins }),
-    );
+    app.use('/users', createUserRoutes({ userController, authenticate, allowedOrigins }));
     app.use(() => {
         throw new NotFoundError({ message: 'Route not found' });
     });

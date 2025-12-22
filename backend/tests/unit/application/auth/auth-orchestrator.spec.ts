@@ -57,9 +57,7 @@ describe('AuthOrchestrator', () => {
             compare: jest.fn().mockReturnValue(true),
         };
 
-        generateTokenSpy = jest
-            .spyOn(tokenUtils, 'generateToken')
-            .mockReturnValue(TOKEN);
+        generateTokenSpy = jest.spyOn(tokenUtils, 'generateToken').mockReturnValue(TOKEN);
 
         authOrchestrator = new AuthOrchestrator(
             userServiceMock as UserService,
@@ -159,10 +157,7 @@ describe('AuthOrchestrator', () => {
                 password: PASSWORD,
             });
 
-            expect(hasherMock.compare).toHaveBeenCalledWith(
-                PASSWORD,
-                PASSWORD_HASH,
-            );
+            expect(hasherMock.compare).toHaveBeenCalledWith(PASSWORD, PASSWORD_HASH);
         });
 
         // it('should throw UnauthorizedError if passwords do not match', async () => {

@@ -1,9 +1,6 @@
 import express from 'express';
 import { createBodySchema, updateBodySchema } from './transaction-schemas';
-import {
-    Authorize,
-    authorizeParamsSchema,
-} from '../middlewares/business/auth/authorize';
+import { Authorize, authorizeParamsSchema } from '../middlewares/business/auth/authorize';
 import { createValidateParams } from '../middlewares/business/validation/validate-params';
 import { createValidateBody } from '../middlewares/business/validation/validate-body';
 import { TransactionController } from './transaction-controller';
@@ -20,13 +17,7 @@ export const createTransactionRoutes = ({
 }) => {
     const router = express.Router();
 
-    const {
-        create,
-        readAll,
-        read,
-        update,
-        delete: remove,
-    } = transactionController;
+    const { create, readAll, read, update, delete: remove } = transactionController;
     const validateParams = createValidateParams({
         schema: authorizeParamsSchema,
     });
@@ -69,12 +60,7 @@ export const createTransactionRoutes = ({
      *       500:
      *         description: Internal server error
      */
-    router.post(
-        '/',
-        authenticate,
-        createValidateBody({ schema: createBodySchema }),
-        create,
-    );
+    router.post('/', authenticate, createValidateBody({ schema: createBodySchema }), create);
 
     /**
      * @openapi

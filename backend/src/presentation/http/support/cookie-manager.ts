@@ -2,11 +2,7 @@ import { Request, Response } from 'express';
 import { parseBoolean } from '../../../core/utils/parse';
 
 export class CookieManager {
-    setAccessToken = (
-        res: Response,
-        token: string,
-        rememberMe: boolean,
-    ): void => {
+    setAccessToken = (res: Response, token: string, rememberMe: boolean): void => {
         const maxAge = rememberMe ? 15 * 60 * 1000 : undefined; // 15 minutes
 
         res.cookie('access_token', token, {
@@ -17,11 +13,7 @@ export class CookieManager {
         });
     };
 
-    setRefreshToken = (
-        res: Response,
-        token: string,
-        rememberMe: boolean,
-    ): void => {
+    setRefreshToken = (res: Response, token: string, rememberMe: boolean): void => {
         const maxAge = rememberMe ? 7 * 24 * 60 * 60 * 1000 : undefined; // 7 days
 
         res.cookie('refresh_token', token, {
@@ -43,12 +35,7 @@ export class CookieManager {
         });
     };
 
-    setAuth = (
-        res: Response,
-        accessToken: string,
-        refreshToken: string,
-        rememberMe: boolean,
-    ): void => {
+    setAuth = (res: Response, accessToken: string, refreshToken: string, rememberMe: boolean): void => {
         this.setAccessToken(res, accessToken, rememberMe);
         this.setRefreshToken(res, refreshToken, rememberMe);
         this.setRememberMe(res, rememberMe);

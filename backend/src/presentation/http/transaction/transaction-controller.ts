@@ -15,10 +15,7 @@ export class TransactionController {
         private logger: Logger,
     ) {}
 
-    create = async (
-        req: Request<ParamsDictionary, unknown, CreateBody>,
-        res: Response,
-    ) => {
+    create = async (req: Request<ParamsDictionary, unknown, CreateBody>, res: Response) => {
         const transaction = await this.transactionService.create({
             ...req.body,
             userId: req.user.id,
@@ -62,10 +59,7 @@ export class TransactionController {
         });
     };
 
-    update = async (
-        req: Request<ParamsDictionary, unknown, UpdateBody>,
-        res: Response,
-    ) => {
+    update = async (req: Request<ParamsDictionary, unknown, UpdateBody>, res: Response) => {
         const transaction = await this.transactionService.update({
             transaction: req.transaction,
             newName: req.body.name,

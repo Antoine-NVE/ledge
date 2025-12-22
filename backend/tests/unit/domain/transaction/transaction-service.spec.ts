@@ -72,9 +72,7 @@ describe('TransactionService', () => {
         it('should call this.transactionRepository.findManyByUserId', async () => {
             await transactionService.findManyByUserId({ userId: USER_ID });
 
-            expect(
-                transactionRepositoryMock.findManyByUserId,
-            ).toHaveBeenCalledWith(USER_ID);
+            expect(transactionRepositoryMock.findManyByUserId).toHaveBeenCalledWith(USER_ID);
         });
     });
 
@@ -82,9 +80,7 @@ describe('TransactionService', () => {
         it('should call this.transactionRepository.findById', async () => {
             await transactionService.findById({ id: TRANSACTION_ID });
 
-            expect(transactionRepositoryMock.findById).toHaveBeenCalledWith(
-                TRANSACTION_ID,
-            );
+            expect(transactionRepositoryMock.findById).toHaveBeenCalledWith(TRANSACTION_ID);
         });
 
         // it('should throw a NotFoundError if transactionRepository.findOne returns null', () => {
@@ -126,9 +122,7 @@ describe('TransactionService', () => {
         it('should call this.transactionRepository.deleteById', async () => {
             await transactionService.deleteById({ id: TRANSACTION_ID });
 
-            expect(transactionRepositoryMock.deleteById).toHaveBeenCalledWith(
-                TRANSACTION_ID,
-            );
+            expect(transactionRepositoryMock.deleteById).toHaveBeenCalledWith(TRANSACTION_ID);
         });
     });
 });

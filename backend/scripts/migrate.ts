@@ -9,20 +9,13 @@ import { loadEnv } from '../src/infrastructure/config/env';
 const start = async () => {
     const logger = new PinoLogger(
         createBaseLogger({
-            nodeEnv:
-                process.env.NODE_ENV === 'production'
-                    ? 'production'
-                    : 'development',
+            nodeEnv: process.env.NODE_ENV === 'production' ? 'production' : 'development',
         }),
     );
 
-    const { databaseUrl } = await step(
-        'Environment validation',
-        logger,
-        async () => {
-            return loadEnv();
-        },
-    );
+    const { databaseUrl } = await step('Environment validation', logger, async () => {
+        return loadEnv();
+    });
 
     const { db, client } = await step('Mongo connection', logger, async () => {
         return await connectToMongo({ url: databaseUrl });

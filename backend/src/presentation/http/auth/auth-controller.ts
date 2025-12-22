@@ -19,10 +19,7 @@ export class AuthController {
         private cookieManager: CookieManager,
     ) {}
 
-    register = async (
-        req: Request<ParamsDictionary, unknown, RegisterBody>,
-        res: Response,
-    ) => {
+    register = async (req: Request<ParamsDictionary, unknown, RegisterBody>, res: Response) => {
         const { email, password } = req.body;
 
         // The user can't choose to be remembered at registration
@@ -36,12 +33,7 @@ export class AuthController {
         if (!result.success) throw result.error;
         const { user, accessToken, refreshToken } = result.value;
 
-        this.cookieManager.setAuth(
-            res,
-            accessToken,
-            refreshToken.token,
-            rememberMe,
-        );
+        this.cookieManager.setAuth(res, accessToken, refreshToken.token, rememberMe);
 
         const message = 'User registered successfully';
         this.logger.info(message, {
@@ -57,22 +49,14 @@ export class AuthController {
         });
     };
 
-    login = async (
-        req: Request<ParamsDictionary, unknown, LoginBody>,
-        res: Response,
-    ) => {
+    login = async (req: Request<ParamsDictionary, unknown, LoginBody>, res: Response) => {
         const { email, password, rememberMe } = req.body;
 
         const result = await this.authOrchestrator.login({ email, password });
         if (!result.success) throw result.error;
         const { user, accessToken, refreshToken } = result.value;
 
-        this.cookieManager.setAuth(
-            res,
-            accessToken,
-            refreshToken.token,
-            rememberMe,
-        );
+        this.cookieManager.setAuth(res, accessToken, refreshToken.token, rememberMe);
 
         const message = 'User logged in successfully';
         this.logger.info(message, {
@@ -101,12 +85,7 @@ export class AuthController {
         if (!result.success) throw result.error;
         const { accessToken, refreshToken } = result.value;
 
-        this.cookieManager.setAuth(
-            res,
-            accessToken,
-            refreshToken.token,
-            rememberMe,
-        );
+        this.cookieManager.setAuth(res, accessToken, refreshToken.token, rememberMe);
 
         const message = 'Tokens refreshed successfully';
         this.logger.info(message, {

@@ -13,10 +13,6 @@ export class RedisCacheStore implements CacheStore {
     };
 
     existsVerificationEmailCooldown = async (userId: string) => {
-        return (
-            (await this.client.exists(
-                `verification_email_cooldown:${userId}`,
-            )) === 1
-        );
+        return (await this.client.exists(`verification_email_cooldown:${userId}`)) === 1;
     };
 }

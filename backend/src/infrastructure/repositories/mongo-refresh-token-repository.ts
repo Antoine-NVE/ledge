@@ -1,9 +1,6 @@
 import { Collection, ObjectId } from 'mongodb';
 import { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository';
-import {
-    NewRefreshToken,
-    RefreshToken,
-} from '../../domain/refresh-token/refresh-token-types';
+import { NewRefreshToken, RefreshToken } from '../../domain/refresh-token/refresh-token-types';
 import { fail, ok, Result } from '../../core/result';
 import { NotFoundError } from '../../core/errors/not-found-error';
 
@@ -17,18 +14,9 @@ type RefreshTokenDocument = {
 };
 
 export class MongoRefreshTokenRepository implements RefreshTokenRepository {
-    constructor(
-        private refreshTokenCollection: Collection<RefreshTokenDocument>,
-    ) {}
+    constructor(private refreshTokenCollection: Collection<RefreshTokenDocument>) {}
 
-    private toDomain({
-        _id,
-        userId,
-        token,
-        expiresAt,
-        createdAt,
-        updatedAt,
-    }: RefreshTokenDocument): RefreshToken {
+    private toDomain({ _id, userId, token, expiresAt, createdAt, updatedAt }: RefreshTokenDocument): RefreshToken {
         return {
             id: _id.toString(),
             userId: userId.toString(),
@@ -39,12 +27,7 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
         };
     }
 
-    create = async ({
-        userId,
-        token,
-        expiresAt,
-        createdAt,
-    }: NewRefreshToken): Promise<Result<RefreshToken, Error>> => {
+    create = async ({ userId, token, expiresAt, createdAt }: NewRefreshToken): Promise<Result<RefreshToken, Error>> => {
         const document: RefreshTokenDocument = {
             _id: new ObjectId(),
             userId: new ObjectId(userId),
@@ -56,38 +39,25 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
             await this.refreshTokenCollection.insertOne(document);
             return ok(this.toDomain(document));
         } catch (err: unknown) {
-            return fail(
-                err instanceof Error ? err : new Error('Unknown error'),
-            );
+            return fail(err instanceof Error ? err : new Error('Unknown error'));
         }
     };
 
-    findByToken = async (
-        token: string,
-    ): Promise<Result<RefreshToken, NotFoundError | Error>> => {
+    findByToken = async (token: string): Promise<Result<RefreshToken, NotFoundError | Error>> => {
         try {
             const document = await this.refreshTokenCollection.findOne({
                 token,
             });
             if (!document) {
-                return fail(
-                    new NotFoundError({ message: 'Refresh token not found' }),
-                );
+                return fail(new NotFoundError({ message: 'Refresh token not found' }));
             }
             return ok(this.toDomain(document));
         } catch (err: unknown) {
-            return fail(
-                err instanceof Error ? err : new Error('Unknown error'),
-            );
+            return fail(err instanceof Error ? err : new Error('Unknown error'));
         }
     };
 
-    save = async ({
-        id,
-        token,
-        expiresAt,
-        updatedAt,
-    }: RefreshToken): Promise<Result<void, NotFoundError | Error>> => {
+    save = async ({ id, token, expiresAt, updatedAt }: RefreshToken): Promise<Result<void, NotFoundError | Error>> => {
         try {
             const document = await this.refreshTokenCollection.findOneAndUpdate(
                 { _id: new ObjectId(id) },
@@ -100,37 +70,25 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
                 },
             );
             if (!document) {
-                return fail(
-                    new NotFoundError({ message: 'Refresh token not found' }),
-                );
+                return fail(new NotFoundError({ message: 'Refresh token not found' }));
             }
             return ok(undefined);
         } catch (err: unknown) {
-            return fail(
-                err instanceof Error ? err : new Error('Unknown error'),
-            );
+            return fail(err instanceof Error ? err : new Error('Unknown error'));
         }
     };
 
-    deleteByToken = async (
-        token: string,
-    ): Promise<Result<RefreshToken, NotFoundError | Error>> => {
+    deleteByToken = async (token: string): Promise<Result<RefreshToken, NotFoundError | Error>> => {
         try {
-            const document = await this.refreshTokenCollection.findOneAndDelete(
-                {
-                    token,
-                },
-            );
+            const document = await this.refreshTokenCollection.findOneAndDelete({
+                token,
+            });
             if (!document) {
-                return fail(
-                    new NotFoundError({ message: 'Refresh token not found' }),
-                );
+                return fail(new NotFoundError({ message: 'Refresh token not found' }));
             }
             return ok(this.toDomain(document));
         } catch (err: unknown) {
-            return fail(
-                err instanceof Error ? err : new Error('Unknown error'),
-            );
+            return fail(err instanceof Error ? err : new Error('Unknown error'));
         }
     };
 }

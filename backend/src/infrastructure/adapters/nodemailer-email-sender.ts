@@ -4,12 +4,7 @@ import { EmailSender } from '../../application/ports/email-sender';
 export class NodemailerEmailSender implements EmailSender {
     constructor(private transporter: Transporter) {}
 
-    private send = async (options: {
-        from: string;
-        to: string;
-        subject: string;
-        html: string;
-    }): Promise<void> => {
+    private send = async (options: { from: string; to: string; subject: string; html: string }): Promise<void> => {
         await this.transporter.sendMail(options);
     };
 

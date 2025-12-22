@@ -76,10 +76,7 @@ describe('TransactionController', () => {
         });
 
         it('should call this.transactionService.create', async () => {
-            await transactionController.create(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await transactionController.create(reqMock as Request, resMock as Response);
 
             expect(transactionServiceMock.create).toHaveBeenCalledWith({
                 userId: USER_ID,
@@ -88,10 +85,7 @@ describe('TransactionController', () => {
         });
 
         it('should call res.status and res.json', async () => {
-            await transactionController.create(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await transactionController.create(reqMock as Request, resMock as Response);
 
             expect(resMock.status).toHaveBeenCalledWith(201);
             expect(resMock.json).toHaveBeenCalledWith({
@@ -109,21 +103,13 @@ describe('TransactionController', () => {
 
     describe('readAll', () => {
         it('should call this.transactionService.findManyByUserId', async () => {
-            await transactionController.readAll(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await transactionController.readAll(reqMock as Request, resMock as Response);
 
-            expect(
-                transactionServiceMock.findManyByUserId,
-            ).toHaveBeenCalledWith({ userId: USER_ID });
+            expect(transactionServiceMock.findManyByUserId).toHaveBeenCalledWith({ userId: USER_ID });
         });
 
         it('should call res.status and res.json', async () => {
-            await transactionController.readAll(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await transactionController.readAll(reqMock as Request, resMock as Response);
 
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({
@@ -167,10 +153,7 @@ describe('TransactionController', () => {
         });
 
         it('should call this.transactionService.update', async () => {
-            await transactionController.update(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await transactionController.update(reqMock as Request, resMock as Response);
 
             expect(transactionServiceMock.update).toHaveBeenCalledWith({
                 transaction,
@@ -182,10 +165,7 @@ describe('TransactionController', () => {
         });
 
         it('should call res.status and res.json', async () => {
-            await transactionController.update(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await transactionController.update(reqMock as Request, resMock as Response);
 
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({
@@ -207,10 +187,7 @@ describe('TransactionController', () => {
         });
 
         it('should call this.transactionService.deleteById', async () => {
-            await transactionController.delete(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await transactionController.delete(reqMock as Request, resMock as Response);
 
             expect(transactionServiceMock.deleteById).toHaveBeenCalledWith({
                 id: TRANSACTION_ID,
@@ -218,10 +195,7 @@ describe('TransactionController', () => {
         });
 
         it('should call res.status and res.json', async () => {
-            await transactionController.delete(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await transactionController.delete(reqMock as Request, resMock as Response);
 
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({

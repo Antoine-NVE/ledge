@@ -26,9 +26,7 @@ describe('UserController', () => {
     let userOrchestratorMock: Partial<UserOrchestrator>;
     let loggerMock: Partial<Logger>;
 
-    let removePasswordHashSpy: jest.SpiedFunction<
-        typeof cleanUtils.removePasswordHash
-    >;
+    let removePasswordHashSpy: jest.SpiedFunction<typeof cleanUtils.removePasswordHash>;
 
     let userController: UserController;
 
@@ -61,10 +59,7 @@ describe('UserController', () => {
             .spyOn(cleanUtils, 'removePasswordHash')
             .mockReturnValue(cleanUser as Omit<User, 'passwordHash'>);
 
-        userController = new UserController(
-            userOrchestratorMock as UserOrchestrator,
-            loggerMock as Logger,
-        );
+        userController = new UserController(userOrchestratorMock as UserOrchestrator, loggerMock as Logger);
     });
 
     describe('sendVerificationEmail', () => {
@@ -77,24 +72,16 @@ describe('UserController', () => {
         });
 
         it('should call this.userOrchestrator.sendVerificationEmail', async () => {
-            await userController.sendVerificationEmail(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await userController.sendVerificationEmail(reqMock as Request, resMock as Response);
 
-            expect(
-                userOrchestratorMock.sendVerificationEmail,
-            ).toHaveBeenCalledWith({
+            expect(userOrchestratorMock.sendVerificationEmail).toHaveBeenCalledWith({
                 user,
                 frontendBaseUrl: URL,
             });
         });
 
         it('should call res.status and res.json', async () => {
-            await userController.sendVerificationEmail(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await userController.sendVerificationEmail(reqMock as Request, resMock as Response);
 
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({
@@ -112,10 +99,7 @@ describe('UserController', () => {
         });
 
         it('should call this.userOrchestrator.verifyEmail', async () => {
-            await userController.verifyEmail(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await userController.verifyEmail(reqMock as Request, resMock as Response);
 
             expect(userOrchestratorMock.verifyEmail).toHaveBeenCalledWith({
                 token: TOKEN,
@@ -123,10 +107,7 @@ describe('UserController', () => {
         });
 
         it('should call res.status and res.json', async () => {
-            await userController.verifyEmail(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await userController.verifyEmail(reqMock as Request, resMock as Response);
 
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({

@@ -10,10 +10,7 @@ export abstract class AppError extends Error {
     public cause?: unknown;
     public action?: 'REFRESH';
 
-    protected constructor(
-        defaultMessage: string,
-        { message, fields, cause, action }: AppErrorOptions = {},
-    ) {
+    protected constructor(defaultMessage: string, { message, fields, cause, action }: AppErrorOptions = {}) {
         super(message ?? defaultMessage);
         this.name = this.constructor.name;
 

@@ -27,9 +27,7 @@ describe('AuthController', () => {
     let authOrchestratorMock: Partial<AuthOrchestrator>;
     let loggerMock: Partial<Logger>;
 
-    let removePasswordHashSpy: jest.SpiedFunction<
-        typeof cleanUtils.removePasswordHash
-    >;
+    let removePasswordHashSpy: jest.SpiedFunction<typeof cleanUtils.removePasswordHash>;
 
     let authController: AuthController;
 
@@ -100,10 +98,7 @@ describe('AuthController', () => {
         });
 
         it('should call this.authOrchestrator.register', async () => {
-            await authController.register(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await authController.register(reqMock as Request, resMock as Response);
 
             expect(authOrchestratorMock.register).toHaveBeenCalledWith({
                 email: EMAIL,
@@ -112,24 +107,13 @@ describe('AuthController', () => {
         });
 
         it('should call this.cookieManager.setAuth', async () => {
-            await authController.register(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await authController.register(reqMock as Request, resMock as Response);
 
-            expect(cookieManagerMock.setAuth).toHaveBeenCalledWith(
-                resMock,
-                ACCESS_TOKEN,
-                TOKEN,
-                false,
-            );
+            expect(cookieManagerMock.setAuth).toHaveBeenCalledWith(resMock, ACCESS_TOKEN, TOKEN, false);
         });
 
         it('should call res.status and res.json', async () => {
-            await authController.register(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await authController.register(reqMock as Request, resMock as Response);
 
             expect(removePasswordHashSpy).toHaveBeenCalledWith(user);
             expect(resMock.status).toHaveBeenCalledWith(201);
@@ -167,12 +151,7 @@ describe('AuthController', () => {
         it('should call this.cookieManager.setAuth', async () => {
             await authController.login(reqMock as Request, resMock as Response);
 
-            expect(cookieManagerMock.setAuth).toHaveBeenCalledWith(
-                resMock,
-                ACCESS_TOKEN,
-                TOKEN,
-                true,
-            );
+            expect(cookieManagerMock.setAuth).toHaveBeenCalledWith(resMock, ACCESS_TOKEN, TOKEN, true);
         });
 
         it('should call res.status and res.json', async () => {
@@ -195,46 +174,25 @@ describe('AuthController', () => {
 
     describe('refresh', () => {
         it('should call this.cookieManager.getRefreshToken', async () => {
-            await authController.refresh(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await authController.refresh(reqMock as Request, resMock as Response);
 
-            expect(cookieManagerMock.getRefreshToken).toHaveBeenCalledWith(
-                reqMock,
-            );
+            expect(cookieManagerMock.getRefreshToken).toHaveBeenCalledWith(reqMock);
         });
 
         it('should call this.cookieManager.getRememberMe', async () => {
-            await authController.refresh(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await authController.refresh(reqMock as Request, resMock as Response);
 
-            expect(cookieManagerMock.getRememberMe).toHaveBeenCalledWith(
-                reqMock,
-            );
+            expect(cookieManagerMock.getRememberMe).toHaveBeenCalledWith(reqMock);
         });
 
         it('should call this.cookieManager.setAuth', async () => {
-            await authController.refresh(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await authController.refresh(reqMock as Request, resMock as Response);
 
-            expect(cookieManagerMock.setAuth).toHaveBeenCalledWith(
-                resMock,
-                ACCESS_TOKEN,
-                TOKEN,
-                true,
-            );
+            expect(cookieManagerMock.setAuth).toHaveBeenCalledWith(resMock, ACCESS_TOKEN, TOKEN, true);
         });
 
         it('should call res.status and res.json', async () => {
-            await authController.refresh(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await authController.refresh(reqMock as Request, resMock as Response);
 
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({
@@ -246,21 +204,13 @@ describe('AuthController', () => {
 
     describe('logout', () => {
         it('should call this.cookieManager.getRefreshToken', async () => {
-            await authController.logout(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await authController.logout(reqMock as Request, resMock as Response);
 
-            expect(cookieManagerMock.getRefreshToken).toHaveBeenCalledWith(
-                reqMock,
-            );
+            expect(cookieManagerMock.getRefreshToken).toHaveBeenCalledWith(reqMock);
         });
 
         it('should call this.authOrchestrator.logout', async () => {
-            await authController.logout(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await authController.logout(reqMock as Request, resMock as Response);
 
             expect(authOrchestratorMock.logout).toHaveBeenCalledWith({
                 token: TOKEN,
@@ -268,19 +218,13 @@ describe('AuthController', () => {
         });
 
         it('should call this.cookieManager.clearAuth', async () => {
-            await authController.logout(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await authController.logout(reqMock as Request, resMock as Response);
 
             expect(cookieManagerMock.clearAuth).toHaveBeenCalledWith(resMock);
         });
 
         it('should call res.status and res.json', async () => {
-            await authController.logout(
-                reqMock as Request,
-                resMock as Response,
-            );
+            await authController.logout(reqMock as Request, resMock as Response);
 
             expect(resMock.status).toHaveBeenCalledWith(200);
             expect(resMock.json).toHaveBeenCalledWith({

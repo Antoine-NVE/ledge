@@ -1,10 +1,6 @@
 import pino, { BaseLogger } from 'pino';
 
-export const createBaseLogger = ({
-    nodeEnv,
-}: {
-    nodeEnv: 'development' | 'production';
-}) => {
+export const createBaseLogger = ({ nodeEnv }: { nodeEnv: 'development' | 'production' }) => {
     const isDev = nodeEnv === 'development';
 
     const baseLogger: BaseLogger = pino({

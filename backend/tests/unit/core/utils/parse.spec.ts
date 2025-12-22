@@ -1,8 +1,4 @@
-import {
-    parseArray,
-    parseBoolean,
-    parseNumber,
-} from '../../../../src/core/utils/parse';
+import { parseArray, parseBoolean, parseNumber } from '../../../../src/core/utils/parse';
 
 describe('parse utils', () => {
     describe('parseNumber', () => {
@@ -34,11 +30,7 @@ describe('parse utils', () => {
 
     describe('parseArray', () => {
         it('should parse a valid array', () => {
-            expect(parseArray('test,hello,here')).toEqual([
-                'test',
-                'hello',
-                'here',
-            ]);
+            expect(parseArray('test,hello,here')).toEqual(['test', 'hello', 'here']);
             expect(parseArray('123,456,789')).toEqual(['123', '456', '789']);
             expect(parseArray('yay,123,true')).toEqual(['yay', '123', 'true']);
         });

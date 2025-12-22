@@ -29,9 +29,7 @@ describe('UserOrchestrator', () => {
 
         tokenManagerMock = {
             signVerificationEmail: jest.fn().mockReturnValue(TOKEN),
-            verifyVerificationEmail: jest
-                .fn()
-                .mockReturnValue({ userId: USER_ID }),
+            verifyVerificationEmail: jest.fn().mockReturnValue({ userId: USER_ID }),
         };
         emailSenderMock = {
             sendVerification: jest.fn(),
@@ -71,9 +69,7 @@ describe('UserOrchestrator', () => {
                 frontendBaseUrl: FRONTEND_BASE_URL,
             });
 
-            expect(
-                cacheStoreMock.existsVerificationEmailCooldown,
-            ).toHaveBeenCalledWith(USER_ID);
+            expect(cacheStoreMock.existsVerificationEmailCooldown).toHaveBeenCalledWith(USER_ID);
         });
 
         it('should call this.tokenManager.signVerificationEmail', async () => {
@@ -82,9 +78,7 @@ describe('UserOrchestrator', () => {
                 frontendBaseUrl: FRONTEND_BASE_URL,
             });
 
-            expect(tokenManagerMock.signVerificationEmail).toHaveBeenCalledWith(
-                { userId: USER_ID },
-            );
+            expect(tokenManagerMock.signVerificationEmail).toHaveBeenCalledWith({ userId: USER_ID });
         });
 
         it('should call this.emailSender.sendVerification', async () => {
@@ -107,9 +101,7 @@ describe('UserOrchestrator', () => {
                 frontendBaseUrl: FRONTEND_BASE_URL,
             });
 
-            expect(
-                cacheStoreMock.setVerificationEmailCooldown,
-            ).toHaveBeenCalledWith(USER_ID);
+            expect(cacheStoreMock.setVerificationEmailCooldown).toHaveBeenCalledWith(USER_ID);
         });
     });
 
@@ -117,9 +109,7 @@ describe('UserOrchestrator', () => {
         it('should call this.tokenManager.verifyVerificationEmail', async () => {
             await userOrchestrator.verifyEmail({ token: TOKEN });
 
-            expect(
-                tokenManagerMock.verifyVerificationEmail,
-            ).toHaveBeenCalledWith(TOKEN);
+            expect(tokenManagerMock.verifyVerificationEmail).toHaveBeenCalledWith(TOKEN);
         });
 
         it('should call this.userService.findById', async () => {
