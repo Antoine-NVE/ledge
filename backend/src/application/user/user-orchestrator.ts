@@ -1,10 +1,12 @@
 import { User } from '../../domain/user/user-types';
-import { UserService } from '../../domain/user/user-service';
 import { TokenManager } from '../ports/token-manager';
 import { EmailSender } from '../ports/email-sender';
 import { CacheStore } from '../ports/cache-store';
 import { ConflictError } from '../../core/errors/conflict-error';
 import { TooManyRequestsError } from '../../core/errors/too-many-requests-error';
+import { UserRepository } from '../../domain/user/user-repository';
+import { fail, ok, Result } from '../../core/result';
+import { NotFoundError } from '../../core/errors/not-found-error';
 
 type SendVerificationEmailInput = {
     user: User;
@@ -25,7 +27,7 @@ export class UserOrchestrator {
     constructor(
         private tokenManager: TokenManager,
         private emailSender: EmailSender,
-        private userService: UserService,
+        private userRepository: UserRepository,
         private cacheStore: CacheStore,
         private emailFrom: string,
     ) {}
@@ -33,15 +35,17 @@ export class UserOrchestrator {
     sendVerificationEmail = async ({
         user,
         frontendBaseUrl,
-    }: SendVerificationEmailInput): Promise<SendVerificationEmailOutput> => {
+    }: SendVerificationEmailInput): Promise<
+        Result<SendVerificationEmailOutput, ConflictError | TooManyRequestsError>
+    > => {
         if (user.isEmailVerified) {
-            throw new ConflictError({ message: 'Email already verified' });
+            return fail(new ConflictError({ message: 'Email already verified' }));
         }
 
         if (await this.cacheStore.existsVerificationEmailCooldown(user.id)) {
-            throw new TooManyRequestsError({
-                message: 'Please wait before requesting another verification email',
-            });
+            return fail(
+                new TooManyRequestsError({ message: 'Please wait before requesting another verification email' }),
+            );
         }
 
         const token = this.tokenManager.signVerificationEmail({
@@ -56,17 +60,27 @@ export class UserOrchestrator {
         });
 
         await this.cacheStore.setVerificationEmailCooldown(user.id);
+
+        return ok(undefined);
     };
 
-    verifyEmail = async ({ token }: VerifyEmailInput): Promise<VerifyEmailOutput> => {
+    verifyEmail = async ({
+        token,
+    }: VerifyEmailInput): Promise<Result<VerifyEmailOutput, ConflictError | Error | NotFoundError>> => {
         const { userId } = this.tokenManager.verifyVerificationEmail(token);
-        const user = await this.userService.findById({ id: userId });
+
+        const result = await this.userRepository.findById(userId);
+        if (!result.success) return fail(result.error);
+        const user = result.value;
+
         if (user.isEmailVerified) {
-            throw new ConflictError({ message: 'Email already verified' });
+            return fail(new ConflictError({ message: 'Email already verified' }));
         }
 
-        await this.userService.markEmailAsVerified({ user });
+        user.isEmailVerified = true;
+        user.updatedAt = new Date();
+        await this.userRepository.save(user);
 
-        return { user };
+        return ok({ user });
     };
 }
