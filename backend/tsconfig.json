@@ -9,7 +9,8 @@
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
         "strict": true,
-        "skipLibCheck": true
+        "skipLibCheck": true,
+        "exactOptionalPropertyTypes": true // Added by me
     },
     "include": ["./scripts", "./src"] // Added by me
 }
