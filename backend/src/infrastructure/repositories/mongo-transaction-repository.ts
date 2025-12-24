@@ -11,7 +11,7 @@ type TransactionDocument = {
     name: string;
     value: number;
     type: 'expense' | 'income';
-    expenseCategory?: 'need' | 'want' | 'investment' | null;
+    expenseCategory?: 'need' | 'want' | 'investment';
     createdAt: Date;
     updatedAt: Date;
 };
@@ -23,7 +23,7 @@ export class MongoTransactionRepository implements TransactionRepository {
         return {
             _id: new ObjectId(id),
             userId: new ObjectId(userId),
-            ...(expenseCategory !== undefined && { expenseCategory }),
+            ...(expenseCategory !== null && { expenseCategory }),
             ...rest,
         };
     };
@@ -32,7 +32,7 @@ export class MongoTransactionRepository implements TransactionRepository {
         return {
             id: _id.toString(),
             userId: userId.toString(),
-            expenseCategory,
+            expenseCategory: expenseCategory ?? null,
             ...rest,
         };
     };
@@ -73,11 +73,11 @@ export class MongoTransactionRepository implements TransactionRepository {
                 { _id },
                 {
                     $set: {
-                        ...(expenseCategory !== undefined && { expenseCategory }),
+                        ...(expenseCategory !== null && { expenseCategory }),
                         ...rest,
                     },
                     $unset: {
-                        ...(expenseCategory === undefined && { expenseCategory: 1 }),
+                        ...(expenseCategory === null && { expenseCategory: 1 }),
                     },
                 },
             );
