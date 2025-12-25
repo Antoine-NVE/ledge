@@ -1,7 +1,7 @@
 import { User } from './user-types';
 import { ConflictError } from '../../core/errors/conflict-error';
 import { NotFoundError } from '../../core/errors/not-found-error';
-import { Result } from '../../core/result';
+import { Result } from '../../core/types/result';
 
 export interface UserRepository {
     create: (user: User) => Promise<Result<void, ConflictError | Error>>;

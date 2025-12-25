@@ -1,8 +1,9 @@
 import { Collection, ObjectId } from 'mongodb';
 import { TransactionRepository } from '../../domain/transaction/transaction-repository';
 import { Transaction } from '../../domain/transaction/transaction-types';
-import { fail, ok, Result } from '../../core/result';
 import { NotFoundError } from '../../core/errors/not-found-error';
+import { Result } from '../../core/types/result';
+import { fail, ok } from '../../core/utils/result';
 
 type TransactionDocument = {
     _id: ObjectId;

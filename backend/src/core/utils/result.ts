@@ -1,4 +1,4 @@
-export type Result<T, E> = { success: true; value: T } | { success: false; error: E };
+import { Result } from '../types/result';
 
 export const ok = <T>(value: T): Result<T, never> => {
     return { success: true, value };

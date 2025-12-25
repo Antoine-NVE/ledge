@@ -3,7 +3,8 @@ import { UserRepository } from '../../domain/user/user-repository';
 import { User } from '../../domain/user/user-types';
 import { ConflictError } from '../../core/errors/conflict-error';
 import { NotFoundError } from '../../core/errors/not-found-error';
-import { fail, ok, Result } from '../../core/result';
+import { Result } from '../../core/types/result';
+import { fail, ok } from '../../core/utils/result';
 
 type UserDocument = {
     _id: ObjectId;

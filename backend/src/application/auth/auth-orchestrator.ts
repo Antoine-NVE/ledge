@@ -7,8 +7,9 @@ import { UnauthorizedError } from '../../core/errors/unauthorized-error';
 import { generateToken } from '../../core/utils/token';
 import { UserRepository } from '../../domain/user/user-repository';
 import { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository';
-import { fail, ok, Result } from '../../core/result';
 import { ConflictError } from '../../core/errors/conflict-error';
+import { Result } from '../../core/types/result';
+import { fail, ok } from '../../core/utils/result';
 
 type RegisterInput = {
     email: string;

@@ -5,8 +5,9 @@ import { CacheStore } from '../ports/cache-store';
 import { ConflictError } from '../../core/errors/conflict-error';
 import { TooManyRequestsError } from '../../core/errors/too-many-requests-error';
 import { UserRepository } from '../../domain/user/user-repository';
-import { fail, ok, Result } from '../../core/result';
 import { NotFoundError } from '../../core/errors/not-found-error';
+import { Result } from '../../core/types/result';
+import { fail, ok } from '../../core/utils/result';
 
 type SendVerificationEmailInput = {
     user: User;
