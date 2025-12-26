@@ -8,6 +8,7 @@ import { UserRepository } from '../../domain/user/user-repository';
 import { NotFoundError } from '../../core/errors/not-found-error';
 import { Result } from '../../core/types/result';
 import { fail, ok } from '../../core/utils/result';
+import { UnauthorizedError } from '../../core/errors/unauthorized-error';
 
 type SendVerificationEmailInput = {
     user: User;
@@ -39,9 +40,7 @@ export class UserOrchestrator {
     }: SendVerificationEmailInput): Promise<
         Result<SendVerificationEmailOutput, ConflictError | TooManyRequestsError>
     > => {
-        if (user.isEmailVerified) {
-            return fail(new ConflictError({ message: 'Email already verified' }));
-        }
+        if (user.isEmailVerified) return fail(new ConflictError({ message: 'Email already verified' }));
 
         if (await this.cacheStore.existsVerificationEmailCooldown(user.id)) {
             return fail(
@@ -49,9 +48,7 @@ export class UserOrchestrator {
             );
         }
 
-        const token = this.tokenManager.signVerificationEmail({
-            userId: user.id,
-        });
+        const token = this.tokenManager.signVerificationEmail({ userId: user.id });
 
         await this.emailSender.sendVerification({
             from: this.emailFrom,
@@ -67,20 +64,21 @@ export class UserOrchestrator {
 
     verifyEmail = async ({
         token,
-    }: VerifyEmailInput): Promise<Result<VerifyEmailOutput, ConflictError | Error | NotFoundError>> => {
+    }: VerifyEmailInput): Promise<
+        Result<VerifyEmailOutput, ConflictError | Error | NotFoundError | UnauthorizedError>
+    > => {
         const { userId } = this.tokenManager.verifyVerificationEmail(token);
 
-        const result = await this.userRepository.findById(userId);
-        if (!result.success) return fail(result.error);
-        const user = result.value;
-
-        if (user.isEmailVerified) {
-            return fail(new ConflictError({ message: 'Email already verified' }));
-        }
+        const findResult = await this.userRepository.findById(userId);
+        if (!findResult.success) return fail(findResult.error);
+        const user = findResult.value;
+        if (!user) return fail(new UnauthorizedError({ message: 'User not found for this token' }));
+        if (user.isEmailVerified) return fail(new ConflictError({ message: 'Email already verified' }));
 
         user.isEmailVerified = true;
         user.updatedAt = new Date();
-        await this.userRepository.save(user);
+        const saveResult = await this.userRepository.save(user);
+        if (!saveResult.success) return fail(saveResult.error);
 
         return ok({ user });
     };
