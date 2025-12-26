@@ -48,8 +48,8 @@ type LogoutInput = {
 };
 
 type LogoutOutput = {
-    refreshToken: RefreshToken;
-} | void;
+    refreshToken: RefreshToken | null;
+};
 
 export class AuthOrchestrator {
     private readonly REFRESH_TOKEN_DURATION = 7 * 24 * 60 * 60 * 1000;
@@ -96,12 +96,9 @@ export class AuthOrchestrator {
         const now = new Date();
 
         const userResult = await this.userRepository.findByEmail(email);
-        if (!userResult.success) {
-            const err = userResult.error;
-            if (err instanceof NotFoundError) return fail(new UnauthorizedError({ message: 'Invalid credentials' }));
-            return fail(err);
-        }
+        if (!userResult.success) return fail(userResult.error);
         const user = userResult.value;
+        if (!user) return fail(new UnauthorizedError({ message: 'Invalid credentials' }));
 
         const isValidPassword = await this.hasher.compare(password, user.passwordHash);
         if (!isValidPassword) return fail(new UnauthorizedError({ message: 'Invalid credentials' }));
@@ -125,15 +122,10 @@ export class AuthOrchestrator {
     refresh = async ({ token }: RefreshInput): Promise<Result<RefreshOutput, Error | UnauthorizedError>> => {
         const now = new Date();
 
-        const findResult = await this.refreshTokenRepository.findByValue(token);
-        if (!findResult.success) {
-            const err = findResult.error;
-            if (err instanceof NotFoundError) return fail(new UnauthorizedError({ message: 'Invalid refresh token' }));
-            return fail(err);
-        }
+        const findResult = await this.refreshTokenRepository.findByValueAndExpiresAfter(token, now);
+        if (!findResult.success) return fail(findResult.error);
         const refreshToken = findResult.value;
-
-        if (refreshToken.expiresAt < now) return fail(new UnauthorizedError({ message: 'Expired refresh token' }));
+        if (!refreshToken) return fail(new UnauthorizedError({ message: 'Invalid or expired refresh token' }));
 
         refreshToken.value = generateToken();
         refreshToken.expiresAt = new Date(now.getTime() + this.REFRESH_TOKEN_DURATION);
@@ -147,20 +139,9 @@ export class AuthOrchestrator {
     };
 
     logout = async ({ token }: LogoutInput): Promise<Result<LogoutOutput, Error | NotFoundError>> => {
-        const findResult = await this.refreshTokenRepository.findByValue(token);
-        if (!findResult.success) {
-            const err = findResult.error;
-            if (err instanceof NotFoundError) return ok(undefined);
-            return fail(err);
-        }
-        const refreshToken = findResult.value;
-
-        const deleteResult = await this.refreshTokenRepository.delete(refreshToken);
-        if (!deleteResult.success) {
-            const err = deleteResult.error;
-            if (err instanceof NotFoundError) return ok(undefined);
-            return fail(err);
-        }
+        const result = await this.refreshTokenRepository.findByValueAndDelete(token);
+        if (!result.success) return fail(result.error);
+        const refreshToken = result.value;
 
         return ok({ refreshToken });
     };
