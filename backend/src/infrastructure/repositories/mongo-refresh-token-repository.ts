@@ -43,10 +43,10 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
         }
     };
 
-    findByValue = async (value: string): Promise<Result<RefreshToken, Error | NotFoundError>> => {
+    findByValue = async (value: string): Promise<Result<RefreshToken | null, Error>> => {
         try {
             const document = await this.refreshTokenCollection.findOne({ value });
-            if (!document) return fail(new NotFoundError({ message: 'Refresh token not found' }));
+            if (!document) return ok(null);
             return ok(this.toDomain(document));
         } catch (err: unknown) {
             return fail(err instanceof Error ? err : new Error('Unknown error'));
@@ -70,6 +70,16 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
             const result = await this.refreshTokenCollection.deleteOne({ _id });
             if (result.deletedCount === 0) return fail(new NotFoundError({ message: 'Refresh token not found' }));
             return ok(undefined);
+        } catch (err: unknown) {
+            return fail(err instanceof Error ? err : new Error('Unknown error'));
+        }
+    };
+
+    findByValueAndDelete = async (value: string): Promise<Result<RefreshToken | null, Error>> => {
+        try {
+            const document = await this.refreshTokenCollection.findOneAndDelete({ value });
+            if (!document) return ok(null);
+            return ok(this.toDomain(document));
         } catch (err: unknown) {
             return fail(err instanceof Error ? err : new Error('Unknown error'));
         }

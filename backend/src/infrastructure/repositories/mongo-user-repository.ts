@@ -45,20 +45,20 @@ export class MongoUserRepository implements UserRepository {
         }
     };
 
-    findById = async (id: string): Promise<Result<User, Error | NotFoundError>> => {
+    findById = async (id: string): Promise<Result<User | null, Error>> => {
         try {
             const document = await this.userCollection.findOne({ _id: new ObjectId(id) });
-            if (!document) return fail(new NotFoundError({ message: 'User not found' }));
+            if (!document) return ok(null);
             return ok(this.toDomain(document));
         } catch (err: unknown) {
             return fail(err instanceof Error ? err : new Error('Unknown error'));
         }
     };
 
-    findByEmail = async (email: string): Promise<Result<User, Error | NotFoundError>> => {
+    findByEmail = async (email: string): Promise<Result<User | null, Error>> => {
         try {
             const document = await this.userCollection.findOne({ email });
-            if (!document) return fail(new NotFoundError({ message: 'User not found' }));
+            if (!document) return ok(null);
             return ok(this.toDomain(document));
         } catch (err: unknown) {
             return fail(err instanceof Error ? err : new Error('Unknown error'));

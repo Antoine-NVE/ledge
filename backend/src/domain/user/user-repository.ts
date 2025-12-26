@@ -5,7 +5,7 @@ import { Result } from '../../core/types/result';
 
 export interface UserRepository {
     create: (user: User) => Promise<Result<void, ConflictError | Error>>;
-    findById: (id: string) => Promise<Result<User, Error | NotFoundError>>;
-    findByEmail: (email: string) => Promise<Result<User, Error | NotFoundError>>;
+    findById: (id: string) => Promise<Result<User | null, Error>>;
+    findByEmail: (email: string) => Promise<Result<User | null, Error>>;
     save: (user: User) => Promise<Result<void, Error | NotFoundError>>;
 }

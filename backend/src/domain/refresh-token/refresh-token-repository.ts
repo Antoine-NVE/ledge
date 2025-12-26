@@ -4,7 +4,8 @@ import { Result } from '../../core/types/result';
 
 export interface RefreshTokenRepository {
     create(refreshToken: RefreshToken): Promise<Result<void, Error>>;
-    findByValue(value: string): Promise<Result<RefreshToken, Error | NotFoundError>>;
+    findByValue(value: string): Promise<Result<RefreshToken | null, Error>>;
     save(refreshToken: RefreshToken): Promise<Result<void, Error | NotFoundError>>;
     delete(refreshToken: RefreshToken): Promise<Result<void, Error | NotFoundError>>;
+    findByValueAndDelete(value: string): Promise<Result<RefreshToken | null, Error>>;
 }

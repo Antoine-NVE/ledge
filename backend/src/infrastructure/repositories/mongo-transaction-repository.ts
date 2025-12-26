@@ -57,7 +57,7 @@ export class MongoTransactionRepository implements TransactionRepository {
         }
     };
 
-    findById = async (id: string): Promise<Result<Transaction, Error | NotFoundError>> => {
+    getById = async (id: string): Promise<Result<Transaction, Error | NotFoundError>> => {
         try {
             const document = await this.transactionCollection.findOne({ _id: new ObjectId(id) });
             if (!document) return fail(new NotFoundError({ message: 'Transaction not found' }));
