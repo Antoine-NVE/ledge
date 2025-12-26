@@ -1,26 +1,24 @@
 import { TransactionRepository } from '../../domain/transaction/transaction-repository';
 import { Result } from '../../core/types/result';
 import { Transaction } from '../../domain/transaction/transaction-types';
-import { NotFoundError } from '../../core/errors/not-found-error';
 import { fail, ok } from '../../core/utils/result';
 
 type Input = {
-    transactionId: string;
     userId: string;
 };
 
 type Output = {
-    transaction: Transaction;
+    transactions: Transaction[];
 };
 
-export class GetTransactionUseCase {
+export class GetUserTransactionsUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
-    execute = async ({ transactionId, userId }: Input): Promise<Result<Output, Error | NotFoundError>> => {
-        const result = await this.transactionRepository.getByIdAndUserId(transactionId, userId);
+    execute = async ({ userId }: Input): Promise<Result<Output, Error>> => {
+        const result = await this.transactionRepository.findManyByUserId(userId);
         if (!result.success) return fail(result.error);
-        const transaction = result.value;
+        const transactions = result.value;
 
-        return ok({ transaction });
+        return ok({ transactions });
     };
 }
