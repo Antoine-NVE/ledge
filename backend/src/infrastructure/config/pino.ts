@@ -1,6 +1,6 @@
 import pino, { BaseLogger } from 'pino';
 
-export const createBaseLogger = ({ nodeEnv }: { nodeEnv: 'development' | 'production' }) => {
+export const createBaseLogger = ({ nodeEnv, lokiUrl }: { nodeEnv: 'development' | 'production'; lokiUrl: string }) => {
     const isDev = nodeEnv === 'development';
 
     const baseLogger: BaseLogger = pino({
@@ -15,7 +15,7 @@ export const createBaseLogger = ({ nodeEnv }: { nodeEnv: 'development' | 'produc
             : {
                   target: 'pino-loki',
                   options: {
-                      host: 'http://logstore:3100',
+                      host: lokiUrl,
                       batching: false,
                       labels: {
                           service_name: 'backend',

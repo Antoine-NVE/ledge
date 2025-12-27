@@ -5,11 +5,12 @@ const envSchema = z.object({
     nodeEnv: z.enum(['development', 'production']),
     tokenSecret: z.string(),
     allowedOrigins: z.array(z.url()),
-    port: z.number().optional(),
+    port: z.number(),
     databaseUrl: z.url(),
     cacheUrl: z.url(),
     smtpUrl: z.url(),
     emailFrom: z.string(),
+    lokiUrl: z.url(),
 });
 
 export const loadEnv = () => {
@@ -22,5 +23,6 @@ export const loadEnv = () => {
         cacheUrl: process.env.CACHE_URL,
         smtpUrl: process.env.SMTP_URL,
         emailFrom: process.env.EMAIL_FROM,
+        lokiUrl: process.env.LOKI_URL,
     });
 };

@@ -16,14 +16,15 @@ import { buildContainer } from './presentation/container';
 import { startHttpServer } from './presentation/http/server';
 import { step } from './core/utils/lifecycle';
 
-const start = async () => {
-    // .env is not verified yet, but we need a logger now
-    const logger = new PinoLogger(
-        createBaseLogger({
-            nodeEnv: process.env.NODE_ENV === 'production' ? 'production' : 'development',
-        }),
-    );
+// .env is not verified yet, but we need a logger now
+const logger = new PinoLogger(
+    createBaseLogger({
+        nodeEnv: process.env.NODE_ENV === 'development' ? 'development' : 'production',
+        lokiUrl: process.env.LOKI_URL || 'http://loki:3100',
+    }),
+);
 
+const start = async () => {
     const { databaseUrl, cacheUrl, port, smtpUrl, tokenSecret, emailFrom, allowedOrigins } = await step(
         'Environment validation',
         logger,
