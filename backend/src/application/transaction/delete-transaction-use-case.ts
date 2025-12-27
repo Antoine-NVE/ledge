@@ -10,19 +10,16 @@ type Input = {
 };
 
 type Output = {
-    transaction: Transaction;
+    transaction: Transaction | null;
 };
 
 export class DeleteTransactionUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
-    execute = async ({ transactionId, userId }: Input): Promise<Result<Output, Error | NotFoundError>> => {
-        const getResult = await this.transactionRepository.getByIdAndUserId(transactionId, userId);
-        if (!getResult.success) return fail(getResult.error);
-        const transaction = getResult.value;
-
-        const deleteResult = await this.transactionRepository.delete(transaction);
-        if (!deleteResult.success) return fail(deleteResult.error);
+    execute = async ({ transactionId, userId }: Input): Promise<Result<Output, Error>> => {
+        const result = await this.transactionRepository.findByIdAndUserIdAndDelete(transactionId, userId);
+        if (!result.success) return fail(result.error);
+        const transaction = result.value;
 
         return ok({ transaction });
     };

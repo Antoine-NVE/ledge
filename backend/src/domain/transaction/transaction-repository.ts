@@ -7,5 +7,5 @@ export interface TransactionRepository {
     findManyByUserId: (userId: string) => Promise<Result<Transaction[], Error>>;
     getByIdAndUserId: (id: string, userId: string) => Promise<Result<Transaction, Error | NotFoundError>>;
     save: (transaction: Transaction) => Promise<Result<void, Error | NotFoundError>>;
-    delete: (transaction: Transaction) => Promise<Result<void, Error | NotFoundError>>;
+    findByIdAndUserIdAndDelete: (id: string, userId: string) => Promise<Result<Transaction | null, Error>>;
 }

@@ -92,12 +92,14 @@ export class MongoTransactionRepository implements TransactionRepository {
         }
     };
 
-    delete = async (transaction: Transaction): Promise<Result<void, Error | NotFoundError>> => {
-        const { _id } = this.toDocument(transaction);
+    findByIdAndUserIdAndDelete = async (id: string, userId: string): Promise<Result<Transaction | null, Error>> => {
         try {
-            const result = await this.transactionCollection.deleteOne({ _id });
-            if (result.deletedCount === 0) return fail(new NotFoundError({ message: 'Transaction not found' }));
-            return ok(undefined);
+            const document = await this.transactionCollection.findOneAndDelete({
+                _id: new ObjectId(id),
+                userId: new ObjectId(userId),
+            });
+            if (!document) return ok(null);
+            return ok(this.toDomain(document));
         } catch (err: unknown) {
             return fail(err instanceof Error ? err : new Error('Unknown error'));
         }
