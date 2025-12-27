@@ -37,7 +37,10 @@ export class SendVerificationEmailUseCase {
         if (!user) return fail(new UnauthorizedError());
         if (user.isEmailVerified) return fail(new ConflictError({ message: 'Email already verified' }));
 
-        if (await this.cacheStore.existsVerificationEmailCooldown(user.id)) {
+        const cooldownExistsResult = await this.cacheStore.existsVerificationEmailCooldown(user.id);
+        if (!cooldownExistsResult.success) return fail(cooldownExistsResult.error);
+        const exists = cooldownExistsResult.value;
+        if (exists) {
             return fail(
                 new TooManyRequestsError({ message: 'Please wait before requesting another verification email' }),
             );
@@ -52,7 +55,8 @@ export class SendVerificationEmailUseCase {
             token,
         });
 
-        await this.cacheStore.setVerificationEmailCooldown(user.id);
+        const cooldownSetResult = await this.cacheStore.setVerificationEmailCooldown(user.id);
+        if (!cooldownSetResult.success) return fail(cooldownSetResult.error);
 
         return ok({ user });
     };
