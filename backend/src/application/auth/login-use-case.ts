@@ -54,7 +54,7 @@ export class LoginUseCase {
         const refreshTokenResult = await this.refreshTokenRepository.create(refreshToken);
         if (!refreshTokenResult.success) return fail(refreshTokenResult.error);
 
-        const accessToken = this.tokenManager.signAccess({ userId: user.id });
+        const accessToken = await this.tokenManager.signAccess({ userId: user.id });
 
         return ok({ user, accessToken, refreshToken });
     };

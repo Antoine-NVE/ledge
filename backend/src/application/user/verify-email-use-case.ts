@@ -24,7 +24,9 @@ export class VerifyEmailUseCase {
     execute = async ({
         token,
     }: Input): Promise<Result<Output, ConflictError | Error | NotFoundError | UnauthorizedError>> => {
-        const { userId } = this.tokenManager.verifyVerificationEmail(token);
+        const tokenResult = this.tokenManager.verifyVerificationEmail(token);
+        if (!tokenResult.success) return fail(tokenResult.error);
+        const { userId } = tokenResult.value;
 
         const findResult = await this.userRepository.findById(userId);
         if (!findResult.success) return fail(findResult.error);

@@ -38,7 +38,7 @@ export class RefreshUseCase {
         const saveResult = await this.refreshTokenRepository.save(refreshToken);
         if (!saveResult.success) return fail(saveResult.error);
 
-        const accessToken = this.tokenManager.signAccess({ userId: refreshToken.userId });
+        const accessToken = await this.tokenManager.signAccess({ userId: refreshToken.userId });
 
         return ok({ accessToken, refreshToken });
     };

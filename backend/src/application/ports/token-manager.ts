@@ -1,15 +1,10 @@
-export type SignAccessPayload = {
-    userId: string;
-};
-
-export type VerificationEmailPayload = {
-    userId: string;
-};
+import { Result } from '../../core/types/result';
+import { UnauthorizedError } from '../../core/errors/unauthorized-error';
 
 export interface TokenManager {
-    signAccess(payload: SignAccessPayload): string;
-    verifyAccess(token: string): SignAccessPayload;
+    signAccess(payload: { userId: string }): Promise<string>;
+    verifyAccess(token: string): Result<{ userId: string }, UnauthorizedError>;
 
-    signVerificationEmail(payload: VerificationEmailPayload): string;
-    verifyVerificationEmail(token: string): VerificationEmailPayload;
+    signVerificationEmail(payload: { userId: string }): Promise<string>;
+    verifyVerificationEmail(token: string): Result<{ userId: string }, UnauthorizedError>;
 }

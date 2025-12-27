@@ -39,20 +39,18 @@ export class SendVerificationEmailUseCase {
 
         const cooldownExistsResult = await this.cacheStore.existsVerificationEmailCooldown(user.id);
         if (!cooldownExistsResult.success) return fail(cooldownExistsResult.error);
-        const exists = cooldownExistsResult.value;
-        if (exists) {
+        const cooldownExists = cooldownExistsResult.value;
+        if (cooldownExists) {
             return fail(
                 new TooManyRequestsError({ message: 'Please wait before requesting another verification email' }),
             );
         }
 
-        const token = this.tokenManager.signVerificationEmail({ userId });
-
         const emailResult = await this.emailSender.sendVerification({
             from: this.emailFrom,
             to: user.email,
             frontendBaseUrl,
-            token,
+            token: await this.tokenManager.signVerificationEmail({ userId }),
         });
         if (!emailResult.success) return fail(emailResult.error);
 

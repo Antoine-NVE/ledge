@@ -1,18 +1,23 @@
 import { sign, verify, Secret, SignOptions, VerifyOptions, TokenExpiredError, NotBeforeError } from 'jsonwebtoken';
 import z from 'zod';
-import { SignAccessPayload, TokenManager, VerificationEmailPayload } from '../../application/ports/token-manager';
+import { TokenManager } from '../../application/ports/token-manager';
 import { UnauthorizedError } from '../../core/errors/unauthorized-error';
+import { Result } from '../../core/types/result';
+import { fail, ok } from '../../core/utils/result';
 
 export class JwtTokenManager implements TokenManager {
     constructor(private secret: Secret) {}
 
-    private sign = (payload: { aud: string; sub: string }, options: SignOptions) => {
+    private sign = async (payload: { aud: string; sub: string }, options: SignOptions): Promise<string> => {
         return sign(payload, this.secret, options);
     };
 
-    private verify = (token: string, options: VerifyOptions) => {
+    private verify = (
+        token: string,
+        options: VerifyOptions,
+    ): Result<{ sub: string; aud: string; iat: number; exp: number }, UnauthorizedError> => {
         try {
-            const data = z
+            const payload = z
                 .object({
                     sub: z.string(),
                     aud: z.string(),
@@ -21,48 +26,40 @@ export class JwtTokenManager implements TokenManager {
                 })
                 .parse(verify(token, this.secret, options));
 
-            return { userId: data.sub };
+            return ok(payload);
         } catch (err: unknown) {
-            if (err instanceof NotBeforeError) {
-                throw new UnauthorizedError({
-                    message: 'Inactive token',
-                    cause: err,
-                });
-            }
-            if (err instanceof TokenExpiredError) {
-                throw new UnauthorizedError({
-                    message: 'Expired token',
-                    cause: err,
-                });
-            }
-            throw new UnauthorizedError({
-                message: 'Invalid token',
-                cause: err,
-            });
+            let message = 'Invalid token';
+            if (err instanceof NotBeforeError) message = 'Inactive token';
+            if (err instanceof TokenExpiredError) message = 'Expired token';
+
+            return fail(new UnauthorizedError({ message, cause: err }));
         }
     };
 
-    signAccess = ({ userId }: SignAccessPayload): string => {
+    signAccess = ({ userId }: { userId: string }): Promise<string> => {
         return this.sign({ aud: 'access', sub: userId }, { expiresIn: '15m' });
     };
 
-    verifyAccess = (token: string): SignAccessPayload => {
-        try {
-            return this.verify(token, { audience: 'access' });
-        } catch (err: unknown) {
-            if (err instanceof UnauthorizedError) {
-                err.action = 'REFRESH';
-                throw err;
-            }
-            throw err; // Shouldn't happen
+    verifyAccess = (token: string): Result<{ userId: string }, UnauthorizedError> => {
+        const result = this.verify(token, { audience: 'access' });
+        if (!result.success) {
+            const err = result.error;
+            return fail(new UnauthorizedError({ message: err.message, cause: err.cause, action: 'REFRESH' }));
         }
+        const { sub } = result.value;
+
+        return ok({ userId: sub });
     };
 
-    signVerificationEmail = ({ userId }: VerificationEmailPayload): string => {
+    signVerificationEmail = ({ userId }: { userId: string }): Promise<string> => {
         return this.sign({ aud: 'verification-email', sub: userId }, { expiresIn: '1h' });
     };
 
-    verifyVerificationEmail = (token: string): VerificationEmailPayload => {
-        return this.verify(token, { audience: 'verification-email' });
+    verifyVerificationEmail = (token: string): Result<{ userId: string }, UnauthorizedError> => {
+        const result = this.verify(token, { audience: 'verification-email' });
+        if (!result.success) return fail(result.error);
+        const { sub } = result.value;
+
+        return ok({ userId: sub });
     };
 }
