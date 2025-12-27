@@ -1,14 +1,27 @@
 import { Transporter } from 'nodemailer';
 import { EmailSender } from '../../application/ports/email-sender';
+import { Result } from '../../core/types/result';
+import { fail, ok } from '../../core/utils/result';
 
 export class NodemailerEmailSender implements EmailSender {
     constructor(private transporter: Transporter) {}
 
-    private send = async (options: { from: string; to: string; subject: string; html: string }): Promise<void> => {
-        await this.transporter.sendMail(options);
+    private send = async (options: {
+        from: string;
+        to: string;
+        subject: string;
+        html: string;
+    }): Promise<Result<void, Error>> => {
+        try {
+            await this.transporter.sendMail(options);
+
+            return ok(undefined);
+        } catch (err: unknown) {
+            return fail(err instanceof Error ? err : new Error('Unknown error'));
+        }
     };
 
-    sendVerification = async ({
+    sendVerification = ({
         from,
         to,
         frontendBaseUrl,
@@ -18,10 +31,10 @@ export class NodemailerEmailSender implements EmailSender {
         to: string;
         frontendBaseUrl: string;
         token: string;
-    }): Promise<void> => {
+    }): Promise<Result<void, Error>> => {
         const subject = 'Please verify your email address';
         const html = `Click here to verify your email address: <a href="${frontendBaseUrl}/verify-email/${token}">verify email</a>. This link will expire in 1 hour.`;
 
-        await this.send({ from, to, subject, html });
+        return this.send({ from, to, subject, html });
     };
 }

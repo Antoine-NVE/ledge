@@ -48,12 +48,13 @@ export class SendVerificationEmailUseCase {
 
         const token = this.tokenManager.signVerificationEmail({ userId });
 
-        await this.emailSender.sendVerification({
+        const emailResult = await this.emailSender.sendVerification({
             from: this.emailFrom,
             to: user.email,
             frontendBaseUrl,
             token,
         });
+        if (!emailResult.success) return fail(emailResult.error);
 
         const cooldownSetResult = await this.cacheStore.setVerificationEmailCooldown(user.id);
         if (!cooldownSetResult.success) return fail(cooldownSetResult.error);

@@ -1,3 +1,5 @@
+import { Result } from '../../core/types/result';
+
 export interface EmailSender {
     sendVerification: ({
         from,
@@ -9,5 +11,5 @@ export interface EmailSender {
         to: string;
         frontendBaseUrl: string;
         token: string;
-    }) => Promise<void>;
+    }) => Promise<Result<void, Error>>;
 }
