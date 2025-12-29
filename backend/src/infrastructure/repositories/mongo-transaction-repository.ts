@@ -4,6 +4,7 @@ import type { Transaction } from '../../domain/transaction/transaction-types.js'
 import { NotFoundError } from '../../core/errors/not-found-error.js';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
+import { ensureError } from '../../core/utils/error.js';
 
 type TransactionDocument = {
     _id: ObjectId;
@@ -44,7 +45,7 @@ export class MongoTransactionRepository implements TransactionRepository {
             await this.transactionCollection.insertOne(document);
             return ok(undefined);
         } catch (err: unknown) {
-            return fail(err instanceof Error ? err : new Error('Unknown error'));
+            return fail(ensureError(err));
         }
     };
 
@@ -53,7 +54,7 @@ export class MongoTransactionRepository implements TransactionRepository {
             const documents = await this.transactionCollection.find({ userId: new ObjectId(userId) }).toArray();
             return ok(documents.map((document) => this.toDomain(document)));
         } catch (err: unknown) {
-            return fail(err instanceof Error ? err : new Error('Unknown error'));
+            return fail(ensureError(err));
         }
     };
 
@@ -66,7 +67,7 @@ export class MongoTransactionRepository implements TransactionRepository {
             if (!document) return fail(new NotFoundError({ message: 'Transaction not found' }));
             return ok(this.toDomain(document));
         } catch (err: unknown) {
-            return fail(err instanceof Error ? err : new Error('Unknown error'));
+            return fail(ensureError(err));
         }
     };
 
@@ -88,7 +89,7 @@ export class MongoTransactionRepository implements TransactionRepository {
             if (result.matchedCount === 0) return fail(new NotFoundError({ message: 'Transaction not found' }));
             return ok(undefined);
         } catch (err: unknown) {
-            return fail(err instanceof Error ? err : new Error('Unknown error'));
+            return fail(ensureError(err));
         }
     };
 
@@ -101,7 +102,7 @@ export class MongoTransactionRepository implements TransactionRepository {
             if (!document) return ok(null);
             return ok(this.toDomain(document));
         } catch (err: unknown) {
-            return fail(err instanceof Error ? err : new Error('Unknown error'));
+            return fail(ensureError(err));
         }
     };
 }

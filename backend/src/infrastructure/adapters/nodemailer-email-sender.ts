@@ -2,6 +2,7 @@ import type { Transporter } from 'nodemailer';
 import type { EmailSender } from '../../application/ports/email-sender.js';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
+import { ensureError } from '../../core/utils/error.js';
 
 export class NodemailerEmailSender implements EmailSender {
     constructor(private transporter: Transporter) {}
@@ -17,7 +18,7 @@ export class NodemailerEmailSender implements EmailSender {
 
             return ok(undefined);
         } catch (err: unknown) {
-            return fail(err instanceof Error ? err : new Error('Unknown error'));
+            return fail(ensureError(err));
         }
     };
 

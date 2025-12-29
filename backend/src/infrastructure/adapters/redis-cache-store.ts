@@ -2,6 +2,7 @@ import type { RedisClientType } from 'redis';
 import type { CacheStore } from '../../application/ports/cache-store.js';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
+import { ensureError } from '../../core/utils/error.js';
 
 export class RedisCacheStore implements CacheStore {
     constructor(private client: RedisClientType) {}
@@ -16,7 +17,7 @@ export class RedisCacheStore implements CacheStore {
 
             return ok(undefined);
         } catch (err: unknown) {
-            return fail(err instanceof Error ? err : new Error('Unknown error'));
+            return fail(ensureError(err));
         }
     };
 
@@ -26,7 +27,7 @@ export class RedisCacheStore implements CacheStore {
 
             return ok(exists);
         } catch (err: unknown) {
-            return fail(err instanceof Error ? err : new Error('Unknown error'));
+            return fail(ensureError(err));
         }
     };
 }

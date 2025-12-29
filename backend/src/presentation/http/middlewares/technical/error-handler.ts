@@ -1,58 +1,45 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { Logger } from '../../../../application/ports/logger.js';
 import { AppError } from '../../../../core/errors/app-error.js';
-import { UnauthorizedError } from '../../../../core/errors/unauthorized-error.js';
-import { ForbiddenError } from '../../../../core/errors/forbidden-error.js';
-import { NotFoundError } from '../../../../core/errors/not-found-error.js';
-import { ConflictError } from '../../../../core/errors/conflict-error.js';
-import { TooManyRequestsError } from '../../../../core/errors/too-many-requests-error.js';
-import { BadRequestError } from '../../../../core/errors/bad-request-error.js';
-
-const httpErrorMap = new Map<new () => AppError, number>([
-    [BadRequestError, 400],
-    [UnauthorizedError, 401],
-    [ForbiddenError, 403],
-    [NotFoundError, 404],
-    [ConflictError, 409],
-    [TooManyRequestsError, 429],
-]);
+import { ensureError } from '../../../../core/utils/error.js';
 
 export const createErrorHandler = ({ logger }: { logger: Logger }) => {
     return (
-        err: Error,
+        rawErr: unknown,
         req: Request,
         res: Response,
         _next: NextFunction, // eslint-disable-line @typescript-eslint/no-unused-vars
     ): void => {
+        // Should already be an Error in most cases
+        const err = ensureError(rawErr);
+
         // We check if it's an application error
-        for (const [errorClass, status] of httpErrorMap) {
-            if (err instanceof errorClass) {
-                const message = err.message;
-                logger.warn(message, {
-                    err,
-                    userId: req.user?.id,
-                    transactionId: req.transaction?.id,
-                });
-                res.status(status).json({
-                    success: false,
-                    message,
-                    fields: err.fields,
-                    action: err.action,
-                });
-                return;
-            }
+        if (err instanceof AppError) {
+            const message = err.message;
+            res.status(err.statusCode).json({
+                success: false,
+                message,
+                code: err.code,
+                fields: err.fields,
+                action: err.action,
+            });
+            logger.warn(message, {
+                err,
+                userId: req.user?.id,
+                transactionId: req.transaction?.id,
+            });
+            return;
         }
 
         // All others errors
-        const message = 'Internal server error';
-        logger.error(message, {
+        res.status(500).json({
+            success: false,
+            message: 'Internal server error',
+        });
+        logger.error(err.message, {
             err,
             userId: req.user?.id,
             transactionId: req.transaction?.id,
-        });
-        res.status(500).json({
-            success: false,
-            message,
         });
     };
 };

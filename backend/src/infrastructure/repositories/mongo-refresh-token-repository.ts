@@ -4,6 +4,7 @@ import type { RefreshToken } from '../../domain/refresh-token/refresh-token-type
 import { NotFoundError } from '../../core/errors/not-found-error.js';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
+import { ensureError } from '../../core/utils/error.js';
 
 type RefreshTokenDocument = {
     _id: ObjectId;
@@ -39,7 +40,7 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
             await this.refreshTokenCollection.insertOne(document);
             return ok(undefined);
         } catch (err: unknown) {
-            return fail(err instanceof Error ? err : new Error('Unknown error'));
+            return fail(ensureError(err));
         }
     };
 
@@ -52,7 +53,7 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
             if (!document) return ok(null);
             return ok(this.toDomain(document));
         } catch (err: unknown) {
-            return fail(err instanceof Error ? err : new Error('Unknown error'));
+            return fail(ensureError(err));
         }
     };
 
@@ -63,7 +64,7 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
             if (result.matchedCount === 0) return fail(new NotFoundError({ message: 'Refresh token not found' }));
             return ok(undefined);
         } catch (err: unknown) {
-            return fail(err instanceof Error ? err : new Error('Unknown error'));
+            return fail(ensureError(err));
         }
     };
 
@@ -73,7 +74,7 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
             if (!document) return ok(null);
             return ok(this.toDomain(document));
         } catch (err: unknown) {
-            return fail(err instanceof Error ? err : new Error('Unknown error'));
+            return fail(ensureError(err));
         }
     };
 }

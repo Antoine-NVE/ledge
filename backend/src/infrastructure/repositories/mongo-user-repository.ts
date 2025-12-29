@@ -5,6 +5,7 @@ import { ConflictError } from '../../core/errors/conflict-error.js';
 import { NotFoundError } from '../../core/errors/not-found-error.js';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
+import { ensureError } from '../../core/utils/error.js';
 
 type UserDocument = {
     _id: ObjectId;
@@ -41,7 +42,7 @@ export class MongoUserRepository implements UserRepository {
             if (err instanceof MongoServerError && err.code === 11000) {
                 return fail(new ConflictError({ message: 'Email already in use' }));
             }
-            return fail(err instanceof Error ? err : new Error('Unknown error'));
+            return fail(ensureError(err));
         }
     };
 
@@ -51,7 +52,7 @@ export class MongoUserRepository implements UserRepository {
             if (!document) return ok(null);
             return ok(this.toDomain(document));
         } catch (err: unknown) {
-            return fail(err instanceof Error ? err : new Error('Unknown error'));
+            return fail(ensureError(err));
         }
     };
 
@@ -61,7 +62,7 @@ export class MongoUserRepository implements UserRepository {
             if (!document) return ok(null);
             return ok(this.toDomain(document));
         } catch (err: unknown) {
-            return fail(err instanceof Error ? err : new Error('Unknown error'));
+            return fail(ensureError(err));
         }
     };
 
@@ -72,7 +73,7 @@ export class MongoUserRepository implements UserRepository {
             if (result.matchedCount === 0) return fail(new NotFoundError({ message: 'User not found' }));
             return ok(undefined);
         } catch (err: unknown) {
-            return fail(err instanceof Error ? err : new Error('Unknown error'));
+            return fail(ensureError(err));
         }
     };
 }
