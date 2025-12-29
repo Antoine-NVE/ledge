@@ -1,4 +1,4 @@
-import { AppError, AppErrorOptions } from './app-error';
+import { AppError, type AppErrorOptions } from './app-error.js';
 
 export class UnauthorizedError extends AppError {
     constructor(options?: AppErrorOptions) {

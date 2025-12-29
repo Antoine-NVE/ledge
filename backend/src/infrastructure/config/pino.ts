@@ -1,4 +1,4 @@
-import pino, { BaseLogger } from 'pino';
+import pino, { type BaseLogger } from 'pino';
 
 export const createBaseLogger = ({ nodeEnv, lokiUrl }: { nodeEnv: 'development' | 'production'; lokiUrl: string }) => {
     const isDev = nodeEnv === 'development';

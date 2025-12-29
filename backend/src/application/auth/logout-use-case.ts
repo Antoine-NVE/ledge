@@ -1,7 +1,7 @@
-import { RefreshToken } from '../../domain/refresh-token/refresh-token-types';
-import { fail, ok } from '../../core/utils/result';
-import { Result } from '../../core/types/result';
-import { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository';
+import type { RefreshToken } from '../../domain/refresh-token/refresh-token-types.js';
+import { fail, ok } from '../../core/utils/result.js';
+import type { Result } from '../../core/types/result.js';
+import type { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository.js';
 
 type Input = {
     token: string;

@@ -1,7 +1,7 @@
-import { Transporter } from 'nodemailer';
-import { EmailSender } from '../../application/ports/email-sender';
-import { Result } from '../../core/types/result';
-import { fail, ok } from '../../core/utils/result';
+import type { Transporter } from 'nodemailer';
+import type { EmailSender } from '../../application/ports/email-sender.js';
+import type { Result } from '../../core/types/result.js';
+import { fail, ok } from '../../core/utils/result.js';
 
 export class NodemailerEmailSender implements EmailSender {
     constructor(private transporter: Transporter) {}

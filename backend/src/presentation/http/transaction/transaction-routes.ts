@@ -1,10 +1,10 @@
 import express from 'express';
-import { createBodySchema, updateBodySchema } from './transaction-schemas';
-import { Authorize, authorizeParamsSchema } from '../middlewares/business/auth/authorize';
-import { createValidateParams } from '../middlewares/business/validation/validate-params';
-import { createValidateBody } from '../middlewares/business/validation/validate-body';
-import { TransactionController } from './transaction-controller';
-import { Authenticate } from '../middlewares/business/auth/authenticate';
+import { createBodySchema, updateBodySchema } from './transaction-schemas.js';
+import { type Authorize, authorizeParamsSchema } from '../middlewares/business/auth/authorize.js';
+import { createValidateParams } from '../middlewares/business/validation/validate-params.js';
+import { createValidateBody } from '../middlewares/business/validation/validate-body.js';
+import { TransactionController } from './transaction-controller.js';
+import type { Authenticate } from '../middlewares/business/auth/authenticate.js';
 
 export const createTransactionRoutes = ({
     transactionController,

@@ -1,25 +1,25 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import { createAuthRoutes } from './auth/auth-routes';
-import { createTransactionRoutes } from './transaction/transaction-routes';
-import { createUserRoutes } from './user/user-routes';
-import { createCors } from './middlewares/technical/cors';
-import { rateLimiter } from './middlewares/technical/rate-limiter';
-import { createErrorHandler } from './middlewares/technical/error-handler';
-import { AuthController } from './auth/auth-controller';
-import { UserController } from './user/user-controller';
-import { TransactionController } from './transaction/transaction-controller';
-import { createAuthenticate } from './middlewares/business/auth/authenticate';
+import { createAuthRoutes } from './auth/auth-routes.js';
+import { createTransactionRoutes } from './transaction/transaction-routes.js';
+import { createUserRoutes } from './user/user-routes.js';
+import { createCors } from './middlewares/technical/cors.js';
+import { rateLimiter } from './middlewares/technical/rate-limiter.js';
+import { createErrorHandler } from './middlewares/technical/error-handler.js';
+import { AuthController } from './auth/auth-controller.js';
+import { UserController } from './user/user-controller.js';
+import { TransactionController } from './transaction/transaction-controller.js';
+import { createAuthenticate } from './middlewares/business/auth/authenticate.js';
 import { TransactionService } from '../../domain/transaction/transaction-service';
 import { UserOrchestrator } from '../../application/user/user-orchestrator';
 import { AuthOrchestrator } from '../../application/auth/auth-orchestrator';
-import { TokenManager } from '../../application/ports/token-manager';
+import type { TokenManager } from '../../application/ports/token-manager.js';
 import { UserService } from '../../domain/user/user-service';
-import { Logger } from '../../application/ports/logger';
-import { createAuthorize } from './middlewares/business/auth/authorize';
-import { CookieManager } from './support/cookie-manager';
-import { NotFoundError } from '../../core/errors/not-found-error';
-import { createDocsRoutes } from './docs/docs-routes';
+import type { Logger } from '../../application/ports/logger.js';
+import { createAuthorize } from './middlewares/business/auth/authorize.js';
+import { CookieManager } from './support/cookie-manager.js';
+import { NotFoundError } from '../../core/errors/not-found-error.js';
+import { createDocsRoutes } from './docs/docs-routes.js';
 
 export const createHttpApp = ({
     allowedOrigins,

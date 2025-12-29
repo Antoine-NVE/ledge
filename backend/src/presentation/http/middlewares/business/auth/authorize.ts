@@ -1,8 +1,8 @@
-import { NextFunction, Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import z from 'zod';
 import { TransactionService } from '../../../../../domain/transaction/transaction-service';
-import { Transaction } from '../../../../../domain/transaction/transaction-types';
-import { ForbiddenError } from '../../../../../core/errors/forbidden-error';
+import type { Transaction } from '../../../../../domain/transaction/transaction-types.js';
+import { ForbiddenError } from '../../../../../core/errors/forbidden-error.js';
 
 declare module 'express-serve-static-core' {
     interface Request {

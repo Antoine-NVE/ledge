@@ -1,10 +1,10 @@
-import { NextFunction, Request, Response } from 'express';
-import { User } from '../../../../../domain/user/user-types';
-import { TokenManager } from '../../../../../application/ports/token-manager';
+import type { NextFunction, Request, Response } from 'express';
+import type { User } from '../../../../../domain/user/user-types.js';
+import type { TokenManager } from '../../../../../application/ports/token-manager.js';
 import { UserService } from '../../../../../domain/user/user-service';
-import { CookieManager } from '../../../support/cookie-manager';
-import { UnauthorizedError } from '../../../../../core/errors/unauthorized-error';
-import { NotFoundError } from '../../../../../core/errors/not-found-error';
+import { CookieManager } from '../../../support/cookie-manager.js';
+import { UnauthorizedError } from '../../../../../core/errors/unauthorized-error.js';
+import { NotFoundError } from '../../../../../core/errors/not-found-error.js';
 
 declare module 'express-serve-static-core' {
     interface Request {

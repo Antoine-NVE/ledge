@@ -1,6 +1,6 @@
-import { NextFunction, Request, Response } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import z from 'zod';
-import { BadRequestError } from '../../../../../core/errors/bad-request-error';
+import { BadRequestError } from '../../../../../core/errors/bad-request-error.js';
 
 export const createValidateBody = ({ schema }: { schema: z.ZodSchema }) => {
     return (req: Request, res: Response, next: NextFunction) => {

@@ -1,11 +1,11 @@
-import { UserRepository } from '../../domain/user/user-repository';
-import { TokenManager } from '../ports/token-manager';
-import { User } from '../../domain/user/user-types';
-import { Result } from '../../core/types/result';
-import { fail, ok } from '../../core/utils/result';
-import { UnauthorizedError } from '../../core/errors/unauthorized-error';
-import { ConflictError } from '../../core/errors/conflict-error';
-import { NotFoundError } from '../../core/errors/not-found-error';
+import type { UserRepository } from '../../domain/user/user-repository.js';
+import type { TokenManager } from '../ports/token-manager.js';
+import type { User } from '../../domain/user/user-types.js';
+import type { Result } from '../../core/types/result.js';
+import { fail, ok } from '../../core/utils/result.js';
+import { UnauthorizedError } from '../../core/errors/unauthorized-error.js';
+import { ConflictError } from '../../core/errors/conflict-error.js';
+import { NotFoundError } from '../../core/errors/not-found-error.js';
 
 type Input = {
     token: string;

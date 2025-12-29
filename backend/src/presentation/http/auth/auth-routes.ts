@@ -1,7 +1,7 @@
 import express from 'express';
-import { loginBodySchema, registerBodySchema } from './auth-schemas';
-import { createValidateBody } from '../middlewares/business/validation/validate-body';
-import { AuthController } from './auth-controller';
+import { loginBodySchema, registerBodySchema } from './auth-schemas.js';
+import { createValidateBody } from '../middlewares/business/validation/validate-body.js';
+import { AuthController } from './auth-controller.js';
 
 export const createAuthRoutes = ({ authController }: { authController: AuthController }) => {
     const router = express.Router();

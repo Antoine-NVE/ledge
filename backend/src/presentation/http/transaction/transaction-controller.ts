@@ -1,9 +1,9 @@
-import { Request, Response } from 'express';
-import { ParamsDictionary } from 'express-serve-static-core';
+import type { Request, Response } from 'express';
+import type { ParamsDictionary } from 'express-serve-static-core';
 import { TransactionService } from '../../../domain/transaction/transaction-service';
-import { Logger } from '../../../application/ports/logger';
+import type { Logger } from '../../../application/ports/logger.js';
 import z from 'zod';
-import { createBodySchema, updateBodySchema } from './transaction-schemas';
+import { createBodySchema, updateBodySchema } from './transaction-schemas.js';
 
 type CreateBody = z.infer<typeof createBodySchema>;
 

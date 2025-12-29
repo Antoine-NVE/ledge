@@ -1,4 +1,4 @@
-import { createTransport, Transporter } from 'nodemailer';
+import { createTransport, type Transporter } from 'nodemailer';
 
 export const connectToSmtp = async ({ url }: { url: string }) => {
     const transporter: Transporter = createTransport(url);

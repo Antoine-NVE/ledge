@@ -1,8 +1,8 @@
-import { TransactionRepository } from '../../domain/transaction/transaction-repository';
-import { Transaction } from '../../domain/transaction/transaction-types';
-import { Result } from '../../core/types/result';
-import { fail, ok } from '../../core/utils/result';
-import { NotFoundError } from '../../core/errors/not-found-error';
+import type { TransactionRepository } from '../../domain/transaction/transaction-repository.js';
+import type { Transaction } from '../../domain/transaction/transaction-types.js';
+import type { Result } from '../../core/types/result.js';
+import { fail, ok } from '../../core/utils/result.js';
+import { NotFoundError } from '../../core/errors/not-found-error.js';
 
 type Input = {
     transactionId: string;

@@ -1,5 +1,5 @@
-import { NextFunction, Request, Response } from 'express';
-import { BadRequestError } from '../../../../../core/errors/bad-request-error';
+import type { NextFunction, Request, Response } from 'express';
+import { BadRequestError } from '../../../../../core/errors/bad-request-error.js';
 import { ZodType } from 'zod';
 
 export const createValidateParams = <T extends ZodType<Record<string, string>>>({ schema }: { schema: T }) => {

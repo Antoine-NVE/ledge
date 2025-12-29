@@ -1,14 +1,14 @@
-import { UserRepository } from '../../domain/user/user-repository';
-import { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository';
-import { Hasher } from '../ports/hasher';
-import { TokenManager } from '../ports/token-manager';
-import { IdGenerator } from '../ports/id-generator';
-import { User } from '../../domain/user/user-types';
-import { RefreshToken } from '../../domain/refresh-token/refresh-token-types';
-import { Result } from '../../core/types/result';
-import { fail, ok } from '../../core/utils/result';
-import { generateToken } from '../../core/utils/token';
-import { ConflictError } from '../../core/errors/conflict-error';
+import type { UserRepository } from '../../domain/user/user-repository.js';
+import type { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository.js';
+import type { Hasher } from '../ports/hasher.js';
+import type { TokenManager } from '../ports/token-manager.js';
+import type { IdGenerator } from '../ports/id-generator.js';
+import type { User } from '../../domain/user/user-types.js';
+import type { RefreshToken } from '../../domain/refresh-token/refresh-token-types.js';
+import type { Result } from '../../core/types/result.js';
+import { fail, ok } from '../../core/utils/result.js';
+import { generateToken } from '../../core/utils/token.js';
+import { ConflictError } from '../../core/errors/conflict-error.js';
 
 type Input = {
     email: string;

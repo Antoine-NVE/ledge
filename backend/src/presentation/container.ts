@@ -1,10 +1,10 @@
-import { TokenManager } from '../application/ports/token-manager';
-import { Hasher } from '../application/ports/hasher';
-import { EmailSender } from '../application/ports/email-sender';
-import { CacheStore } from '../application/ports/cache-store';
-import { UserRepository } from '../domain/user/user-repository';
-import { TransactionRepository } from '../domain/transaction/transaction-repository';
-import { RefreshTokenRepository } from '../domain/refresh-token/refresh-token-repository';
+import type { TokenManager } from '../application/ports/token-manager.js';
+import type { Hasher } from '../application/ports/hasher.js';
+import type { EmailSender } from '../application/ports/email-sender.js';
+import type { CacheStore } from '../application/ports/cache-store.js';
+import type { UserRepository } from '../domain/user/user-repository.js';
+import type { TransactionRepository } from '../domain/transaction/transaction-repository.js';
+import type { RefreshTokenRepository } from '../domain/refresh-token/refresh-token-repository.js';
 import { UserService } from '../domain/user/user-service';
 import { RefreshTokenService } from '../domain/refresh-token/refresh-token-service';
 import { TransactionService } from '../domain/transaction/transaction-service';

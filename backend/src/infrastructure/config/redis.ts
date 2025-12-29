@@ -1,4 +1,4 @@
-import { createClient, RedisClientType } from 'redis';
+import { createClient, type RedisClientType } from 'redis';
 
 export const connectToRedis = async ({ url }: { url: string }) => {
     const client: RedisClientType = createClient({ url });

@@ -1,12 +1,12 @@
-import { NextFunction, Request, Response } from 'express';
-import { Logger } from '../../../../application/ports/logger';
-import { AppError } from '../../../../core/errors/app-error';
-import { UnauthorizedError } from '../../../../core/errors/unauthorized-error';
-import { ForbiddenError } from '../../../../core/errors/forbidden-error';
-import { NotFoundError } from '../../../../core/errors/not-found-error';
-import { ConflictError } from '../../../../core/errors/conflict-error';
-import { TooManyRequestsError } from '../../../../core/errors/too-many-requests-error';
-import { BadRequestError } from '../../../../core/errors/bad-request-error';
+import type { NextFunction, Request, Response } from 'express';
+import type { Logger } from '../../../../application/ports/logger.js';
+import { AppError } from '../../../../core/errors/app-error.js';
+import { UnauthorizedError } from '../../../../core/errors/unauthorized-error.js';
+import { ForbiddenError } from '../../../../core/errors/forbidden-error.js';
+import { NotFoundError } from '../../../../core/errors/not-found-error.js';
+import { ConflictError } from '../../../../core/errors/conflict-error.js';
+import { TooManyRequestsError } from '../../../../core/errors/too-many-requests-error.js';
+import { BadRequestError } from '../../../../core/errors/bad-request-error.js';
 
 const httpErrorMap = new Map<new () => AppError, number>([
     [BadRequestError, 400],

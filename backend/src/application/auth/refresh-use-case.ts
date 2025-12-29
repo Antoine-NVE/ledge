@@ -1,11 +1,11 @@
-import { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository';
-import { TokenManager } from '../ports/token-manager';
-import { RefreshToken } from '../../domain/refresh-token/refresh-token-types';
-import { Result } from '../../core/types/result';
-import { fail, ok } from '../../core/utils/result';
-import { UnauthorizedError } from '../../core/errors/unauthorized-error';
-import { generateToken } from '../../core/utils/token';
-import { NotFoundError } from '../../core/errors/not-found-error';
+import type { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository.js';
+import type { TokenManager } from '../ports/token-manager.js';
+import type { RefreshToken } from '../../domain/refresh-token/refresh-token-types.js';
+import type { Result } from '../../core/types/result.js';
+import { fail, ok } from '../../core/utils/result.js';
+import { UnauthorizedError } from '../../core/errors/unauthorized-error.js';
+import { generateToken } from '../../core/utils/token.js';
+import { NotFoundError } from '../../core/errors/not-found-error.js';
 
 type Input = {
     token: string;

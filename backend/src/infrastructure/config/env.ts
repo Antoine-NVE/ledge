@@ -1,5 +1,5 @@
 import z from 'zod';
-import { parseArray, parseNumber } from '../../core/utils/parse';
+import { parseArray, parseNumber } from '../../core/utils/parse.js';
 
 const envSchema = z.object({
     nodeEnv: z.enum(['development', 'production']),

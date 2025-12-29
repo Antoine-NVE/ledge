@@ -1,16 +1,47 @@
 // npx tsc --init
 
 {
+    // Visit https://aka.ms/tsconfig to read more about this file
     "compilerOptions": {
-        "target": "es2016",
-        "module": "commonjs",
-        "rootDir": "./", // Commented by default
-        "outDir": "./dist", // Commented by default with "./"
-        "esModuleInterop": true,
-        "forceConsistentCasingInFileNames": true,
+        // File Layout
+        "rootDir": "./", // Original value: commented with "./src"
+        "outDir": "./dist", // Original value: same but commented
+
+        // Environment Settings
+        // See also https://aka.ms/tsconfig/module
+        "module": "nodenext",
+        "target": "esnext",
+        "types": [],
+        // For nodejs:
+        // "lib": ["esnext"],
+        // "types": ["node"],
+        // and npm install -D @types/node
+
+        // Other Outputs
+        "sourceMap": true,
+        "declaration": true,
+        "declarationMap": true,
+
+        // Stricter Typechecking Options
+        "noUncheckedIndexedAccess": true,
+        "exactOptionalPropertyTypes": true,
+
+        // Style Options
+        // "noImplicitReturns": true,
+        // "noImplicitOverride": true,
+        // "noUnusedLocals": true,
+        // "noUnusedParameters": true,
+        // "noFallthroughCasesInSwitch": true,
+        // "noPropertyAccessFromIndexSignature": true,
+
+        // Recommended Options
         "strict": true,
-        "skipLibCheck": true,
-        "exactOptionalPropertyTypes": true // Added by me
+        "jsx": "react-jsx",
+        "verbatimModuleSyntax": true,
+        "isolatedModules": true,
+        "noUncheckedSideEffectImports": true,
+        "moduleDetection": "force",
+        "skipLibCheck": true
     },
     "include": ["./scripts", "./src"] // Added by me
 }

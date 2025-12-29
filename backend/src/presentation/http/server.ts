@@ -1,4 +1,4 @@
-import { Express } from 'express';
+import type { Express } from 'express';
 import { Server } from 'node:http';
 
 export const startHttpServer = ({ app, port }: { app: Express; port: number }): Promise<Server> => {

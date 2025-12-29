@@ -1,10 +1,10 @@
 import { Collection, MongoServerError, ObjectId } from 'mongodb';
-import { UserRepository } from '../../domain/user/user-repository';
-import { User } from '../../domain/user/user-types';
-import { ConflictError } from '../../core/errors/conflict-error';
-import { NotFoundError } from '../../core/errors/not-found-error';
-import { Result } from '../../core/types/result';
-import { fail, ok } from '../../core/utils/result';
+import type { UserRepository } from '../../domain/user/user-repository.js';
+import type { User } from '../../domain/user/user-types.js';
+import { ConflictError } from '../../core/errors/conflict-error.js';
+import { NotFoundError } from '../../core/errors/not-found-error.js';
+import type { Result } from '../../core/types/result.js';
+import { fail, ok } from '../../core/utils/result.js';
 
 type UserDocument = {
     _id: ObjectId;

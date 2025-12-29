@@ -1,9 +1,17 @@
-import { sign, verify, Secret, SignOptions, VerifyOptions, TokenExpiredError, NotBeforeError } from 'jsonwebtoken';
+import {
+    sign,
+    verify,
+    type Secret,
+    type SignOptions,
+    type VerifyOptions,
+    TokenExpiredError,
+    NotBeforeError,
+} from 'jsonwebtoken';
 import z from 'zod';
-import { TokenManager } from '../../application/ports/token-manager';
-import { UnauthorizedError } from '../../core/errors/unauthorized-error';
-import { Result } from '../../core/types/result';
-import { fail, ok } from '../../core/utils/result';
+import type { TokenManager } from '../../application/ports/token-manager.js';
+import { UnauthorizedError } from '../../core/errors/unauthorized-error.js';
+import type { Result } from '../../core/types/result.js';
+import { fail, ok } from '../../core/utils/result.js';
 
 export class JwtTokenManager implements TokenManager {
     constructor(private secret: Secret) {}

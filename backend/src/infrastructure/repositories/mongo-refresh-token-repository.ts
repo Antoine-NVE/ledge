@@ -1,9 +1,9 @@
 import { Collection, ObjectId } from 'mongodb';
-import { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository';
-import { RefreshToken } from '../../domain/refresh-token/refresh-token-types';
-import { NotFoundError } from '../../core/errors/not-found-error';
-import { Result } from '../../core/types/result';
-import { fail, ok } from '../../core/utils/result';
+import type { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository.js';
+import type { RefreshToken } from '../../domain/refresh-token/refresh-token-types.js';
+import { NotFoundError } from '../../core/errors/not-found-error.js';
+import type { Result } from '../../core/types/result.js';
+import { fail, ok } from '../../core/utils/result.js';
 
 type RefreshTokenDocument = {
     _id: ObjectId;

@@ -1,4 +1,4 @@
-import { AppError, AppErrorOptions } from './app-error';
+import { AppError, type AppErrorOptions } from './app-error.js';
 
 export class BadRequestError extends AppError {
     constructor(options?: AppErrorOptions) {

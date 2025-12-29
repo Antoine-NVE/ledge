@@ -1,10 +1,10 @@
-import { Request, Response } from 'express';
-import { ParamsDictionary } from 'express-serve-static-core';
+import type { Request, Response } from 'express';
+import type { ParamsDictionary } from 'express-serve-static-core';
 import { UserOrchestrator } from '../../../application/user/user-orchestrator';
-import { Logger } from '../../../application/ports/logger';
-import { removePasswordHash } from '../../../core/utils/clean';
-import z from 'zod/index';
-import { createSendVerificationEmailBodySchema, verifyEmailBodySchema } from './user-schemas';
+import type { Logger } from '../../../application/ports/logger.js';
+import { removePasswordHash } from '../../../core/utils/clean.js';
+import z from 'zod';
+import { createSendVerificationEmailBodySchema, verifyEmailBodySchema } from './user-schemas.js';
 
 type SendVerificationEmailBody = z.infer<ReturnType<typeof createSendVerificationEmailBodySchema>>;
 

@@ -1,13 +1,13 @@
-import { EmailSender } from '../ports/email-sender';
-import { UserRepository } from '../../domain/user/user-repository';
-import { TokenManager } from '../ports/token-manager';
-import { CacheStore } from '../ports/cache-store';
-import { fail, ok } from '../../core/utils/result';
-import { UnauthorizedError } from '../../core/errors/unauthorized-error';
-import { TooManyRequestsError } from '../../core/errors/too-many-requests-error';
-import { ConflictError } from '../../core/errors/conflict-error';
-import { Result } from '../../core/types/result';
-import { User } from '../../domain/user/user-types';
+import type { EmailSender } from '../ports/email-sender.js';
+import type { UserRepository } from '../../domain/user/user-repository.js';
+import type { TokenManager } from '../ports/token-manager.js';
+import type { CacheStore } from '../ports/cache-store.js';
+import { fail, ok } from '../../core/utils/result.js';
+import { UnauthorizedError } from '../../core/errors/unauthorized-error.js';
+import { TooManyRequestsError } from '../../core/errors/too-many-requests-error.js';
+import { ConflictError } from '../../core/errors/conflict-error.js';
+import type { Result } from '../../core/types/result.js';
+import type { User } from '../../domain/user/user-types.js';
 
 type Input = {
     userId: string;

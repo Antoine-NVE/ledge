@@ -1,7 +1,7 @@
-import { User } from './user-types';
-import { ConflictError } from '../../core/errors/conflict-error';
-import { NotFoundError } from '../../core/errors/not-found-error';
-import { Result } from '../../core/types/result';
+import type { User } from './user-types.js';
+import { ConflictError } from '../../core/errors/conflict-error.js';
+import { NotFoundError } from '../../core/errors/not-found-error.js';
+import type { Result } from '../../core/types/result.js';
 
 export interface UserRepository {
     create: (user: User) => Promise<Result<void, ConflictError | Error>>;

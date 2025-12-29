@@ -1,8 +1,8 @@
 import express from 'express';
-import { createSendVerificationEmailBodySchema, verifyEmailBodySchema } from './user-schemas';
-import { createValidateBody } from '../middlewares/business/validation/validate-body';
-import { UserController } from './user-controller';
-import { Authenticate } from '../middlewares/business/auth/authenticate';
+import { createSendVerificationEmailBodySchema, verifyEmailBodySchema } from './user-schemas.js';
+import { createValidateBody } from '../middlewares/business/validation/validate-body.js';
+import { UserController } from './user-controller.js';
+import type { Authenticate } from '../middlewares/business/auth/authenticate.js';
 
 export const createUserRoutes = ({
     userController,

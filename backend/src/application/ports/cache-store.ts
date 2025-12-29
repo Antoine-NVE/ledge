@@ -1,4 +1,4 @@
-import { Result } from '../../core/types/result';
+import type { Result } from '../../core/types/result.js';
 
 export interface CacheStore {
     setVerificationEmailCooldown: (userId: string) => Promise<Result<void, Error>>;

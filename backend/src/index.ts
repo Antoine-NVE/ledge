@@ -1,20 +1,20 @@
-import { loadEnv } from './infrastructure/config/env';
-import { createBaseLogger } from './infrastructure/config/pino';
-import { connectToRedis } from './infrastructure/config/redis';
-import { connectToMongo } from './infrastructure/config/mongo';
-import { PinoLogger } from './infrastructure/adapters/pino-logger';
-import { JwtTokenManager } from './infrastructure/adapters/jwt-token-manager';
-import { BcryptHasher } from './infrastructure/adapters/bcrypt-hasher';
-import { NodemailerEmailSender } from './infrastructure/adapters/nodemailer-email-sender';
-import { connectToSmtp } from './infrastructure/config/nodemailer';
-import { RedisCacheStore } from './infrastructure/adapters/redis-cache-store';
-import { MongoUserRepository } from './infrastructure/repositories/mongo-user-repository';
-import { MongoTransactionRepository } from './infrastructure/repositories/mongo-transaction-repository';
-import { MongoRefreshTokenRepository } from './infrastructure/repositories/mongo-refresh-token-repository';
-import { createHttpApp } from './presentation/http/app';
-import { buildContainer } from './presentation/container';
-import { startHttpServer } from './presentation/http/server';
-import { step } from './core/utils/lifecycle';
+import { loadEnv } from './infrastructure/config/env.js';
+import { createBaseLogger } from './infrastructure/config/pino.js';
+import { connectToRedis } from './infrastructure/config/redis.js';
+import { connectToMongo } from './infrastructure/config/mongo.js';
+import { PinoLogger } from './infrastructure/adapters/pino-logger.js';
+import { JwtTokenManager } from './infrastructure/adapters/jwt-token-manager.js';
+import { BcryptHasher } from './infrastructure/adapters/bcrypt-hasher.js';
+import { NodemailerEmailSender } from './infrastructure/adapters/nodemailer-email-sender.js';
+import { connectToSmtp } from './infrastructure/config/nodemailer.js';
+import { RedisCacheStore } from './infrastructure/adapters/redis-cache-store.js';
+import { MongoUserRepository } from './infrastructure/repositories/mongo-user-repository.js';
+import { MongoTransactionRepository } from './infrastructure/repositories/mongo-transaction-repository.js';
+import { MongoRefreshTokenRepository } from './infrastructure/repositories/mongo-refresh-token-repository.js';
+import { createHttpApp } from './presentation/http/app.js';
+import { buildContainer } from './presentation/container.js';
+import { startHttpServer } from './presentation/http/server.js';
+import { step } from './core/utils/lifecycle.js';
 
 // .env is not verified yet, but we need a logger now
 const logger = new PinoLogger(

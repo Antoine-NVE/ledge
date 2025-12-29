@@ -1,6 +1,6 @@
-import { RefreshToken } from './refresh-token-types';
-import { NotFoundError } from '../../core/errors/not-found-error';
-import { Result } from '../../core/types/result';
+import type { RefreshToken } from './refresh-token-types.js';
+import { NotFoundError } from '../../core/errors/not-found-error.js';
+import type { Result } from '../../core/types/result.js';
 
 export interface RefreshTokenRepository {
     create(refreshToken: RefreshToken): Promise<Result<void, Error>>;

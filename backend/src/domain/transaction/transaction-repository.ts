@@ -1,6 +1,6 @@
-import { Transaction } from './transaction-types';
-import { NotFoundError } from '../../core/errors/not-found-error';
-import { Result } from '../../core/types/result';
+import type { Transaction } from './transaction-types.js';
+import { NotFoundError } from '../../core/errors/not-found-error.js';
+import type { Result } from '../../core/types/result.js';
 
 export interface TransactionRepository {
     create: (transaction: Transaction) => Promise<Result<void, Error>>;

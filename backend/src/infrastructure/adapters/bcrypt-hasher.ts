@@ -1,5 +1,5 @@
 import bcrypt from 'bcrypt';
-import { Hasher } from '../../application/ports/hasher';
+import type { Hasher } from '../../application/ports/hasher.js';
 
 export class BcryptHasher implements Hasher {
     hash = (value: string): Promise<string> => {

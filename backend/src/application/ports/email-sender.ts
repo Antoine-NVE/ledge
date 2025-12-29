@@ -1,4 +1,4 @@
-import { Result } from '../../core/types/result';
+import type { Result } from '../../core/types/result.js';
 
 export interface EmailSender {
     sendVerification: ({

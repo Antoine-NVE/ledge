@@ -1,7 +1,7 @@
-import { TransactionRepository } from '../../domain/transaction/transaction-repository';
-import { Result } from '../../core/types/result';
-import { Transaction } from '../../domain/transaction/transaction-types';
-import { fail, ok } from '../../core/utils/result';
+import type { TransactionRepository } from '../../domain/transaction/transaction-repository.js';
+import type { Result } from '../../core/types/result.js';
+import type { Transaction } from '../../domain/transaction/transaction-types.js';
+import { fail, ok } from '../../core/utils/result.js';
 
 type Input = {
     userId: string;

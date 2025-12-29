@@ -1,12 +1,12 @@
-import { Request, Response } from 'express';
-import { ParamsDictionary } from 'express-serve-static-core';
+import type { Request, Response } from 'express';
+import type { ParamsDictionary } from 'express-serve-static-core';
 import { AuthOrchestrator } from '../../../application/auth/auth-orchestrator';
-import { Logger } from '../../../application/ports/logger';
-import { CookieManager } from '../support/cookie-manager';
-import { UnauthorizedError } from '../../../core/errors/unauthorized-error';
-import { removePasswordHash } from '../../../core/utils/clean';
+import type { Logger } from '../../../application/ports/logger.js';
+import { CookieManager } from '../support/cookie-manager.js';
+import { UnauthorizedError } from '../../../core/errors/unauthorized-error.js';
+import { removePasswordHash } from '../../../core/utils/clean.js';
 import z from 'zod';
-import { loginBodySchema, registerBodySchema } from './auth-schemas';
+import { loginBodySchema, registerBodySchema } from './auth-schemas.js';
 
 type RegisterBody = z.infer<typeof registerBodySchema>;
 

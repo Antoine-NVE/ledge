@@ -1,4 +1,4 @@
-import { Logger } from '../../application/ports/logger';
+import type { Logger } from '../../application/ports/logger.js';
 
 export const step = async <T>(name: string, logger: Logger, fn: () => Promise<T>): Promise<T> => {
     try {
