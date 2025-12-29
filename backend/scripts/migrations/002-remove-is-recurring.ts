@@ -1,11 +1,13 @@
-import { Db } from 'mongodb';
+import type { Context } from '../../src/infrastructure/config/migration.js';
 
-export const up = async ({ context: db }: { context: Db }) => {
-    await db.collection('transactions').updateMany({ isRecurring: { $exists: true } }, { $unset: { isRecurring: '' } });
+export const up = async ({ context: { mongoDb } }: { context: Context }) => {
+    await mongoDb
+        .collection('transactions')
+        .updateMany({ isRecurring: { $exists: true } }, { $unset: { isRecurring: '' } });
 };
 
-export const down = async ({ context: db }: { context: Db }) => {
-    await db
+export const down = async ({ context: { mongoDb } }: { context: Context }) => {
+    await mongoDb
         .collection('transactions')
         .updateMany({ isRecurring: { $exists: false } }, { $set: { isRecurring: false } });
 };

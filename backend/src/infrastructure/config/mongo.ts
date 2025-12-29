@@ -1,13 +1,29 @@
 import { Db, MongoClient } from 'mongodb';
+import type { Result } from '../../core/types/result.js';
+import { fail, ok } from '../../core/utils/result.js';
+import { ensureError } from '../../core/utils/error.js';
 
-export const connectToMongo = async ({ url }: { url: string }) => {
-    const client = new MongoClient(url);
-    await client.connect();
-    const db = client.db();
+type Input = {
+    mongoUrl: string;
+};
 
-    await setupIndexes(db);
+type Output = {
+    mongoClient: MongoClient;
+    mongoDb: Db;
+};
 
-    return { client, db };
+export const connectToMongo = async ({ mongoUrl }: Input): Promise<Result<Output, Error>> => {
+    try {
+        const mongoClient = new MongoClient(mongoUrl);
+        await mongoClient.connect();
+        const mongoDb = mongoClient.db();
+
+        await setupIndexes(mongoDb);
+
+        return ok({ mongoClient, mongoDb });
+    } catch (err: unknown) {
+        return fail(ensureError(err));
+    }
 };
 
 const setupIndexes = async (db: Db) => {

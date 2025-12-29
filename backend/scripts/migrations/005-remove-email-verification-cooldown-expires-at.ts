@@ -1,7 +1,7 @@
-import { Db } from 'mongodb';
+import type { Context } from '../../src/infrastructure/config/migration.js';
 
-export const up = async ({ context: db }: { context: Db }) => {
-    await db
+export const up = async ({ context: { mongoDb } }: { context: Context }) => {
+    await mongoDb
         .collection('users')
         .updateMany(
             { emailVerificationCooldownExpiresAt: { $exists: true } },

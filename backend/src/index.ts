@@ -13,8 +13,9 @@ import { MongoTransactionRepository } from './infrastructure/repositories/mongo-
 import { MongoRefreshTokenRepository } from './infrastructure/repositories/mongo-refresh-token-repository.js';
 import { createHttpApp } from './presentation/http/app.js';
 import { buildContainer } from './presentation/container.js';
-import { startHttpServer } from './presentation/http/server.js';
-import { step } from './core/utils/lifecycle.js';
+import { startServer } from './presentation/server.js';
+import { fail, ok } from './core/utils/result.js';
+import type { Result } from './core/types/result.js';
 
 // .env is not verified yet, but we need a logger now
 const logger = new PinoLogger(
@@ -24,59 +25,57 @@ const logger = new PinoLogger(
     }),
 );
 
-const start = async () => {
-    const { databaseUrl, cacheUrl, port, smtpUrl, tokenSecret, emailFrom, allowedOrigins } = await step(
-        'Environment validation',
+const start = async (): Promise<Result<void, Error>> => {
+    const envResult = loadEnv();
+    if (!envResult.success) return fail(new Error('Failed to load environment', { cause: envResult.error }));
+    const { redisUrl, mongoUrl, smtpUrl, tokenSecret, emailFrom, allowedOrigins, port } = envResult.value;
+    logger.info('Environment loaded');
+
+    const redisResult = await connectToRedis({ redisUrl });
+    if (!redisResult.success) return fail(new Error('Failed to connect to redis', { cause: redisResult.error }));
+    const { redisClient } = redisResult.value;
+    logger.info('Redis connected');
+
+    const mongoResult = await connectToMongo({ mongoUrl });
+    if (!mongoResult.success) return fail(new Error('Failed to connect to Mongo', { cause: mongoResult.error }));
+    const { mongoDb } = mongoResult.value;
+    logger.info('Mongo connected');
+
+    const smtpResult = await connectToSmtp({ smtpUrl });
+    if (!smtpResult.success) return fail(new Error('Failed to connect to SMTP', { cause: smtpResult.error }));
+    const { smtpTransporter } = smtpResult.value;
+    logger.info('SMTP connected');
+
+    const { transactionService, authOrchestrator, userOrchestrator, tokenManager, userService } = buildContainer({
+        tokenManager: new JwtTokenManager(tokenSecret),
+        hasher: new BcryptHasher(),
+        emailSender: new NodemailerEmailSender(smtpTransporter),
+        cacheStore: new RedisCacheStore(redisClient),
+        emailFrom,
+        userRepository: new MongoUserRepository(mongoDb.collection('users')),
+        transactionRepository: new MongoTransactionRepository(mongoDb.collection('transactions')),
+        refreshTokenRepository: new MongoRefreshTokenRepository(mongoDb.collection('refreshtokens')),
+    });
+
+    const app = createHttpApp({
+        allowedOrigins,
+        transactionService,
+        authOrchestrator,
+        userOrchestrator,
         logger,
-        async () => {
-            return loadEnv();
-        },
-    );
-
-    const client = await step('Redis connection', logger, async () => {
-        return await connectToRedis({ url: cacheUrl });
+        tokenManager,
+        userService,
     });
 
-    const { db } = await step('Mongo connection', logger, async () => {
-        return await connectToMongo({ url: databaseUrl });
-    });
+    const serverResult = await startServer({ app, port });
+    if (!serverResult.success) return fail(new Error('Failed to start server', { cause: serverResult.error }));
+    logger.info('Server started');
 
-    const transporter = await step('SMTP connection', logger, async () => {
-        return await connectToSmtp({ url: smtpUrl });
-    });
-
-    const { transactionService, authOrchestrator, userOrchestrator, tokenManager, userService } = await step(
-        'Container build',
-        logger,
-        async () => {
-            return buildContainer({
-                tokenManager: new JwtTokenManager(tokenSecret),
-                hasher: new BcryptHasher(),
-                emailSender: new NodemailerEmailSender(transporter),
-                cacheStore: new RedisCacheStore(client),
-                emailFrom,
-                userRepository: new MongoUserRepository(db.collection('users')),
-                transactionRepository: new MongoTransactionRepository(db.collection('transactions')),
-                refreshTokenRepository: new MongoRefreshTokenRepository(db.collection('refreshtokens')),
-            });
-        },
-    );
-
-    const app = await step('HTTP app creation', logger, async () => {
-        return createHttpApp({
-            allowedOrigins,
-            transactionService,
-            authOrchestrator,
-            userOrchestrator,
-            logger,
-            tokenManager,
-            userService,
-        });
-    });
-
-    await step('HTTP server startup', logger, async () => {
-        return startHttpServer({ app, port });
-    });
+    return ok(undefined);
 };
 
-start().then();
+const result = await start();
+if (!result.success) {
+    logger.fatal(result.error.message, { err: result.error });
+    process.exit(1);
+}
