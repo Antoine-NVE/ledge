@@ -1,15 +1,15 @@
 import type { Result } from '../../core/types/result.js';
 
 export interface EmailSender {
-    sendVerification: ({
+    sendEmailVerification: ({
         from,
         to,
         frontendBaseUrl,
-        token,
+        emailVerificationToken,
     }: {
         from: string;
         to: string;
         frontendBaseUrl: string;
-        token: string;
+        emailVerificationToken: string;
     }) => Promise<Result<void, Error>>;
 }

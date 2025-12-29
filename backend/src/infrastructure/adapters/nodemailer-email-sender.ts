@@ -22,19 +22,19 @@ export class NodemailerEmailSender implements EmailSender {
         }
     };
 
-    sendVerification = ({
+    sendEmailVerification = ({
         from,
         to,
         frontendBaseUrl,
-        token,
+        emailVerificationToken,
     }: {
         from: string;
         to: string;
         frontendBaseUrl: string;
-        token: string;
+        emailVerificationToken: string;
     }): Promise<Result<void, Error>> => {
         const subject = 'Please verify your email address';
-        const html = `Click here to verify your email address: <a href="${frontendBaseUrl}/verify-email/${token}">verify email</a>. This link will expire in 1 hour.`;
+        const html = `Click here to verify your email address: <a href="${frontendBaseUrl}/verify-email/${emailVerificationToken}">verify email</a>. This link will expire in 1 hour.`;
 
         return this.send({ from, to, subject, html });
     };

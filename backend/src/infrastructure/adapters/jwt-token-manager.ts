@@ -48,8 +48,8 @@ export class JwtTokenManager implements TokenManager {
         return this.sign({ aud: 'access', sub: userId }, { expiresIn: '15m' });
     };
 
-    verifyAccess = (token: string): Result<{ userId: string }, UnauthorizedError> => {
-        const result = this.verify(token, { audience: 'access' });
+    verifyAccess = (accessToken: string): Result<{ userId: string }, UnauthorizedError> => {
+        const result = this.verify(accessToken, { audience: 'access' });
         if (!result.success) {
             const err = result.error;
             return fail(new UnauthorizedError({ message: err.message, cause: err.cause, action: 'REFRESH' }));
@@ -59,12 +59,12 @@ export class JwtTokenManager implements TokenManager {
         return ok({ userId: sub });
     };
 
-    signVerificationEmail = ({ userId }: { userId: string }): Promise<string> => {
-        return this.sign({ aud: 'verification-email', sub: userId }, { expiresIn: '1h' });
+    signEmailVerification = ({ userId }: { userId: string }): Promise<string> => {
+        return this.sign({ aud: 'email-verification', sub: userId }, { expiresIn: '1h' });
     };
 
-    verifyVerificationEmail = (token: string): Result<{ userId: string }, UnauthorizedError> => {
-        const result = this.verify(token, { audience: 'verification-email' });
+    verifyEmailVerification = (emailVerificationToken: string): Result<{ userId: string }, UnauthorizedError> => {
+        const result = this.verify(emailVerificationToken, { audience: 'email-verification' });
         if (!result.success) return fail(result.error);
         const { sub } = result.value;
 

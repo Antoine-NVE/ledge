@@ -18,7 +18,7 @@ type Output = {
     user: User;
 };
 
-export class SendVerificationEmailUseCase {
+export class RequestEmailVerificationUseCase {
     constructor(
         private userRepository: UserRepository,
         private emailSender: EmailSender,
@@ -37,25 +37,25 @@ export class SendVerificationEmailUseCase {
         if (!user) return fail(new UnauthorizedError());
         if (user.isEmailVerified) return fail(new ConflictError({ message: 'Email already verified' }));
 
-        const cooldownExistsResult = await this.cacheStore.existsVerificationEmailCooldown(user.id);
-        if (!cooldownExistsResult.success) return fail(cooldownExistsResult.error);
-        const cooldownExists = cooldownExistsResult.value;
-        if (cooldownExists) {
+        const hasCooldownResult = await this.cacheStore.hasEmailVerificationCooldown(user.id);
+        if (!hasCooldownResult.success) return fail(hasCooldownResult.error);
+        const hasCooldown = hasCooldownResult.value;
+        if (hasCooldown) {
             return fail(
-                new TooManyRequestsError({ message: 'Please wait before requesting another verification email' }),
+                new TooManyRequestsError({ message: 'Please wait before requesting another email verification' }),
             );
         }
 
-        const emailResult = await this.emailSender.sendVerification({
+        const emailResult = await this.emailSender.sendEmailVerification({
             from: this.emailFrom,
             to: user.email,
             frontendBaseUrl,
-            token: await this.tokenManager.signVerificationEmail({ userId }),
+            emailVerificationToken: await this.tokenManager.signEmailVerification({ userId }),
         });
         if (!emailResult.success) return fail(emailResult.error);
 
-        const cooldownSetResult = await this.cacheStore.setVerificationEmailCooldown(user.id);
-        if (!cooldownSetResult.success) return fail(cooldownSetResult.error);
+        const setCooldownResult = await this.cacheStore.setEmailVerificationCooldown(user.id);
+        if (!setCooldownResult.success) return fail(setCooldownResult.error);
 
         return ok({ user });
     };

@@ -8,7 +8,7 @@ import { ConflictError } from '../../core/errors/conflict-error.js';
 import { NotFoundError } from '../../core/errors/not-found-error.js';
 
 type Input = {
-    token: string;
+    emailVerificationToken: string;
 };
 
 type Output = {
@@ -22,9 +22,9 @@ export class VerifyEmailUseCase {
     ) {}
 
     execute = async ({
-        token,
+        emailVerificationToken,
     }: Input): Promise<Result<Output, ConflictError | Error | NotFoundError | UnauthorizedError>> => {
-        const tokenResult = this.tokenManager.verifyVerificationEmail(token);
+        const tokenResult = this.tokenManager.verifyEmailVerification(emailVerificationToken);
         if (!tokenResult.success) return fail(tokenResult.error);
         const { userId } = tokenResult.value;
 

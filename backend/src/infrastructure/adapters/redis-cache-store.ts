@@ -7,7 +7,7 @@ import { ensureError } from '../../core/utils/error.js';
 export class RedisCacheStore implements CacheStore {
     constructor(private client: RedisClientType) {}
 
-    setVerificationEmailCooldown = async (userId: string): Promise<Result<void, Error>> => {
+    setEmailVerificationCooldown = async (userId: string): Promise<Result<void, Error>> => {
         try {
             await this.client.set(
                 `verification_email_cooldown:${userId}`,
@@ -21,7 +21,7 @@ export class RedisCacheStore implements CacheStore {
         }
     };
 
-    existsVerificationEmailCooldown = async (userId: string): Promise<Result<boolean, Error>> => {
+    hasEmailVerificationCooldown = async (userId: string): Promise<Result<boolean, Error>> => {
         try {
             const exists = (await this.client.exists(`verification_email_cooldown:${userId}`)) === 1;
 

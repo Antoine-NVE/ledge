@@ -1,6 +1,5 @@
 import type { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository.js';
 import type { TokenManager } from '../ports/token-manager.js';
-import type { RefreshToken } from '../../domain/refresh-token/refresh-token-types.js';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
 import { UnauthorizedError } from '../../core/errors/unauthorized-error.js';
@@ -8,12 +7,12 @@ import { generateToken } from '../../core/utils/token.js';
 import { NotFoundError } from '../../core/errors/not-found-error.js';
 
 type Input = {
-    token: string;
+    refreshToken: string;
 };
 
 type Output = {
     accessToken: string;
-    refreshToken: RefreshToken;
+    refreshToken: string;
 };
 
 export class RefreshUseCase {
@@ -24,10 +23,10 @@ export class RefreshUseCase {
         private tokenManager: TokenManager,
     ) {}
 
-    execute = async ({ token }: Input): Promise<Result<Output, Error | NotFoundError | UnauthorizedError>> => {
+    execute = async (input: Input): Promise<Result<Output, Error | NotFoundError | UnauthorizedError>> => {
         const now = new Date();
 
-        const findResult = await this.refreshTokenRepository.findByValueAndExpiresAfter(token, now);
+        const findResult = await this.refreshTokenRepository.findByValueAndExpiresAfter(input.refreshToken, now);
         if (!findResult.success) return fail(findResult.error);
         const refreshToken = findResult.value;
         if (!refreshToken) return fail(new UnauthorizedError({ message: 'Invalid or expired refresh token' }));
@@ -40,6 +39,6 @@ export class RefreshUseCase {
 
         const accessToken = await this.tokenManager.signAccess({ userId: refreshToken.userId });
 
-        return ok({ accessToken, refreshToken });
+        return ok({ accessToken, refreshToken: refreshToken.value });
     };
 }
