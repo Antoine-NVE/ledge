@@ -72,17 +72,14 @@ export class MongoTransactionRepository implements TransactionRepository {
     };
 
     save = async (transaction: Transaction): Promise<Result<void, Error | NotFoundError>> => {
-        const { _id, expenseCategory, ...rest } = this.toDocument(transaction);
+        const { _id, ...rest } = this.toDocument(transaction);
         try {
             const result = await this.transactionCollection.updateOne(
                 { _id },
                 {
-                    $set: {
-                        ...(expenseCategory !== null && { expenseCategory }),
-                        ...rest,
-                    },
+                    $set: rest,
                     $unset: {
-                        ...(expenseCategory === null && { expenseCategory: 1 }),
+                        ...(transaction.expenseCategory === null && { expenseCategory: 1 }),
                     },
                 },
             );
