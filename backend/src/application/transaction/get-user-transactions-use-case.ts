@@ -17,7 +17,7 @@ export class GetUserTransactionsUseCase {
     execute = async ({ userId }: Input): Promise<Result<Output, Error>> => {
         const result = await this.transactionRepository.findManyByUserId(userId);
         if (!result.success) return fail(result.error);
-        const transactions = result.value;
+        const transactions = result.data;
 
         return ok({ transactions });
     };

@@ -1,21 +1,8 @@
 import express from 'express';
-import { createSendVerificationEmailBodySchema, verifyEmailBodySchema } from './user-schemas.js';
-import { createValidateBody } from '../middlewares/business/validation/validate-body.js';
-import { UserController } from './user-controller.js';
-import type { Authenticate } from '../middlewares/business/auth/authenticate.js';
+import type { UserController } from '../controllers/user-controller.js';
 
-export const createUserRoutes = ({
-    userController,
-    authenticate,
-    allowedOrigins,
-}: {
-    userController: UserController;
-    authenticate: Authenticate;
-    allowedOrigins: string[];
-}) => {
+export const createUserRoutes = ({ sendVerificationEmail, verifyEmail, me }: UserController) => {
     const router = express.Router();
-
-    const { sendVerificationEmail, verifyEmail, me } = userController;
 
     /**
      * @openapi
@@ -49,14 +36,7 @@ export const createUserRoutes = ({
      *       500:
      *         description: Internal server error
      */
-    router.post(
-        '/send-verification-email',
-        authenticate,
-        createValidateBody({
-            schema: createSendVerificationEmailBodySchema({ allowedOrigins }),
-        }),
-        sendVerificationEmail,
-    );
+    router.post('/request-email-verification', sendVerificationEmail);
 
     /**
      * @openapi
@@ -90,7 +70,7 @@ export const createUserRoutes = ({
      *       500:
      *         description: Internal server error
      */
-    router.post('/verify-email', createValidateBody({ schema: verifyEmailBodySchema }), verifyEmail);
+    router.post('/verify-email', verifyEmail);
 
     /**
      * @openapi
@@ -107,7 +87,7 @@ export const createUserRoutes = ({
      *       500:
      *         description: Internal server error
      */
-    router.get('/me', authenticate, me);
+    router.get('/me', me);
 
     return router;
 };

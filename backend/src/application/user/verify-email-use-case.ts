@@ -26,11 +26,11 @@ export class VerifyEmailUseCase {
     }: Input): Promise<Result<Output, ConflictError | Error | NotFoundError | UnauthorizedError>> => {
         const tokenResult = this.tokenManager.verifyEmailVerification(emailVerificationToken);
         if (!tokenResult.success) return fail(tokenResult.error);
-        const { userId } = tokenResult.value;
+        const { userId } = tokenResult.data;
 
         const findResult = await this.userRepository.findById(userId);
         if (!findResult.success) return fail(findResult.error);
-        const user = findResult.value;
+        const user = findResult.data;
         if (!user) return fail(new UnauthorizedError({ message: 'User not found for this token' }));
         if (user.isEmailVerified) return fail(new ConflictError({ message: 'Email already verified' }));
 

@@ -1,12 +1,8 @@
 import express from 'express';
-import { loginBodySchema, registerBodySchema } from './auth-schemas.js';
-import { createValidateBody } from '../middlewares/business/validation/validate-body.js';
-import { AuthController } from './auth-controller.js';
+import type { AuthController } from '../controllers/auth-controller.js';
 
-export const createAuthRoutes = ({ authController }: { authController: AuthController }) => {
+export const createAuthRoutes = ({ register, login, refresh, logout }: AuthController) => {
     const router = express.Router();
-
-    const { register, login, refresh, logout } = authController;
 
     /**
      * @openapi
@@ -42,7 +38,7 @@ export const createAuthRoutes = ({ authController }: { authController: AuthContr
      *       500:
      *         description: Internal server error
      */
-    router.post('/register', createValidateBody({ schema: registerBodySchema }), register);
+    router.post('/register', register);
 
     /**
      * @openapi
@@ -78,7 +74,7 @@ export const createAuthRoutes = ({ authController }: { authController: AuthContr
      *       500:
      *         description: Internal server error
      */
-    router.post('/login', createValidateBody({ schema: loginBodySchema }), login);
+    router.post('/login', login);
 
     /**
      * @openapi

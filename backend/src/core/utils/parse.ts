@@ -1,17 +1,17 @@
-export const parseNumber = (value: string | undefined): number | undefined => {
-    if (value === '' || value === undefined) return undefined;
+export const parseNumber = (value: string | undefined): number | null => {
+    if (!value) return null;
     const number = Number(value);
-    return isNaN(number) ? undefined : number;
+    return isNaN(number) ? null : number;
 };
 
-export const parseBoolean = (value: string | undefined): boolean | undefined => {
-    if (value === undefined) return undefined;
+export const parseBoolean = (value: string | undefined): boolean | null => {
+    if (!value) return null;
     if (value === 'true') return true;
     if (value === 'false') return false;
-    return undefined;
+    return null;
 };
 
-export const parseArray = (value: string | undefined): string[] | undefined => {
-    if (value === '' || value === undefined) return undefined;
+export const parseArray = (value: string | undefined): string[] | null => {
+    if (!value) return null;
     return value.split(',');
 };

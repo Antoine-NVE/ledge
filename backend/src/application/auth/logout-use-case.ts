@@ -6,18 +6,15 @@ type Input = {
     refreshToken: string;
 };
 
-type Output = {
-    refreshToken: string | null;
-};
+type Output = void;
 
 export class LogoutUseCase {
     constructor(private refreshTokenRepository: RefreshTokenRepository) {}
 
-    execute = async (input: Input): Promise<Result<Output, Error>> => {
-        const result = await this.refreshTokenRepository.findByValueAndDelete(input.refreshToken);
+    execute = async ({ refreshToken }: Input): Promise<Result<Output, Error>> => {
+        const result = await this.refreshTokenRepository.findByValueAndDelete(refreshToken);
         if (!result.success) return fail(result.error);
-        const refreshToken = result.value;
 
-        return ok({ refreshToken: refreshToken?.value ?? null });
+        return ok(undefined);
     };
 }

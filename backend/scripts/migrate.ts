@@ -23,12 +23,12 @@ const logger = new PinoLogger(
 const start = async (): Promise<Result<Output, Error>> => {
     const envResult = loadEnv();
     if (!envResult.success) return fail(new Error('Failed to load environment', { cause: envResult.error }));
-    const { mongoUrl } = envResult.value;
+    const { mongoUrl } = envResult.data;
     logger.info('Environment loaded');
 
     const mongoResult = await connectToMongo({ mongoUrl });
     if (!mongoResult.success) return fail(new Error('Failed to connect to Mongo', { cause: mongoResult.error }));
-    const { mongoDb, mongoClient } = mongoResult.value;
+    const { mongoDb, mongoClient } = mongoResult.data;
     logger.info('Mongo connected');
 
     const umzug = createMigrationRunner({ mongoDb, logger });
@@ -55,7 +55,7 @@ if (!result.success) {
     logger.fatal(result.error.message, { err: result.error });
     process.exit(1);
 }
-const { mongoClient } = result.value;
+const { mongoClient } = result.data;
 
 await mongoClient.close().catch(() => {});
 logger.info('Mongo disconnected');

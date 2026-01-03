@@ -1,83 +1,106 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import { createAuthRoutes } from './auth/auth-routes.js';
-import { createTransactionRoutes } from './transaction/transaction-routes.js';
-import { createUserRoutes } from './user/user-routes.js';
-import { createCors } from './middlewares/technical/cors.js';
-import { rateLimiter } from './middlewares/technical/rate-limiter.js';
-import { createErrorHandler } from './middlewares/technical/error-handler.js';
-import { AuthController } from './auth/auth-controller.js';
-import { UserController } from './user/user-controller.js';
-import { TransactionController } from './transaction/transaction-controller.js';
-import { createAuthenticate } from './middlewares/business/auth/authenticate.js';
-import { TransactionService } from '../../domain/transaction/transaction-service';
-import { UserOrchestrator } from '../../application/user/user-orchestrator';
-import { AuthOrchestrator } from '../../application/auth/auth-orchestrator';
-import type { TokenManager } from '../../application/ports/token-manager.js';
-import { UserService } from '../../domain/user/user-service';
-import type { Logger } from '../../application/ports/logger.js';
-import { createAuthorize } from './middlewares/business/auth/authorize.js';
-import { CookieManager } from './support/cookie-manager.js';
+import { corsFactory } from './middlewares/cors.js';
+import { rateLimiter } from './middlewares/rate-limiter.js';
+import { errorHandler } from './middlewares/error-handler.js';
 import { NotFoundError } from '../../core/errors/not-found-error.js';
-import { createDocsRoutes } from './docs/docs-routes.js';
+import type { TokenManager } from '../../application/ports/token-manager.js';
+import type { IdGenerator } from '../../application/ports/id-generator.js';
+import type { RegisterUseCase } from '../../application/auth/register-use-case.js';
+import type { LoginUseCase } from '../../application/auth/login-use-case.js';
+import type { RefreshUseCase } from '../../application/auth/refresh-use-case.js';
+import type { LogoutUseCase } from '../../application/auth/logout-use-case.js';
+import type { CreateTransactionUseCase } from '../../application/transaction/create-transaction-use-case.js';
+import type { GetUserTransactionsUseCase } from '../../application/transaction/get-user-transactions-use-case.js';
+import type { GetTransactionUseCase } from '../../application/transaction/get-transaction-use-case.js';
+import type { UpdateTransactionUseCase } from '../../application/transaction/update-transaction-use-case.js';
+import type { DeleteTransactionUseCase } from '../../application/transaction/delete-transaction-use-case.js';
+import type { RequestEmailVerificationUseCase } from '../../application/user/request-email-verification-use-case.js';
+import type { VerifyEmailUseCase } from '../../application/user/verify-email-use-case.js';
+import type { GetCurrentUserUseCase } from '../../application/user/get-current-user-use-case.js';
+import { AuthController } from './controllers/auth-controller.js';
+import { TransactionController } from './controllers/transaction-controller.js';
+import { UserController } from './controllers/user-controller.js';
+import { createDocsRoutes } from './routes/docs-routes.js';
+import { createAuthRoutes } from './routes/auth-routes.js';
+import { createTransactionRoutes } from './routes/transaction-routes.js';
+import { createUserRoutes } from './routes/user-routes.js';
+
+type Input = {
+    tokenManager: TokenManager;
+    idGenerator: IdGenerator;
+    registerUseCase: RegisterUseCase;
+    loginUseCase: LoginUseCase;
+    refreshUseCase: RefreshUseCase;
+    logoutUseCase: LogoutUseCase;
+    createTransactionUseCase: CreateTransactionUseCase;
+    getUserTransactionsUseCase: GetUserTransactionsUseCase;
+    getTransactionUseCase: GetTransactionUseCase;
+    updateTransactionUseCase: UpdateTransactionUseCase;
+    deleteTransactionUseCase: DeleteTransactionUseCase;
+    requestEmailVerificationUseCase: RequestEmailVerificationUseCase;
+    verifyEmailUseCase: VerifyEmailUseCase;
+    getCurrentUserUseCase: GetCurrentUserUseCase;
+    allowedOrigins: string[];
+};
 
 export const createHttpApp = ({
-    allowedOrigins,
-    transactionService,
-    userOrchestrator,
-    authOrchestrator,
     tokenManager,
-    userService,
-    logger,
-}: {
-    allowedOrigins: string[];
-    transactionService: TransactionService;
-    userOrchestrator: UserOrchestrator;
-    authOrchestrator: AuthOrchestrator;
-    tokenManager: TokenManager;
-    userService: UserService;
-    logger: Logger;
-}) => {
+    idGenerator,
+    registerUseCase,
+    loginUseCase,
+    refreshUseCase,
+    logoutUseCase,
+    createTransactionUseCase,
+    getUserTransactionsUseCase,
+    getTransactionUseCase,
+    updateTransactionUseCase,
+    deleteTransactionUseCase,
+    requestEmailVerificationUseCase,
+    verifyEmailUseCase,
+    getCurrentUserUseCase,
+    allowedOrigins,
+}: Input) => {
     const app = express();
 
     // Security
-    app.use(createCors({ allowedOrigins }));
+    app.use(corsFactory({ allowedOrigins }));
     app.use(rateLimiter);
 
     // Parsing
     app.use(express.json());
     app.use(cookieParser());
 
-    // Dependencies
-    const cookieManager = new CookieManager();
-    const authController = new AuthController(authOrchestrator, logger, cookieManager);
-    const transactionController = new TransactionController(transactionService, logger);
-    const userController = new UserController(userOrchestrator, logger);
-    const authenticate = createAuthenticate({
+    // Controllers
+    const authController = new AuthController(registerUseCase, loginUseCase, refreshUseCase, logoutUseCase);
+    const transactionController = new TransactionController(
         tokenManager,
-        userService,
-        cookieManager,
-    });
-    const authorize = createAuthorize({ transactionService });
+        idGenerator,
+        createTransactionUseCase,
+        getUserTransactionsUseCase,
+        getTransactionUseCase,
+        updateTransactionUseCase,
+        deleteTransactionUseCase,
+    );
+    const userController = new UserController(
+        tokenManager,
+        requestEmailVerificationUseCase,
+        verifyEmailUseCase,
+        getCurrentUserUseCase,
+        allowedOrigins,
+    );
 
     // Routes
     app.use('/docs', createDocsRoutes());
-    app.use('/auth', createAuthRoutes({ authController }));
-    app.use(
-        '/transactions',
-        createTransactionRoutes({
-            transactionController,
-            authenticate,
-            authorize,
-        }),
-    );
-    app.use('/users', createUserRoutes({ userController, authenticate, allowedOrigins }));
+    app.use('/auth', createAuthRoutes(authController));
+    app.use('/transactions', createTransactionRoutes(transactionController));
+    app.use('/users', createUserRoutes(userController));
     app.use(() => {
         throw new NotFoundError({ message: 'Route not found' });
     });
 
     // Error handler
-    app.use(createErrorHandler({ logger }));
+    app.use(errorHandler);
 
     return app;
 };

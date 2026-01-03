@@ -1,26 +1,8 @@
 import express from 'express';
-import { createBodySchema, updateBodySchema } from './transaction-schemas.js';
-import { type Authorize, authorizeParamsSchema } from '../middlewares/business/auth/authorize.js';
-import { createValidateParams } from '../middlewares/business/validation/validate-params.js';
-import { createValidateBody } from '../middlewares/business/validation/validate-body.js';
-import { TransactionController } from './transaction-controller.js';
-import type { Authenticate } from '../middlewares/business/auth/authenticate.js';
+import type { TransactionController } from '../controllers/transaction-controller.js';
 
-export const createTransactionRoutes = ({
-    transactionController,
-    authenticate,
-    authorize,
-}: {
-    transactionController: TransactionController;
-    authenticate: Authenticate;
-    authorize: Authorize;
-}) => {
+export const createTransactionRoutes = ({ create, readAll, read, update, delete: remove }: TransactionController) => {
     const router = express.Router();
-
-    const { create, readAll, read, update, delete: remove } = transactionController;
-    const validateParams = createValidateParams({
-        schema: authorizeParamsSchema,
-    });
 
     /**
      * @openapi
@@ -60,7 +42,7 @@ export const createTransactionRoutes = ({
      *       500:
      *         description: Internal server error
      */
-    router.post('/', authenticate, createValidateBody({ schema: createBodySchema }), create);
+    router.post('/', create);
 
     /**
      * @openapi
@@ -79,7 +61,7 @@ export const createTransactionRoutes = ({
      *       500:
      *         description: Internal server error
      */
-    router.get('/', authenticate, readAll);
+    router.get('/', readAll);
 
     /**
      * @openapi
@@ -102,7 +84,7 @@ export const createTransactionRoutes = ({
      *       500:
      *         description: Internal server error
      */
-    router.get('/:id', authenticate, validateParams, authorize, read);
+    router.get('/:transactionId', read);
 
     /**
      * @openapi
@@ -143,14 +125,7 @@ export const createTransactionRoutes = ({
      *       500:
      *         description: Internal server error
      */
-    router.put(
-        '/:id',
-        authenticate,
-        validateParams,
-        authorize,
-        createValidateBody({ schema: updateBodySchema }),
-        update,
-    );
+    router.put('/:transactionId', update);
 
     /**
      * @openapi
@@ -173,7 +148,7 @@ export const createTransactionRoutes = ({
      *       500:
      *         description: Internal server error
      */
-    router.delete('/:id', authenticate, validateParams, authorize, remove);
+    router.delete('/:transactionId', remove);
 
     return router;
 };

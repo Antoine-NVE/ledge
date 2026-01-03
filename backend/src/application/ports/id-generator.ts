@@ -1,4 +1,4 @@
 export interface IdGenerator {
     generate(): string;
-    isValid(id: string): boolean;
+    validate(id: string): boolean;
 }

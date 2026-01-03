@@ -1,4 +1,5 @@
 import z from 'zod';
+import type { IdGenerator } from '../../../application/ports/id-generator.js';
 
 const monthSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
 
@@ -27,7 +28,7 @@ const createIncomeSchema = z.object({
     name: nameSchema,
     value: valueSchema,
     type: incomeTypeSchema,
-    expenseCategory: z.undefined(),
+    expenseCategory: z.null(),
 });
 
 const createExpenseSchema = z.object({
@@ -42,7 +43,7 @@ const updateIncomeSchema = z.object({
     name: nameSchema,
     value: valueSchema,
     type: incomeTypeSchema,
-    expenseCategory: z.undefined(),
+    expenseCategory: z.null(),
 });
 
 const updateExpenseSchema = z.object({
@@ -54,4 +55,22 @@ const updateExpenseSchema = z.object({
 
 export const createBodySchema = z.discriminatedUnion('type', [createIncomeSchema, createExpenseSchema]);
 
+export const readParamsSchemaFactory = (idGenerator: IdGenerator) => {
+    return z.object({
+        transactionId: z.string().refine((value) => idGenerator.validate(value)),
+    });
+};
+
+export const updateParamsSchemaFactory = (idGenerator: IdGenerator) => {
+    return z.object({
+        transactionId: z.string().refine((value) => idGenerator.validate(value)),
+    });
+};
+
 export const updateBodySchema = z.discriminatedUnion('type', [updateIncomeSchema, updateExpenseSchema]);
+
+export const deleteParamsSchemaFactory = (idGenerator: IdGenerator) => {
+    return z.object({
+        transactionId: z.string().refine((value) => idGenerator.validate(value)),
+    });
+};

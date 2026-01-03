@@ -5,43 +5,63 @@ import type { CacheStore } from '../application/ports/cache-store.js';
 import type { UserRepository } from '../domain/user/user-repository.js';
 import type { TransactionRepository } from '../domain/transaction/transaction-repository.js';
 import type { RefreshTokenRepository } from '../domain/refresh-token/refresh-token-repository.js';
-import { UserService } from '../domain/user/user-service';
-import { RefreshTokenService } from '../domain/refresh-token/refresh-token-service';
-import { TransactionService } from '../domain/transaction/transaction-service';
-import { AuthOrchestrator } from '../application/auth/auth-orchestrator';
-import { UserOrchestrator } from '../application/user/user-orchestrator';
+import { RegisterUseCase } from '../application/auth/register-use-case.js';
+import type { IdGenerator } from '../application/ports/id-generator.js';
+import { LoginUseCase } from '../application/auth/login-use-case.js';
+import { RefreshUseCase } from '../application/auth/refresh-use-case.js';
+import { LogoutUseCase } from '../application/auth/logout-use-case.js';
+import { CreateTransactionUseCase } from '../application/transaction/create-transaction-use-case.js';
+import { GetUserTransactionsUseCase } from '../application/transaction/get-user-transactions-use-case.js';
+import { GetTransactionUseCase } from '../application/transaction/get-transaction-use-case.js';
+import { UpdateTransactionUseCase } from '../application/transaction/update-transaction-use-case.js';
+import { DeleteTransactionUseCase } from '../application/transaction/delete-transaction-use-case.js';
+import { RequestEmailVerificationUseCase } from '../application/user/request-email-verification-use-case.js';
+import { VerifyEmailUseCase } from '../application/user/verify-email-use-case.js';
+import { GetCurrentUserUseCase } from '../application/user/get-current-user-use-case.js';
+
+type Input = {
+    tokenManager: TokenManager;
+    hasher: Hasher;
+    emailSender: EmailSender;
+    cacheStore: CacheStore;
+    idGenerator: IdGenerator;
+    userRepository: UserRepository;
+    transactionRepository: TransactionRepository;
+    refreshTokenRepository: RefreshTokenRepository;
+    emailFrom: string;
+};
 
 export const buildContainer = ({
     tokenManager,
     hasher,
     emailSender,
     cacheStore,
-    emailFrom,
+    idGenerator,
     userRepository,
     transactionRepository,
     refreshTokenRepository,
-}: {
-    tokenManager: TokenManager;
-    hasher: Hasher;
-    emailSender: EmailSender;
-    cacheStore: CacheStore;
-    emailFrom: string;
-    userRepository: UserRepository;
-    transactionRepository: TransactionRepository;
-    refreshTokenRepository: RefreshTokenRepository;
-}) => {
-    const userService = new UserService(userRepository);
-    const refreshTokenService = new RefreshTokenService(refreshTokenRepository);
-    const transactionService = new TransactionService(transactionRepository);
-
-    const authOrchestrator = new AuthOrchestrator(userRepository, tokenManager, refreshTokenRepository, hasher);
-    const userOrchestrator = new UserOrchestrator(tokenManager, emailSender, userService, cacheStore, emailFrom);
-
+    emailFrom,
+}: Input) => {
     return {
-        transactionService,
-        authOrchestrator,
-        userOrchestrator,
-        tokenManager,
-        userService,
+        registerUseCase: new RegisterUseCase(userRepository, refreshTokenRepository, hasher, tokenManager, idGenerator),
+        loginUseCase: new LoginUseCase(userRepository, refreshTokenRepository, hasher, tokenManager, idGenerator),
+        refreshUseCase: new RefreshUseCase(refreshTokenRepository, tokenManager),
+        logoutUseCase: new LogoutUseCase(refreshTokenRepository),
+
+        createTransactionUseCase: new CreateTransactionUseCase(transactionRepository, idGenerator),
+        getUserTransactionsUseCase: new GetUserTransactionsUseCase(transactionRepository),
+        getTransactionUseCase: new GetTransactionUseCase(transactionRepository),
+        updateTransactionUseCase: new UpdateTransactionUseCase(transactionRepository),
+        deleteTransactionUseCase: new DeleteTransactionUseCase(transactionRepository),
+
+        requestEmailVerificationUseCase: new RequestEmailVerificationUseCase(
+            userRepository,
+            emailSender,
+            tokenManager,
+            cacheStore,
+            emailFrom,
+        ),
+        verifyEmailUseCase: new VerifyEmailUseCase(userRepository, tokenManager),
+        getCurrentUserUseCase: new GetCurrentUserUseCase(userRepository),
     };
 };

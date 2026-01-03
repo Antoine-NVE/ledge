@@ -30,7 +30,7 @@ export class UpdateTransactionUseCase {
     }: Input): Promise<Result<Output, Error | NotFoundError>> => {
         const getResult = await this.transactionRepository.getByIdAndUserId(transactionId, userId);
         if (!getResult.success) return fail(getResult.error);
-        const transaction = getResult.value;
+        const transaction = getResult.data;
 
         transaction.name = name;
         transaction.value = value;

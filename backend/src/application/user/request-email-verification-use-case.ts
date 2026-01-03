@@ -7,16 +7,13 @@ import { UnauthorizedError } from '../../core/errors/unauthorized-error.js';
 import { TooManyRequestsError } from '../../core/errors/too-many-requests-error.js';
 import { ConflictError } from '../../core/errors/conflict-error.js';
 import type { Result } from '../../core/types/result.js';
-import type { User } from '../../domain/user/user-types.js';
 
 type Input = {
     userId: string;
     frontendBaseUrl: string;
 };
 
-type Output = {
-    user: User;
-};
+type Output = void;
 
 export class RequestEmailVerificationUseCase {
     constructor(
@@ -33,13 +30,13 @@ export class RequestEmailVerificationUseCase {
     }: Input): Promise<Result<Output, ConflictError | Error | TooManyRequestsError | UnauthorizedError>> => {
         const result = await this.userRepository.findById(userId);
         if (!result.success) return fail(result.error);
-        const user = result.value;
+        const user = result.data;
         if (!user) return fail(new UnauthorizedError());
         if (user.isEmailVerified) return fail(new ConflictError({ message: 'Email already verified' }));
 
         const hasCooldownResult = await this.cacheStore.hasEmailVerificationCooldown(user.id);
         if (!hasCooldownResult.success) return fail(hasCooldownResult.error);
-        const hasCooldown = hasCooldownResult.value;
+        const hasCooldown = hasCooldownResult.data;
         if (hasCooldown) {
             return fail(
                 new TooManyRequestsError({ message: 'Please wait before requesting another email verification' }),
@@ -57,6 +54,6 @@ export class RequestEmailVerificationUseCase {
         const setCooldownResult = await this.cacheStore.setEmailVerificationCooldown(user.id);
         if (!setCooldownResult.success) return fail(setCooldownResult.error);
 
-        return ok({ user });
+        return ok(undefined);
     };
 }

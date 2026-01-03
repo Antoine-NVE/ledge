@@ -2,9 +2,12 @@ import { Router } from 'express';
 import path from 'node:path';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
+import { fileURLToPath } from 'node:url';
 
 export const createDocsRoutes = () => {
     const router = Router();
+    const __filename = fileURLToPath(import.meta.url);
+    const __dirname = path.dirname(__filename);
 
     router.use(
         '/',

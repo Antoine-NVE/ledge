@@ -16,6 +16,7 @@ import { buildContainer } from './presentation/container.js';
 import { startServer } from './presentation/server.js';
 import { fail, ok } from './core/utils/result.js';
 import type { Result } from './core/types/result.js';
+import { MongoIdGenerator } from './infrastructure/adapters/mongo-id-generator.js';
 
 // .env is not verified yet, but we need a logger now
 const logger = new PinoLogger(
@@ -28,43 +29,43 @@ const logger = new PinoLogger(
 const start = async (): Promise<Result<void, Error>> => {
     const envResult = loadEnv();
     if (!envResult.success) return fail(new Error('Failed to load environment', { cause: envResult.error }));
-    const { redisUrl, mongoUrl, smtpUrl, tokenSecret, emailFrom, allowedOrigins, port } = envResult.value;
+    const { redisUrl, mongoUrl, smtpUrl, tokenSecret, emailFrom, allowedOrigins, port } = envResult.data;
     logger.info('Environment loaded');
 
     const redisResult = await connectToRedis({ redisUrl });
     if (!redisResult.success) return fail(new Error('Failed to connect to redis', { cause: redisResult.error }));
-    const { redisClient } = redisResult.value;
+    const { redisClient } = redisResult.data;
     logger.info('Redis connected');
 
     const mongoResult = await connectToMongo({ mongoUrl });
     if (!mongoResult.success) return fail(new Error('Failed to connect to Mongo', { cause: mongoResult.error }));
-    const { mongoDb } = mongoResult.value;
+    const { mongoDb } = mongoResult.data;
     logger.info('Mongo connected');
 
     const smtpResult = await connectToSmtp({ smtpUrl });
     if (!smtpResult.success) return fail(new Error('Failed to connect to SMTP', { cause: smtpResult.error }));
-    const { smtpTransporter } = smtpResult.value;
+    const { smtpTransporter } = smtpResult.data;
     logger.info('SMTP connected');
 
-    const { transactionService, authOrchestrator, userOrchestrator, tokenManager, userService } = buildContainer({
-        tokenManager: new JwtTokenManager(tokenSecret),
+    const tokenManager = new JwtTokenManager(tokenSecret);
+    const idGenerator = new MongoIdGenerator();
+    const container = buildContainer({
+        tokenManager,
         hasher: new BcryptHasher(),
         emailSender: new NodemailerEmailSender(smtpTransporter),
         cacheStore: new RedisCacheStore(redisClient),
-        emailFrom,
+        idGenerator,
         userRepository: new MongoUserRepository(mongoDb.collection('users')),
         transactionRepository: new MongoTransactionRepository(mongoDb.collection('transactions')),
         refreshTokenRepository: new MongoRefreshTokenRepository(mongoDb.collection('refreshtokens')),
+        emailFrom,
     });
 
     const app = createHttpApp({
-        allowedOrigins,
-        transactionService,
-        authOrchestrator,
-        userOrchestrator,
-        logger,
         tokenManager,
-        userService,
+        idGenerator,
+        ...container,
+        allowedOrigins,
     });
 
     const serverResult = await startServer({ app, port });

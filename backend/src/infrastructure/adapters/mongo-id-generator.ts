@@ -6,7 +6,7 @@ export class MongoIdGenerator implements IdGenerator {
         return new ObjectId().toString();
     };
 
-    isValid = (id: string): boolean => {
+    validate = (id: string): boolean => {
         return ObjectId.isValid(id);
     };
 }

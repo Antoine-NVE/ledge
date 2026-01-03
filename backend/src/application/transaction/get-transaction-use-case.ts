@@ -19,7 +19,7 @@ export class GetTransactionUseCase {
     execute = async ({ transactionId, userId }: Input): Promise<Result<Output, Error | NotFoundError>> => {
         const result = await this.transactionRepository.getByIdAndUserId(transactionId, userId);
         if (!result.success) return fail(result.error);
-        const transaction = result.value;
+        const transaction = result.data;
 
         return ok({ transaction });
     };
