@@ -7,7 +7,7 @@ import type { GetCurrentUserUseCase } from '../../../application/user/get-curren
 import type { ApiSuccess } from '../../types/api.js';
 import type { User } from '../../../domain/user/user-types.js';
 import { AuthenticatedController } from './authenticated-controller.js';
-import { sendVerificationEmailBodySchemaFactory, verifyEmailBodySchema } from '../schemas/user-schemas.js';
+import { requestEmailVerificationBodySchemaFactory, verifyEmailBodySchema } from '../schemas/user-schemas.js';
 
 export class UserController extends AuthenticatedController {
     constructor(
@@ -20,11 +20,11 @@ export class UserController extends AuthenticatedController {
         super(tokenManager);
     }
 
-    sendVerificationEmail = async (req: Request, res: Response): Promise<void> => {
+    requestEmailVerification = async (req: Request, res: Response): Promise<void> => {
         const userId = this.getUserId(req);
 
         const { frontendBaseUrl } = this.validate(
-            sendVerificationEmailBodySchemaFactory(this.allowedOrigins),
+            requestEmailVerificationBodySchemaFactory(this.allowedOrigins),
             req.body,
         );
 

@@ -1,7 +1,7 @@
 import express from 'express';
 import type { AuthController } from '../controllers/auth-controller.js';
 
-export const createAuthRoutes = ({ register, login, refresh, logout }: AuthController) => {
+export const createAuthRoutes = (authController: AuthController) => {
     const router = express.Router();
 
     /**
@@ -38,7 +38,7 @@ export const createAuthRoutes = ({ register, login, refresh, logout }: AuthContr
      *       500:
      *         description: Internal server error
      */
-    router.post('/register', register);
+    router.post('/register', authController.register);
 
     /**
      * @openapi
@@ -74,7 +74,7 @@ export const createAuthRoutes = ({ register, login, refresh, logout }: AuthContr
      *       500:
      *         description: Internal server error
      */
-    router.post('/login', login);
+    router.post('/login', authController.login);
 
     /**
      * @openapi
@@ -91,7 +91,7 @@ export const createAuthRoutes = ({ register, login, refresh, logout }: AuthContr
      *       500:
      *         description: Internal server error
      */
-    router.post('/refresh', refresh);
+    router.post('/refresh', authController.refresh);
 
     /**
      * @openapi
@@ -106,7 +106,7 @@ export const createAuthRoutes = ({ register, login, refresh, logout }: AuthContr
      *       500:
      *         description: Internal server error
      */
-    router.post('/logout', logout);
+    router.post('/logout', authController.logout);
 
     return router;
 };

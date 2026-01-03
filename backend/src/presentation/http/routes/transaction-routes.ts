@@ -1,7 +1,7 @@
 import express from 'express';
 import type { TransactionController } from '../controllers/transaction-controller.js';
 
-export const createTransactionRoutes = ({ create, readAll, read, update, delete: remove }: TransactionController) => {
+export const createTransactionRoutes = (transactionController: TransactionController) => {
     const router = express.Router();
 
     /**
@@ -42,7 +42,7 @@ export const createTransactionRoutes = ({ create, readAll, read, update, delete:
      *       500:
      *         description: Internal server error
      */
-    router.post('/', create);
+    router.post('/', transactionController.create);
 
     /**
      * @openapi
@@ -61,7 +61,7 @@ export const createTransactionRoutes = ({ create, readAll, read, update, delete:
      *       500:
      *         description: Internal server error
      */
-    router.get('/', readAll);
+    router.get('/', transactionController.readAll);
 
     /**
      * @openapi
@@ -84,7 +84,7 @@ export const createTransactionRoutes = ({ create, readAll, read, update, delete:
      *       500:
      *         description: Internal server error
      */
-    router.get('/:transactionId', read);
+    router.get('/:transactionId', transactionController.read);
 
     /**
      * @openapi
@@ -125,7 +125,7 @@ export const createTransactionRoutes = ({ create, readAll, read, update, delete:
      *       500:
      *         description: Internal server error
      */
-    router.put('/:transactionId', update);
+    router.put('/:transactionId', transactionController.update);
 
     /**
      * @openapi
@@ -148,7 +148,7 @@ export const createTransactionRoutes = ({ create, readAll, read, update, delete:
      *       500:
      *         description: Internal server error
      */
-    router.delete('/:transactionId', remove);
+    router.delete('/:transactionId', transactionController.delete);
 
     return router;
 };

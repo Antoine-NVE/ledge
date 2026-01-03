@@ -41,7 +41,7 @@ export const sendVerificationEmail = async (): Promise<
 > => {
     try {
         const response = await customFetch(
-            import.meta.env.VITE_API_URL + '/users/send-verification-email',
+            import.meta.env.VITE_API_URL + '/users/request-email-verification',
             {
                 method: 'POST',
                 credentials: 'include',

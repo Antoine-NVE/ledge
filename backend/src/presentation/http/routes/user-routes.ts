@@ -1,7 +1,7 @@
 import express from 'express';
 import type { UserController } from '../controllers/user-controller.js';
 
-export const createUserRoutes = ({ sendVerificationEmail, verifyEmail, me }: UserController) => {
+export const createUserRoutes = (userController: UserController) => {
     const router = express.Router();
 
     /**
@@ -36,7 +36,7 @@ export const createUserRoutes = ({ sendVerificationEmail, verifyEmail, me }: Use
      *       500:
      *         description: Internal server error
      */
-    router.post('/request-email-verification', sendVerificationEmail);
+    router.post('/request-email-verification', userController.requestEmailVerification);
 
     /**
      * @openapi
@@ -70,7 +70,7 @@ export const createUserRoutes = ({ sendVerificationEmail, verifyEmail, me }: Use
      *       500:
      *         description: Internal server error
      */
-    router.post('/verify-email', verifyEmail);
+    router.post('/verify-email', userController.verifyEmail);
 
     /**
      * @openapi
@@ -87,7 +87,7 @@ export const createUserRoutes = ({ sendVerificationEmail, verifyEmail, me }: Use
      *       500:
      *         description: Internal server error
      */
-    router.get('/me', me);
+    router.get('/me', userController.me);
 
     return router;
 };
