@@ -1,6 +1,5 @@
 import type { UserRepository } from '../../domain/user/user-repository.js';
 import type { TokenManager } from '../ports/token-manager.js';
-import type { User } from '../../domain/user/user-types.js';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
 import { UnauthorizedError } from '../../core/errors/unauthorized-error.js';
@@ -11,9 +10,7 @@ type Input = {
     emailVerificationToken: string;
 };
 
-type Output = {
-    user: User;
-};
+type Output = void;
 
 export class VerifyEmailUseCase {
     constructor(
@@ -39,6 +36,6 @@ export class VerifyEmailUseCase {
         const saveResult = await this.userRepository.save(user);
         if (!saveResult.success) return fail(saveResult.error);
 
-        return ok({ user });
+        return ok(undefined);
     };
 }
