@@ -31,7 +31,7 @@ export class RequestEmailVerificationUseCase {
         const result = await this.userRepository.findById(userId);
         if (!result.success) return fail(result.error);
         const user = result.data;
-        if (!user) return fail(new UnauthorizedError());
+        if (!user) return fail(new UnauthorizedError({ action: 'LOGIN' }));
         if (user.isEmailVerified) return fail(new ConflictError({ message: 'Email already verified' }));
 
         const hasCooldownResult = await this.cacheStore.hasEmailVerificationCooldown(user.id);
