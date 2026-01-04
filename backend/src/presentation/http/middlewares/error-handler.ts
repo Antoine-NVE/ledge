@@ -2,7 +2,7 @@ import type { NextFunction, Request, Response } from 'express';
 import { ensureError } from '../../../core/utils/error.js';
 import { AppError } from '../../../core/errors/app-error.js';
 import type { ApiError } from '../../types/api.js';
-import z, { ZodError } from 'zod';
+import { ZodError } from 'zod';
 
 export const errorHandler = (
     rawErr: unknown,
@@ -26,12 +26,8 @@ export const errorHandler = (
         if (err.action) response.action = err.action;
 
         if (err.cause instanceof ZodError) {
-            const flattened = z.flattenError(err.cause);
-
-            response.details = {
-                form: flattened.formErrors,
-                fields: flattened.fieldErrors,
-            };
+            // TODO: find a better way
+            response.errors = err.cause.format();
         }
 
         res.status(err.statusCode).json(response);

@@ -47,8 +47,8 @@ const start = async (): Promise<Result<void, Error>> => {
     const { smtpTransporter } = smtpResult.data;
     logger.info('SMTP connected');
 
-    const tokenManager = new JwtTokenManager(tokenSecret);
     const idGenerator = new MongoIdGenerator();
+    const tokenManager = new JwtTokenManager(idGenerator, tokenSecret);
     const container = buildContainer({
         tokenManager,
         hasher: new BcryptHasher(),

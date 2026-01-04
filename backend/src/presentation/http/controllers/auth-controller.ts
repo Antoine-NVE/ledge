@@ -7,7 +7,7 @@ import type { LogoutUseCase } from '../../../application/auth/logout-use-case.js
 import type { ApiSuccess } from '../../types/api.js';
 import type { User } from '../../../domain/user/user-types.js';
 import { BaseController } from './base-controller.js';
-import { loginBodySchema, registerBodySchema } from '../schemas/auth-schemas.js';
+import { loginSchema, registerSchema } from '../schemas/auth-schemas.js';
 
 export class AuthController extends BaseController {
     constructor(
@@ -20,9 +20,9 @@ export class AuthController extends BaseController {
     }
 
     register = async (req: Request, res: Response) => {
-        const { email, password } = this.validate(registerBodySchema, req.body);
+        const { body } = this.validate(req, registerSchema);
 
-        const result = await this.registerUseCase.execute({ email, password });
+        const result = await this.registerUseCase.execute(body);
         if (!result.success) throw result.error;
         const { user, accessToken, refreshToken } = result.data;
 
@@ -40,13 +40,13 @@ export class AuthController extends BaseController {
     };
 
     login = async (req: Request, res: Response) => {
-        const { email, password, rememberMe } = this.validate(loginBodySchema, req.body);
+        const { body } = this.validate(req, loginSchema);
 
-        const result = await this.loginUseCase.execute({ email, password });
+        const result = await this.loginUseCase.execute(body);
         if (!result.success) throw result.error;
         const { user, accessToken, refreshToken } = result.data;
 
-        this.setAuthCookies(res, accessToken, refreshToken, rememberMe);
+        this.setAuthCookies(res, accessToken, refreshToken, body.rememberMe);
 
         const response: ApiSuccess<{ user: Omit<User, 'passwordHash'> }> = {
             success: true,

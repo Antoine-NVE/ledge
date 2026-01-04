@@ -7,7 +7,7 @@ import type { GetCurrentUserUseCase } from '../../../application/user/get-curren
 import type { ApiSuccess } from '../../types/api.js';
 import type { User } from '../../../domain/user/user-types.js';
 import { AuthenticatedController } from './authenticated-controller.js';
-import { requestEmailVerificationBodySchemaFactory, verifyEmailBodySchema } from '../schemas/user-schemas.js';
+import { requestEmailVerificationSchema, verifyEmailSchema } from '../schemas/user-schemas.js';
 
 export class UserController extends AuthenticatedController {
     constructor(
@@ -23,12 +23,9 @@ export class UserController extends AuthenticatedController {
     requestEmailVerification = async (req: Request, res: Response): Promise<void> => {
         const userId = this.getUserId(req);
 
-        const { frontendBaseUrl } = this.validate(
-            requestEmailVerificationBodySchemaFactory(this.allowedOrigins),
-            req.body,
-        );
+        const { body } = this.validate(req, requestEmailVerificationSchema(this.allowedOrigins));
 
-        const result = await this.requestEmailVerificationUseCase.execute({ userId, frontendBaseUrl });
+        const result = await this.requestEmailVerificationUseCase.execute({ userId, ...body });
         if (!result.success) throw result.error;
 
         const response: ApiSuccess<void> = {
@@ -40,9 +37,9 @@ export class UserController extends AuthenticatedController {
     };
 
     verifyEmail = async (req: Request, res: Response): Promise<void> => {
-        const { token } = this.validate(verifyEmailBodySchema, req.body);
+        const { body } = this.validate(req, verifyEmailSchema);
 
-        const result = await this.verifyEmailUseCase.execute({ emailVerificationToken: token });
+        const result = await this.verifyEmailUseCase.execute({ emailVerificationToken: body.token });
         if (!result.success) throw result.error;
 
         const response: ApiSuccess<void> = {

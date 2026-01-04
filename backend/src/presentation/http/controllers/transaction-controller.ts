@@ -9,13 +9,7 @@ import type { IdGenerator } from '../../../application/ports/id-generator.js';
 import type { ApiSuccess } from '../../types/api.js';
 import type { Transaction } from '../../../domain/transaction/transaction-types.js';
 import { AuthenticatedController } from './authenticated-controller.js';
-import {
-    createBodySchema,
-    deleteParamsSchemaFactory,
-    readParamsSchemaFactory,
-    updateBodySchema,
-    updateParamsSchemaFactory,
-} from '../schemas/transaction-schemas.js';
+import { createSchema, deleteSchema, readSchema, updateSchema } from '../schemas/transaction-schemas.js';
 
 export class TransactionController extends AuthenticatedController {
     constructor(
@@ -33,9 +27,9 @@ export class TransactionController extends AuthenticatedController {
     create = async (req: Request, res: Response) => {
         const userId = this.getUserId(req);
 
-        const data = this.validate(createBodySchema, req.body);
+        const { body } = this.validate(req, createSchema);
 
-        const result = await this.createTransactionUseCase.execute({ userId, ...data });
+        const result = await this.createTransactionUseCase.execute({ userId, ...body });
         if (!result.success) throw result.error;
         const { transaction } = result.data;
 
@@ -71,9 +65,9 @@ export class TransactionController extends AuthenticatedController {
     read = async (req: Request, res: Response) => {
         const userId = this.getUserId(req);
 
-        const { transactionId } = this.validate(readParamsSchemaFactory(this.idGenerator), req.params);
+        const { params } = this.validate(req, readSchema(this.idGenerator));
 
-        const result = await this.getTransactionUseCase.execute({ transactionId, userId });
+        const result = await this.getTransactionUseCase.execute({ ...params, userId });
         if (!result.success) throw result.error;
         const { transaction } = result.data;
 
@@ -91,10 +85,9 @@ export class TransactionController extends AuthenticatedController {
     update = async (req: Request, res: Response) => {
         const userId = this.getUserId(req);
 
-        const { transactionId } = this.validate(updateParamsSchemaFactory(this.idGenerator), req.params);
-        const data = this.validate(updateBodySchema, req.body);
+        const { body, params } = this.validate(req, updateSchema(this.idGenerator));
 
-        const result = await this.updateTransactionUseCase.execute({ transactionId, userId, ...data });
+        const result = await this.updateTransactionUseCase.execute({ ...params, userId, ...body });
         if (!result.success) throw result.error;
         const { transaction } = result.data;
 
@@ -112,9 +105,9 @@ export class TransactionController extends AuthenticatedController {
     delete = async (req: Request, res: Response) => {
         const userId = this.getUserId(req);
 
-        const { transactionId } = this.validate(deleteParamsSchemaFactory(this.idGenerator), req.params);
+        const { params } = this.validate(req, deleteSchema(this.idGenerator));
 
-        const result = await this.deleteTransactionUseCase.execute({ transactionId, userId });
+        const result = await this.deleteTransactionUseCase.execute({ ...params, userId });
         if (!result.success) throw result.error;
 
         res.status(204).json();

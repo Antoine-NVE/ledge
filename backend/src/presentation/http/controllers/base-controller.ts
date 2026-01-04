@@ -6,8 +6,15 @@ import { UnauthorizedError } from '../../../core/errors/unauthorized-error.js';
 export abstract class BaseController {
     protected constructor() {}
 
-    protected validate<T>(schema: ZodType<T>, data: unknown): T {
-        const result = schema.safeParse(data);
+    protected validate<T>(req: Request, schema: ZodType<T>): T {
+        // We could probably parse the whole req, but it's maybe not really optimal
+        const validationTarget = {
+            body: req.body,
+            params: req.params,
+            query: req.query,
+        };
+
+        const result = schema.safeParse(validationTarget);
         if (!result.success) throw new BadRequestError({ cause: result.error });
 
         return result.data;

@@ -1,11 +1,15 @@
 import z from 'zod';
 
-export const requestEmailVerificationBodySchemaFactory = (allowedOrigins: string[]) => {
+export const requestEmailVerificationSchema = (allowedOrigins: string[]) => {
     return z.object({
-        frontendBaseUrl: z.url().refine((val) => allowedOrigins.includes(val)),
+        body: z.object({
+            frontendBaseUrl: z.url().refine((value) => allowedOrigins.includes(value)),
+        }),
     });
 };
 
-export const verifyEmailBodySchema = z.object({
-    token: z.string(),
+export const verifyEmailSchema = z.object({
+    body: z.object({
+        token: z.string(),
+    }),
 });

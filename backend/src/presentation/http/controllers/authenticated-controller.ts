@@ -10,9 +10,10 @@ export abstract class AuthenticatedController extends BaseController {
     protected getUserId(req: Request): string {
         const accessToken = this.getAccessToken(req);
 
-        const authResult = this.tokenManager.verifyAccess(accessToken);
-        if (!authResult.success) throw authResult.error;
+        const result = this.tokenManager.verifyAccess(accessToken);
+        if (!result.success) throw result.error;
+        const { userId } = result.data;
 
-        return authResult.data.userId;
+        return userId;
     }
 }

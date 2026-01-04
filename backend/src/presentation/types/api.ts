@@ -1,7 +1,11 @@
+// TODO: find a better way
+type ValidationError = string[] | { [key: string]: ValidationError };
+
 export type ApiSuccess<T> = {
     success: true;
     code: string;
     message: string;
+    action?: string;
     data?: T;
 };
 
@@ -10,10 +14,7 @@ export type ApiError = {
     code: string;
     message: string;
     action?: string;
-    details?: {
-        form: string[];
-        fields: Record<string, string[]>;
-    };
+    errors?: Record<string, ValidationError>;
 };
 
 export type ApiResponse<T> = ApiSuccess<T> | ApiError;
