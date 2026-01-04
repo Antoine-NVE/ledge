@@ -1,6 +1,6 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import { corsFactory } from './middlewares/cors.js';
+import { cors } from './middlewares/cors.js';
 import { rateLimiter } from './middlewares/rate-limiter.js';
 import { errorHandler } from './middlewares/error-handler.js';
 import { NotFoundError } from '../../core/errors/not-found-error.js';
@@ -64,7 +64,7 @@ export const createHttpApp = ({
     const app = express();
 
     // Security
-    app.use(corsFactory({ allowedOrigins }));
+    app.use(cors({ allowedOrigins }));
     app.use(rateLimiter);
 
     // Parsing
