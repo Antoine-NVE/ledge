@@ -39,7 +39,7 @@ const start = async (): Promise<Result<Output, Error>> => {
     };
     const commandName = process.argv[2] || '';
     const command = commands[commandName];
-    if (!command) return fail(new Error('Invalid migration command'));
+    if (!command) return fail(new Error("Invalid migration command. Please choose between 'up' and 'down'"));
 
     const migrationResult = await command()
         .then(() => ok(undefined))
