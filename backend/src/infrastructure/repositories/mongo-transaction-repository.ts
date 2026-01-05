@@ -6,17 +6,30 @@ import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
 import { ensureError } from '../../core/utils/error.js';
 
-type TransactionDocument = {
+type ExpenseDocument = {
     _id: ObjectId;
     userId: ObjectId;
     month: string;
     name: string;
     value: number;
-    type: 'expense' | 'income';
+    type: 'expense';
     expenseCategory?: 'need' | 'want' | 'investment';
     createdAt: Date;
     updatedAt: Date;
 };
+
+type IncomeDocument = {
+    _id: ObjectId;
+    userId: ObjectId;
+    month: string;
+    name: string;
+    value: number;
+    type: 'income';
+    createdAt: Date;
+    updatedAt: Date;
+};
+
+type TransactionDocument = ExpenseDocument | IncomeDocument;
 
 export class MongoTransactionRepository implements TransactionRepository {
     constructor(private transactionCollection: Collection<TransactionDocument>) {}
@@ -30,11 +43,20 @@ export class MongoTransactionRepository implements TransactionRepository {
         };
     };
 
-    private toDomain = ({ _id, userId, expenseCategory, ...rest }: TransactionDocument): Transaction => {
+    private toDomain = ({ _id, userId, ...rest }: TransactionDocument): Transaction => {
+        if (rest.type === 'expense') {
+            return {
+                id: _id.toString(),
+                userId: userId.toString(),
+                expenseCategory: rest.expenseCategory ?? null,
+                ...rest,
+            };
+        }
+
         return {
             id: _id.toString(),
             userId: userId.toString(),
-            expenseCategory: expenseCategory ?? null,
+            expenseCategory: null,
             ...rest,
         };
     };
@@ -79,7 +101,7 @@ export class MongoTransactionRepository implements TransactionRepository {
                 {
                     $set: rest,
                     $unset: {
-                        ...(rest.expenseCategory === undefined && { expenseCategory: 1 }),
+                        ...('expenseCategory' in rest && { expenseCategory: 1 }),
                     },
                 },
             );

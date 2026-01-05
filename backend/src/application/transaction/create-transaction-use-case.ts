@@ -9,9 +9,16 @@ type Input = {
     month: string;
     name: string;
     value: number;
-    type: 'expense' | 'income';
-    expenseCategory: 'need' | 'want' | 'investment' | null;
-};
+} & (
+    | {
+          type: 'expense';
+          expenseCategory: 'need' | 'want' | 'investment' | null;
+      }
+    | {
+          type: 'income';
+          expenseCategory: null;
+      }
+);
 
 type Output = {
     transaction: Transaction;
