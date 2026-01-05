@@ -65,9 +65,9 @@ export class AuthController extends BaseController {
 
         const result = await this.refreshUseCase.execute({ refreshToken });
         if (!result.success) throw result.error;
-        const data = result.data;
+        const { accessToken, newRefreshToken } = result.data;
 
-        this.setAuthCookies(res, data.accessToken, data.refreshToken, rememberMe);
+        this.setAuthCookies(res, accessToken, newRefreshToken, rememberMe);
 
         const response: ApiSuccess<void> = {
             success: true,
