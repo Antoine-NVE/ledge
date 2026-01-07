@@ -98,7 +98,7 @@ export class MongoTransactionRepository implements TransactionRepository {
                 {
                     $set: rest,
                     $unset: {
-                        ...('expenseCategory' in rest && { expenseCategory: 1 }),
+                        ...(!('expenseCategory' in rest) && { expenseCategory: 1 }),
                     },
                 },
             );
