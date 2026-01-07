@@ -31,12 +31,14 @@ export class RequestEmailVerificationUseCase {
         const result = await this.userRepository.findById(userId);
         if (!result.success) return fail(result.error);
         const user = result.data;
+
         if (!user) return fail(new UnauthorizedError({ action: 'LOGIN' }));
         if (user.isEmailVerified) return fail(new ConflictError({ message: 'Email already verified' }));
 
         const hasCooldownResult = await this.cacheStore.hasEmailVerificationCooldown(user.id);
         if (!hasCooldownResult.success) return fail(hasCooldownResult.error);
         const hasCooldown = hasCooldownResult.data;
+
         if (hasCooldown) {
             return fail(
                 new TooManyRequestsError({ message: 'Please wait before requesting another email verification' }),

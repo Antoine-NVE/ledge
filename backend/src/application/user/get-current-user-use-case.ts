@@ -19,6 +19,7 @@ export class GetCurrentUserUseCase {
         const result = await this.userRepository.findById(userId);
         if (!result.success) return fail(result.error);
         const user = result.data;
+
         if (!user) return fail(new UnauthorizedError({ action: 'LOGIN' }));
 
         return ok({ user });

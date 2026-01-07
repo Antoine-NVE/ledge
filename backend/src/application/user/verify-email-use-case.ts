@@ -28,11 +28,13 @@ export class VerifyEmailUseCase {
         const findResult = await this.userRepository.findById(userId);
         if (!findResult.success) return fail(findResult.error);
         const user = findResult.data;
+
         if (!user) return fail(new UnauthorizedError({ message: 'User not found for this token' }));
         if (user.isEmailVerified) return fail(new ConflictError({ message: 'Email already verified' }));
 
         user.isEmailVerified = true;
         user.updatedAt = new Date();
+
         const saveResult = await this.userRepository.save(user);
         if (!saveResult.success) return fail(saveResult.error);
 

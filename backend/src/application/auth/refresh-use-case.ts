@@ -29,11 +29,15 @@ export class RefreshUseCase {
         const findResult = await this.refreshTokenRepository.findByValueAndExpiresAfter(input.refreshToken, now);
         if (!findResult.success) return fail(findResult.error);
         const refreshToken = findResult.data;
-        if (!refreshToken) return fail(new UnauthorizedError({ message: 'Invalid or expired refresh token' }));
+
+        if (!refreshToken) {
+            return fail(new UnauthorizedError({ message: 'Invalid or expired refresh token', action: 'LOGIN' }));
+        }
 
         refreshToken.value = generateToken();
         refreshToken.expiresAt = new Date(now.getTime() + this.REFRESH_TOKEN_DURATION);
         refreshToken.updatedAt = now;
+
         const saveResult = await this.refreshTokenRepository.save(refreshToken);
         if (!saveResult.success) return fail(saveResult.error);
 

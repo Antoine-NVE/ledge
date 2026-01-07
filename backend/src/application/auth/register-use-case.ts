@@ -43,6 +43,7 @@ export class RegisterUseCase {
             createdAt: now,
             updatedAt: now,
         };
+
         const userResult = await this.userRepository.create(user);
         if (!userResult.success) return fail(userResult.error);
 
@@ -54,6 +55,7 @@ export class RegisterUseCase {
             createdAt: now,
             updatedAt: now,
         };
+
         const refreshTokenResult = await this.refreshTokenRepository.create(refreshToken);
         if (!refreshTokenResult.success) return fail(refreshTokenResult.error);
 

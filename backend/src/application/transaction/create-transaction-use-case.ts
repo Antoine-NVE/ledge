@@ -39,6 +39,7 @@ export class CreateTransactionUseCase {
             createdAt: now,
             updatedAt: now,
         };
+
         const result = await this.transactionRepository.create(transaction);
         if (!result.success) return fail(result.error);
 
