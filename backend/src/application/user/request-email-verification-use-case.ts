@@ -39,11 +39,10 @@ export class RequestEmailVerificationUseCase {
         if (!hasCooldownResult.success) return fail(hasCooldownResult.error);
         const hasCooldown = hasCooldownResult.data;
 
-        if (hasCooldown) {
+        if (hasCooldown)
             return fail(
                 new TooManyRequestsError({ message: 'Please wait before requesting another email verification' }),
             );
-        }
 
         const emailResult = await this.emailSender.sendEmailVerification({
             from: this.emailFrom,

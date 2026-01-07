@@ -54,19 +54,6 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
         }
     };
 
-    findByValueAndExpiresAfter = async (
-        value: string,
-        expiresAfter: Date,
-    ): Promise<Result<RefreshToken | null, Error>> => {
-        try {
-            const document = await this.refreshTokenCollection.findOne({ value, expiresAt: { $gt: expiresAfter } });
-            if (!document) return ok(null);
-            return ok(this.toDomain(document));
-        } catch (err: unknown) {
-            return fail(ensureError(err));
-        }
-    };
-
     save = async (refreshToken: RefreshToken): Promise<Result<void, Error | NotFoundError>> => {
         const { _id, ...rest } = this.toDocument(refreshToken);
         try {
