@@ -45,6 +45,6 @@ export class UpdateTransactionUseCase {
         const saveResult = await this.transactionRepository.save(updatedTransaction);
         if (!saveResult.success) return fail(saveResult.error);
 
-        return ok({ transaction });
+        return ok({ transaction: updatedTransaction });
     };
 }
