@@ -11,9 +11,15 @@ type Output = void;
 export class LogoutUseCase {
     constructor(private refreshTokenRepository: RefreshTokenRepository) {}
 
-    execute = async ({ refreshToken }: Input): Promise<Result<Output, Error>> => {
-        const result = await this.refreshTokenRepository.findByValueAndDelete(refreshToken);
-        if (!result.success) return fail(result.error);
+    execute = async (input: Input): Promise<Result<Output, Error>> => {
+        const findResult = await this.refreshTokenRepository.findByValue(input.refreshToken);
+        if (!findResult.success) return fail(findResult.error);
+        const refreshToken = findResult.data;
+
+        if (!refreshToken) return ok(undefined);
+
+        const deleteResult = await this.refreshTokenRepository.delete(refreshToken);
+        if (!deleteResult.success) return fail(deleteResult.error);
 
         return ok(undefined);
     };

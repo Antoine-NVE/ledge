@@ -11,7 +11,7 @@ export const errorHandler = (
     _next: NextFunction, // eslint-disable-line @typescript-eslint/no-unused-vars
 ): void => {
     const err = ensureError(rawErr); // Should already be an Error in most cases
-
+    console.log(err);
     const response: ApiError = {
         success: false,
         code: 'INTERNAL_SERVER_ERROR',

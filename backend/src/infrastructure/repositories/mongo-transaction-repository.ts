@@ -80,12 +80,9 @@ export class MongoTransactionRepository implements TransactionRepository {
         }
     };
 
-    getByIdAndUserId = async (id: string, userId: string): Promise<Result<Transaction, Error | NotFoundError>> => {
+    getById = async (id: string): Promise<Result<Transaction, Error | NotFoundError>> => {
         try {
-            const document = await this.transactionCollection.findOne({
-                _id: new ObjectId(id),
-                userId: new ObjectId(userId),
-            });
+            const document = await this.transactionCollection.findOne({ _id: new ObjectId(id) });
             if (!document) return fail(new NotFoundError({ message: 'Transaction not found' }));
             return ok(this.toDomain(document));
         } catch (err: unknown) {
@@ -112,14 +109,11 @@ export class MongoTransactionRepository implements TransactionRepository {
         }
     };
 
-    findByIdAndUserIdAndDelete = async (id: string, userId: string): Promise<Result<Transaction | null, Error>> => {
+    delete = async (transaction: Transaction): Promise<Result<void, Error | NotFoundError>> => {
         try {
-            const document = await this.transactionCollection.findOneAndDelete({
-                _id: new ObjectId(id),
-                userId: new ObjectId(userId),
-            });
-            if (!document) return ok(null);
-            return ok(this.toDomain(document));
+            const result = await this.transactionCollection.deleteOne({ _id: new ObjectId(transaction.id) });
+            if (result.deletedCount === 0) return fail(new NotFoundError({ message: 'Transaction not found' }));
+            return ok(undefined);
         } catch (err: unknown) {
             return fail(ensureError(err));
         }

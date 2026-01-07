@@ -44,6 +44,16 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
         }
     };
 
+    findByValue = async (value: string): Promise<Result<RefreshToken | null, Error>> => {
+        try {
+            const document = await this.refreshTokenCollection.findOne({ value });
+            if (!document) return ok(null);
+            return ok(this.toDomain(document));
+        } catch (err: unknown) {
+            return fail(ensureError(err));
+        }
+    };
+
     findByValueAndExpiresAfter = async (
         value: string,
         expiresAfter: Date,
@@ -68,11 +78,11 @@ export class MongoRefreshTokenRepository implements RefreshTokenRepository {
         }
     };
 
-    findByValueAndDelete = async (value: string): Promise<Result<RefreshToken | null, Error>> => {
+    delete = async (refreshToken: RefreshToken): Promise<Result<void, Error | NotFoundError>> => {
         try {
-            const document = await this.refreshTokenCollection.findOneAndDelete({ value });
-            if (!document) return ok(null);
-            return ok(this.toDomain(document));
+            const result = await this.refreshTokenCollection.deleteOne({ _id: new ObjectId(refreshToken.id) });
+            if (result.deletedCount === 0) return fail(new NotFoundError({ message: 'Refresh token not found' }));
+            return ok(undefined);
         } catch (err: unknown) {
             return fail(ensureError(err));
         }

@@ -109,7 +109,16 @@ export class TransactionController extends AuthenticatedController {
 
         const result = await this.deleteTransactionUseCase.execute({ ...params, userId });
         if (!result.success) throw result.error;
+        const { transaction } = result.data;
 
-        res.status(204).json();
+        const response: ApiSuccess<{ transaction: Transaction }> = {
+            success: true,
+            code: 'OK',
+            message: 'Transaction deleted successfully',
+            data: {
+                transaction,
+            },
+        };
+        res.status(200).json(response);
     };
 }
