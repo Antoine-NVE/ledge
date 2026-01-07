@@ -87,6 +87,11 @@ export class AuthController extends BaseController {
             if (!result.success) throw result.error;
         }
 
-        res.status(204).json();
+        const response: ApiSuccess<void> = {
+            success: true,
+            code: 'OK',
+            message: 'Logged out successfully',
+        };
+        res.status(200).json(response);
     };
 }
