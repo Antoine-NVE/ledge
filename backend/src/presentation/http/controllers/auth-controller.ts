@@ -91,6 +91,7 @@ export class AuthController extends BaseController {
             success: true,
             code: 'OK',
             message: 'Logged out successfully',
+            action: 'LOGIN',
         };
         res.status(200).json(response);
     };
