@@ -76,12 +76,12 @@ export const createHttpApp = ({
 }: Input) => {
     const app = express();
 
+    // Logger
+    app.use(requestLoggerMiddleware({ logger, tokenGenerator }));
+
     // Security
     app.use(corsMiddleware({ allowedOrigins }));
     app.use(rateLimiterMiddleware());
-
-    // Logger
-    app.use(requestLoggerMiddleware({ logger, tokenGenerator }));
 
     // Parsing
     app.use(express.json());
