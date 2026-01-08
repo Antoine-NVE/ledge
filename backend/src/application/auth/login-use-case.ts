@@ -7,8 +7,8 @@ import type { RefreshToken } from '../../domain/refresh-token/refresh-token-type
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
 import { UnauthorizedError } from '../../core/errors/unauthorized-error.js';
-import { generateToken } from '../../core/utils/token.js';
 import type { IdManager } from '../ports/id-manager.js';
+import type { TokenGenerator } from '../ports/token-generator.js';
 
 type Input = {
     email: string;
@@ -30,6 +30,7 @@ export class LoginUseCase {
         private hasher: Hasher,
         private tokenManager: TokenManager,
         private idManager: IdManager,
+        private tokenGenerator: TokenGenerator,
     ) {}
 
     execute = async ({ email, password }: Input): Promise<Result<Output, Error | UnauthorizedError>> => {
@@ -47,7 +48,7 @@ export class LoginUseCase {
         const refreshToken: RefreshToken = {
             id: this.idManager.generate(),
             userId: user.id,
-            value: generateToken(),
+            value: this.tokenGenerator.generate(),
             expiresAt: new Date(now.getTime() + this.REFRESH_TOKEN_DURATION),
             createdAt: now,
             updatedAt: now,

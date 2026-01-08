@@ -27,6 +27,7 @@ import { createTransactionRoutes } from './routes/transaction-routes.js';
 import { createUserRoutes } from './routes/user-routes.js';
 import type { Logger } from '../../application/ports/logger.js';
 import { requestLoggerMiddleware } from './middlewares/request-logger.js';
+import type { TokenGenerator } from '../../application/ports/token-generator.js';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -38,6 +39,7 @@ type Input = {
     logger: Logger;
     tokenManager: TokenManager;
     idManager: IdManager;
+    tokenGenerator: TokenGenerator;
     registerUseCase: RegisterUseCase;
     loginUseCase: LoginUseCase;
     refreshUseCase: RefreshUseCase;
@@ -57,6 +59,7 @@ export const createHttpApp = ({
     logger,
     tokenManager,
     idManager,
+    tokenGenerator,
     registerUseCase,
     loginUseCase,
     refreshUseCase,
@@ -78,7 +81,7 @@ export const createHttpApp = ({
     app.use(rateLimiterMiddleware());
 
     // Logger
-    app.use(requestLoggerMiddleware({ logger }));
+    app.use(requestLoggerMiddleware({ logger, tokenGenerator }));
 
     // Parsing
     app.use(express.json());

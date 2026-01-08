@@ -3,8 +3,8 @@ import type { TokenManager } from '../ports/token-manager.js';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
 import { UnauthorizedError } from '../../core/errors/unauthorized-error.js';
-import { generateToken } from '../../core/utils/token.js';
 import { NotFoundError } from '../../core/errors/not-found-error.js';
+import type { TokenGenerator } from '../ports/token-generator.js';
 
 type Input = {
     refreshToken: string;
@@ -21,6 +21,7 @@ export class RefreshUseCase {
     constructor(
         private refreshTokenRepository: RefreshTokenRepository,
         private tokenManager: TokenManager,
+        private tokenGenerator: TokenGenerator,
     ) {}
 
     execute = async (input: Input): Promise<Result<Output, Error | NotFoundError | UnauthorizedError>> => {
@@ -34,7 +35,7 @@ export class RefreshUseCase {
         if (refreshToken.expiresAt < now)
             return fail(new UnauthorizedError({ message: 'Expired refresh token', action: 'LOGIN' }));
 
-        refreshToken.value = generateToken();
+        refreshToken.value = this.tokenGenerator.generate();
         refreshToken.expiresAt = new Date(now.getTime() + this.REFRESH_TOKEN_DURATION);
         refreshToken.updatedAt = now;
 

@@ -7,8 +7,8 @@ import type { User } from '../../domain/user/user-types.js';
 import type { RefreshToken } from '../../domain/refresh-token/refresh-token-types.js';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
-import { generateToken } from '../../core/utils/token.js';
 import { ConflictError } from '../../core/errors/conflict-error.js';
+import type { TokenGenerator } from '../ports/token-generator.js';
 
 type Input = {
     email: string;
@@ -30,6 +30,7 @@ export class RegisterUseCase {
         private hasher: Hasher,
         private tokenManager: TokenManager,
         private idManager: IdManager,
+        private tokenGenerator: TokenGenerator,
     ) {}
 
     execute = async ({ email, password }: Input): Promise<Result<Output, ConflictError | Error>> => {
@@ -50,7 +51,7 @@ export class RegisterUseCase {
         const refreshToken: RefreshToken = {
             id: this.idManager.generate(),
             userId: user.id,
-            value: generateToken(),
+            value: this.tokenGenerator.generate(),
             expiresAt: new Date(now.getTime() + this.REFRESH_TOKEN_DURATION),
             createdAt: now,
             updatedAt: now,

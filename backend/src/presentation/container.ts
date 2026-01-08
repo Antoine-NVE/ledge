@@ -18,6 +18,7 @@ import { DeleteTransactionUseCase } from '../application/transaction/delete-tran
 import { RequestEmailVerificationUseCase } from '../application/user/request-email-verification-use-case.js';
 import { VerifyEmailUseCase } from '../application/user/verify-email-use-case.js';
 import { GetCurrentUserUseCase } from '../application/user/get-current-user-use-case.js';
+import type { TokenGenerator } from '../application/ports/token-generator.js';
 
 type Input = {
     tokenManager: TokenManager;
@@ -25,6 +26,7 @@ type Input = {
     emailSender: EmailSender;
     cacheStore: CacheStore;
     idManager: IdManager;
+    tokenGenerator: TokenGenerator;
     userRepository: UserRepository;
     transactionRepository: TransactionRepository;
     refreshTokenRepository: RefreshTokenRepository;
@@ -37,15 +39,30 @@ export const buildContainer = ({
     emailSender,
     cacheStore,
     idManager,
+    tokenGenerator,
     userRepository,
     transactionRepository,
     refreshTokenRepository,
     emailFrom,
 }: Input) => {
     return {
-        registerUseCase: new RegisterUseCase(userRepository, refreshTokenRepository, hasher, tokenManager, idManager),
-        loginUseCase: new LoginUseCase(userRepository, refreshTokenRepository, hasher, tokenManager, idManager),
-        refreshUseCase: new RefreshUseCase(refreshTokenRepository, tokenManager),
+        registerUseCase: new RegisterUseCase(
+            userRepository,
+            refreshTokenRepository,
+            hasher,
+            tokenManager,
+            idManager,
+            tokenGenerator,
+        ),
+        loginUseCase: new LoginUseCase(
+            userRepository,
+            refreshTokenRepository,
+            hasher,
+            tokenManager,
+            idManager,
+            tokenGenerator,
+        ),
+        refreshUseCase: new RefreshUseCase(refreshTokenRepository, tokenManager, tokenGenerator),
         logoutUseCase: new LogoutUseCase(refreshTokenRepository),
 
         createTransactionUseCase: new CreateTransactionUseCase(transactionRepository, idManager),

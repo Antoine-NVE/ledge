@@ -17,6 +17,7 @@ import { startServer } from './presentation/server.js';
 import { fail, ok } from './core/utils/result.js';
 import type { Result } from './core/types/result.js';
 import { MongoIdManager } from './infrastructure/adapters/mongo-id-manager.js';
+import { CryptoTokenGenerator } from './infrastructure/adapters/crypto-token-generator.js';
 
 // .env is not verified yet, but we need a logger now
 const logger = new PinoLogger(
@@ -49,12 +50,14 @@ const start = async (): Promise<Result<void, Error>> => {
 
     const idManager = new MongoIdManager();
     const tokenManager = new JwtTokenManager(idManager, tokenSecret);
+    const tokenGenerator = new CryptoTokenGenerator();
     const container = buildContainer({
         tokenManager,
         hasher: new BcryptHasher(),
         emailSender: new NodemailerEmailSender(smtpTransporter),
         cacheStore: new RedisCacheStore(redisClient),
         idManager,
+        tokenGenerator,
         userRepository: new MongoUserRepository(mongoDb.collection('users')),
         transactionRepository: new MongoTransactionRepository(mongoDb.collection('transactions')),
         refreshTokenRepository: new MongoRefreshTokenRepository(mongoDb.collection('refreshtokens')),
@@ -65,6 +68,7 @@ const start = async (): Promise<Result<void, Error>> => {
         logger,
         tokenManager,
         idManager,
+        tokenGenerator,
         ...container,
         allowedOrigins,
     });
