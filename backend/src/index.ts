@@ -62,6 +62,7 @@ const start = async (): Promise<Result<void, Error>> => {
     });
 
     const app = createHttpApp({
+        logger,
         tokenManager,
         idGenerator,
         ...container,

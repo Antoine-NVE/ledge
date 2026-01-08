@@ -25,8 +25,17 @@ import { createDocsRoutes } from './routes/docs-routes.js';
 import { createAuthRoutes } from './routes/auth-routes.js';
 import { createTransactionRoutes } from './routes/transaction-routes.js';
 import { createUserRoutes } from './routes/user-routes.js';
+import type { Logger } from '../../application/ports/logger.js';
+import { requestLogger } from './middlewares/request-logger.js';
+
+declare module 'express-serve-static-core' {
+    interface Request {
+        logger: Logger;
+    }
+}
 
 type Input = {
+    logger: Logger;
     tokenManager: TokenManager;
     idGenerator: IdGenerator;
     registerUseCase: RegisterUseCase;
@@ -45,6 +54,7 @@ type Input = {
 };
 
 export const createHttpApp = ({
+    logger,
     tokenManager,
     idGenerator,
     registerUseCase,
@@ -66,6 +76,9 @@ export const createHttpApp = ({
     // Security
     app.use(cors({ allowedOrigins }));
     app.use(rateLimiter);
+
+    // Logger
+    app.use(requestLogger({ logger }));
 
     // Parsing
     app.use(express.json());

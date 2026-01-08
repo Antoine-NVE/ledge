@@ -1,4 +1,4 @@
-import type { BaseLogger } from 'pino';
+import type { Logger as BaseLogger } from 'pino';
 import type { Logger } from '../../application/ports/logger.js';
 
 export class PinoLogger implements Logger {
@@ -22,5 +22,9 @@ export class PinoLogger implements Logger {
 
     debug(message: string, meta?: Record<string, unknown>): void {
         this.baseLogger.debug(meta, message);
+    }
+
+    child(bindings: Record<string, unknown>): Logger {
+        return new PinoLogger(this.baseLogger.child(bindings));
     }
 }
