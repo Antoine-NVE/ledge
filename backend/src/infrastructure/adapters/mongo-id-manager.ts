@@ -1,7 +1,7 @@
-import type { IdGenerator } from '../../application/ports/id-generator.js';
+import type { IdManager } from '../../application/ports/id-manager.js';
 import { ObjectId } from 'mongodb';
 
-export class MongoIdGenerator implements IdGenerator {
+export class MongoIdManager implements IdManager {
     generate = (): string => {
         return new ObjectId().toString();
     };

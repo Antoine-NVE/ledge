@@ -16,7 +16,7 @@ import { buildContainer } from './presentation/container.js';
 import { startServer } from './presentation/server.js';
 import { fail, ok } from './core/utils/result.js';
 import type { Result } from './core/types/result.js';
-import { MongoIdGenerator } from './infrastructure/adapters/mongo-id-generator.js';
+import { MongoIdManager } from './infrastructure/adapters/mongo-id-manager.js';
 
 // .env is not verified yet, but we need a logger now
 const logger = new PinoLogger(
@@ -47,14 +47,14 @@ const start = async (): Promise<Result<void, Error>> => {
     const { smtpTransporter } = smtpResult.data;
     logger.info('SMTP connected');
 
-    const idGenerator = new MongoIdGenerator();
-    const tokenManager = new JwtTokenManager(idGenerator, tokenSecret);
+    const idManager = new MongoIdManager();
+    const tokenManager = new JwtTokenManager(idManager, tokenSecret);
     const container = buildContainer({
         tokenManager,
         hasher: new BcryptHasher(),
         emailSender: new NodemailerEmailSender(smtpTransporter),
         cacheStore: new RedisCacheStore(redisClient),
-        idGenerator,
+        idManager,
         userRepository: new MongoUserRepository(mongoDb.collection('users')),
         transactionRepository: new MongoTransactionRepository(mongoDb.collection('transactions')),
         refreshTokenRepository: new MongoRefreshTokenRepository(mongoDb.collection('refreshtokens')),
@@ -64,7 +64,7 @@ const start = async (): Promise<Result<void, Error>> => {
     const app = createHttpApp({
         logger,
         tokenManager,
-        idGenerator,
+        idManager,
         ...container,
         allowedOrigins,
     });

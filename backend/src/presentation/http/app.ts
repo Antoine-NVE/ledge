@@ -5,7 +5,7 @@ import { rateLimiterMiddleware } from './middlewares/rate-limiter.js';
 import { errorHandlerMiddleware } from './middlewares/error-handler.js';
 import { NotFoundError } from '../../core/errors/not-found-error.js';
 import type { TokenManager } from '../../application/ports/token-manager.js';
-import type { IdGenerator } from '../../application/ports/id-generator.js';
+import type { IdManager } from '../../application/ports/id-manager.js';
 import type { RegisterUseCase } from '../../application/auth/register-use-case.js';
 import type { LoginUseCase } from '../../application/auth/login-use-case.js';
 import type { RefreshUseCase } from '../../application/auth/refresh-use-case.js';
@@ -37,7 +37,7 @@ declare module 'express-serve-static-core' {
 type Input = {
     logger: Logger;
     tokenManager: TokenManager;
-    idGenerator: IdGenerator;
+    idManager: IdManager;
     registerUseCase: RegisterUseCase;
     loginUseCase: LoginUseCase;
     refreshUseCase: RefreshUseCase;
@@ -56,7 +56,7 @@ type Input = {
 export const createHttpApp = ({
     logger,
     tokenManager,
-    idGenerator,
+    idManager,
     registerUseCase,
     loginUseCase,
     refreshUseCase,
@@ -88,7 +88,7 @@ export const createHttpApp = ({
     const authController = new AuthController(registerUseCase, loginUseCase, refreshUseCase, logoutUseCase);
     const transactionController = new TransactionController(
         tokenManager,
-        idGenerator,
+        idManager,
         createTransactionUseCase,
         getUserTransactionsUseCase,
         getTransactionUseCase,

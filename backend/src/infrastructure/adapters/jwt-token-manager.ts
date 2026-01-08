@@ -4,11 +4,11 @@ import type { TokenManager } from '../../application/ports/token-manager.js';
 import { UnauthorizedError } from '../../core/errors/unauthorized-error.js';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
-import type { IdGenerator } from '../../application/ports/id-generator.js';
+import type { IdManager } from '../../application/ports/id-manager.js';
 
-const verifySchema = (idGenerator: IdGenerator) => {
+const verifySchema = (idManager: IdManager) => {
     return z.object({
-        sub: z.string().refine((value) => idGenerator.validate(value)),
+        sub: z.string().refine((value) => idManager.validate(value)),
         aud: z.string(),
         iat: z.number(),
         exp: z.number(),
@@ -17,7 +17,7 @@ const verifySchema = (idGenerator: IdGenerator) => {
 
 export class JwtTokenManager implements TokenManager {
     constructor(
-        private idGenerator: IdGenerator,
+        private idManager: IdManager,
         private secret: jwt.Secret,
     ) {}
 
@@ -30,7 +30,7 @@ export class JwtTokenManager implements TokenManager {
         options: jwt.VerifyOptions,
     ): Result<{ sub: string; aud: string; iat: number; exp: number }, UnauthorizedError> => {
         try {
-            const payload = verifySchema(this.idGenerator).parse(jwt.verify(token, this.secret, options));
+            const payload = verifySchema(this.idManager).parse(jwt.verify(token, this.secret, options));
 
             return ok(payload);
         } catch (err: unknown) {

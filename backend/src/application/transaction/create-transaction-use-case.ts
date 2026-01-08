@@ -1,6 +1,6 @@
 import type { TransactionRepository } from '../../domain/transaction/transaction-repository.js';
 import type { Transaction } from '../../domain/transaction/transaction-types.js';
-import type { IdGenerator } from '../ports/id-generator.js';
+import type { IdManager } from '../ports/id-manager.js';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
 
@@ -27,14 +27,14 @@ type Output = {
 export class CreateTransactionUseCase {
     constructor(
         private transactionRepository: TransactionRepository,
-        private idGenerator: IdGenerator,
+        private idManager: IdManager,
     ) {}
 
     execute = async (input: Input): Promise<Result<Output, Error>> => {
         const now = new Date();
 
         const transaction: Transaction = {
-            id: this.idGenerator.generate(),
+            id: this.idManager.generate(),
             ...input,
             createdAt: now,
             updatedAt: now,

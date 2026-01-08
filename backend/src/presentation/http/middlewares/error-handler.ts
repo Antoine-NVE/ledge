@@ -32,10 +32,12 @@ export const errorHandlerMiddleware = () => {
             }
 
             res.status(err.statusCode).json(response);
+            req.logger.warn(err.message, { err });
             return;
         }
 
         // All others errors
         res.status(500).json(response);
+        req.logger.error(err.message, { err });
     };
 };

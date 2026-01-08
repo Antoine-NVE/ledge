@@ -8,7 +8,7 @@ import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
 import { UnauthorizedError } from '../../core/errors/unauthorized-error.js';
 import { generateToken } from '../../core/utils/token.js';
-import type { IdGenerator } from '../ports/id-generator.js';
+import type { IdManager } from '../ports/id-manager.js';
 
 type Input = {
     email: string;
@@ -29,7 +29,7 @@ export class LoginUseCase {
         private refreshTokenRepository: RefreshTokenRepository,
         private hasher: Hasher,
         private tokenManager: TokenManager,
-        private idGenerator: IdGenerator,
+        private idManager: IdManager,
     ) {}
 
     execute = async ({ email, password }: Input): Promise<Result<Output, Error | UnauthorizedError>> => {
@@ -45,7 +45,7 @@ export class LoginUseCase {
         if (!isValidPassword) return fail(new UnauthorizedError({ message: 'Invalid credentials' }));
 
         const refreshToken: RefreshToken = {
-            id: this.idGenerator.generate(),
+            id: this.idManager.generate(),
             userId: user.id,
             value: generateToken(),
             expiresAt: new Date(now.getTime() + this.REFRESH_TOKEN_DURATION),

@@ -1,4 +1,4 @@
-export interface IdGenerator {
+export interface IdManager {
     generate(): string;
     validate(id: string): boolean;
 }

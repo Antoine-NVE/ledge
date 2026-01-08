@@ -6,7 +6,7 @@ import type { UserRepository } from '../domain/user/user-repository.js';
 import type { TransactionRepository } from '../domain/transaction/transaction-repository.js';
 import type { RefreshTokenRepository } from '../domain/refresh-token/refresh-token-repository.js';
 import { RegisterUseCase } from '../application/auth/register-use-case.js';
-import type { IdGenerator } from '../application/ports/id-generator.js';
+import type { IdManager } from '../application/ports/id-manager.js';
 import { LoginUseCase } from '../application/auth/login-use-case.js';
 import { RefreshUseCase } from '../application/auth/refresh-use-case.js';
 import { LogoutUseCase } from '../application/auth/logout-use-case.js';
@@ -24,7 +24,7 @@ type Input = {
     hasher: Hasher;
     emailSender: EmailSender;
     cacheStore: CacheStore;
-    idGenerator: IdGenerator;
+    idManager: IdManager;
     userRepository: UserRepository;
     transactionRepository: TransactionRepository;
     refreshTokenRepository: RefreshTokenRepository;
@@ -36,19 +36,19 @@ export const buildContainer = ({
     hasher,
     emailSender,
     cacheStore,
-    idGenerator,
+    idManager,
     userRepository,
     transactionRepository,
     refreshTokenRepository,
     emailFrom,
 }: Input) => {
     return {
-        registerUseCase: new RegisterUseCase(userRepository, refreshTokenRepository, hasher, tokenManager, idGenerator),
-        loginUseCase: new LoginUseCase(userRepository, refreshTokenRepository, hasher, tokenManager, idGenerator),
+        registerUseCase: new RegisterUseCase(userRepository, refreshTokenRepository, hasher, tokenManager, idManager),
+        loginUseCase: new LoginUseCase(userRepository, refreshTokenRepository, hasher, tokenManager, idManager),
         refreshUseCase: new RefreshUseCase(refreshTokenRepository, tokenManager),
         logoutUseCase: new LogoutUseCase(refreshTokenRepository),
 
-        createTransactionUseCase: new CreateTransactionUseCase(transactionRepository, idGenerator),
+        createTransactionUseCase: new CreateTransactionUseCase(transactionRepository, idManager),
         getUserTransactionsUseCase: new GetUserTransactionsUseCase(transactionRepository),
         getTransactionUseCase: new GetTransactionUseCase(transactionRepository),
         updateTransactionUseCase: new UpdateTransactionUseCase(transactionRepository),

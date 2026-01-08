@@ -1,5 +1,5 @@
 import z from 'zod';
-import type { IdGenerator } from '../../../application/ports/id-generator.js';
+import type { IdManager } from '../../../application/ports/id-manager.js';
 
 const monthSchema = z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
 
@@ -38,15 +38,15 @@ export const createSchema = z.object({
     ]),
 });
 
-export const readSchema = (idGenerator: IdGenerator) => {
+export const readSchema = (idManager: IdManager) => {
     return z.object({
         params: z.object({
-            transactionId: z.string().refine((value) => idGenerator.validate(value)),
+            transactionId: z.string().refine((value) => idManager.validate(value)),
         }),
     });
 };
 
-export const updateSchema = (idGenerator: IdGenerator) => {
+export const updateSchema = (idManager: IdManager) => {
     return z.object({
         body: z.discriminatedUnion('type', [
             z.object({
@@ -63,15 +63,15 @@ export const updateSchema = (idGenerator: IdGenerator) => {
             }),
         ]),
         params: z.object({
-            transactionId: z.string().refine((value) => idGenerator.validate(value)),
+            transactionId: z.string().refine((value) => idManager.validate(value)),
         }),
     });
 };
 
-export const deleteSchema = (idGenerator: IdGenerator) => {
+export const deleteSchema = (idManager: IdManager) => {
     return z.object({
         params: z.object({
-            transactionId: z.string().refine((value) => idGenerator.validate(value)),
+            transactionId: z.string().refine((value) => idManager.validate(value)),
         }),
     });
 };

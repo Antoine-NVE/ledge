@@ -2,7 +2,7 @@ import type { UserRepository } from '../../domain/user/user-repository.js';
 import type { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository.js';
 import type { Hasher } from '../ports/hasher.js';
 import type { TokenManager } from '../ports/token-manager.js';
-import type { IdGenerator } from '../ports/id-generator.js';
+import type { IdManager } from '../ports/id-manager.js';
 import type { User } from '../../domain/user/user-types.js';
 import type { RefreshToken } from '../../domain/refresh-token/refresh-token-types.js';
 import type { Result } from '../../core/types/result.js';
@@ -29,14 +29,14 @@ export class RegisterUseCase {
         private refreshTokenRepository: RefreshTokenRepository,
         private hasher: Hasher,
         private tokenManager: TokenManager,
-        private idGenerator: IdGenerator,
+        private idManager: IdManager,
     ) {}
 
     execute = async ({ email, password }: Input): Promise<Result<Output, ConflictError | Error>> => {
         const now = new Date();
 
         const user: User = {
-            id: this.idGenerator.generate(),
+            id: this.idManager.generate(),
             email,
             passwordHash: await this.hasher.hash(password),
             isEmailVerified: false,
@@ -48,7 +48,7 @@ export class RegisterUseCase {
         if (!userResult.success) return fail(userResult.error);
 
         const refreshToken: RefreshToken = {
-            id: this.idGenerator.generate(),
+            id: this.idManager.generate(),
             userId: user.id,
             value: generateToken(),
             expiresAt: new Date(now.getTime() + this.REFRESH_TOKEN_DURATION),
