@@ -2,7 +2,7 @@ import type { Logger } from '../../../application/ports/logger.js';
 import type { NextFunction, Request, Response } from 'express';
 import { generateToken } from '../../../core/utils/token.js';
 
-export const requestLogger = ({ logger }: { logger: Logger }) => {
+export const requestLoggerMiddleware = ({ logger }: { logger: Logger }) => {
     return (req: Request, res: Response, next: NextFunction) => {
         const startTime = performance.now();
 

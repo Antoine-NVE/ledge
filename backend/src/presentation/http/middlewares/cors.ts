@@ -1,7 +1,7 @@
-import c from 'cors';
+import cors from 'cors';
 
-export const cors = ({ allowedOrigins }: { allowedOrigins: string[] }) => {
-    return c({
+export const corsMiddleware = ({ allowedOrigins }: { allowedOrigins: string[] }) => {
+    return cors({
         origin: allowedOrigins,
         credentials: true,
     });

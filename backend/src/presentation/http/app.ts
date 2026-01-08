@@ -1,8 +1,8 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
-import { cors } from './middlewares/cors.js';
-import { rateLimiter } from './middlewares/rate-limiter.js';
-import { errorHandler } from './middlewares/error-handler.js';
+import { corsMiddleware } from './middlewares/cors.js';
+import { rateLimiterMiddleware } from './middlewares/rate-limiter.js';
+import { errorHandlerMiddleware } from './middlewares/error-handler.js';
 import { NotFoundError } from '../../core/errors/not-found-error.js';
 import type { TokenManager } from '../../application/ports/token-manager.js';
 import type { IdGenerator } from '../../application/ports/id-generator.js';
@@ -26,7 +26,7 @@ import { createAuthRoutes } from './routes/auth-routes.js';
 import { createTransactionRoutes } from './routes/transaction-routes.js';
 import { createUserRoutes } from './routes/user-routes.js';
 import type { Logger } from '../../application/ports/logger.js';
-import { requestLogger } from './middlewares/request-logger.js';
+import { requestLoggerMiddleware } from './middlewares/request-logger.js';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -74,11 +74,11 @@ export const createHttpApp = ({
     const app = express();
 
     // Security
-    app.use(cors({ allowedOrigins }));
-    app.use(rateLimiter);
+    app.use(corsMiddleware({ allowedOrigins }));
+    app.use(rateLimiterMiddleware());
 
     // Logger
-    app.use(requestLogger({ logger }));
+    app.use(requestLoggerMiddleware({ logger }));
 
     // Parsing
     app.use(express.json());
@@ -113,7 +113,7 @@ export const createHttpApp = ({
     });
 
     // Error handler
-    app.use(errorHandler);
+    app.use(errorHandlerMiddleware());
 
     return app;
 };
