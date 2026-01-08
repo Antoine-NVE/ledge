@@ -36,7 +36,7 @@ export const errorHandlerMiddleware = () => {
             return;
         }
 
-        // All others errors
+        // All other errors
         res.status(500).json(response);
         req.logger.error(err.message, { err });
     };
