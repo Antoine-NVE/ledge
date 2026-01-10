@@ -1,72 +1,62 @@
-import jwt from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
 import z from 'zod';
 import type { TokenManager } from '../../application/ports/token-manager.js';
-import { UnauthorizedError } from '../../core/errors/unauthorized-error.js';
-import type { Result } from '../../core/types/result.js';
-import { fail, ok } from '../../core/utils/result.js';
 import type { IdManager } from '../../application/ports/id-manager.js';
-
-const verifySchema = (idManager: IdManager) => {
-    return z.object({
-        sub: z.string().refine((value) => idManager.validate(value)),
-        aud: z.string(),
-        iat: z.number(),
-        exp: z.number(),
-    });
-};
+import { AuthenticationError } from '../../application/errors/authentication.error.js';
+import { BusinessRuleError } from '../../application/errors/business-rule.error.js';
+import type { StringValue } from 'ms';
 
 export class JwtTokenManager implements TokenManager {
     constructor(
         private idManager: IdManager,
-        private secret: jwt.Secret,
+        private secret: string,
     ) {}
 
-    private sign = async (payload: { aud: string; sub: string }, options: jwt.SignOptions): Promise<string> => {
-        return jwt.sign(payload, this.secret, options);
+    private sign = (payload: { sub: string }, options: { audience: string; expiresIn: StringValue }): string => {
+        return sign(payload, this.secret, options);
     };
 
     private verify = (
         token: string,
-        options: jwt.VerifyOptions,
-    ): Result<{ sub: string; aud: string; iat: number; exp: number }, UnauthorizedError> => {
+        options: { audience: string },
+    ): { sub: string; aud: string; iat: number; exp: number } => {
+        const schema = (idManager: IdManager) => {
+            return z.object({
+                sub: z.string().refine((value) => idManager.validate(value)),
+                aud: z.string(),
+                iat: z.number(),
+                exp: z.number(),
+            });
+        };
+
+        return schema(this.idManager).parse(verify(token, this.secret, options));
+    };
+
+    signAccess = ({ userId }: { userId: string }): string => {
+        return this.sign({ sub: userId }, { audience: 'access', expiresIn: '15 minutes' });
+    };
+
+    verifyAccess = (accessToken: string): { userId: string } => {
         try {
-            const payload = verifySchema(this.idManager).parse(jwt.verify(token, this.secret, options));
+            const { sub } = this.verify(accessToken, { audience: 'access' });
 
-            return ok(payload);
+            return { userId: sub };
         } catch (err: unknown) {
-            let message = 'Invalid token';
-            if (err instanceof jwt.NotBeforeError) message = 'Inactive token';
-            if (err instanceof jwt.TokenExpiredError) message = 'Expired token';
-
-            return fail(new UnauthorizedError({ message, cause: err }));
+            throw new AuthenticationError();
         }
     };
 
-    signAccess = ({ userId }: { userId: string }): Promise<string> => {
-        return this.sign({ aud: 'access', sub: userId }, { expiresIn: '15m' });
+    signEmailVerification = ({ userId }: { userId: string }): string => {
+        return this.sign({ sub: userId }, { audience: 'email-verification', expiresIn: '1 hour' });
     };
 
-    verifyAccess = (accessToken: string): Result<{ userId: string }, UnauthorizedError> => {
-        const result = this.verify(accessToken, { audience: 'access' });
-        if (!result.success) {
-            return fail(
-                new UnauthorizedError({ message: result.error.message, cause: result.error.cause, action: 'REFRESH' }),
-            );
+    verifyEmailVerification = (emailVerificationToken: string): { userId: string } => {
+        try {
+            const { sub } = this.verify(emailVerificationToken, { audience: 'email-verification' });
+
+            return { userId: sub };
+        } catch (err: unknown) {
+            throw new BusinessRuleError();
         }
-        const { sub } = result.data;
-
-        return ok({ userId: sub });
-    };
-
-    signEmailVerification = ({ userId }: { userId: string }): Promise<string> => {
-        return this.sign({ aud: 'email-verification', sub: userId }, { expiresIn: '1h' });
-    };
-
-    verifyEmailVerification = (emailVerificationToken: string): Result<{ userId: string }, UnauthorizedError> => {
-        const result = this.verify(emailVerificationToken, { audience: 'email-verification' });
-        if (!result.success) return fail(result.error);
-        const { sub } = result.data;
-
-        return ok({ userId: sub });
     };
 }
