@@ -1,8 +1,6 @@
 import type { TransactionRepository } from '../../domain/transaction/transaction-repository.js';
 import type { Transaction } from '../../domain/transaction/transaction-types.js';
 import type { IdManager } from '../ports/id-manager.js';
-import type { Result } from '../../core/types/result.js';
-import { fail, ok } from '../../core/utils/result.js';
 
 type Input = {
     userId: string;
@@ -30,7 +28,7 @@ export class CreateTransactionUseCase {
         private idManager: IdManager,
     ) {}
 
-    execute = async (input: Input): Promise<Result<Output, Error>> => {
+    execute = async (input: Input): Promise<Output> => {
         const now = new Date();
 
         const transaction: Transaction = {
@@ -40,9 +38,8 @@ export class CreateTransactionUseCase {
             updatedAt: now,
         };
 
-        const result = await this.transactionRepository.create(transaction);
-        if (!result.success) return fail(result.error);
+        await this.transactionRepository.create(transaction);
 
-        return ok({ transaction });
+        return { transaction };
     };
 }

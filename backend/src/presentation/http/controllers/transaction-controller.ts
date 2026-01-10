@@ -6,10 +6,12 @@ import type { UpdateTransactionUseCase } from '../../../application/transaction/
 import type { DeleteTransactionUseCase } from '../../../application/transaction/delete-transaction-use-case.js';
 import type { TokenManager } from '../../../application/ports/token-manager.js';
 import type { IdManager } from '../../../application/ports/id-manager.js';
-import type { ApiSuccess } from '../../types/api.js';
+import type { ApiError, ApiSuccess } from '../../types/api.js';
 import type { Transaction } from '../../../domain/transaction/transaction-types.js';
 import { AuthenticatedController } from './authenticated-controller.js';
 import { createSchema, deleteSchema, readSchema, updateSchema } from '../schemas/transaction-schemas.js';
+import { AuthorizationError } from '../../../application/errors/authorization.error.js';
+import { ResourceNotFoundError } from '../../../application/errors/resource-not-found.error.js';
 
 export class TransactionController extends AuthenticatedController {
     constructor(
@@ -29,9 +31,7 @@ export class TransactionController extends AuthenticatedController {
 
         const { body } = this.validate(req, createSchema);
 
-        const result = await this.createTransactionUseCase.execute({ userId, ...body });
-        if (!result.success) throw result.error;
-        const { transaction } = result.data;
+        const { transaction } = await this.createTransactionUseCase.execute({ userId, ...body });
 
         const response: ApiSuccess<{ transaction: Transaction }> = {
             success: true,
@@ -47,9 +47,7 @@ export class TransactionController extends AuthenticatedController {
     readAll = async (req: Request, res: Response) => {
         const userId = this.getUserId(req);
 
-        const result = await this.getUserTransactionsUseCase.execute({ userId });
-        if (!result.success) throw result.error;
-        const { transactions } = result.data;
+        const { transactions } = await this.getUserTransactionsUseCase.execute({ userId });
 
         const response: ApiSuccess<{ transactions: Transaction[] }> = {
             success: true,
@@ -67,19 +65,39 @@ export class TransactionController extends AuthenticatedController {
 
         const { params } = this.validate(req, readSchema(this.idManager));
 
-        const result = await this.getTransactionUseCase.execute({ ...params, userId });
-        if (!result.success) throw result.error;
-        const { transaction } = result.data;
+        try {
+            const { transaction } = await this.getTransactionUseCase.execute({ ...params, userId });
 
-        const response: ApiSuccess<{ transaction: Transaction }> = {
-            success: true,
-            code: 'OK',
-            message: 'Transaction retrieved successfully',
-            data: {
-                transaction,
-            },
-        };
-        res.status(200).json(response);
+            const response: ApiSuccess<{ transaction: Transaction }> = {
+                success: true,
+                code: 'OK',
+                message: 'Transaction retrieved successfully',
+                data: {
+                    transaction,
+                },
+            };
+            res.status(200).json(response);
+        } catch (err: unknown) {
+            if (err instanceof AuthorizationError) {
+                const response: ApiError = {
+                    success: false,
+                    code: 'FORBIDDEN',
+                    message: 'Do not have permission to read this transaction',
+                };
+                res.status(403).json(response);
+                return;
+            }
+            if (err instanceof ResourceNotFoundError) {
+                const response: ApiError = {
+                    success: false,
+                    code: 'NOT_FOUND',
+                    message: 'Transaction not found',
+                };
+                res.status(404).json(response);
+                return;
+            }
+            throw err;
+        }
     };
 
     update = async (req: Request, res: Response) => {
@@ -87,19 +105,39 @@ export class TransactionController extends AuthenticatedController {
 
         const { body, params } = this.validate(req, updateSchema(this.idManager));
 
-        const result = await this.updateTransactionUseCase.execute({ ...params, userId, ...body });
-        if (!result.success) throw result.error;
-        const { transaction } = result.data;
+        try {
+            const { transaction } = await this.updateTransactionUseCase.execute({ ...params, userId, ...body });
 
-        const response: ApiSuccess<{ transaction: Transaction }> = {
-            success: true,
-            code: 'OK',
-            message: 'Transaction updated successfully',
-            data: {
-                transaction,
-            },
-        };
-        res.status(200).json(response);
+            const response: ApiSuccess<{ transaction: Transaction }> = {
+                success: true,
+                code: 'OK',
+                message: 'Transaction updated successfully',
+                data: {
+                    transaction,
+                },
+            };
+            res.status(200).json(response);
+        } catch (err: unknown) {
+            if (err instanceof AuthorizationError) {
+                const response: ApiError = {
+                    success: false,
+                    code: 'FORBIDDEN',
+                    message: 'Do not have permission to update this transaction',
+                };
+                res.status(403).json(response);
+                return;
+            }
+            if (err instanceof ResourceNotFoundError) {
+                const response: ApiError = {
+                    success: false,
+                    code: 'NOT_FOUND',
+                    message: 'Transaction not found',
+                };
+                res.status(404).json(response);
+                return;
+            }
+            throw err;
+        }
     };
 
     delete = async (req: Request, res: Response) => {
@@ -107,18 +145,38 @@ export class TransactionController extends AuthenticatedController {
 
         const { params } = this.validate(req, deleteSchema(this.idManager));
 
-        const result = await this.deleteTransactionUseCase.execute({ ...params, userId });
-        if (!result.success) throw result.error;
-        const { transaction } = result.data;
+        try {
+            const { transaction } = await this.deleteTransactionUseCase.execute({ ...params, userId });
 
-        const response: ApiSuccess<{ transaction: Transaction }> = {
-            success: true,
-            code: 'OK',
-            message: 'Transaction deleted successfully',
-            data: {
-                transaction,
-            },
-        };
-        res.status(200).json(response);
+            const response: ApiSuccess<{ transaction: Transaction }> = {
+                success: true,
+                code: 'OK',
+                message: 'Transaction deleted successfully',
+                data: {
+                    transaction,
+                },
+            };
+            res.status(200).json(response);
+        } catch (err: unknown) {
+            if (err instanceof AuthorizationError) {
+                const response: ApiError = {
+                    success: false,
+                    code: 'FORBIDDEN',
+                    message: 'Do not have permission to delete this transaction',
+                };
+                res.status(403).json(response);
+                return;
+            }
+            if (err instanceof ResourceNotFoundError) {
+                const response: ApiError = {
+                    success: false,
+                    code: 'NOT_FOUND',
+                    message: 'Transaction not found',
+                };
+                res.status(404).json(response);
+                return;
+            }
+            throw err;
+        }
     };
 }
