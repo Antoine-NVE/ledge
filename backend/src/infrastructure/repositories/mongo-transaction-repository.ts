@@ -1,10 +1,6 @@
 import { Collection, ObjectId } from 'mongodb';
 import type { TransactionRepository } from '../../domain/transaction/transaction-repository.js';
 import type { Transaction } from '../../domain/transaction/transaction-types.js';
-import { NotFoundError } from '../../core/errors/not-found-error.js';
-import type { Result } from '../../core/types/result.js';
-import { fail, ok } from '../../core/utils/result.js';
-import { ensureError } from '../../core/utils/error.js';
 
 type ExpenseDocument = {
     _id: ObjectId;
@@ -61,61 +57,41 @@ export class MongoTransactionRepository implements TransactionRepository {
         };
     };
 
-    create = async (transaction: Transaction): Promise<Result<void, Error>> => {
+    create = async (transaction: Transaction): Promise<void> => {
         const document = this.toDocument(transaction);
-        try {
-            await this.transactionCollection.insertOne(document);
-            return ok(undefined);
-        } catch (err: unknown) {
-            return fail(ensureError(err));
-        }
+
+        await this.transactionCollection.insertOne(document);
     };
 
-    findManyByUserId = async (userId: string): Promise<Result<Transaction[], Error>> => {
-        try {
-            const documents = await this.transactionCollection.find({ userId: new ObjectId(userId) }).toArray();
-            return ok(documents.map((document) => this.toDomain(document)));
-        } catch (err: unknown) {
-            return fail(ensureError(err));
-        }
+    findManyByUserId = async (userId: string): Promise<Transaction[]> => {
+        const documents = await this.transactionCollection.find({ userId: new ObjectId(userId) }).toArray();
+
+        return documents.map((document) => this.toDomain(document));
     };
 
-    getById = async (id: string): Promise<Result<Transaction, Error | NotFoundError>> => {
-        try {
-            const document = await this.transactionCollection.findOne({ _id: new ObjectId(id) });
-            if (!document) return fail(new NotFoundError({ message: 'Transaction not found' }));
-            return ok(this.toDomain(document));
-        } catch (err: unknown) {
-            return fail(ensureError(err));
-        }
+    findById = async (id: string): Promise<Transaction | null> => {
+        const document = await this.transactionCollection.findOne({ _id: new ObjectId(id) });
+
+        return document ? this.toDomain(document) : null;
     };
 
-    save = async (transaction: Transaction): Promise<Result<void, Error | NotFoundError>> => {
+    save = async (transaction: Transaction): Promise<void> => {
         const { _id, ...rest } = this.toDocument(transaction);
-        try {
-            const result = await this.transactionCollection.updateOne(
-                { _id },
-                {
-                    $set: rest,
-                    $unset: {
-                        ...(!('expenseCategory' in rest) && { expenseCategory: 1 }),
-                    },
+
+        await this.transactionCollection.updateOne(
+            { _id },
+            {
+                $set: rest,
+                $unset: {
+                    ...(!('expenseCategory' in rest) && { expenseCategory: 1 }),
                 },
-            );
-            if (result.matchedCount === 0) return fail(new NotFoundError({ message: 'Transaction not found' }));
-            return ok(undefined);
-        } catch (err: unknown) {
-            return fail(ensureError(err));
-        }
+            },
+        );
     };
 
-    delete = async (transaction: Transaction): Promise<Result<void, Error | NotFoundError>> => {
-        try {
-            const result = await this.transactionCollection.deleteOne({ _id: new ObjectId(transaction.id) });
-            if (result.deletedCount === 0) return fail(new NotFoundError({ message: 'Transaction not found' }));
-            return ok(undefined);
-        } catch (err: unknown) {
-            return fail(ensureError(err));
-        }
+    delete = async (transaction: Transaction): Promise<void> => {
+        const { _id } = this.toDocument(transaction);
+
+        await this.transactionCollection.deleteOne({ _id });
     };
 }

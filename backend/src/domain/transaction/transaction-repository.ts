@@ -1,11 +1,9 @@
 import type { Transaction } from './transaction-types.js';
-import { NotFoundError } from '../../core/errors/not-found-error.js';
-import type { Result } from '../../core/types/result.js';
 
 export interface TransactionRepository {
-    create: (transaction: Transaction) => Promise<Result<void, Error>>;
-    findManyByUserId: (userId: string) => Promise<Result<Transaction[], Error>>;
-    getById: (id: string) => Promise<Result<Transaction, Error | NotFoundError>>;
-    save: (transaction: Transaction) => Promise<Result<void, Error | NotFoundError>>;
-    delete: (transaction: Transaction) => Promise<Result<void, Error | NotFoundError>>;
+    create: (transaction: Transaction) => Promise<void>;
+    findManyByUserId: (userId: string) => Promise<Transaction[]>;
+    findById: (id: string) => Promise<Transaction | null>;
+    save: (transaction: Transaction) => Promise<void>;
+    delete: (transaction: Transaction) => Promise<void>;
 }
