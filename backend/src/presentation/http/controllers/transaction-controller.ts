@@ -12,6 +12,8 @@ import { AuthenticatedController } from './authenticated-controller.js';
 import { createSchema, deleteSchema, readSchema, updateSchema } from '../schemas/transaction-schemas.js';
 import { AuthorizationError } from '../../../application/errors/authorization.error.js';
 import { ResourceNotFoundError } from '../../../application/errors/resource-not-found.error.js';
+import { ValidationError } from '../../errors/validation.error.js';
+import { AuthenticationError } from '../../../application/errors/authentication.error.js';
 
 export class TransactionController extends AuthenticatedController {
     constructor(
@@ -27,45 +29,81 @@ export class TransactionController extends AuthenticatedController {
     }
 
     create = async (req: Request, res: Response) => {
-        const userId = this.getUserId(req);
+        try {
+            const userId = this.getUserId(req);
 
-        const { body } = this.validate(req, createSchema);
+            const { body } = this.validate(req, createSchema);
 
-        const { transaction } = await this.createTransactionUseCase.execute({ userId, ...body });
+            const { transaction } = await this.createTransactionUseCase.execute({ userId, ...body });
 
-        const response: ApiSuccess<{ transaction: Transaction }> = {
-            success: true,
-            code: 'CREATED',
-            message: 'Transaction created successfully',
-            data: {
-                transaction,
-            },
-        };
-        res.status(201).json(response);
+            const response: ApiSuccess<{ transaction: Transaction }> = {
+                success: true,
+                code: 'CREATED',
+                message: 'Transaction created successfully',
+                data: {
+                    transaction,
+                },
+            };
+            res.status(201).json(response);
+        } catch (err: unknown) {
+            if (err instanceof ValidationError) {
+                const response: ApiError = {
+                    success: false,
+                    code: 'BAD_REQUEST',
+                    message: 'Invalid data',
+                    issues: err.issues,
+                };
+                res.status(400).json(response);
+                return;
+            }
+            if (err instanceof AuthenticationError) {
+                const response: ApiError = {
+                    success: false,
+                    code: 'UNAUTHORIZED',
+                    message: 'Please login',
+                };
+                res.status(401).json(response);
+                return;
+            }
+            throw err;
+        }
     };
 
     readAll = async (req: Request, res: Response) => {
-        const userId = this.getUserId(req);
+        try {
+            const userId = this.getUserId(req);
 
-        const { transactions } = await this.getUserTransactionsUseCase.execute({ userId });
+            const { transactions } = await this.getUserTransactionsUseCase.execute({ userId });
 
-        const response: ApiSuccess<{ transactions: Transaction[] }> = {
-            success: true,
-            code: 'OK',
-            message: 'Transactions retrieved successfully',
-            data: {
-                transactions,
-            },
-        };
-        res.status(200).json(response);
+            const response: ApiSuccess<{ transactions: Transaction[] }> = {
+                success: true,
+                code: 'OK',
+                message: 'Transactions retrieved successfully',
+                data: {
+                    transactions,
+                },
+            };
+            res.status(200).json(response);
+        } catch (err: unknown) {
+            if (err instanceof AuthenticationError) {
+                const response: ApiError = {
+                    success: false,
+                    code: 'UNAUTHORIZED',
+                    message: 'Please login',
+                };
+                res.status(401).json(response);
+                return;
+            }
+            throw err;
+        }
     };
 
     read = async (req: Request, res: Response) => {
-        const userId = this.getUserId(req);
-
-        const { params } = this.validate(req, readSchema(this.idManager));
-
         try {
+            const userId = this.getUserId(req);
+
+            const { params } = this.validate(req, readSchema(this.idManager));
+
             const { transaction } = await this.getTransactionUseCase.execute({ ...params, userId });
 
             const response: ApiSuccess<{ transaction: Transaction }> = {
@@ -78,6 +116,25 @@ export class TransactionController extends AuthenticatedController {
             };
             res.status(200).json(response);
         } catch (err: unknown) {
+            if (err instanceof ValidationError) {
+                const response: ApiError = {
+                    success: false,
+                    code: 'BAD_REQUEST',
+                    message: 'Invalid data',
+                    issues: err.issues,
+                };
+                res.status(400).json(response);
+                return;
+            }
+            if (err instanceof AuthenticationError) {
+                const response: ApiError = {
+                    success: false,
+                    code: 'UNAUTHORIZED',
+                    message: 'Please login',
+                };
+                res.status(401).json(response);
+                return;
+            }
             if (err instanceof AuthorizationError) {
                 const response: ApiError = {
                     success: false,
@@ -101,11 +158,11 @@ export class TransactionController extends AuthenticatedController {
     };
 
     update = async (req: Request, res: Response) => {
-        const userId = this.getUserId(req);
-
-        const { body, params } = this.validate(req, updateSchema(this.idManager));
-
         try {
+            const userId = this.getUserId(req);
+
+            const { body, params } = this.validate(req, updateSchema(this.idManager));
+
             const { transaction } = await this.updateTransactionUseCase.execute({ ...params, userId, ...body });
 
             const response: ApiSuccess<{ transaction: Transaction }> = {
@@ -118,6 +175,25 @@ export class TransactionController extends AuthenticatedController {
             };
             res.status(200).json(response);
         } catch (err: unknown) {
+            if (err instanceof ValidationError) {
+                const response: ApiError = {
+                    success: false,
+                    code: 'BAD_REQUEST',
+                    message: 'Invalid data',
+                    issues: err.issues,
+                };
+                res.status(400).json(response);
+                return;
+            }
+            if (err instanceof AuthenticationError) {
+                const response: ApiError = {
+                    success: false,
+                    code: 'UNAUTHORIZED',
+                    message: 'Please login',
+                };
+                res.status(401).json(response);
+                return;
+            }
             if (err instanceof AuthorizationError) {
                 const response: ApiError = {
                     success: false,
@@ -141,11 +217,11 @@ export class TransactionController extends AuthenticatedController {
     };
 
     delete = async (req: Request, res: Response) => {
-        const userId = this.getUserId(req);
-
-        const { params } = this.validate(req, deleteSchema(this.idManager));
-
         try {
+            const userId = this.getUserId(req);
+
+            const { params } = this.validate(req, deleteSchema(this.idManager));
+
             const { transaction } = await this.deleteTransactionUseCase.execute({ ...params, userId });
 
             const response: ApiSuccess<{ transaction: Transaction }> = {
@@ -158,6 +234,25 @@ export class TransactionController extends AuthenticatedController {
             };
             res.status(200).json(response);
         } catch (err: unknown) {
+            if (err instanceof ValidationError) {
+                const response: ApiError = {
+                    success: false,
+                    code: 'BAD_REQUEST',
+                    message: 'Invalid data',
+                    issues: err.issues,
+                };
+                res.status(400).json(response);
+                return;
+            }
+            if (err instanceof AuthenticationError) {
+                const response: ApiError = {
+                    success: false,
+                    code: 'UNAUTHORIZED',
+                    message: 'Please login',
+                };
+                res.status(401).json(response);
+                return;
+            }
             if (err instanceof AuthorizationError) {
                 const response: ApiError = {
                     success: false,

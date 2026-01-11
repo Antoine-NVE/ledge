@@ -1,21 +1,23 @@
 import { type ZodType } from 'zod';
-import { BadRequestError } from '../../../core/errors/bad-request-error.js';
 import type { Request, Response } from 'express';
-import { UnauthorizedError } from '../../../core/errors/unauthorized-error.js';
+import { ValidationError } from '../../errors/validation.error.js';
 
 export abstract class BaseController {
     protected constructor() {}
 
-    protected validate<T>(req: Request, schema: ZodType<T>): T {
-        // We could probably parse the whole req, but it's maybe not really optimal
-        const validationTarget = {
-            body: req.body,
-            params: req.params,
-            query: req.query,
-        };
-
-        const result = schema.safeParse(validationTarget);
-        if (!result.success) throw new BadRequestError({ cause: result.error });
+    protected validate<T>(
+        req: Request,
+        schema: ZodType<
+            T,
+            {
+                body?: unknown;
+                params?: unknown;
+                query?: unknown;
+            }
+        >,
+    ): T {
+        const result = schema.safeParse(req);
+        if (!result.success) throw new ValidationError(result.error.issues);
 
         return result.data;
     }
@@ -52,23 +54,15 @@ export abstract class BaseController {
         res.clearCookie('remember_me');
     }
 
-    protected getAccessToken(req: Request): string {
-        const accessToken = req.cookies['access_token'];
-        if (!accessToken) throw new UnauthorizedError({ message: 'Missing access token', action: 'REFRESH' });
-        return accessToken;
+    protected findAccessToken(req: Request): string | null {
+        return req.cookies['access_token'] ?? null;
     }
 
     protected findRefreshToken(req: Request): string | null {
         return req.cookies['refresh_token'] ?? null;
     }
 
-    protected getRefreshToken(req: Request): string {
-        const refreshToken = this.findRefreshToken(req);
-        if (!refreshToken) throw new UnauthorizedError({ message: 'Missing refresh token', action: 'LOGIN' });
-        return refreshToken;
-    }
-
-    protected getRememberMe(req: Request): boolean {
+    protected findRememberMe(req: Request): boolean {
         return req.cookies['remember_me'] === 'true';
     }
 }

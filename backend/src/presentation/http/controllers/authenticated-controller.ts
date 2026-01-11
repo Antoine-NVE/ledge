@@ -1,6 +1,7 @@
 import { BaseController } from './base-controller.js';
 import type { TokenManager } from '../../../application/ports/token-manager.js';
 import type { Request } from 'express';
+import { AuthenticationError } from '../../../application/errors/authentication.error.js';
 
 export abstract class AuthenticatedController extends BaseController {
     protected constructor(private tokenManager: TokenManager) {
@@ -8,11 +9,10 @@ export abstract class AuthenticatedController extends BaseController {
     }
 
     protected getUserId(req: Request): string {
-        const accessToken = this.getAccessToken(req);
+        const accessToken = this.findAccessToken(req);
+        if (!accessToken) throw new AuthenticationError();
 
-        const result = this.tokenManager.verifyAccess(accessToken);
-        if (!result.success) throw result.error;
-        const { userId } = result.data;
+        const { userId } = this.tokenManager.verifyAccess(accessToken);
 
         return userId;
     }
