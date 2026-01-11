@@ -1,4 +1,4 @@
-import { sign, verify } from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import z from 'zod';
 import type { TokenManager } from '../../application/ports/token-manager.js';
 import type { IdManager } from '../../application/ports/id-manager.js';
@@ -13,7 +13,7 @@ export class JwtTokenManager implements TokenManager {
     ) {}
 
     private sign = (payload: { sub: string }, options: { audience: string; expiresIn: StringValue }): string => {
-        return sign(payload, this.secret, options);
+        return jwt.sign(payload, this.secret, options);
     };
 
     private verify = (
@@ -29,7 +29,7 @@ export class JwtTokenManager implements TokenManager {
             });
         };
 
-        return schema(this.idManager).parse(verify(token, this.secret, options));
+        return schema(this.idManager).parse(jwt.verify(token, this.secret, options));
     };
 
     signAccess = ({ userId }: { userId: string }): string => {
