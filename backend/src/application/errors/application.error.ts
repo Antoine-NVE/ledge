@@ -1,6 +1,11 @@
+export type ApplicationErrorOptions = {
+    message?: string;
+    cause?: unknown;
+};
+
 export abstract class ApplicationError extends Error {
-    constructor(message?: string) {
-        super(message);
+    protected constructor(defaultMessage: string, { message, cause }: ApplicationErrorOptions = {}) {
+        super(message ?? defaultMessage, { cause });
         this.name = this.constructor.name;
     }
 }
