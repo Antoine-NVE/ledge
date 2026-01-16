@@ -37,7 +37,6 @@ export class UpdateTransactionUseCase {
             ...rest,
             updatedAt: new Date(),
         };
-
         await this.transactionRepository.save(updatedTransaction);
 
         return { transaction: updatedTransaction };

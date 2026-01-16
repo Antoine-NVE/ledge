@@ -37,7 +37,6 @@ export class CreateTransactionUseCase {
             createdAt: now,
             updatedAt: now,
         };
-
         await this.transactionRepository.create(transaction);
 
         return { transaction };
