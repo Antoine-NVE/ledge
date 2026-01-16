@@ -20,16 +20,14 @@ export class JwtTokenManager implements TokenManager {
         token: string,
         options: { audience: string },
     ): { sub: string; aud: string; iat: number; exp: number } => {
-        const schema = (idManager: IdManager) => {
-            return z.object({
-                sub: z.string().refine((value) => idManager.validate(value)),
-                aud: z.string(),
-                iat: z.number(),
-                exp: z.number(),
-            });
-        };
+        const schema = z.object({
+            sub: z.string().refine((value) => this.idManager.validate(value)),
+            aud: z.string(),
+            iat: z.number(),
+            exp: z.number(),
+        });
 
-        return schema(this.idManager).parse(jwt.verify(token, this.secret, options));
+        return schema.parse(jwt.verify(token, this.secret, options));
     };
 
     signAccess = ({ userId }: { userId: string }): string => {
@@ -42,7 +40,7 @@ export class JwtTokenManager implements TokenManager {
 
             return { userId: sub };
         } catch (err: unknown) {
-            throw new AuthenticationError();
+            throw new AuthenticationError({ cause: err });
         }
     };
 
@@ -56,7 +54,7 @@ export class JwtTokenManager implements TokenManager {
 
             return { userId: sub };
         } catch (err: unknown) {
-            throw new BusinessRuleError();
+            throw new BusinessRuleError({ cause: err });
         }
     };
 }
