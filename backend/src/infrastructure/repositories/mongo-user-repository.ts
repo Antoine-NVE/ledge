@@ -1,6 +1,7 @@
 import { Collection, MongoServerError, ObjectId } from 'mongodb';
 import type { UserRepository } from '../../domain/user/user-repository.js';
 import type { User } from '../../domain/user/user-types.js';
+import { BusinessRuleError } from '../../application/errors/business-rule.error.js';
 
 type UserDocument = {
     _id: ObjectId;
@@ -29,10 +30,17 @@ export class MongoUserRepository implements UserRepository {
     };
 
     create = async (user: User): Promise<void> => {
-        // TODO: check for duplicate email
         const document = this.toDocument(user);
 
-        await this.userCollection.insertOne(document);
+        try {
+            await this.userCollection.insertOne(document);
+        } catch (err: unknown) {
+            if (err instanceof MongoServerError && err.code === 11000) {
+                // Here is a rare case where we throw an ApplicationError from infrastructure layer
+                throw new BusinessRuleError();
+            }
+            throw err;
+        }
     };
 
     findById = async (id: string): Promise<User | null> => {

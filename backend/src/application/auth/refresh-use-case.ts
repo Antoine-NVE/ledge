@@ -1,10 +1,8 @@
 import type { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository.js';
 import type { TokenManager } from '../ports/token-manager.js';
-import type { Result } from '../../core/types/result.js';
-import { fail, ok } from '../../core/utils/result.js';
-import { UnauthorizedError } from '../../core/errors/unauthorized-error.js';
-import { NotFoundError } from '../../core/errors/not-found-error.js';
 import type { TokenGenerator } from '../ports/token-generator.js';
+import { AuthenticationError } from '../errors/authentication.error.js';
+import type { RefreshToken } from '../../domain/refresh-token/refresh-token-types.js';
 
 type Input = {
     refreshToken: string;
@@ -24,26 +22,22 @@ export class RefreshUseCase {
         private tokenGenerator: TokenGenerator,
     ) {}
 
-    execute = async (input: Input): Promise<Result<Output, Error | NotFoundError | UnauthorizedError>> => {
+    execute = async (input: Input): Promise<Output> => {
         const now = new Date();
 
-        const findResult = await this.refreshTokenRepository.findByValue(input.refreshToken);
-        if (!findResult.success) return fail(findResult.error);
-        const refreshToken = findResult.data;
+        const refreshToken = await this.refreshTokenRepository.findByValue(input.refreshToken);
+        if (!refreshToken || refreshToken.expiresAt < now) throw new AuthenticationError();
 
-        if (!refreshToken) return fail(new UnauthorizedError({ message: 'Invalid refresh token', action: 'LOGIN' }));
-        if (refreshToken.expiresAt < now)
-            return fail(new UnauthorizedError({ message: 'Expired refresh token', action: 'LOGIN' }));
+        const updatedRefreshToken: RefreshToken = {
+            ...refreshToken,
+            value: this.tokenGenerator.generate(),
+            expiresAt: new Date(now.getTime() + this.REFRESH_TOKEN_DURATION),
+            updatedAt: now,
+        };
+        await this.refreshTokenRepository.save(updatedRefreshToken);
 
-        refreshToken.value = this.tokenGenerator.generate();
-        refreshToken.expiresAt = new Date(now.getTime() + this.REFRESH_TOKEN_DURATION);
-        refreshToken.updatedAt = now;
+        const accessToken = this.tokenManager.signAccess({ userId: refreshToken.userId });
 
-        const saveResult = await this.refreshTokenRepository.save(refreshToken);
-        if (!saveResult.success) return fail(saveResult.error);
-
-        const accessToken = await this.tokenManager.signAccess({ userId: refreshToken.userId });
-
-        return ok({ accessToken, newRefreshToken: refreshToken.value });
+        return { accessToken, newRefreshToken: updatedRefreshToken.value };
     };
 }

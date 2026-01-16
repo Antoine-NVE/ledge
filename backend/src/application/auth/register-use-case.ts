@@ -5,9 +5,6 @@ import type { TokenManager } from '../ports/token-manager.js';
 import type { IdManager } from '../ports/id-manager.js';
 import type { User } from '../../domain/user/user-types.js';
 import type { RefreshToken } from '../../domain/refresh-token/refresh-token-types.js';
-import type { Result } from '../../core/types/result.js';
-import { fail, ok } from '../../core/utils/result.js';
-import { ConflictError } from '../../core/errors/conflict-error.js';
 import type { TokenGenerator } from '../ports/token-generator.js';
 
 type Input = {
@@ -33,7 +30,7 @@ export class RegisterUseCase {
         private tokenGenerator: TokenGenerator,
     ) {}
 
-    execute = async ({ email, password }: Input): Promise<Result<Output, ConflictError | Error>> => {
+    execute = async ({ email, password }: Input): Promise<Output> => {
         const now = new Date();
 
         const user: User = {
@@ -44,9 +41,7 @@ export class RegisterUseCase {
             createdAt: now,
             updatedAt: now,
         };
-
-        const userResult = await this.userRepository.create(user);
-        if (!userResult.success) return fail(userResult.error);
+        await this.userRepository.create(user);
 
         const refreshToken: RefreshToken = {
             id: this.idManager.generate(),
@@ -56,12 +51,10 @@ export class RegisterUseCase {
             createdAt: now,
             updatedAt: now,
         };
+        await this.refreshTokenRepository.create(refreshToken);
 
-        const refreshTokenResult = await this.refreshTokenRepository.create(refreshToken);
-        if (!refreshTokenResult.success) return fail(refreshTokenResult.error);
+        const accessToken = this.tokenManager.signAccess({ userId: user.id });
 
-        const accessToken = await this.tokenManager.signAccess({ userId: user.id });
-
-        return ok({ user, accessToken, refreshToken: refreshToken.value });
+        return { user, accessToken, refreshToken: refreshToken.value };
     };
 }

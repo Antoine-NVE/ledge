@@ -4,11 +4,9 @@ import type { Hasher } from '../ports/hasher.js';
 import type { TokenManager } from '../ports/token-manager.js';
 import type { User } from '../../domain/user/user-types.js';
 import type { RefreshToken } from '../../domain/refresh-token/refresh-token-types.js';
-import type { Result } from '../../core/types/result.js';
-import { fail, ok } from '../../core/utils/result.js';
-import { UnauthorizedError } from '../../core/errors/unauthorized-error.js';
 import type { IdManager } from '../ports/id-manager.js';
 import type { TokenGenerator } from '../ports/token-generator.js';
+import { AuthenticationError } from '../errors/authentication.error.js';
 
 type Input = {
     email: string;
@@ -33,17 +31,14 @@ export class LoginUseCase {
         private tokenGenerator: TokenGenerator,
     ) {}
 
-    execute = async ({ email, password }: Input): Promise<Result<Output, Error | UnauthorizedError>> => {
+    execute = async ({ email, password }: Input): Promise<Output> => {
         const now = new Date();
 
-        const userResult = await this.userRepository.findByEmail(email);
-        if (!userResult.success) return fail(userResult.error);
-        const user = userResult.data;
-
-        if (!user) return fail(new UnauthorizedError({ message: 'Invalid credentials' }));
+        const user = await this.userRepository.findByEmail(email);
+        if (!user) throw new AuthenticationError();
 
         const isValidPassword = await this.hasher.compare(password, user.passwordHash);
-        if (!isValidPassword) return fail(new UnauthorizedError({ message: 'Invalid credentials' }));
+        if (!isValidPassword) throw new AuthenticationError();
 
         const refreshToken: RefreshToken = {
             id: this.idManager.generate(),
@@ -53,12 +48,10 @@ export class LoginUseCase {
             createdAt: now,
             updatedAt: now,
         };
+        await this.refreshTokenRepository.create(refreshToken);
 
-        const refreshTokenResult = await this.refreshTokenRepository.create(refreshToken);
-        if (!refreshTokenResult.success) return fail(refreshTokenResult.error);
+        const accessToken = this.tokenManager.signAccess({ userId: user.id });
 
-        const accessToken = await this.tokenManager.signAccess({ userId: user.id });
-
-        return ok({ user, accessToken, refreshToken: refreshToken.value });
+        return { user, accessToken, refreshToken: refreshToken.value };
     };
 }
