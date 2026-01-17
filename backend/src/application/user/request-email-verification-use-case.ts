@@ -2,11 +2,8 @@ import type { EmailSender } from '../ports/email-sender.js';
 import type { UserRepository } from '../../domain/user/user-repository.js';
 import type { TokenManager } from '../ports/token-manager.js';
 import type { CacheStore } from '../ports/cache-store.js';
-import { fail, ok } from '../../core/utils/result.js';
-import { UnauthorizedError } from '../../core/errors/unauthorized-error.js';
-import { TooManyRequestsError } from '../../core/errors/too-many-requests-error.js';
-import { ConflictError } from '../../core/errors/conflict-error.js';
-import type { Result } from '../../core/types/result.js';
+import { AuthenticationError } from '../errors/authentication.error.js';
+import { BusinessRuleError } from '../errors/business-rule.error.js';
 
 type Input = {
     userId: string;
@@ -24,37 +21,21 @@ export class RequestEmailVerificationUseCase {
         private emailFrom: string,
     ) {}
 
-    execute = async ({
-        userId,
-        frontendBaseUrl,
-    }: Input): Promise<Result<Output, ConflictError | Error | TooManyRequestsError | UnauthorizedError>> => {
-        const result = await this.userRepository.findById(userId);
-        if (!result.success) return fail(result.error);
-        const user = result.data;
+    execute = async ({ userId, frontendBaseUrl }: Input): Promise<Output> => {
+        const user = await this.userRepository.findById(userId);
+        if (!user) throw new AuthenticationError();
+        if (user.isEmailVerified) throw new BusinessRuleError('EMAIL_ALREADY_VERIFIED');
 
-        if (!user) return fail(new UnauthorizedError({ action: 'LOGIN' }));
-        if (user.isEmailVerified) return fail(new ConflictError({ message: 'Email already verified' }));
+        const activeCooldown = await this.cacheStore.hasEmailVerificationCooldown(user.id);
+        if (activeCooldown) throw new BusinessRuleError('ACTIVE_COOLDOWN');
 
-        const hasCooldownResult = await this.cacheStore.hasEmailVerificationCooldown(user.id);
-        if (!hasCooldownResult.success) return fail(hasCooldownResult.error);
-        const hasCooldown = hasCooldownResult.data;
-
-        if (hasCooldown)
-            return fail(
-                new TooManyRequestsError({ message: 'Please wait before requesting another email verification' }),
-            );
-
-        const emailResult = await this.emailSender.sendEmailVerification({
+        await this.emailSender.sendEmailVerification({
             from: this.emailFrom,
             to: user.email,
             frontendBaseUrl,
-            emailVerificationToken: await this.tokenManager.signEmailVerification({ userId }),
+            emailVerificationToken: this.tokenManager.signEmailVerification({ userId }),
         });
-        if (!emailResult.success) return fail(emailResult.error);
 
-        const setCooldownResult = await this.cacheStore.setEmailVerificationCooldown(user.id);
-        if (!setCooldownResult.success) return fail(setCooldownResult.error);
-
-        return ok(undefined);
+        await this.cacheStore.setEmailVerificationCooldown(user.id);
     };
 }

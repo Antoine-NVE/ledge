@@ -50,7 +50,7 @@ export class AuthController extends BaseController {
                 res.status(400).json(response);
                 return;
             }
-            if (err instanceof BusinessRuleError) {
+            if (err instanceof BusinessRuleError && err.reason === 'DUPLICATE_EMAIL') {
                 const response: ApiError = {
                     success: false,
                     code: 'CONFLICT_ERROR',

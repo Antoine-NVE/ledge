@@ -35,9 +35,9 @@ export class MongoUserRepository implements UserRepository {
         try {
             await this.userCollection.insertOne(document);
         } catch (err: unknown) {
-            if (err instanceof MongoServerError && err.code === 11000) {
+            if (err instanceof MongoServerError && err.code === 11000 && err.keyPattern.email) {
                 // Here is a rare case where we throw an ApplicationError from infrastructure layer
-                throw new BusinessRuleError();
+                throw new BusinessRuleError('DUPLICATE_EMAIL');
             }
             throw err;
         }

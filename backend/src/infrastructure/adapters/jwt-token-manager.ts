@@ -54,7 +54,7 @@ export class JwtTokenManager implements TokenManager {
 
             return { userId: sub };
         } catch (err: unknown) {
-            throw new BusinessRuleError({ cause: err });
+            throw new BusinessRuleError('INVALID_TOKEN', { cause: err });
         }
     };
 }

@@ -3,11 +3,11 @@ export interface EmailSender {
         from,
         to,
         frontendBaseUrl,
-        token,
+        emailVerificationToken,
     }: {
         from: string;
         to: string;
         frontendBaseUrl: string;
-        token: string;
+        emailVerificationToken: string;
     }) => Promise<void>;
 }
