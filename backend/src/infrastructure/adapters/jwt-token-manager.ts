@@ -16,10 +16,7 @@ export class JwtTokenManager implements TokenManager {
         return jwt.sign(payload, this.secret, options);
     };
 
-    private verify = (
-        token: string,
-        options: { audience: string },
-    ): { sub: string; aud: string; iat: number; exp: number } => {
+    private verify = (token: string, options: { audience: string }): z.infer<typeof schema> => {
         const schema = z.object({
             sub: z.string().refine((value) => this.idManager.validate(value)),
             aud: z.string(),

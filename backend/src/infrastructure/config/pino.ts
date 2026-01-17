@@ -1,9 +1,16 @@
 import pino, { type Logger as BaseLogger } from 'pino';
 
-export const createBaseLogger = ({ nodeEnv, lokiUrl }: { nodeEnv: 'development' | 'production'; lokiUrl: string }) => {
+type Input = {
+    nodeEnv: 'development' | 'production';
+    lokiUrl: string;
+};
+
+type Output = BaseLogger;
+
+export const createBaseLogger = ({ nodeEnv, lokiUrl }: Input): Output => {
     const isDev = nodeEnv === 'development';
 
-    const baseLogger: BaseLogger = pino({
+    return pino({
         level: isDev ? 'debug' : 'info', // Minimum level to show. List: fatal > error > warn > info > debug > trace
         transport: isDev
             ? {
@@ -23,6 +30,4 @@ export const createBaseLogger = ({ nodeEnv, lokiUrl }: { nodeEnv: 'development' 
                   },
               },
     });
-
-    return baseLogger;
 };
