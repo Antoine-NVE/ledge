@@ -72,7 +72,7 @@ export class UserController extends AuthenticatedController {
                     code: 'TOO_MANY_REQUESTS',
                     message: 'Please wait before requesting another email verification',
                 };
-                res.status(429).json(response);
+                res.status(409).json(response);
                 return;
             }
             throw err;

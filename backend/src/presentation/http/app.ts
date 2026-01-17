@@ -3,7 +3,6 @@ import cookieParser from 'cookie-parser';
 import { corsMiddleware } from './middlewares/cors.js';
 import { rateLimiterMiddleware } from './middlewares/rate-limiter.js';
 import { errorHandlerMiddleware } from './middlewares/error-handler.js';
-import { NotFoundError } from '../../core/errors/not-found-error.js';
 import type { TokenManager } from '../../application/ports/token-manager.js';
 import type { IdManager } from '../../application/ports/id-manager.js';
 import type { RegisterUseCase } from '../../application/auth/register-use-case.js';
@@ -28,6 +27,8 @@ import { createUserRoutes } from './routes/user-routes.js';
 import type { Logger } from '../../application/ports/logger.js';
 import { requestLoggerMiddleware } from './middlewares/request-logger.js';
 import type { TokenGenerator } from '../../application/ports/token-generator.js';
+import type { ApiError } from '../types/api.js';
+import type { Request, Response } from 'express';
 
 declare module 'express-serve-static-core' {
     interface Request {
@@ -111,8 +112,13 @@ export const createHttpApp = ({
     app.use('/auth', createAuthRoutes(authController));
     app.use('/transactions', createTransactionRoutes(transactionController));
     app.use('/users', createUserRoutes(userController));
-    app.use(() => {
-        throw new NotFoundError({ message: 'Route not found' });
+    app.use((req: Request, res: Response) => {
+        const response: ApiError = {
+            success: false,
+            code: 'NOT_FOUND',
+            message: 'Route not found',
+        };
+        res.status(404).json(response);
     });
 
     // Error handler
