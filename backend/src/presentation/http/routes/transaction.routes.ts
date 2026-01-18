@@ -1,5 +1,5 @@
 import express from 'express';
-import type { TransactionController } from '../controllers/transaction-controller.js';
+import type { TransactionController } from '../controllers/transaction.controller.js';
 
 export const createTransactionRoutes = (transactionController: TransactionController) => {
     const router = express.Router();

@@ -1,6 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { ensureError } from '../../../core/utils/error.js';
-import type { ApiError } from '../../types/api.js';
+import type { ApiError } from '../../types/api-response.js';
 
 export const errorHandlerMiddleware = () => {
     return (

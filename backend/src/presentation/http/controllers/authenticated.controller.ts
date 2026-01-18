@@ -1,4 +1,4 @@
-import { BaseController } from './base-controller.js';
+import { BaseController } from './base.controller.js';
 import type { TokenManager } from '../../../domain/ports/token-manager.js';
 import type { Request } from 'express';
 import { AuthenticationError } from '../../../application/errors/authentication.error.js';
