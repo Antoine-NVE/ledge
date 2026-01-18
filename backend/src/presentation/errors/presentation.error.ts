@@ -4,8 +4,8 @@ export type PresentationErrorOptions = {
 };
 
 export abstract class PresentationError extends Error {
-    protected constructor(defaultMessage: string, { message, cause }: PresentationErrorOptions = {}) {
-        super(message ?? defaultMessage, { cause });
+    protected constructor(defaultMessage: string, options?: PresentationErrorOptions) {
+        super(options?.message ?? defaultMessage, { cause: options?.cause });
         this.name = this.constructor.name;
     }
 }

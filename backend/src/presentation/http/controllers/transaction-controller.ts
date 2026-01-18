@@ -4,10 +4,10 @@ import type { GetUserTransactionsUseCase } from '../../../application/transactio
 import type { GetTransactionUseCase } from '../../../application/transaction/get-transaction-use-case.js';
 import type { UpdateTransactionUseCase } from '../../../application/transaction/update-transaction-use-case.js';
 import type { DeleteTransactionUseCase } from '../../../application/transaction/delete-transaction-use-case.js';
-import type { TokenManager } from '../../../application/ports/token-manager.js';
-import type { IdManager } from '../../../application/ports/id-manager.js';
+import type { TokenManager } from '../../../domain/ports/token-manager.js';
+import type { IdManager } from '../../../domain/ports/id-manager.js';
 import type { ApiError, ApiSuccess } from '../../types/api.js';
-import type { Transaction } from '../../../domain/transaction/transaction.js';
+import type { Transaction } from '../../../domain/entities/transaction.js';
 import { AuthenticatedController } from './authenticated-controller.js';
 import { createSchema, deleteSchema, readSchema, updateSchema } from '../schemas/transaction-schemas.js';
 import { AuthorizationError } from '../../../application/errors/authorization.error.js';

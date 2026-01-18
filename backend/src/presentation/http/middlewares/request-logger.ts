@@ -1,6 +1,6 @@
-import type { Logger } from '../../../application/ports/logger.js';
+import type { Logger } from '../../../domain/ports/logger.js';
 import type { NextFunction, Request, Response } from 'express';
-import type { TokenGenerator } from '../../../application/ports/token-generator.js';
+import type { TokenGenerator } from '../../../domain/ports/token-generator.js';
 
 export const requestLoggerMiddleware = ({
     logger,

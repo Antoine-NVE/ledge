@@ -5,7 +5,7 @@ import type { LoginUseCase } from '../../../application/auth/login-use-case.js';
 import type { RefreshUseCase } from '../../../application/auth/refresh-use-case.js';
 import type { LogoutUseCase } from '../../../application/auth/logout-use-case.js';
 import type { ApiError, ApiSuccess } from '../../types/api.js';
-import type { User } from '../../../domain/user/user.js';
+import type { User } from '../../../domain/entities/user.js';
 import { BaseController } from './base-controller.js';
 import { loginSchema, registerSchema } from '../schemas/auth-schemas.js';
 import { AuthenticationError } from '../../../application/errors/authentication.error.js';
