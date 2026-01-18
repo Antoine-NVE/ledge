@@ -15,17 +15,25 @@ type UserDocument = Readonly<{
 export class MongoUserRepository implements UserRepository {
     constructor(private userCollection: Collection<UserDocument>) {}
 
-    private toDocument = ({ id, ...rest }: User): UserDocument => {
+    private toDocument = (user: User): UserDocument => {
         return {
-            _id: new ObjectId(id),
-            ...rest,
+            _id: new ObjectId(user.id),
+            email: user.email,
+            passwordHash: user.passwordHash,
+            isEmailVerified: user.isEmailVerified,
+            createdAt: user.createdAt,
+            updatedAt: user.updatedAt,
         };
     };
 
-    private toDomain = ({ _id, ...rest }: UserDocument): User => {
+    private toDomain = (document: UserDocument): User => {
         return {
-            id: _id.toString(),
-            ...rest,
+            id: document._id.toString(),
+            email: document.email,
+            passwordHash: document.passwordHash,
+            isEmailVerified: document.isEmailVerified,
+            createdAt: document.createdAt,
+            updatedAt: document.updatedAt,
         };
     };
 

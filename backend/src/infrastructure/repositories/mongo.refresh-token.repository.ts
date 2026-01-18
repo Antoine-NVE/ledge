@@ -14,19 +14,25 @@ type RefreshTokenDocument = Readonly<{
 export class MongoRefreshTokenRepository implements RefreshTokenRepository {
     constructor(private refreshTokenCollection: Collection<RefreshTokenDocument>) {}
 
-    private toDocument = ({ id, userId, ...rest }: RefreshToken): RefreshTokenDocument => {
+    private toDocument = (refreshToken: RefreshToken): RefreshTokenDocument => {
         return {
-            _id: new ObjectId(id),
-            userId: new ObjectId(userId),
-            ...rest,
+            _id: new ObjectId(refreshToken.id),
+            userId: new ObjectId(refreshToken.userId),
+            value: refreshToken.value,
+            expiresAt: refreshToken.expiresAt,
+            createdAt: refreshToken.createdAt,
+            updatedAt: refreshToken.updatedAt,
         };
     };
 
-    private toDomain = ({ _id, userId, ...rest }: RefreshTokenDocument): RefreshToken => {
+    private toDomain = (document: RefreshTokenDocument): RefreshToken => {
         return {
-            id: _id.toString(),
-            userId: userId.toString(),
-            ...rest,
+            id: document._id.toString(),
+            userId: document.userId.toString(),
+            value: document.value,
+            expiresAt: document.expiresAt,
+            createdAt: document.createdAt,
+            updatedAt: document.updatedAt,
         };
     };
 

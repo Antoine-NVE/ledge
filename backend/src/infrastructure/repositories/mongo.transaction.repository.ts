@@ -30,30 +30,45 @@ type TransactionDocument = ExpenseDocument | IncomeDocument;
 export class MongoTransactionRepository implements TransactionRepository {
     constructor(private transactionCollection: Collection<TransactionDocument>) {}
 
-    private toDocument = ({ id, userId, expenseCategory, ...rest }: Transaction): TransactionDocument => {
+    private toDocument = (transaction: Transaction): TransactionDocument => {
         return {
-            _id: new ObjectId(id),
-            userId: new ObjectId(userId),
-            ...(expenseCategory !== null && { expenseCategory }),
-            ...rest,
+            _id: new ObjectId(transaction.id),
+            userId: new ObjectId(transaction.userId),
+            month: transaction.month,
+            name: transaction.name,
+            value: transaction.value,
+            type: transaction.type,
+            ...(transaction.expenseCategory !== null && { expenseCategory: transaction.expenseCategory }),
+            createdAt: transaction.createdAt,
+            updatedAt: transaction.updatedAt,
         };
     };
 
-    private toDomain = ({ _id, userId, ...rest }: TransactionDocument): Transaction => {
-        if (rest.type === 'expense') {
+    private toDomain = (document: TransactionDocument): Transaction => {
+        if (document.type === 'expense') {
             return {
-                id: _id.toString(),
-                userId: userId.toString(),
-                expenseCategory: rest.expenseCategory ?? null,
-                ...rest,
+                id: document._id.toString(),
+                userId: document.userId.toString(),
+                month: document.month,
+                name: document.name,
+                value: document.value,
+                type: document.type,
+                expenseCategory: document.expenseCategory ?? null,
+                createdAt: document.createdAt,
+                updatedAt: document.updatedAt,
             };
         }
 
         return {
-            id: _id.toString(),
-            userId: userId.toString(),
+            id: document._id.toString(),
+            userId: document.userId.toString(),
+            month: document.month,
+            name: document.name,
+            value: document.value,
+            type: document.type,
             expenseCategory: null,
-            ...rest,
+            createdAt: document.createdAt,
+            updatedAt: document.updatedAt,
         };
     };
 
