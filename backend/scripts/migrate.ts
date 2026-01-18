@@ -1,6 +1,6 @@
 import { createBaseLogger } from '../src/infrastructure/config/pino.js';
 import { connectToMongo } from '../src/infrastructure/config/mongo.js';
-import { PinoLogger } from '../src/infrastructure/adapters/pino-logger.js';
+import { PinoLogger } from '../src/infrastructure/adapters/pino.logger.js';
 import { loadEnv } from '../src/infrastructure/config/env.js';
 import { fail, ok } from '../src/core/utils/result.js';
 import type { Result } from '../src/core/types/result.js';

@@ -1,5 +1,5 @@
 import type { Logger as BaseLogger } from 'pino';
-import type { Logger } from '../../application/ports/logger.js';
+import type { Logger } from '../../domain/ports/logger.js';
 
 export class PinoLogger implements Logger {
     constructor(private baseLogger: BaseLogger) {}

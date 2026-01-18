@@ -1,7 +1,7 @@
 import jwt from 'jsonwebtoken';
 import z from 'zod';
-import type { TokenManager } from '../../application/ports/token-manager.js';
-import type { IdManager } from '../../application/ports/id-manager.js';
+import type { TokenManager } from '../../domain/ports/token-manager.js';
+import type { IdManager } from '../../domain/ports/id-manager.js';
 import { AuthenticationError } from '../../application/errors/authentication.error.js';
 import { BusinessRuleError } from '../../application/errors/business-rule.error.js';
 import type { StringValue } from 'ms';

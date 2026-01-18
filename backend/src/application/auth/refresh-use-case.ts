@@ -1,6 +1,6 @@
 import type { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository.js';
-import type { TokenManager } from '../ports/token-manager.js';
-import type { TokenGenerator } from '../ports/token-generator.js';
+import type { TokenManager } from '../../domain/ports/token-manager.js';
+import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import { AuthenticationError } from '../errors/authentication.error.js';
 import type { RefreshToken } from '../../domain/entities/refresh-token.js';
 

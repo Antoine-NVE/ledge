@@ -1,11 +1,11 @@
 import type { UserRepository } from '../../domain/repositories/user.repository.js';
 import type { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository.js';
-import type { Hasher } from '../ports/hasher.js';
-import type { TokenManager } from '../ports/token-manager.js';
+import type { Hasher } from '../../domain/ports/hasher.js';
+import type { TokenManager } from '../../domain/ports/token-manager.js';
 import type { User } from '../../domain/entities/user.js';
 import type { RefreshToken } from '../../domain/entities/refresh-token.js';
-import type { IdManager } from '../ports/id-manager.js';
-import type { TokenGenerator } from '../ports/token-generator.js';
+import type { IdManager } from '../../domain/ports/id-manager.js';
+import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import { AuthenticationError } from '../errors/authentication.error.js';
 
 type Input = {

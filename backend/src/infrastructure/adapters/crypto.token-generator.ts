@@ -1,4 +1,4 @@
-import type { TokenGenerator } from '../../application/ports/token-generator.js';
+import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import crypto from 'crypto';
 
 export class CryptoTokenGenerator implements TokenGenerator {

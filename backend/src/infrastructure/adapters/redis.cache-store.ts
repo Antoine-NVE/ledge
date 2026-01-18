@@ -1,5 +1,5 @@
 import type { RedisClientType } from 'redis';
-import type { CacheStore } from '../../application/ports/cache-store.js';
+import type { CacheStore } from '../../domain/ports/cache-store.js';
 
 export class RedisCacheStore implements CacheStore {
     constructor(private client: RedisClientType) {}

@@ -1,4 +1,4 @@
-import type { IdManager } from '../../application/ports/id-manager.js';
+import type { IdManager } from '../../domain/ports/id-manager.js';
 import { ObjectId } from 'mongodb';
 
 export class MongoIdManager implements IdManager {

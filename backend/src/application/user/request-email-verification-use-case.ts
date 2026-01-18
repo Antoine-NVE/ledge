@@ -1,7 +1,7 @@
-import type { EmailSender } from '../ports/email-sender.js';
+import type { EmailSender } from '../../domain/ports/email-sender.js';
 import type { UserRepository } from '../../domain/repositories/user.repository.js';
-import type { TokenManager } from '../ports/token-manager.js';
-import type { CacheStore } from '../ports/cache-store.js';
+import type { TokenManager } from '../../domain/ports/token-manager.js';
+import type { CacheStore } from '../../domain/ports/cache-store.js';
 import { AuthenticationError } from '../errors/authentication.error.js';
 import { BusinessRuleError } from '../errors/business-rule.error.js';
 

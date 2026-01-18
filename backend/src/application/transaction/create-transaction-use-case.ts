@@ -1,6 +1,6 @@
 import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
 import type { Transaction } from '../../domain/entities/transaction.js';
-import type { IdManager } from '../ports/id-manager.js';
+import type { IdManager } from '../../domain/ports/id-manager.js';
 
 type Input = {
     userId: string;

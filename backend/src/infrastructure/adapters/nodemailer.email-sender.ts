@@ -1,5 +1,5 @@
 import type { Transporter } from 'nodemailer';
-import type { EmailSender } from '../../application/ports/email-sender.js';
+import type { EmailSender } from '../../domain/ports/email-sender.js';
 
 export class NodemailerEmailSender implements EmailSender {
     constructor(private transporter: Transporter) {}

@@ -2,12 +2,12 @@ import { loadEnv } from './infrastructure/config/env.js';
 import { createBaseLogger } from './infrastructure/config/pino.js';
 import { connectToRedis } from './infrastructure/config/redis.js';
 import { connectToMongo } from './infrastructure/config/mongo.js';
-import { PinoLogger } from './infrastructure/adapters/pino-logger.js';
-import { JwtTokenManager } from './infrastructure/adapters/jwt-token-manager.js';
-import { BcryptHasher } from './infrastructure/adapters/bcrypt-hasher.js';
-import { NodemailerEmailSender } from './infrastructure/adapters/nodemailer-email-sender.js';
+import { PinoLogger } from './infrastructure/adapters/pino.logger.js';
+import { JwtTokenManager } from './infrastructure/adapters/jwt.token-manager.js';
+import { BcryptHasher } from './infrastructure/adapters/bcrypt.hasher.js';
+import { NodemailerEmailSender } from './infrastructure/adapters/nodemailer.email-sender.js';
 import { connectToSmtp } from './infrastructure/config/nodemailer.js';
-import { RedisCacheStore } from './infrastructure/adapters/redis-cache-store.js';
+import { RedisCacheStore } from './infrastructure/adapters/redis.cache-store.js';
 import { MongoUserRepository } from './infrastructure/repositories/mongo.user.repository.js';
 import { MongoTransactionRepository } from './infrastructure/repositories/mongo.transaction.repository.js';
 import { MongoRefreshTokenRepository } from './infrastructure/repositories/mongo.refresh-token.repository.js';
@@ -16,8 +16,8 @@ import { buildContainer } from './presentation/container.js';
 import { startServer } from './presentation/server.js';
 import { fail, ok } from './core/utils/result.js';
 import type { Result } from './core/types/result.js';
-import { MongoIdManager } from './infrastructure/adapters/mongo-id-manager.js';
-import { CryptoTokenGenerator } from './infrastructure/adapters/crypto-token-generator.js';
+import { MongoIdManager } from './infrastructure/adapters/mongo.id-manager.js';
+import { CryptoTokenGenerator } from './infrastructure/adapters/crypto.token-generator.js';
 
 // .env is not verified yet, but we need a logger now
 const logger = new PinoLogger(
