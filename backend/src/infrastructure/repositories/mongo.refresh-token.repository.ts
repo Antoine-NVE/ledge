@@ -1,15 +1,15 @@
 import { Collection, ObjectId } from 'mongodb';
-import type { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository.js';
-import type { RefreshToken } from '../../domain/refresh-token/refresh-token-types.js';
+import type { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository.js';
+import type { RefreshToken } from '../../domain/entities/refresh-token.js';
 
-type RefreshTokenDocument = {
+type RefreshTokenDocument = Readonly<{
     _id: ObjectId;
     userId: ObjectId;
     value: string;
     expiresAt: Date;
     createdAt: Date;
     updatedAt: Date;
-};
+}>;
 
 export class MongoRefreshTokenRepository implements RefreshTokenRepository {
     constructor(private refreshTokenCollection: Collection<RefreshTokenDocument>) {}

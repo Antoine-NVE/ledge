@@ -1,4 +1,4 @@
-import { RefreshToken } from '../../../../src/domain/refresh-token/refresh-token-types';
+import { RefreshToken } from '../../../../src/domain/refresh-token/refresh-token';
 import { RefreshTokenRepository } from '../../../../src/domain/refresh-token/refresh-token-repository';
 import { RefreshTokenService } from '../../../../src/domain/refresh-token/refresh-token-service';
 

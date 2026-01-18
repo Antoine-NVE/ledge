@@ -1,5 +1,5 @@
-import { User } from '../../../../src/domain/user/user-types';
-import { RefreshToken } from '../../../../src/domain/refresh-token/refresh-token-types';
+import { User } from '../../../../src/domain/user/user';
+import { RefreshToken } from '../../../../src/domain/refresh-token/refresh-token';
 import { UserService } from '../../../../src/domain/user/user-service';
 import { TokenManager } from '../../../../src/application/ports/token-manager';
 import { RefreshTokenService } from '../../../../src/domain/refresh-token/refresh-token-service';

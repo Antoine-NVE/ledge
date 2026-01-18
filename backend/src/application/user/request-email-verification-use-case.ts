@@ -1,5 +1,5 @@
 import type { EmailSender } from '../ports/email-sender.js';
-import type { UserRepository } from '../../domain/user/user-repository.js';
+import type { UserRepository } from '../../domain/repositories/user.repository.js';
 import type { TokenManager } from '../ports/token-manager.js';
 import type { CacheStore } from '../ports/cache-store.js';
 import { AuthenticationError } from '../errors/authentication.error.js';

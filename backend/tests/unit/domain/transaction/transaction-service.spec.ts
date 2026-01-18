@@ -1,6 +1,6 @@
 import { TransactionRepository } from '../../../../src/domain/transaction/transaction-repository';
 import { TransactionService } from '../../../../src/domain/transaction/transaction-service';
-import { Transaction } from '../../../../src/domain/transaction/transaction-types';
+import { Transaction } from '../../../../src/domain/transaction/transaction';
 
 describe('TransactionService', () => {
     const USER_ID = 'USERID123';

@@ -1,7 +1,7 @@
-import type { UserRepository } from '../../domain/user/user-repository.js';
+import type { UserRepository } from '../../domain/repositories/user.repository.js';
 import type { TokenManager } from '../ports/token-manager.js';
 import { BusinessRuleError } from '../errors/business-rule.error.js';
-import type { User } from '../../domain/user/user-types.js';
+import type { User } from '../../domain/entities/user.js';
 
 type Input = {
     emailVerificationToken: string;

@@ -1,8 +1,8 @@
 import { Collection, ObjectId } from 'mongodb';
-import type { TransactionRepository } from '../../domain/transaction/transaction-repository.js';
-import type { Transaction } from '../../domain/transaction/transaction-types.js';
+import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
+import type { Transaction } from '../../domain/entities/transaction.js';
 
-type ExpenseDocument = {
+type ExpenseDocument = Readonly<{
     _id: ObjectId;
     userId: ObjectId;
     month: string;
@@ -12,9 +12,9 @@ type ExpenseDocument = {
     expenseCategory?: 'need' | 'want' | 'investment';
     createdAt: Date;
     updatedAt: Date;
-};
+}>;
 
-type IncomeDocument = {
+type IncomeDocument = Readonly<{
     _id: ObjectId;
     userId: ObjectId;
     month: string;
@@ -23,7 +23,7 @@ type IncomeDocument = {
     type: 'income';
     createdAt: Date;
     updatedAt: Date;
-};
+}>;
 
 type TransactionDocument = ExpenseDocument | IncomeDocument;
 

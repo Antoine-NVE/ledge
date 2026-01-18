@@ -1,4 +1,4 @@
-import type { Transaction } from './transaction-types.js';
+import type { Transaction } from '../entities/transaction.js';
 
 export interface TransactionRepository {
     create: (transaction: Transaction) => Promise<void>;

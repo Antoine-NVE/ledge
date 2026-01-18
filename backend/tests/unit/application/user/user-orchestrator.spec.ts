@@ -1,4 +1,4 @@
-import { User } from '../../../../src/domain/user/user-types';
+import { User } from '../../../../src/domain/user/user';
 import { TokenManager } from '../../../../src/application/ports/token-manager';
 import { EmailSender } from '../../../../src/application/ports/email-sender';
 import { UserService } from '../../../../src/domain/user/user-service';

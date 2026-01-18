@@ -7,7 +7,7 @@ import type { DeleteTransactionUseCase } from '../../../application/transaction/
 import type { TokenManager } from '../../../application/ports/token-manager.js';
 import type { IdManager } from '../../../application/ports/id-manager.js';
 import type { ApiError, ApiSuccess } from '../../types/api.js';
-import type { Transaction } from '../../../domain/transaction/transaction-types.js';
+import type { Transaction } from '../../../domain/transaction/transaction.js';
 import { AuthenticatedController } from './authenticated-controller.js';
 import { createSchema, deleteSchema, readSchema, updateSchema } from '../schemas/transaction-schemas.js';
 import { AuthorizationError } from '../../../application/errors/authorization.error.js';

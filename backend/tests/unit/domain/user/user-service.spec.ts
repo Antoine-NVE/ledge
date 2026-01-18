@@ -1,4 +1,4 @@
-import { User } from '../../../../src/domain/user/user-types';
+import { User } from '../../../../src/domain/user/user';
 import { UserRepository } from '../../../../src/domain/user/user-repository';
 import { UserService } from '../../../../src/domain/user/user-service';
 

@@ -1,4 +1,4 @@
-import type { RefreshToken } from './refresh-token-types.js';
+import type { RefreshToken } from '../entities/refresh-token.js';
 
 export interface RefreshTokenRepository {
     create(refreshToken: RefreshToken): Promise<void>;

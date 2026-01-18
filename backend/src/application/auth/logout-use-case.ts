@@ -1,4 +1,4 @@
-import type { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository.js';
+import type { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository.js';
 
 type Input = {
     refreshToken: string;

@@ -1,4 +1,4 @@
-type Expense = {
+type Expense = Readonly<{
     id: string;
     userId: string;
     month: string;
@@ -8,9 +8,9 @@ type Expense = {
     expenseCategory: 'need' | 'want' | 'investment' | null;
     createdAt: Date;
     updatedAt: Date;
-};
+}>;
 
-type Income = {
+type Income = Readonly<{
     id: string;
     userId: string;
     month: string;
@@ -20,6 +20,6 @@ type Income = {
     expenseCategory: null;
     createdAt: Date;
     updatedAt: Date;
-};
+}>;
 
 export type Transaction = Expense | Income;

@@ -1,5 +1,5 @@
-import type { TransactionRepository } from '../../domain/transaction/transaction-repository.js';
-import type { Transaction } from '../../domain/transaction/transaction-types.js';
+import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
+import type { Transaction } from '../../domain/entities/transaction.js';
 
 type Input = {
     userId: string;

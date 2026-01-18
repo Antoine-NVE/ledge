@@ -1,4 +1,4 @@
-import { User } from '../../../../src/domain/user/user-types';
+import { User } from '../../../../src/domain/user/user';
 import { removePasswordHash } from '../../../../src/core/utils/clean';
 
 describe('clean utils', () => {

@@ -1,5 +1,5 @@
-import type { UserRepository } from '../../domain/user/user-repository.js';
-import type { User } from '../../domain/user/user-types.js';
+import type { UserRepository } from '../../domain/repositories/user.repository.js';
+import type { User } from '../../domain/entities/user.js';
 import { AuthenticationError } from '../errors/authentication.error.js';
 
 type Input = {

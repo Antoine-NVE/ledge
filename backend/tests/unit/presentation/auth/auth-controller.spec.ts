@@ -3,8 +3,8 @@ import { Logger } from 'pino';
 import { CookieManager } from '../../../../src/presentation/http/support/cookie-manager';
 import { AuthOrchestrator } from '../../../../src/application/auth/auth-orchestrator';
 import { AuthController } from '../../../../src/presentation/http/auth/auth-controller';
-import { User } from '../../../../src/domain/user/user-types';
-import { RefreshToken } from '../../../../src/domain/refresh-token/refresh-token-types';
+import { User } from '../../../../src/domain/user/user';
+import { RefreshToken } from '../../../../src/domain/refresh-token/refresh-token';
 import * as cleanUtils from '../../../../src/core/utils/clean';
 
 describe('AuthController', () => {

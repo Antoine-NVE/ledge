@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { Logger } from 'pino';
-import { User } from '../../../../src/domain/user/user-types';
+import { User } from '../../../../src/domain/user/user';
 import { UserOrchestrator } from '../../../../src/application/user/user-orchestrator';
 import { UserController } from '../../../../src/presentation/http/user/user-controller';
 import * as cleanUtils from '../../../../src/core/utils/clean';

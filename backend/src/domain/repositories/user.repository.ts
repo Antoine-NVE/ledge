@@ -1,4 +1,4 @@
-import type { User } from './user-types.js';
+import type { User } from '../entities/user.js';
 
 export interface UserRepository {
     create: (user: User) => Promise<void>;

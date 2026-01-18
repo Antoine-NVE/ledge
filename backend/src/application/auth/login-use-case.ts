@@ -1,9 +1,9 @@
-import type { UserRepository } from '../../domain/user/user-repository.js';
-import type { RefreshTokenRepository } from '../../domain/refresh-token/refresh-token-repository.js';
+import type { UserRepository } from '../../domain/repositories/user.repository.js';
+import type { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository.js';
 import type { Hasher } from '../ports/hasher.js';
 import type { TokenManager } from '../ports/token-manager.js';
-import type { User } from '../../domain/user/user-types.js';
-import type { RefreshToken } from '../../domain/refresh-token/refresh-token-types.js';
+import type { User } from '../../domain/entities/user.js';
+import type { RefreshToken } from '../../domain/entities/refresh-token.js';
 import type { IdManager } from '../ports/id-manager.js';
 import type { TokenGenerator } from '../ports/token-generator.js';
 import { AuthenticationError } from '../errors/authentication.error.js';

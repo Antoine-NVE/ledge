@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { Logger } from 'pino';
-import { User } from '../../../../src/domain/user/user-types';
-import { Transaction } from '../../../../src/domain/transaction/transaction-types';
+import { User } from '../../../../src/domain/user/user';
+import { Transaction } from '../../../../src/domain/transaction/transaction';
 import { TransactionController } from '../../../../src/presentation/http/transaction/transaction-controller';
 import { TransactionService } from '../../../../src/domain/transaction/transaction-service';
 

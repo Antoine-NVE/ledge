@@ -5,7 +5,7 @@ import type { VerifyEmailUseCase } from '../../../application/user/verify-email-
 import type { TokenManager } from '../../../application/ports/token-manager.js';
 import type { GetCurrentUserUseCase } from '../../../application/user/get-current-user-use-case.js';
 import type { ApiError, ApiSuccess } from '../../types/api.js';
-import type { User } from '../../../domain/user/user-types.js';
+import type { User } from '../../../domain/user/user.js';
 import { AuthenticatedController } from './authenticated-controller.js';
 import { requestEmailVerificationSchema, verifyEmailSchema } from '../schemas/user-schemas.js';
 import { ValidationError } from '../../errors/validation.error.js';

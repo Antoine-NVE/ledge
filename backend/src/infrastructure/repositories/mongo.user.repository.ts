@@ -1,16 +1,16 @@
 import { Collection, MongoServerError, ObjectId } from 'mongodb';
-import type { UserRepository } from '../../domain/user/user-repository.js';
-import type { User } from '../../domain/user/user-types.js';
+import type { UserRepository } from '../../domain/repositories/user.repository.js';
+import type { User } from '../../domain/entities/user.js';
 import { BusinessRuleError } from '../../application/errors/business-rule.error.js';
 
-type UserDocument = {
+type UserDocument = Readonly<{
     _id: ObjectId;
     email: string;
     passwordHash: string;
     isEmailVerified: boolean;
     createdAt: Date;
     updatedAt: Date;
-};
+}>;
 
 export class MongoUserRepository implements UserRepository {
     constructor(private userCollection: Collection<UserDocument>) {}
