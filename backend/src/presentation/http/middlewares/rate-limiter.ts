@@ -12,6 +12,7 @@ export const rateLimiterMiddleware = () => {
                 code: 'TOO_MANY_REQUESTS',
                 message: 'Too many requests',
             };
+            req.logger.warn('Too many requests');
             res.status(429).json(response);
         },
     });

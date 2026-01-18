@@ -30,12 +30,6 @@ import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import type { ApiError } from '../types/api.js';
 import type { Request, Response } from 'express';
 
-declare module 'express-serve-static-core' {
-    interface Request {
-        logger: Logger;
-    }
-}
-
 type Input = {
     logger: Logger;
     tokenManager: TokenManager;
@@ -118,6 +112,7 @@ export const createHttpApp = ({
             code: 'NOT_FOUND',
             message: 'Route not found',
         };
+        req.logger.warn('Route not found');
         res.status(404).json(response);
     });
 
