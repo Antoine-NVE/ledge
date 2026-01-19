@@ -1,12 +1,16 @@
 import { ApplicationError, type ApplicationErrorOptions } from './application.error.js';
 
-export type Reason = 'EMAIL_ALREADY_VERIFIED' | 'ACTIVE_COOLDOWN' | 'INVALID_TOKEN' | 'DUPLICATE_EMAIL';
+export type BusinessRuleErrorReason =
+    | 'EMAIL_ALREADY_VERIFIED'
+    | 'ACTIVE_COOLDOWN'
+    | 'INVALID_TOKEN'
+    | 'DUPLICATE_EMAIL';
 
-export class BusinessRuleError extends ApplicationError {
+export class BusinessRuleError extends ApplicationError<'BUSINESS_RULE_ERROR'> {
     constructor(
-        public readonly reason: Reason,
+        public readonly reason: BusinessRuleErrorReason,
         options?: ApplicationErrorOptions,
     ) {
-        super('Business rule error', options);
+        super('BUSINESS_RULE_ERROR', 'Business rule error', options);
     }
 }

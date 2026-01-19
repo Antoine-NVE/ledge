@@ -42,7 +42,7 @@ export class AuthController extends BaseController {
             if (err instanceof ValidationError) {
                 const response: ApiError<z.infer<typeof registerSchema>> = {
                     success: false,
-                    code: 'VALIDATION_ERROR',
+                    code: err.code,
                     tree: err.tree,
                 };
                 res.status(400).json(response);
@@ -51,7 +51,7 @@ export class AuthController extends BaseController {
             if (err instanceof BusinessRuleError && err.reason === 'DUPLICATE_EMAIL') {
                 const response: ApiError = {
                     success: false,
-                    code: 'BUSINESS_RULE_ERROR',
+                    code: err.code,
                     reason: err.reason,
                 };
                 res.status(409).json(response);
@@ -80,7 +80,7 @@ export class AuthController extends BaseController {
             if (err instanceof ValidationError) {
                 const response: ApiError<z.infer<typeof loginSchema>> = {
                     success: false,
-                    code: 'VALIDATION_ERROR',
+                    code: err.code,
                     tree: err.tree,
                 };
                 res.status(400).json(response);
@@ -89,7 +89,7 @@ export class AuthController extends BaseController {
             if (err instanceof AuthenticationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'AUTHENTICATION_ERROR',
+                    code: err.code,
                 };
                 res.status(401).json(response);
                 return;
@@ -117,7 +117,7 @@ export class AuthController extends BaseController {
             if (err instanceof AuthenticationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'AUTHENTICATION_ERROR',
+                    code: err.code,
                 };
                 res.status(401).json(response);
                 return;

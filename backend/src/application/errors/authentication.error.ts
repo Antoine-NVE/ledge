@@ -1,7 +1,7 @@
 import { ApplicationError, type ApplicationErrorOptions } from './application.error.js';
 
-export class AuthenticationError extends ApplicationError {
+export class AuthenticationError extends ApplicationError<'AUTHENTICATION_ERROR'> {
     constructor(options?: ApplicationErrorOptions) {
-        super('Authentication error', options);
+        super('AUTHENTICATION_ERROR', 'Authentication error', options);
     }
 }

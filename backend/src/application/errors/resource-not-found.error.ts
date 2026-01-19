@@ -1,7 +1,7 @@
 import { ApplicationError, type ApplicationErrorOptions } from './application.error.js';
 
-export class ResourceNotFoundError extends ApplicationError {
+export class ResourceNotFoundError extends ApplicationError<'RESOURCE_NOT_FOUND_ERROR'> {
     constructor(options?: ApplicationErrorOptions) {
-        super('Resource not found error', options);
+        super('RESOURCE_NOT_FOUND_ERROR', 'Resource not found error', options);
     }
 }

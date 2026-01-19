@@ -48,7 +48,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof ValidationError) {
                 const response: ApiError<z.infer<typeof createSchema>> = {
                     success: false,
-                    code: 'VALIDATION_ERROR',
+                    code: err.code,
                     tree: err.tree,
                 };
                 res.status(400).json(response);
@@ -57,7 +57,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof AuthenticationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'AUTHENTICATION_ERROR',
+                    code: err.code,
                 };
                 res.status(401).json(response);
                 return;
@@ -83,7 +83,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof AuthenticationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'AUTHENTICATION_ERROR',
+                    code: err.code,
                 };
                 res.status(401).json(response);
                 return;
@@ -111,7 +111,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof ValidationError) {
                 const response: ApiError<z.infer<typeof readSchema>> = {
                     success: false,
-                    code: 'VALIDATION_ERROR',
+                    code: err.code,
                     tree: err.tree,
                 };
                 res.status(400).json(response);
@@ -120,7 +120,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof AuthenticationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'AUTHENTICATION_ERROR',
+                    code: err.code,
                 };
                 res.status(401).json(response);
                 return;
@@ -128,7 +128,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof AuthorizationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'AUTHORIZATION_ERROR',
+                    code: err.code,
                 };
                 res.status(403).json(response);
                 return;
@@ -136,7 +136,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof ResourceNotFoundError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'RESOURCE_NOT_FOUND_ERROR',
+                    code: err.code,
                 };
                 res.status(404).json(response);
                 return;
@@ -164,7 +164,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof ValidationError) {
                 const response: ApiError<z.infer<typeof updateSchema>> = {
                     success: false,
-                    code: 'VALIDATION_ERROR',
+                    code: err.code,
                     tree: err.tree,
                 };
                 res.status(400).json(response);
@@ -173,7 +173,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof AuthenticationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'AUTHENTICATION_ERROR',
+                    code: err.code,
                 };
                 res.status(401).json(response);
                 return;
@@ -181,7 +181,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof AuthorizationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'AUTHORIZATION_ERROR',
+                    code: err.code,
                 };
                 res.status(403).json(response);
                 return;
@@ -189,7 +189,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof ResourceNotFoundError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'RESOURCE_NOT_FOUND_ERROR',
+                    code: err.code,
                 };
                 res.status(404).json(response);
                 return;
@@ -217,7 +217,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof ValidationError) {
                 const response: ApiError<z.infer<typeof deleteSchema>> = {
                     success: false,
-                    code: 'VALIDATION_ERROR',
+                    code: err.code,
                     tree: err.tree,
                 };
                 res.status(400).json(response);
@@ -226,7 +226,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof AuthenticationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'AUTHENTICATION_ERROR',
+                    code: err.code,
                 };
                 res.status(401).json(response);
                 return;
@@ -234,7 +234,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof AuthorizationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'AUTHORIZATION_ERROR',
+                    code: err.code,
                 };
                 res.status(403).json(response);
                 return;
@@ -242,7 +242,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof ResourceNotFoundError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'RESOURCE_NOT_FOUND_ERROR',
+                    code: err.code,
                 };
                 res.status(404).json(response);
                 return;
