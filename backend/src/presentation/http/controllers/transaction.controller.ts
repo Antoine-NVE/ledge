@@ -14,6 +14,7 @@ import { AuthorizationError } from '../../../application/errors/authorization.er
 import { ResourceNotFoundError } from '../../../application/errors/resource-not-found.error.js';
 import { ValidationError } from '../../errors/validation.error.js';
 import { AuthenticationError } from '../../../application/errors/authentication.error.js';
+import z from 'zod';
 
 export class TransactionController extends AuthenticatedController {
     constructor(
@@ -38,8 +39,6 @@ export class TransactionController extends AuthenticatedController {
 
             const response: ApiSuccess<{ transaction: Transaction }> = {
                 success: true,
-                code: 'CREATED',
-                message: 'Transaction created successfully',
                 data: {
                     transaction,
                 },
@@ -47,11 +46,10 @@ export class TransactionController extends AuthenticatedController {
             res.status(201).json(response);
         } catch (err: unknown) {
             if (err instanceof ValidationError) {
-                const response: ApiError = {
+                const response: ApiError<z.infer<typeof createSchema>> = {
                     success: false,
-                    code: 'BAD_REQUEST',
-                    message: 'Invalid data',
-                    issues: err.issues,
+                    code: 'VALIDATION_ERROR',
+                    tree: err.tree,
                 };
                 res.status(400).json(response);
                 return;
@@ -59,8 +57,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof AuthenticationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'UNAUTHORIZED',
-                    message: 'Please login',
+                    code: 'AUTHENTICATION_ERROR',
                 };
                 res.status(401).json(response);
                 return;
@@ -77,8 +74,6 @@ export class TransactionController extends AuthenticatedController {
 
             const response: ApiSuccess<{ transactions: Transaction[] }> = {
                 success: true,
-                code: 'OK',
-                message: 'Transactions retrieved successfully',
                 data: {
                     transactions,
                 },
@@ -88,8 +83,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof AuthenticationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'UNAUTHORIZED',
-                    message: 'Please login',
+                    code: 'AUTHENTICATION_ERROR',
                 };
                 res.status(401).json(response);
                 return;
@@ -108,8 +102,6 @@ export class TransactionController extends AuthenticatedController {
 
             const response: ApiSuccess<{ transaction: Transaction }> = {
                 success: true,
-                code: 'OK',
-                message: 'Transaction retrieved successfully',
                 data: {
                     transaction,
                 },
@@ -117,11 +109,10 @@ export class TransactionController extends AuthenticatedController {
             res.status(200).json(response);
         } catch (err: unknown) {
             if (err instanceof ValidationError) {
-                const response: ApiError = {
+                const response: ApiError<z.infer<typeof readSchema>> = {
                     success: false,
-                    code: 'BAD_REQUEST',
-                    message: 'Invalid data',
-                    issues: err.issues,
+                    code: 'VALIDATION_ERROR',
+                    tree: err.tree,
                 };
                 res.status(400).json(response);
                 return;
@@ -129,8 +120,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof AuthenticationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'UNAUTHORIZED',
-                    message: 'Please login',
+                    code: 'AUTHENTICATION_ERROR',
                 };
                 res.status(401).json(response);
                 return;
@@ -138,8 +128,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof AuthorizationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'FORBIDDEN',
-                    message: 'Do not have permission to read this transaction',
+                    code: 'AUTHORIZATION_ERROR',
                 };
                 res.status(403).json(response);
                 return;
@@ -147,8 +136,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof ResourceNotFoundError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'NOT_FOUND',
-                    message: 'Transaction not found',
+                    code: 'RESOURCE_NOT_FOUND_ERROR',
                 };
                 res.status(404).json(response);
                 return;
@@ -167,8 +155,6 @@ export class TransactionController extends AuthenticatedController {
 
             const response: ApiSuccess<{ transaction: Transaction }> = {
                 success: true,
-                code: 'OK',
-                message: 'Transaction updated successfully',
                 data: {
                     transaction,
                 },
@@ -176,11 +162,10 @@ export class TransactionController extends AuthenticatedController {
             res.status(200).json(response);
         } catch (err: unknown) {
             if (err instanceof ValidationError) {
-                const response: ApiError = {
+                const response: ApiError<z.infer<typeof updateSchema>> = {
                     success: false,
-                    code: 'BAD_REQUEST',
-                    message: 'Invalid data',
-                    issues: err.issues,
+                    code: 'VALIDATION_ERROR',
+                    tree: err.tree,
                 };
                 res.status(400).json(response);
                 return;
@@ -188,8 +173,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof AuthenticationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'UNAUTHORIZED',
-                    message: 'Please login',
+                    code: 'AUTHENTICATION_ERROR',
                 };
                 res.status(401).json(response);
                 return;
@@ -197,8 +181,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof AuthorizationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'FORBIDDEN',
-                    message: 'Do not have permission to update this transaction',
+                    code: 'AUTHORIZATION_ERROR',
                 };
                 res.status(403).json(response);
                 return;
@@ -206,8 +189,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof ResourceNotFoundError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'NOT_FOUND',
-                    message: 'Transaction not found',
+                    code: 'RESOURCE_NOT_FOUND_ERROR',
                 };
                 res.status(404).json(response);
                 return;
@@ -226,8 +208,6 @@ export class TransactionController extends AuthenticatedController {
 
             const response: ApiSuccess<{ transaction: Transaction }> = {
                 success: true,
-                code: 'OK',
-                message: 'Transaction deleted successfully',
                 data: {
                     transaction,
                 },
@@ -235,11 +215,10 @@ export class TransactionController extends AuthenticatedController {
             res.status(200).json(response);
         } catch (err: unknown) {
             if (err instanceof ValidationError) {
-                const response: ApiError = {
+                const response: ApiError<z.infer<typeof deleteSchema>> = {
                     success: false,
-                    code: 'BAD_REQUEST',
-                    message: 'Invalid data',
-                    issues: err.issues,
+                    code: 'VALIDATION_ERROR',
+                    tree: err.tree,
                 };
                 res.status(400).json(response);
                 return;
@@ -247,8 +226,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof AuthenticationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'UNAUTHORIZED',
-                    message: 'Please login',
+                    code: 'AUTHENTICATION_ERROR',
                 };
                 res.status(401).json(response);
                 return;
@@ -256,8 +234,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof AuthorizationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'FORBIDDEN',
-                    message: 'Do not have permission to delete this transaction',
+                    code: 'AUTHORIZATION_ERROR',
                 };
                 res.status(403).json(response);
                 return;
@@ -265,8 +242,7 @@ export class TransactionController extends AuthenticatedController {
             if (err instanceof ResourceNotFoundError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'NOT_FOUND',
-                    message: 'Transaction not found',
+                    code: 'RESOURCE_NOT_FOUND_ERROR',
                 };
                 res.status(404).json(response);
                 return;

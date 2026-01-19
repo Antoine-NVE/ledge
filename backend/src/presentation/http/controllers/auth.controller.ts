@@ -11,6 +11,7 @@ import { loginSchema, registerSchema } from '../schemas/auth.schemas.js';
 import { AuthenticationError } from '../../../application/errors/authentication.error.js';
 import { ValidationError } from '../../errors/validation.error.js';
 import { BusinessRuleError } from '../../../application/errors/business-rule.error.js';
+import z from 'zod';
 
 export class AuthController extends BaseController {
     constructor(
@@ -32,8 +33,6 @@ export class AuthController extends BaseController {
 
             const response: ApiSuccess<{ user: Omit<User, 'passwordHash'> }> = {
                 success: true,
-                code: 'CREATED',
-                message: 'User registered successfully',
                 data: {
                     user: removePasswordHash(user),
                 },
@@ -41,11 +40,10 @@ export class AuthController extends BaseController {
             res.status(201).json(response);
         } catch (err: unknown) {
             if (err instanceof ValidationError) {
-                const response: ApiError = {
+                const response: ApiError<z.infer<typeof registerSchema>> = {
                     success: false,
-                    code: 'BAD_REQUEST',
-                    message: 'Invalid data',
-                    issues: err.issues,
+                    code: 'VALIDATION_ERROR',
+                    tree: err.tree,
                 };
                 res.status(400).json(response);
                 return;
@@ -53,8 +51,8 @@ export class AuthController extends BaseController {
             if (err instanceof BusinessRuleError && err.reason === 'DUPLICATE_EMAIL') {
                 const response: ApiError = {
                     success: false,
-                    code: 'CONFLICT_ERROR',
-                    message: 'Email already in use',
+                    code: 'BUSINESS_RULE_ERROR',
+                    reason: err.reason,
                 };
                 res.status(409).json(response);
                 return;
@@ -73,8 +71,6 @@ export class AuthController extends BaseController {
 
             const response: ApiSuccess<{ user: Omit<User, 'passwordHash'> }> = {
                 success: true,
-                code: 'OK',
-                message: 'User logged in successfully',
                 data: {
                     user: removePasswordHash(user),
                 },
@@ -82,11 +78,10 @@ export class AuthController extends BaseController {
             res.status(200).json(response);
         } catch (err: unknown) {
             if (err instanceof ValidationError) {
-                const response: ApiError = {
+                const response: ApiError<z.infer<typeof loginSchema>> = {
                     success: false,
-                    code: 'BAD_REQUEST',
-                    message: 'Invalid data',
-                    issues: err.issues,
+                    code: 'VALIDATION_ERROR',
+                    tree: err.tree,
                 };
                 res.status(400).json(response);
                 return;
@@ -94,8 +89,7 @@ export class AuthController extends BaseController {
             if (err instanceof AuthenticationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'UNAUTHORIZED',
-                    message: 'Invalid credentials',
+                    code: 'AUTHENTICATION_ERROR',
                 };
                 res.status(401).json(response);
                 return;
@@ -115,18 +109,15 @@ export class AuthController extends BaseController {
 
             this.setAuthCookies(res, accessToken, newRefreshToken, rememberMe);
 
-            const response: ApiSuccess<void> = {
+            const response: ApiSuccess = {
                 success: true,
-                code: 'OK',
-                message: 'Tokens refreshed successfully',
             };
             res.status(200).json(response);
         } catch (err: unknown) {
             if (err instanceof AuthenticationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'UNAUTHORIZED',
-                    message: 'Invalid refresh token',
+                    code: 'AUTHENTICATION_ERROR',
                 };
                 res.status(401).json(response);
                 return;
@@ -142,10 +133,8 @@ export class AuthController extends BaseController {
 
         if (refreshToken) await this.logoutUseCase.execute({ refreshToken });
 
-        const response: ApiSuccess<void> = {
+        const response: ApiSuccess = {
             success: true,
-            code: 'OK',
-            message: 'Logged out successfully',
         };
         res.status(200).json(response);
     };

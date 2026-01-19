@@ -1,17 +1,22 @@
-import type { $ZodIssue } from 'zod/v4/core';
+import type { $ZodErrorTree } from 'zod/v4/core';
+import type { Reason } from '../../application/errors/business-rule.error.js';
 
-export type ApiSuccess<T> = {
-    success: true;
-    code: string;
-    message: string;
-    data?: T;
-};
+export type ApiSuccess<T = void> = T extends void ? { success: true } : { success: true; data: T };
 
-export type ApiError = {
+export type ApiError<E = void> = {
     success: false;
-    code: string;
-    message: string;
-    issues?: $ZodIssue[];
-};
+} & (
+    | {
+          code: 'AUTHENTICATION_ERROR' | 'AUTHORIZATION_ERROR' | 'RESOURCE_NOT_FOUND_ERROR';
+      }
+    | {
+          code: 'BUSINESS_RULE_ERROR';
+          reason: Reason;
+      }
+    | {
+          code: 'VALIDATION_ERROR';
+          tree: $ZodErrorTree<E>;
+      }
+);
 
-export type ApiResponse<T> = ApiSuccess<T> | ApiError;
+export type ApiResponse<T, E> = ApiSuccess<T> | ApiError<E>;

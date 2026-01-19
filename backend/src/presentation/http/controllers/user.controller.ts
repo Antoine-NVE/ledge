@@ -11,6 +11,7 @@ import { requestEmailVerificationSchema, verifyEmailSchema } from '../schemas/us
 import { ValidationError } from '../../errors/validation.error.js';
 import { AuthenticationError } from '../../../application/errors/authentication.error.js';
 import { BusinessRuleError } from '../../../application/errors/business-rule.error.js';
+import z from 'zod';
 
 export class UserController extends AuthenticatedController {
     constructor(
@@ -31,19 +32,16 @@ export class UserController extends AuthenticatedController {
 
             await this.requestEmailVerificationUseCase.execute({ userId, ...body });
 
-            const response: ApiSuccess<void> = {
+            const response: ApiSuccess = {
                 success: true,
-                code: 'OK',
-                message: 'Verification email sent successfully',
             };
             res.status(200).json(response);
         } catch (err: unknown) {
             if (err instanceof ValidationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'BAD_REQUEST',
-                    message: 'Invalid data',
-                    issues: err.issues,
+                    code: 'VALIDATION_ERROR',
+                    tree: err.tree,
                 };
                 res.status(400).json(response);
                 return;
@@ -51,8 +49,7 @@ export class UserController extends AuthenticatedController {
             if (err instanceof AuthenticationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'UNAUTHORIZED',
-                    message: 'Please login',
+                    code: 'AUTHENTICATION_ERROR',
                 };
                 res.status(401).json(response);
                 return;
@@ -60,8 +57,8 @@ export class UserController extends AuthenticatedController {
             if (err instanceof BusinessRuleError && err.reason === 'EMAIL_ALREADY_VERIFIED') {
                 const response: ApiError = {
                     success: false,
-                    code: 'CONFLICT',
-                    message: 'Email already verified',
+                    code: 'BUSINESS_RULE_ERROR',
+                    reason: err.reason,
                 };
                 res.status(409).json(response);
                 return;
@@ -69,8 +66,8 @@ export class UserController extends AuthenticatedController {
             if (err instanceof BusinessRuleError && err.reason === 'ACTIVE_COOLDOWN') {
                 const response: ApiError = {
                     success: false,
-                    code: 'TOO_MANY_REQUESTS',
-                    message: 'Please wait before requesting another email verification',
+                    code: 'BUSINESS_RULE_ERROR',
+                    reason: err.reason,
                 };
                 res.status(409).json(response);
                 return;
@@ -85,19 +82,16 @@ export class UserController extends AuthenticatedController {
 
             await this.verifyEmailUseCase.execute({ emailVerificationToken: body.token });
 
-            const response: ApiSuccess<void> = {
+            const response: ApiSuccess = {
                 success: true,
-                code: 'OK',
-                message: 'Email verified successfully',
             };
             res.status(200).json(response);
         } catch (err: unknown) {
             if (err instanceof ValidationError) {
-                const response: ApiError = {
+                const response: ApiError<z.infer<typeof verifyEmailSchema>> = {
                     success: false,
-                    code: 'BAD_REQUEST',
-                    message: 'Invalid data',
-                    issues: err.issues,
+                    code: 'VALIDATION_ERROR',
+                    tree: err.tree,
                 };
                 res.status(400).json(response);
                 return;
@@ -105,8 +99,8 @@ export class UserController extends AuthenticatedController {
             if (err instanceof BusinessRuleError && err.reason === 'INVALID_TOKEN') {
                 const response: ApiError = {
                     success: false,
-                    code: 'BAD_REQUEST',
-                    message: 'Invalid token',
+                    code: 'BUSINESS_RULE_ERROR',
+                    reason: err.reason,
                 };
                 res.status(400).json(response);
                 return;
@@ -114,8 +108,8 @@ export class UserController extends AuthenticatedController {
             if (err instanceof BusinessRuleError && err.reason === 'EMAIL_ALREADY_VERIFIED') {
                 const response: ApiError = {
                     success: false,
-                    code: 'CONFLICT',
-                    message: 'Email already verified',
+                    code: 'BUSINESS_RULE_ERROR',
+                    reason: err.reason,
                 };
                 res.status(409).json(response);
                 return;
@@ -132,8 +126,6 @@ export class UserController extends AuthenticatedController {
 
             const response: ApiSuccess<{ user: Omit<User, 'passwordHash'> }> = {
                 success: true,
-                code: 'OK',
-                message: 'User retrieved successfully',
                 data: {
                     user: removePasswordHash(user),
                 },
@@ -143,8 +135,7 @@ export class UserController extends AuthenticatedController {
             if (err instanceof AuthenticationError) {
                 const response: ApiError = {
                     success: false,
-                    code: 'UNAUTHORIZED',
-                    message: 'Please login',
+                    code: 'AUTHENTICATION_ERROR',
                 };
                 res.status(401).json(response);
                 return;

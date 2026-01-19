@@ -1,4 +1,4 @@
-import { type ZodType } from 'zod';
+import z, { type ZodType } from 'zod';
 import type { Request, Response } from 'express';
 import { ValidationError } from '../../errors/validation.error.js';
 
@@ -17,7 +17,7 @@ export abstract class BaseController {
         >,
     ): T {
         const result = schema.safeParse(req);
-        if (!result.success) throw new ValidationError(result.error.issues);
+        if (!result.success) throw new ValidationError(z.treeifyError(result.error));
 
         return result.data;
     }

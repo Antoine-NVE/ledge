@@ -1,6 +1,6 @@
 import { ApplicationError, type ApplicationErrorOptions } from './application.error.js';
 
-type Reason = 'EMAIL_ALREADY_VERIFIED' | 'ACTIVE_COOLDOWN' | 'INVALID_TOKEN' | 'DUPLICATE_EMAIL';
+export type Reason = 'EMAIL_ALREADY_VERIFIED' | 'ACTIVE_COOLDOWN' | 'INVALID_TOKEN' | 'DUPLICATE_EMAIL';
 
 export class BusinessRuleError extends ApplicationError {
     constructor(
