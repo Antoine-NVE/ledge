@@ -5,7 +5,12 @@ import type { PresentationErrorCode } from '../errors/presentation.error.js';
 
 export type ApiSuccess<T = void> = T extends void ? { success: true } : { success: true; data: T };
 
-type ApiErrorCode = ApplicationErrorCode | PresentationErrorCode | 'INTERNAL_SERVER_ERROR';
+type ApiErrorCode =
+    | ApplicationErrorCode
+    | PresentationErrorCode
+    | 'ROUTE_NOT_FOUND_ERROR'
+    | 'TOO_MANY_REQUESTS_ERROR'
+    | 'INTERNAL_SERVER_ERROR';
 
 export type ApiError<E = void> = { success: false } & (
     | {

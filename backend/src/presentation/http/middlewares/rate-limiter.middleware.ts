@@ -9,8 +9,7 @@ export const rateLimiterMiddleware = () => {
         handler: (req: Request, res: Response) => {
             const response: ApiError = {
                 success: false,
-                code: 'TOO_MANY_REQUESTS',
-                message: 'Too many requests',
+                code: 'TOO_MANY_REQUESTS_ERROR',
             };
             req.logger.warn('Too many requests');
             res.status(429).json(response);

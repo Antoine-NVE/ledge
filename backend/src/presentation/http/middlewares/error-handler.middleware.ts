@@ -15,7 +15,6 @@ export const errorHandlerMiddleware = () => {
         const response: ApiError = {
             success: false,
             code: 'INTERNAL_SERVER_ERROR',
-            message: 'Internal server error',
         };
         res.status(500).json(response);
     };

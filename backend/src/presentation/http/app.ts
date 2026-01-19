@@ -109,8 +109,7 @@ export const createHttpApp = ({
     app.use((req: Request, res: Response) => {
         const response: ApiError = {
             success: false,
-            code: 'NOT_FOUND',
-            message: 'Route not found',
+            code: 'ROUTE_NOT_FOUND_ERROR',
         };
         req.logger.warn('Route not found');
         res.status(404).json(response);
