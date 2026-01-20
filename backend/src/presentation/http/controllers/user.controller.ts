@@ -1,17 +1,17 @@
 import type { Request, Response } from 'express';
-import { removePasswordHash } from '../../../core/utils/clean.js';
 import type { RequestEmailVerificationUseCase } from '../../../application/user/request-email-verification.use-case.js';
 import type { VerifyEmailUseCase } from '../../../application/user/verify-email.use-case.js';
 import type { TokenManager } from '../../../domain/ports/token-manager.js';
 import type { GetCurrentUserUseCase } from '../../../application/user/get-current-user.use-case.js';
 import type { ApiError, ApiSuccess } from '../../types/api-response.js';
-import type { User } from '../../../domain/entities/user.js';
 import { AuthenticatedController } from './authenticated.controller.js';
 import { requestEmailVerificationSchema, verifyEmailSchema } from '../schemas/user.schemas.js';
 import { ValidationError } from '../../errors/validation.error.js';
 import { AuthenticationError } from '../../../application/errors/authentication.error.js';
 import { BusinessRuleError } from '../../../application/errors/business-rule.error.js';
 import z from 'zod';
+import type { MeDto } from '../dto/user/me.dto.js';
+import { toMeDto } from '../mappers/user/me.mapper.js';
 
 export class UserController extends AuthenticatedController {
     constructor(
@@ -124,11 +124,9 @@ export class UserController extends AuthenticatedController {
 
             const { user } = await this.getCurrentUserUseCase.execute({ userId });
 
-            const response: ApiSuccess<{ user: Omit<User, 'passwordHash'> }> = {
+            const response: ApiSuccess<MeDto> = {
                 success: true,
-                data: {
-                    user: removePasswordHash(user),
-                },
+                data: toMeDto(user),
             };
             res.status(200).json(response);
         } catch (err: unknown) {

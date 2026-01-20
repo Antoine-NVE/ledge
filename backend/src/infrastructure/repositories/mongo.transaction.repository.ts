@@ -2,30 +2,28 @@ import { Collection, ObjectId } from 'mongodb';
 import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
 import type { Transaction } from '../../domain/entities/transaction.js';
 
-type ExpenseDocument = Readonly<{
-    _id: ObjectId;
-    userId: ObjectId;
-    month: string;
-    name: string;
-    value: number;
-    type: 'expense';
-    expenseCategory?: 'need' | 'want' | 'investment';
-    createdAt: Date;
-    updatedAt: Date;
-}>;
-
-type IncomeDocument = Readonly<{
-    _id: ObjectId;
-    userId: ObjectId;
-    month: string;
-    name: string;
-    value: number;
-    type: 'income';
-    createdAt: Date;
-    updatedAt: Date;
-}>;
-
-type TransactionDocument = ExpenseDocument | IncomeDocument;
+type TransactionDocument =
+    | Readonly<{
+          _id: ObjectId;
+          userId: ObjectId;
+          month: string;
+          name: string;
+          value: number;
+          type: 'expense';
+          expenseCategory?: 'need' | 'want' | 'investment';
+          createdAt: Date;
+          updatedAt: Date;
+      }>
+    | Readonly<{
+          _id: ObjectId;
+          userId: ObjectId;
+          month: string;
+          name: string;
+          value: number;
+          type: 'income';
+          createdAt: Date;
+          updatedAt: Date;
+      }>;
 
 export class MongoTransactionRepository implements TransactionRepository {
     constructor(private transactionCollection: Collection<TransactionDocument>) {}
@@ -45,31 +43,32 @@ export class MongoTransactionRepository implements TransactionRepository {
     };
 
     private toDomain = (document: TransactionDocument): Transaction => {
-        if (document.type === 'expense') {
-            return {
-                id: document._id.toString(),
-                userId: document.userId.toString(),
-                month: document.month,
-                name: document.name,
-                value: document.value,
-                type: document.type,
-                expenseCategory: document.expenseCategory ?? null,
-                createdAt: document.createdAt,
-                updatedAt: document.updatedAt,
-            };
+        switch (document.type) {
+            case 'expense':
+                return {
+                    id: document._id.toString(),
+                    userId: document.userId.toString(),
+                    month: document.month,
+                    name: document.name,
+                    value: document.value,
+                    type: document.type,
+                    expenseCategory: document.expenseCategory ?? null,
+                    createdAt: document.createdAt,
+                    updatedAt: document.updatedAt,
+                };
+            case 'income':
+                return {
+                    id: document._id.toString(),
+                    userId: document.userId.toString(),
+                    month: document.month,
+                    name: document.name,
+                    value: document.value,
+                    type: document.type,
+                    expenseCategory: null,
+                    createdAt: document.createdAt,
+                    updatedAt: document.updatedAt,
+                };
         }
-
-        return {
-            id: document._id.toString(),
-            userId: document.userId.toString(),
-            month: document.month,
-            name: document.name,
-            value: document.value,
-            type: document.type,
-            expenseCategory: null,
-            createdAt: document.createdAt,
-            updatedAt: document.updatedAt,
-        };
     };
 
     create = async (transaction: Transaction): Promise<void> => {

@@ -10,7 +10,7 @@ type Input = {
 
 type Output = {
     accessToken: string;
-    newRefreshToken: string;
+    refreshToken: string;
 };
 
 export class RefreshUseCase {
@@ -38,6 +38,6 @@ export class RefreshUseCase {
 
         const accessToken = this.tokenManager.signAccess({ userId: refreshToken.userId });
 
-        return { accessToken, newRefreshToken: updatedRefreshToken.value };
+        return { accessToken, refreshToken: updatedRefreshToken.value };
     };
 }

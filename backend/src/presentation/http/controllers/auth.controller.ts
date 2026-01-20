@@ -1,17 +1,19 @@
 import type { Request, Response } from 'express';
-import { removePasswordHash } from '../../../core/utils/clean.js';
 import type { RegisterUseCase } from '../../../application/auth/register.use-case.js';
 import type { LoginUseCase } from '../../../application/auth/login.use-case.js';
 import type { RefreshUseCase } from '../../../application/auth/refresh.use-case.js';
 import type { LogoutUseCase } from '../../../application/auth/logout.use-case.js';
 import type { ApiError, ApiSuccess } from '../../types/api-response.js';
-import type { User } from '../../../domain/entities/user.js';
 import { BaseController } from './base.controller.js';
 import { loginSchema, registerSchema } from '../schemas/auth.schemas.js';
 import { AuthenticationError } from '../../../application/errors/authentication.error.js';
 import { ValidationError } from '../../errors/validation.error.js';
 import { BusinessRuleError } from '../../../application/errors/business-rule.error.js';
 import z from 'zod';
+import type { RegisterDto } from '../dto/auth/register.dto.js';
+import type { LoginDto } from '../dto/auth/login.dto.js';
+import { toRegisterDto } from '../mappers/auth/register.mapper.js';
+import { toLoginDto } from '../mappers/auth/login.mapper.js';
 
 export class AuthController extends BaseController {
     constructor(
@@ -31,11 +33,9 @@ export class AuthController extends BaseController {
 
             this.setAuthCookies(res, accessToken, refreshToken, false);
 
-            const response: ApiSuccess<{ user: Omit<User, 'passwordHash'> }> = {
+            const response: ApiSuccess<RegisterDto> = {
                 success: true,
-                data: {
-                    user: removePasswordHash(user),
-                },
+                data: toRegisterDto(user),
             };
             res.status(201).json(response);
         } catch (err: unknown) {
@@ -69,11 +69,9 @@ export class AuthController extends BaseController {
 
             this.setAuthCookies(res, accessToken, refreshToken, body.rememberMe);
 
-            const response: ApiSuccess<{ user: Omit<User, 'passwordHash'> }> = {
+            const response: ApiSuccess<LoginDto> = {
                 success: true,
-                data: {
-                    user: removePasswordHash(user),
-                },
+                data: toLoginDto(user),
             };
             res.status(200).json(response);
         } catch (err: unknown) {
@@ -105,9 +103,9 @@ export class AuthController extends BaseController {
 
             const rememberMe = this.findRememberMe(req);
 
-            const { accessToken, newRefreshToken } = await this.refreshUseCase.execute({ refreshToken });
+            const output = await this.refreshUseCase.execute({ refreshToken });
 
-            this.setAuthCookies(res, accessToken, newRefreshToken, rememberMe);
+            this.setAuthCookies(res, output.accessToken, output.refreshToken, rememberMe);
 
             const response: ApiSuccess = {
                 success: true,

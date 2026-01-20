@@ -7,7 +7,6 @@ import type { DeleteTransactionUseCase } from '../../../application/transaction/
 import type { TokenManager } from '../../../domain/ports/token-manager.js';
 import type { IdManager } from '../../../domain/ports/id-manager.js';
 import type { ApiError, ApiSuccess } from '../../types/api-response.js';
-import type { Transaction } from '../../../domain/entities/transaction.js';
 import { AuthenticatedController } from './authenticated.controller.js';
 import { createSchema, deleteSchema, readSchema, updateSchema } from '../schemas/transaction.schemas.js';
 import { AuthorizationError } from '../../../application/errors/authorization.error.js';
@@ -15,6 +14,16 @@ import { ResourceNotFoundError } from '../../../application/errors/resource-not-
 import { ValidationError } from '../../errors/validation.error.js';
 import { AuthenticationError } from '../../../application/errors/authentication.error.js';
 import z from 'zod';
+import type { CreateDto } from '../dto/transaction/create.dto.js';
+import type { ReadAllDto } from '../dto/transaction/read-all.dto.js';
+import { toCreateDto } from '../mappers/transaction/create.mapper.js';
+import { toReadAllDto } from '../mappers/transaction/read-all.mapper.js';
+import { toReadDto } from '../mappers/transaction/read.mapper.js';
+import { toUpdateDto } from '../mappers/transaction/update.mapper.js';
+import { toDeleteDto } from '../mappers/transaction/delete.mapper.js';
+import type { ReadDto } from '../dto/transaction/read.dto.js';
+import type { UpdateDto } from '../dto/transaction/update.dto.js';
+import type { DeleteDto } from '../dto/transaction/delete.dto.js';
 
 export class TransactionController extends AuthenticatedController {
     constructor(
@@ -37,11 +46,9 @@ export class TransactionController extends AuthenticatedController {
 
             const { transaction } = await this.createTransactionUseCase.execute({ userId, ...body });
 
-            const response: ApiSuccess<{ transaction: Transaction }> = {
+            const response: ApiSuccess<CreateDto> = {
                 success: true,
-                data: {
-                    transaction,
-                },
+                data: toCreateDto(transaction),
             };
             res.status(201).json(response);
         } catch (err: unknown) {
@@ -72,11 +79,9 @@ export class TransactionController extends AuthenticatedController {
 
             const { transactions } = await this.getUserTransactionsUseCase.execute({ userId });
 
-            const response: ApiSuccess<{ transactions: Transaction[] }> = {
+            const response: ApiSuccess<ReadAllDto> = {
                 success: true,
-                data: {
-                    transactions,
-                },
+                data: toReadAllDto(transactions),
             };
             res.status(200).json(response);
         } catch (err: unknown) {
@@ -100,11 +105,9 @@ export class TransactionController extends AuthenticatedController {
 
             const { transaction } = await this.getTransactionUseCase.execute({ ...params, userId });
 
-            const response: ApiSuccess<{ transaction: Transaction }> = {
+            const response: ApiSuccess<ReadDto> = {
                 success: true,
-                data: {
-                    transaction,
-                },
+                data: toReadDto(transaction),
             };
             res.status(200).json(response);
         } catch (err: unknown) {
@@ -153,11 +156,9 @@ export class TransactionController extends AuthenticatedController {
 
             const { transaction } = await this.updateTransactionUseCase.execute({ ...params, userId, ...body });
 
-            const response: ApiSuccess<{ transaction: Transaction }> = {
+            const response: ApiSuccess<UpdateDto> = {
                 success: true,
-                data: {
-                    transaction,
-                },
+                data: toUpdateDto(transaction),
             };
             res.status(200).json(response);
         } catch (err: unknown) {
@@ -206,11 +207,9 @@ export class TransactionController extends AuthenticatedController {
 
             const { transaction } = await this.deleteTransactionUseCase.execute({ ...params, userId });
 
-            const response: ApiSuccess<{ transaction: Transaction }> = {
+            const response: ApiSuccess<DeleteDto> = {
                 success: true,
-                data: {
-                    transaction,
-                },
+                data: toDeleteDto(transaction),
             };
             res.status(200).json(response);
         } catch (err: unknown) {

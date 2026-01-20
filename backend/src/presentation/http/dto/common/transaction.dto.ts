@@ -1,4 +1,4 @@
-export type Transaction =
+export type TransactionDto =
     | Readonly<{
           id: string;
           userId: string;
@@ -7,8 +7,8 @@ export type Transaction =
           value: number;
           type: 'expense';
           expenseCategory: 'need' | 'want' | 'investment' | null;
-          createdAt: Date;
-          updatedAt: Date;
+          createdAt: string;
+          updatedAt: string;
       }>
     | Readonly<{
           id: string;
@@ -18,6 +18,6 @@ export type Transaction =
           value: number;
           type: 'income';
           expenseCategory: null;
-          createdAt: Date;
-          updatedAt: Date;
+          createdAt: string;
+          updatedAt: string;
       }>;
