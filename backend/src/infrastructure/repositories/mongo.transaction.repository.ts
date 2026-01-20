@@ -2,8 +2,8 @@ import { Collection, ObjectId } from 'mongodb';
 import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
 import type { Transaction } from '../../domain/entities/transaction.js';
 
-type TransactionDocument =
-    | Readonly<{
+type TransactionDocument = Readonly<
+    | {
           _id: ObjectId;
           userId: ObjectId;
           month: string;
@@ -13,8 +13,8 @@ type TransactionDocument =
           expenseCategory?: 'need' | 'want' | 'investment';
           createdAt: Date;
           updatedAt: Date;
-      }>
-    | Readonly<{
+      }
+    | {
           _id: ObjectId;
           userId: ObjectId;
           month: string;
@@ -23,7 +23,8 @@ type TransactionDocument =
           type: 'income';
           createdAt: Date;
           updatedAt: Date;
-      }>;
+      }
+>;
 
 export class MongoTransactionRepository implements TransactionRepository {
     constructor(private transactionCollection: Collection<TransactionDocument>) {}
