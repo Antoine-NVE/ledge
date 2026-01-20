@@ -1,4 +1,4 @@
-import type { Transaction } from '../../../../domain/entities/transaction.js';
+import type { Transaction } from '../../../domain/entities/transaction.js';
 import type { CreateDto } from '../../dto/transaction/create.dto.js';
 import { toTransactionDto } from '../common/transaction.mapper.js';
 

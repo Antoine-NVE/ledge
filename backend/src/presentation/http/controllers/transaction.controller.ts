@@ -8,22 +8,22 @@ import type { TokenManager } from '../../../domain/ports/token-manager.js';
 import type { IdManager } from '../../../domain/ports/id-manager.js';
 import type { ApiError, ApiSuccess } from '../../types/api-response.js';
 import { AuthenticatedController } from './authenticated.controller.js';
-import { createSchema, deleteSchema, readSchema, updateSchema } from '../schemas/transaction.schemas.js';
 import { AuthorizationError } from '../../../application/errors/authorization.error.js';
 import { ResourceNotFoundError } from '../../../application/errors/resource-not-found.error.js';
 import { ValidationError } from '../../errors/validation.error.js';
 import { AuthenticationError } from '../../../application/errors/authentication.error.js';
 import z from 'zod';
-import type { CreateDto } from '../dto/transaction/create.dto.js';
-import type { ReadAllDto } from '../dto/transaction/read-all.dto.js';
-import { toCreateDto } from '../mappers/transaction/create.mapper.js';
-import { toReadAllDto } from '../mappers/transaction/read-all.mapper.js';
-import { toReadDto } from '../mappers/transaction/read.mapper.js';
-import { toUpdateDto } from '../mappers/transaction/update.mapper.js';
-import { toDeleteDto } from '../mappers/transaction/delete.mapper.js';
-import type { ReadDto } from '../dto/transaction/read.dto.js';
-import type { UpdateDto } from '../dto/transaction/update.dto.js';
-import type { DeleteDto } from '../dto/transaction/delete.dto.js';
+import { createSchema, deleteSchema, readSchema, updateSchema } from '../../schemas/transaction.schemas.js';
+import type { CreateDto } from '../../dto/transaction/create.dto.js';
+import { toCreateDto } from '../../mappers/transaction/create.mapper.js';
+import type { ReadAllDto } from '../../dto/transaction/read-all.dto.js';
+import { toReadAllDto } from '../../mappers/transaction/read-all.mapper.js';
+import type { ReadDto } from '../../dto/transaction/read.dto.js';
+import { toReadDto } from '../../mappers/transaction/read.mapper.js';
+import type { UpdateDto } from '../../dto/transaction/update.dto.js';
+import { toUpdateDto } from '../../mappers/transaction/update.mapper.js';
+import type { DeleteDto } from '../../dto/transaction/delete.dto.js';
+import { toDeleteDto } from '../../mappers/transaction/delete.mapper.js';
 
 export class TransactionController extends AuthenticatedController {
     constructor(

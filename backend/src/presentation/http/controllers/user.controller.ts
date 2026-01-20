@@ -5,13 +5,13 @@ import type { TokenManager } from '../../../domain/ports/token-manager.js';
 import type { GetCurrentUserUseCase } from '../../../application/user/get-current-user.use-case.js';
 import type { ApiError, ApiSuccess } from '../../types/api-response.js';
 import { AuthenticatedController } from './authenticated.controller.js';
-import { requestEmailVerificationSchema, verifyEmailSchema } from '../schemas/user.schemas.js';
 import { ValidationError } from '../../errors/validation.error.js';
 import { AuthenticationError } from '../../../application/errors/authentication.error.js';
 import { BusinessRuleError } from '../../../application/errors/business-rule.error.js';
 import z from 'zod';
-import type { MeDto } from '../dto/user/me.dto.js';
-import { toMeDto } from '../mappers/user/me.mapper.js';
+import { requestEmailVerificationSchema, verifyEmailSchema } from '../../schemas/user.schemas.js';
+import type { MeDto } from '../../dto/user/me.dto.js';
+import { toMeDto } from '../../mappers/user/me.mapper.js';
 
 export class UserController extends AuthenticatedController {
     constructor(

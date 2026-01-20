@@ -1,4 +1,4 @@
-import type { User } from '../../../../domain/entities/user.js';
+import type { User } from '../../../domain/entities/user.js';
 import type { MeDto } from '../../dto/user/me.dto.js';
 import { toUserDto } from '../common/user.mapper.js';
 

@@ -5,15 +5,15 @@ import type { RefreshUseCase } from '../../../application/auth/refresh.use-case.
 import type { LogoutUseCase } from '../../../application/auth/logout.use-case.js';
 import type { ApiError, ApiSuccess } from '../../types/api-response.js';
 import { BaseController } from './base.controller.js';
-import { loginSchema, registerSchema } from '../schemas/auth.schemas.js';
 import { AuthenticationError } from '../../../application/errors/authentication.error.js';
 import { ValidationError } from '../../errors/validation.error.js';
 import { BusinessRuleError } from '../../../application/errors/business-rule.error.js';
 import z from 'zod';
-import type { RegisterDto } from '../dto/auth/register.dto.js';
-import type { LoginDto } from '../dto/auth/login.dto.js';
-import { toRegisterDto } from '../mappers/auth/register.mapper.js';
-import { toLoginDto } from '../mappers/auth/login.mapper.js';
+import { loginSchema, registerSchema } from '../../schemas/auth.schemas.js';
+import type { RegisterDto } from '../../dto/auth/register.dto.js';
+import { toRegisterDto } from '../../mappers/auth/register.mapper.js';
+import type { LoginDto } from '../../dto/auth/login.dto.js';
+import { toLoginDto } from '../../mappers/auth/login.mapper.js';
 
 export class AuthController extends BaseController {
     constructor(
