@@ -1,9 +1,8 @@
 import z from 'zod';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
-import { ensureError } from '../../core/utils/error.js';
 
-export const loadEnv = (): Result<z.infer<typeof schema>, Error> => {
+export const loadEnv = (): Result<z.infer<typeof schema>, unknown> => {
     const schema = z.object({
         nodeEnv: z.enum(['development', 'production']),
         tokenSecret: z.string(),
@@ -34,6 +33,6 @@ export const loadEnv = (): Result<z.infer<typeof schema>, Error> => {
 
         return ok(parsed);
     } catch (err: unknown) {
-        return fail(ensureError(err));
+        return fail(err);
     }
 };

@@ -1,7 +1,6 @@
 import { Db, MongoClient } from 'mongodb';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
-import { ensureError } from '../../core/utils/error.js';
 
 type Input = {
     mongoUrl: string;
@@ -12,7 +11,7 @@ type Output = {
     mongoDb: Db;
 };
 
-export const connectToMongo = async ({ mongoUrl }: Input): Promise<Result<Output, Error>> => {
+export const connectToMongo = async ({ mongoUrl }: Input): Promise<Result<Output, unknown>> => {
     try {
         const mongoClient = new MongoClient(mongoUrl);
         await mongoClient.connect();
@@ -22,7 +21,7 @@ export const connectToMongo = async ({ mongoUrl }: Input): Promise<Result<Output
 
         return ok({ mongoClient, mongoDb });
     } catch (err: unknown) {
-        return fail(ensureError(err));
+        return fail(err);
     }
 };
 

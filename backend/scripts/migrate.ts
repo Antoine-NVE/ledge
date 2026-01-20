@@ -6,7 +6,6 @@ import { fail, ok } from '../src/core/utils/result.js';
 import type { Result } from '../src/core/types/result.js';
 import type { MongoClient } from 'mongodb';
 import { createMigrationRunner } from '../src/infrastructure/config/migration.js';
-import { ensureError } from '../src/core/utils/error.js';
 
 type Output = {
     mongoClient: MongoClient;
@@ -43,7 +42,7 @@ const start = async (): Promise<Result<Output, Error>> => {
 
     const migrationResult = await command()
         .then(() => ok(undefined))
-        .catch((err) => fail(ensureError(err)));
+        .catch((err) => fail(err));
     if (!migrationResult.success) return fail(new Error('Failed to run migration', { cause: migrationResult.error }));
     logger.info('Migration run');
 

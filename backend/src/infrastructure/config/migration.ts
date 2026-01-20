@@ -2,7 +2,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import { MongoDBStorage, Umzug } from 'umzug';
 import type { Db } from 'mongodb';
-import type { Logger } from '../../application/ports/logger.js';
+import type { Logger } from '../../domain/ports/logger.js';
 
 type Input = {
     mongoDb: Db;
