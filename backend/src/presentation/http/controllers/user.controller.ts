@@ -38,7 +38,7 @@ export class UserController extends AuthenticatedController {
             res.status(200).json(response);
         } catch (err: unknown) {
             if (err instanceof ValidationError) {
-                const response: ApiError = {
+                const response: ApiError<z.infer<ReturnType<typeof requestEmailVerificationSchema>>> = {
                     success: false,
                     code: err.code,
                     tree: err.tree,
@@ -78,7 +78,7 @@ export class UserController extends AuthenticatedController {
 
     verifyEmail = async (req: Request, res: Response): Promise<void> => {
         try {
-            const { body } = this.validate(req, verifyEmailSchema);
+            const { body } = this.validate(req, verifyEmailSchema());
 
             await this.verifyEmailUseCase.execute({ emailVerificationToken: body.token });
 
@@ -88,7 +88,7 @@ export class UserController extends AuthenticatedController {
             res.status(200).json(response);
         } catch (err: unknown) {
             if (err instanceof ValidationError) {
-                const response: ApiError<z.infer<typeof verifyEmailSchema>> = {
+                const response: ApiError<z.infer<ReturnType<typeof verifyEmailSchema>>> = {
                     success: false,
                     code: err.code,
                     tree: err.tree,

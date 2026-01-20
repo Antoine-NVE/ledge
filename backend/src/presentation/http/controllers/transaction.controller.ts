@@ -33,7 +33,7 @@ export class TransactionController extends AuthenticatedController {
         try {
             const userId = this.getUserId(req);
 
-            const { body } = this.validate(req, createSchema);
+            const { body } = this.validate(req, createSchema());
 
             const { transaction } = await this.createTransactionUseCase.execute({ userId, ...body });
 
@@ -46,7 +46,7 @@ export class TransactionController extends AuthenticatedController {
             res.status(201).json(response);
         } catch (err: unknown) {
             if (err instanceof ValidationError) {
-                const response: ApiError<z.infer<typeof createSchema>> = {
+                const response: ApiError<z.infer<ReturnType<typeof createSchema>>> = {
                     success: false,
                     code: err.code,
                     tree: err.tree,
@@ -109,7 +109,7 @@ export class TransactionController extends AuthenticatedController {
             res.status(200).json(response);
         } catch (err: unknown) {
             if (err instanceof ValidationError) {
-                const response: ApiError<z.infer<typeof readSchema>> = {
+                const response: ApiError<z.infer<ReturnType<typeof readSchema>>> = {
                     success: false,
                     code: err.code,
                     tree: err.tree,
@@ -162,7 +162,7 @@ export class TransactionController extends AuthenticatedController {
             res.status(200).json(response);
         } catch (err: unknown) {
             if (err instanceof ValidationError) {
-                const response: ApiError<z.infer<typeof updateSchema>> = {
+                const response: ApiError<z.infer<ReturnType<typeof updateSchema>>> = {
                     success: false,
                     code: err.code,
                     tree: err.tree,
@@ -215,7 +215,7 @@ export class TransactionController extends AuthenticatedController {
             res.status(200).json(response);
         } catch (err: unknown) {
             if (err instanceof ValidationError) {
-                const response: ApiError<z.infer<typeof deleteSchema>> = {
+                const response: ApiError<z.infer<ReturnType<typeof deleteSchema>>> = {
                     success: false,
                     code: err.code,
                     tree: err.tree,

@@ -25,7 +25,7 @@ export class AuthController extends BaseController {
 
     register = async (req: Request, res: Response) => {
         try {
-            const { body } = this.validate(req, registerSchema);
+            const { body } = this.validate(req, registerSchema());
 
             const { user, accessToken, refreshToken } = await this.registerUseCase.execute(body);
 
@@ -40,7 +40,7 @@ export class AuthController extends BaseController {
             res.status(201).json(response);
         } catch (err: unknown) {
             if (err instanceof ValidationError) {
-                const response: ApiError<z.infer<typeof registerSchema>> = {
+                const response: ApiError<z.infer<ReturnType<typeof registerSchema>>> = {
                     success: false,
                     code: err.code,
                     tree: err.tree,
@@ -63,7 +63,7 @@ export class AuthController extends BaseController {
 
     login = async (req: Request, res: Response) => {
         try {
-            const { body } = this.validate(req, loginSchema);
+            const { body } = this.validate(req, loginSchema());
 
             const { user, accessToken, refreshToken } = await this.loginUseCase.execute(body);
 
@@ -78,7 +78,7 @@ export class AuthController extends BaseController {
             res.status(200).json(response);
         } catch (err: unknown) {
             if (err instanceof ValidationError) {
-                const response: ApiError<z.infer<typeof loginSchema>> = {
+                const response: ApiError<z.infer<ReturnType<typeof loginSchema>>> = {
                     success: false,
                     code: err.code,
                     tree: err.tree,

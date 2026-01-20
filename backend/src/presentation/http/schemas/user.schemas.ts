@@ -8,8 +8,10 @@ export const requestEmailVerificationSchema = (allowedOrigins: string[]) => {
     });
 };
 
-export const verifyEmailSchema = z.object({
-    body: z.object({
-        token: z.string(),
-    }),
-});
+export const verifyEmailSchema = () => {
+    return z.object({
+        body: z.object({
+            token: z.string(),
+        }),
+    });
+};
