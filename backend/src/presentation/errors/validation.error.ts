@@ -1,10 +1,11 @@
-import { PresentationError, type PresentationErrorOptions } from './presentation.error.js';
+import { PresentationError } from './presentation.error.js';
 import type { $ZodErrorTree } from 'zod/v4/core';
+import type { ErrorOptions } from '../../core/errors/base.error.js';
 
 export class ValidationError<T> extends PresentationError<'VALIDATION_ERROR'> {
     constructor(
         public readonly tree: $ZodErrorTree<T>,
-        options?: PresentationErrorOptions,
+        options?: ErrorOptions,
     ) {
         super('VALIDATION_ERROR', 'Validation error', options);
     }

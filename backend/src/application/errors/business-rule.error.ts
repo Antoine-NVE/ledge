@@ -1,4 +1,5 @@
-import { ApplicationError, type ApplicationErrorOptions } from './application.error.js';
+import { ApplicationError } from './application.error.js';
+import type { ErrorOptions } from '../../core/errors/base.error.js';
 
 export type BusinessRuleErrorReason =
     | 'EMAIL_ALREADY_VERIFIED'
@@ -9,7 +10,7 @@ export type BusinessRuleErrorReason =
 export class BusinessRuleError extends ApplicationError<'BUSINESS_RULE_ERROR'> {
     constructor(
         public readonly reason: BusinessRuleErrorReason,
-        options?: ApplicationErrorOptions,
+        options?: ErrorOptions,
     ) {
         super('BUSINESS_RULE_ERROR', 'Business rule error', options);
     }

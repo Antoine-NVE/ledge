@@ -1,17 +1,9 @@
+import { BaseError, type ErrorOptions } from '../../core/errors/base.error.js';
+
 export type PresentationErrorCode = 'VALIDATION_ERROR';
 
-export type PresentationErrorOptions = {
-    message?: string;
-    cause?: unknown;
-};
-
-export abstract class PresentationError<C extends PresentationErrorCode> extends Error {
-    protected constructor(
-        public readonly code: C,
-        defaultMessage: string,
-        options?: PresentationErrorOptions,
-    ) {
-        super(options?.message ?? defaultMessage, { cause: options?.cause });
-        this.name = this.constructor.name;
+export abstract class PresentationError<C extends PresentationErrorCode> extends BaseError<C> {
+    protected constructor(code: C, defaultMessage: string, options?: ErrorOptions) {
+        super(code, defaultMessage, options);
     }
 }
