@@ -1,13 +1,8 @@
-import { BaseError, type ErrorOptions } from '../../core/errors/base.error.js';
-
-export type ApplicationErrorCode =
-    | 'AUTHENTICATION_ERROR'
-    | 'AUTHORIZATION_ERROR'
-    | 'BUSINESS_RULE_ERROR'
-    | 'RESOURCE_NOT_FOUND_ERROR';
+import { BaseError } from '../../core/errors/base.error.js';
+import type { ApplicationErrorCode } from '../../presentation/types/api-response.js';
 
 export abstract class ApplicationError<C extends ApplicationErrorCode> extends BaseError<C> {
-    protected constructor(code: C, defaultMessage: string, options?: ErrorOptions) {
+    protected constructor(code: C, defaultMessage: string, options?: ErrorOptions & { message?: string }) {
         super(code, defaultMessage, options);
     }
 }

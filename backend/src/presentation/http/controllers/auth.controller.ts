@@ -3,12 +3,9 @@ import type { RegisterUseCase } from '../../../application/auth/register.use-cas
 import type { LoginUseCase } from '../../../application/auth/login.use-case.js';
 import type { RefreshUseCase } from '../../../application/auth/refresh.use-case.js';
 import type { LogoutUseCase } from '../../../application/auth/logout.use-case.js';
-import type { ApiError, ApiSuccess } from '../../types/api-response.js';
+import type { ApiSuccess } from '../../types/api-response.js';
 import { BaseController } from './base.controller.js';
 import { AuthenticationError } from '../../../application/errors/authentication.error.js';
-import { ValidationError } from '../../errors/validation.error.js';
-import { BusinessRuleError } from '../../../application/errors/business-rule.error.js';
-import z from 'zod';
 import { loginSchema, registerSchema } from '../../schemas/auth.schemas.js';
 import type { RegisterDto } from '../../dto/auth/register.dto.js';
 import { toRegisterDto } from '../../mappers/auth/register.mapper.js';
@@ -26,102 +23,47 @@ export class AuthController extends BaseController {
     }
 
     register = async (req: Request, res: Response) => {
-        try {
-            const { body } = this.validate(req, registerSchema());
+        const { body } = this.validate(req, registerSchema());
 
-            const { user, accessToken, refreshToken } = await this.registerUseCase.execute(body);
+        const { user, accessToken, refreshToken } = await this.registerUseCase.execute(body);
 
-            this.setAuthCookies(res, accessToken, refreshToken, false);
+        this.setAuthCookies(res, accessToken, refreshToken, false);
 
-            const response: ApiSuccess<RegisterDto> = {
-                success: true,
-                data: toRegisterDto(user),
-            };
-            res.status(201).json(response);
-        } catch (err: unknown) {
-            if (err instanceof ValidationError) {
-                const response: ApiError<z.infer<ReturnType<typeof registerSchema>>> = {
-                    success: false,
-                    code: err.code,
-                    tree: err.tree,
-                };
-                res.status(400).json(response);
-                return;
-            }
-            if (err instanceof BusinessRuleError && err.reason === 'DUPLICATE_EMAIL') {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                    reason: err.reason,
-                };
-                res.status(409).json(response);
-                return;
-            }
-            throw err;
-        }
+        const response: ApiSuccess<RegisterDto> = {
+            success: true,
+            data: toRegisterDto(user),
+        };
+        res.status(201).json(response);
     };
 
     login = async (req: Request, res: Response) => {
-        try {
-            const { body } = this.validate(req, loginSchema());
+        const { body } = this.validate(req, loginSchema());
 
-            const { user, accessToken, refreshToken } = await this.loginUseCase.execute(body);
+        const { user, accessToken, refreshToken } = await this.loginUseCase.execute(body);
 
-            this.setAuthCookies(res, accessToken, refreshToken, body.rememberMe);
+        this.setAuthCookies(res, accessToken, refreshToken, body.rememberMe);
 
-            const response: ApiSuccess<LoginDto> = {
-                success: true,
-                data: toLoginDto(user),
-            };
-            res.status(200).json(response);
-        } catch (err: unknown) {
-            if (err instanceof ValidationError) {
-                const response: ApiError<z.infer<ReturnType<typeof loginSchema>>> = {
-                    success: false,
-                    code: err.code,
-                    tree: err.tree,
-                };
-                res.status(400).json(response);
-                return;
-            }
-            if (err instanceof AuthenticationError) {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                };
-                res.status(401).json(response);
-                return;
-            }
-            throw err;
-        }
+        const response: ApiSuccess<LoginDto> = {
+            success: true,
+            data: toLoginDto(user),
+        };
+        res.status(200).json(response);
     };
 
     refresh = async (req: Request, res: Response) => {
-        try {
-            const refreshToken = this.findRefreshToken(req);
-            if (!refreshToken) throw new AuthenticationError();
+        const refreshToken = this.findRefreshToken(req);
+        if (!refreshToken) throw new AuthenticationError();
 
-            const rememberMe = this.findRememberMe(req);
+        const rememberMe = this.findRememberMe(req);
 
-            const output = await this.refreshUseCase.execute({ refreshToken });
+        const output = await this.refreshUseCase.execute({ refreshToken });
 
-            this.setAuthCookies(res, output.accessToken, output.refreshToken, rememberMe);
+        this.setAuthCookies(res, output.accessToken, output.refreshToken, rememberMe);
 
-            const response: ApiSuccess = {
-                success: true,
-            };
-            res.status(200).json(response);
-        } catch (err: unknown) {
-            if (err instanceof AuthenticationError) {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                };
-                res.status(401).json(response);
-                return;
-            }
-            throw err;
-        }
+        const response: ApiSuccess = {
+            success: true,
+        };
+        res.status(200).json(response);
     };
 
     logout = async (req: Request, res: Response) => {

@@ -27,8 +27,7 @@ import { createUserRoutes } from './routes/user.routes.js';
 import type { Logger } from '../../domain/ports/logger.js';
 import { requestLoggerMiddleware } from './middlewares/request-logger.middleware.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
-import type { ApiError } from '../types/api-response.js';
-import type { Request, Response } from 'express';
+import { RouteNotFoundError } from '../errors/route-not-found.error.js';
 
 type Input = {
     logger: Logger;
@@ -106,13 +105,8 @@ export const createHttpApp = ({
     app.use('/auth', createAuthRoutes(authController));
     app.use('/transactions', createTransactionRoutes(transactionController));
     app.use('/users', createUserRoutes(userController));
-    app.use((req: Request, res: Response) => {
-        const response: ApiError = {
-            success: false,
-            code: 'ROUTE_NOT_FOUND_ERROR',
-        };
-        req.logger.warn('Route not found');
-        res.status(404).json(response);
+    app.use(() => {
+        throw new RouteNotFoundError();
     });
 
     // Error handler

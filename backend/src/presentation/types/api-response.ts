@@ -1,16 +1,22 @@
 import type { $ZodErrorTree } from 'zod/v4/core';
-import type { BusinessRuleErrorReason } from '../../application/errors/business-rule.error.js';
-import type { ApplicationErrorCode } from '../../application/errors/application.error.js';
-import type { PresentationErrorCode } from '../errors/presentation.error.js';
 
 export type ApiSuccess<T = void> = T extends void ? { success: true } : { success: true; data: T };
 
-type ApiErrorCode =
-    | ApplicationErrorCode
-    | PresentationErrorCode
-    | 'ROUTE_NOT_FOUND_ERROR'
-    | 'TOO_MANY_REQUESTS_ERROR'
-    | 'INTERNAL_SERVER_ERROR';
+export type PresentationErrorCode = 'ROUTE_NOT_FOUND_ERROR' | 'TOO_MANY_REQUESTS_ERROR' | 'VALIDATION_ERROR';
+
+export type ApplicationErrorCode =
+    | 'AUTHENTICATION_ERROR'
+    | 'AUTHORIZATION_ERROR'
+    | 'BUSINESS_RULE_ERROR'
+    | 'RESOURCE_NOT_FOUND_ERROR';
+
+export type BusinessRuleErrorReason =
+    | 'ACTIVE_COOLDOWN'
+    | 'DUPLICATE_EMAIL'
+    | 'EMAIL_ALREADY_VERIFIED'
+    | 'INVALID_TOKEN';
+
+type ApiErrorCode = PresentationErrorCode | ApplicationErrorCode | 'INTERNAL_SERVER_ERROR';
 
 export type ApiError<E = void> = { success: false } & (
     | {

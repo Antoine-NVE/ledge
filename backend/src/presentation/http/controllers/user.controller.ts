@@ -3,12 +3,8 @@ import type { RequestEmailVerificationUseCase } from '../../../application/user/
 import type { VerifyEmailUseCase } from '../../../application/user/verify-email.use-case.js';
 import type { TokenManager } from '../../../domain/ports/token-manager.js';
 import type { GetCurrentUserUseCase } from '../../../application/user/get-current-user.use-case.js';
-import type { ApiError, ApiSuccess } from '../../types/api-response.js';
+import type { ApiSuccess } from '../../types/api-response.js';
 import { AuthenticatedController } from './authenticated.controller.js';
-import { ValidationError } from '../../errors/validation.error.js';
-import { AuthenticationError } from '../../../application/errors/authentication.error.js';
-import { BusinessRuleError } from '../../../application/errors/business-rule.error.js';
-import z from 'zod';
 import { requestEmailVerificationSchema, verifyEmailSchema } from '../../schemas/user.schemas.js';
 import type { MeDto } from '../../dto/user/me.dto.js';
 import { toMeDto } from '../../mappers/user/me.mapper.js';
@@ -25,120 +21,38 @@ export class UserController extends AuthenticatedController {
     }
 
     requestEmailVerification = async (req: Request, res: Response): Promise<void> => {
-        try {
-            const userId = this.getUserId(req);
+        const userId = this.getUserId(req);
 
-            const { body } = this.validate(req, requestEmailVerificationSchema(this.allowedOrigins));
+        const { body } = this.validate(req, requestEmailVerificationSchema(this.allowedOrigins));
 
-            await this.requestEmailVerificationUseCase.execute({ userId, ...body });
+        await this.requestEmailVerificationUseCase.execute({ userId, ...body });
 
-            const response: ApiSuccess = {
-                success: true,
-            };
-            res.status(200).json(response);
-        } catch (err: unknown) {
-            if (err instanceof ValidationError) {
-                const response: ApiError<z.infer<ReturnType<typeof requestEmailVerificationSchema>>> = {
-                    success: false,
-                    code: err.code,
-                    tree: err.tree,
-                };
-                res.status(400).json(response);
-                return;
-            }
-            if (err instanceof AuthenticationError) {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                };
-                res.status(401).json(response);
-                return;
-            }
-            if (err instanceof BusinessRuleError && err.reason === 'EMAIL_ALREADY_VERIFIED') {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                    reason: err.reason,
-                };
-                res.status(409).json(response);
-                return;
-            }
-            if (err instanceof BusinessRuleError && err.reason === 'ACTIVE_COOLDOWN') {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                    reason: err.reason,
-                };
-                res.status(409).json(response);
-                return;
-            }
-            throw err;
-        }
+        const response: ApiSuccess = {
+            success: true,
+        };
+        res.status(200).json(response);
     };
 
     verifyEmail = async (req: Request, res: Response): Promise<void> => {
-        try {
-            const { body } = this.validate(req, verifyEmailSchema());
+        const { body } = this.validate(req, verifyEmailSchema());
 
-            await this.verifyEmailUseCase.execute({ emailVerificationToken: body.token });
+        await this.verifyEmailUseCase.execute({ emailVerificationToken: body.token });
 
-            const response: ApiSuccess = {
-                success: true,
-            };
-            res.status(200).json(response);
-        } catch (err: unknown) {
-            if (err instanceof ValidationError) {
-                const response: ApiError<z.infer<ReturnType<typeof verifyEmailSchema>>> = {
-                    success: false,
-                    code: err.code,
-                    tree: err.tree,
-                };
-                res.status(400).json(response);
-                return;
-            }
-            if (err instanceof BusinessRuleError && err.reason === 'INVALID_TOKEN') {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                    reason: err.reason,
-                };
-                res.status(400).json(response);
-                return;
-            }
-            if (err instanceof BusinessRuleError && err.reason === 'EMAIL_ALREADY_VERIFIED') {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                    reason: err.reason,
-                };
-                res.status(409).json(response);
-                return;
-            }
-            throw err;
-        }
+        const response: ApiSuccess = {
+            success: true,
+        };
+        res.status(200).json(response);
     };
 
     me = async (req: Request, res: Response): Promise<void> => {
-        try {
-            const userId = this.getUserId(req);
+        const userId = this.getUserId(req);
 
-            const { user } = await this.getCurrentUserUseCase.execute({ userId });
+        const { user } = await this.getCurrentUserUseCase.execute({ userId });
 
-            const response: ApiSuccess<MeDto> = {
-                success: true,
-                data: toMeDto(user),
-            };
-            res.status(200).json(response);
-        } catch (err: unknown) {
-            if (err instanceof AuthenticationError) {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                };
-                res.status(401).json(response);
-                return;
-            }
-            throw err;
-        }
+        const response: ApiSuccess<MeDto> = {
+            success: true,
+            data: toMeDto(user),
+        };
+        res.status(200).json(response);
     };
 }

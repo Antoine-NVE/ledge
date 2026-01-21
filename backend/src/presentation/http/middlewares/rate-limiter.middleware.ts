@@ -1,18 +1,12 @@
 import rateLimit from 'express-rate-limit';
-import type { Request, Response } from 'express';
-import type { ApiError } from '../../types/api-response.js';
+import { TooManyRequestsError } from '../../errors/too-many-requests.error.js';
 
 export const rateLimiterMiddleware = () => {
     return rateLimit({
         windowMs: 60 * 1000,
         limit: 60,
-        handler: (req: Request, res: Response) => {
-            const response: ApiError = {
-                success: false,
-                code: 'TOO_MANY_REQUESTS_ERROR',
-            };
-            req.logger.warn('Too many requests');
-            res.status(429).json(response);
+        handler: () => {
+            throw new TooManyRequestsError();
         },
     });
 };

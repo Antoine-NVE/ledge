@@ -6,13 +6,8 @@ import type { UpdateTransactionUseCase } from '../../../application/transaction/
 import type { DeleteTransactionUseCase } from '../../../application/transaction/delete-transaction.use-case.js';
 import type { TokenManager } from '../../../domain/ports/token-manager.js';
 import type { IdManager } from '../../../domain/ports/id-manager.js';
-import type { ApiError, ApiSuccess } from '../../types/api-response.js';
+import type { ApiSuccess } from '../../types/api-response.js';
 import { AuthenticatedController } from './authenticated.controller.js';
-import { AuthorizationError } from '../../../application/errors/authorization.error.js';
-import { ResourceNotFoundError } from '../../../application/errors/resource-not-found.error.js';
-import { ValidationError } from '../../errors/validation.error.js';
-import { AuthenticationError } from '../../../application/errors/authentication.error.js';
-import z from 'zod';
 import { createSchema, deleteSchema, readSchema, updateSchema } from '../../schemas/transaction.schemas.js';
 import type { CreateDto } from '../../dto/transaction/create.dto.js';
 import { toCreateDto } from '../../mappers/transaction/create.mapper.js';
@@ -39,214 +34,70 @@ export class TransactionController extends AuthenticatedController {
     }
 
     create = async (req: Request, res: Response) => {
-        try {
-            const userId = this.getUserId(req);
+        const userId = this.getUserId(req);
 
-            const { body } = this.validate(req, createSchema());
+        const { body } = this.validate(req, createSchema());
 
-            const { transaction } = await this.createTransactionUseCase.execute({ userId, ...body });
+        const { transaction } = await this.createTransactionUseCase.execute({ userId, ...body });
 
-            const response: ApiSuccess<CreateDto> = {
-                success: true,
-                data: toCreateDto(transaction),
-            };
-            res.status(201).json(response);
-        } catch (err: unknown) {
-            if (err instanceof ValidationError) {
-                const response: ApiError<z.infer<ReturnType<typeof createSchema>>> = {
-                    success: false,
-                    code: err.code,
-                    tree: err.tree,
-                };
-                res.status(400).json(response);
-                return;
-            }
-            if (err instanceof AuthenticationError) {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                };
-                res.status(401).json(response);
-                return;
-            }
-            throw err;
-        }
+        const response: ApiSuccess<CreateDto> = {
+            success: true,
+            data: toCreateDto(transaction),
+        };
+        res.status(201).json(response);
     };
 
     readAll = async (req: Request, res: Response) => {
-        try {
-            const userId = this.getUserId(req);
+        const userId = this.getUserId(req);
 
-            const { transactions } = await this.getUserTransactionsUseCase.execute({ userId });
+        const { transactions } = await this.getUserTransactionsUseCase.execute({ userId });
 
-            const response: ApiSuccess<ReadAllDto> = {
-                success: true,
-                data: toReadAllDto(transactions),
-            };
-            res.status(200).json(response);
-        } catch (err: unknown) {
-            if (err instanceof AuthenticationError) {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                };
-                res.status(401).json(response);
-                return;
-            }
-            throw err;
-        }
+        const response: ApiSuccess<ReadAllDto> = {
+            success: true,
+            data: toReadAllDto(transactions),
+        };
+        res.status(200).json(response);
     };
 
     read = async (req: Request, res: Response) => {
-        try {
-            const userId = this.getUserId(req);
+        const userId = this.getUserId(req);
 
-            const { params } = this.validate(req, readSchema(this.idManager));
+        const { params } = this.validate(req, readSchema(this.idManager));
 
-            const { transaction } = await this.getTransactionUseCase.execute({ ...params, userId });
+        const { transaction } = await this.getTransactionUseCase.execute({ ...params, userId });
 
-            const response: ApiSuccess<ReadDto> = {
-                success: true,
-                data: toReadDto(transaction),
-            };
-            res.status(200).json(response);
-        } catch (err: unknown) {
-            if (err instanceof ValidationError) {
-                const response: ApiError<z.infer<ReturnType<typeof readSchema>>> = {
-                    success: false,
-                    code: err.code,
-                    tree: err.tree,
-                };
-                res.status(400).json(response);
-                return;
-            }
-            if (err instanceof AuthenticationError) {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                };
-                res.status(401).json(response);
-                return;
-            }
-            if (err instanceof AuthorizationError) {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                };
-                res.status(403).json(response);
-                return;
-            }
-            if (err instanceof ResourceNotFoundError) {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                };
-                res.status(404).json(response);
-                return;
-            }
-            throw err;
-        }
+        const response: ApiSuccess<ReadDto> = {
+            success: true,
+            data: toReadDto(transaction),
+        };
+        res.status(200).json(response);
     };
 
     update = async (req: Request, res: Response) => {
-        try {
-            const userId = this.getUserId(req);
+        const userId = this.getUserId(req);
 
-            const { body, params } = this.validate(req, updateSchema(this.idManager));
+        const { body, params } = this.validate(req, updateSchema(this.idManager));
 
-            const { transaction } = await this.updateTransactionUseCase.execute({ ...params, userId, ...body });
+        const { transaction } = await this.updateTransactionUseCase.execute({ ...params, userId, ...body });
 
-            const response: ApiSuccess<UpdateDto> = {
-                success: true,
-                data: toUpdateDto(transaction),
-            };
-            res.status(200).json(response);
-        } catch (err: unknown) {
-            if (err instanceof ValidationError) {
-                const response: ApiError<z.infer<ReturnType<typeof updateSchema>>> = {
-                    success: false,
-                    code: err.code,
-                    tree: err.tree,
-                };
-                res.status(400).json(response);
-                return;
-            }
-            if (err instanceof AuthenticationError) {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                };
-                res.status(401).json(response);
-                return;
-            }
-            if (err instanceof AuthorizationError) {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                };
-                res.status(403).json(response);
-                return;
-            }
-            if (err instanceof ResourceNotFoundError) {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                };
-                res.status(404).json(response);
-                return;
-            }
-            throw err;
-        }
+        const response: ApiSuccess<UpdateDto> = {
+            success: true,
+            data: toUpdateDto(transaction),
+        };
+        res.status(200).json(response);
     };
 
     delete = async (req: Request, res: Response) => {
-        try {
-            const userId = this.getUserId(req);
+        const userId = this.getUserId(req);
 
-            const { params } = this.validate(req, deleteSchema(this.idManager));
+        const { params } = this.validate(req, deleteSchema(this.idManager));
 
-            const { transaction } = await this.deleteTransactionUseCase.execute({ ...params, userId });
+        const { transaction } = await this.deleteTransactionUseCase.execute({ ...params, userId });
 
-            const response: ApiSuccess<DeleteDto> = {
-                success: true,
-                data: toDeleteDto(transaction),
-            };
-            res.status(200).json(response);
-        } catch (err: unknown) {
-            if (err instanceof ValidationError) {
-                const response: ApiError<z.infer<ReturnType<typeof deleteSchema>>> = {
-                    success: false,
-                    code: err.code,
-                    tree: err.tree,
-                };
-                res.status(400).json(response);
-                return;
-            }
-            if (err instanceof AuthenticationError) {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                };
-                res.status(401).json(response);
-                return;
-            }
-            if (err instanceof AuthorizationError) {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                };
-                res.status(403).json(response);
-                return;
-            }
-            if (err instanceof ResourceNotFoundError) {
-                const response: ApiError = {
-                    success: false,
-                    code: err.code,
-                };
-                res.status(404).json(response);
-                return;
-            }
-            throw err;
-        }
+        const response: ApiSuccess<DeleteDto> = {
+            success: true,
+            data: toDeleteDto(transaction),
+        };
+        res.status(200).json(response);
     };
 }
