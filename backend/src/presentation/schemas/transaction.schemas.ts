@@ -1,5 +1,5 @@
 import z from 'zod';
-import type { IdManager } from '../../../domain/ports/id-manager.js';
+import type { IdManager } from '../../domain/ports/id-manager.js';
 
 const monthSchema = () => {
     return z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
