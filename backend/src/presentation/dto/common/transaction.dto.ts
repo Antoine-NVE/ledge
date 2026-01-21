@@ -1,5 +1,5 @@
-export type TransactionDto =
-    | Readonly<{
+export type TransactionDto = Readonly<
+    | {
           id: string;
           userId: string;
           month: string;
@@ -9,8 +9,8 @@ export type TransactionDto =
           expenseCategory: 'need' | 'want' | 'investment' | null;
           createdAt: string;
           updatedAt: string;
-      }>
-    | Readonly<{
+      }
+    | {
           id: string;
           userId: string;
           month: string;
@@ -20,4 +20,5 @@ export type TransactionDto =
           expenseCategory: null;
           createdAt: string;
           updatedAt: string;
-      }>;
+      }
+>;
