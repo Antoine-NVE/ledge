@@ -17,17 +17,11 @@ import type { DeleteTransactionUseCase } from '../../application/transaction/del
 import type { RequestEmailVerificationUseCase } from '../../application/user/request-email-verification.use-case.js';
 import type { VerifyEmailUseCase } from '../../application/user/verify-email.use-case.js';
 import type { GetCurrentUserUseCase } from '../../application/user/get-current-user.use-case.js';
-import { AuthController } from './controllers/auth.controller.js';
-import { TransactionController } from './controllers/transaction.controller.js';
-import { UserController } from './controllers/user.controller.js';
-import { createDocsRoutes } from './routes/docs.routes.js';
-import { createAuthRoutes } from './routes/auth.routes.js';
-import { createTransactionRoutes } from './routes/transaction.routes.js';
-import { createUserRoutes } from './routes/user.routes.js';
 import type { Logger } from '../../domain/ports/logger.js';
 import { requestLoggerMiddleware } from './middlewares/request-logger.middleware.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import { RouteNotFoundError } from '../errors/route-not-found.error.js';
+import { routes } from './routes/routes.js';
 
 type Input = {
     logger: Logger;
@@ -81,30 +75,27 @@ export const createHttpApp = ({
     app.use(express.json());
     app.use(cookieParser());
 
-    // Controllers
-    const authController = new AuthController(registerUseCase, loginUseCase, refreshUseCase, logoutUseCase);
-    const transactionController = new TransactionController(
-        tokenManager,
-        idManager,
-        createTransactionUseCase,
-        getUserTransactionsUseCase,
-        getTransactionUseCase,
-        updateTransactionUseCase,
-        deleteTransactionUseCase,
-    );
-    const userController = new UserController(
-        tokenManager,
-        requestEmailVerificationUseCase,
-        verifyEmailUseCase,
-        getCurrentUserUseCase,
-        allowedOrigins,
-    );
-
     // Routes
-    app.use('/docs', createDocsRoutes());
-    app.use('/auth', createAuthRoutes(authController));
-    app.use('/transactions', createTransactionRoutes(transactionController));
-    app.use('/users', createUserRoutes(userController));
+    const router = express.Router();
+    app.use(
+        routes(router, {
+            tokenManager,
+            idManager,
+            registerUseCase,
+            loginUseCase,
+            refreshUseCase,
+            logoutUseCase,
+            createTransactionUseCase,
+            getUserTransactionsUseCase,
+            getTransactionUseCase,
+            updateTransactionUseCase,
+            deleteTransactionUseCase,
+            requestEmailVerificationUseCase,
+            verifyEmailUseCase,
+            getCurrentUserUseCase,
+            allowedOrigins,
+        }),
+    );
     app.use(() => {
         throw new RouteNotFoundError();
     });

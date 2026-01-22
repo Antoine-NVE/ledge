@@ -1,16 +1,15 @@
-import { Router } from 'express';
-import path from 'node:path';
-import swaggerJsdoc from 'swagger-jsdoc';
-import swaggerUi from 'swagger-ui-express';
+import type { Router } from 'express';
 import { fileURLToPath } from 'node:url';
+import path from 'node:path';
+import swaggerUi from 'swagger-ui-express';
+import swaggerJsdoc from 'swagger-jsdoc';
 
-export const createDocsRoutes = () => {
-    const router = Router();
+export const docsRoute = (router: Router) => {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
 
     router.use(
-        '/',
+        '/docs',
         swaggerUi.serve,
         swaggerUi.setup(
             swaggerJsdoc({
@@ -21,10 +20,8 @@ export const createDocsRoutes = () => {
                         version: '1.0.0',
                     },
                 },
-                apis: [path.join(__dirname, './*.routes.{js,ts}')],
+                apis: [path.join(__dirname, '../**/*.routes.{js,ts}')],
             }),
         ),
     );
-
-    return router;
 };
