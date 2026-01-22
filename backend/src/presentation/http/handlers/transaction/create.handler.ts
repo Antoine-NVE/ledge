@@ -8,12 +8,12 @@ import { validateRequest } from '../../helpers/validate-request.js';
 import { getAuthenticatedUserId } from '../../helpers/auth.js';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 
-type Deps = {
+export type CreateTransactionDeps = {
     createTransactionUseCase: CreateTransactionUseCase;
     tokenManager: TokenManager;
 };
 
-export const createTransactionHandler = ({ createTransactionUseCase, tokenManager }: Deps) => {
+export const createTransactionHandler = ({ createTransactionUseCase, tokenManager }: CreateTransactionDeps) => {
     return async (req: Request, res: Response) => {
         const userId = getAuthenticatedUserId(req, tokenManager);
 

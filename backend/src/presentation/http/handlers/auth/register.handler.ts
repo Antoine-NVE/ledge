@@ -7,11 +7,11 @@ import type { RegisterDto } from '../../../dto/auth/register.dto.js';
 import { toRegisterDto } from '../../../mappers/auth/register.mapper.js';
 import type { Request, Response } from 'express';
 
-type Deps = {
+export type RegisterDeps = {
     registerUseCase: RegisterUseCase;
 };
 
-export const registerHandler = ({ registerUseCase }: Deps) => {
+export const registerHandler = ({ registerUseCase }: RegisterDeps) => {
     return async (req: Request, res: Response) => {
         const { body } = validateRequest(req, registerSchema());
 

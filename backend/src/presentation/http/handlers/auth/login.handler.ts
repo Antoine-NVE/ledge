@@ -7,11 +7,11 @@ import { validateRequest } from '../../helpers/validate-request.js';
 import { setAuthCookies } from '../../helpers/auth-cookies.js';
 import type { LoginUseCase } from '../../../../application/auth/login.use-case.js';
 
-type Deps = {
+export type LoginDeps = {
     loginUseCase: LoginUseCase;
 };
 
-export const loginHandler = ({ loginUseCase }: Deps) => {
+export const loginHandler = ({ loginUseCase }: LoginDeps) => {
     return async (req: Request, res: Response) => {
         const { body } = validateRequest(req, loginSchema());
 

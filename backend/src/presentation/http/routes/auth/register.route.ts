@@ -1,12 +1,7 @@
 import type { Router } from 'express';
-import type { RegisterUseCase } from '../../../../application/auth/register.use-case.js';
-import { registerHandler } from '../../handlers/auth/register.handler.js';
+import { type RegisterDeps, registerHandler } from '../../handlers/auth/register.handler.js';
 
-type Deps = {
-    registerUseCase: RegisterUseCase;
-};
-
-export const registerRoute = (router: Router, deps: Deps) => {
+export const registerRoute = (router: Router, deps: RegisterDeps) => {
     /**
      * @openapi
      * /auth/register:

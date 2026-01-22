@@ -4,11 +4,11 @@ import { verifyEmailSchema } from '../../../schemas/user.schemas.js';
 import type { ApiSuccess } from '../../../types/api-response.js';
 import { validateRequest } from '../../helpers/validate-request.js';
 
-type Deps = {
+export type VerifyEmailDeps = {
     verifyEmailUseCase: VerifyEmailUseCase;
 };
 
-export const verifyEmailHandler = ({ verifyEmailUseCase }: Deps) => {
+export const verifyEmailHandler = ({ verifyEmailUseCase }: VerifyEmailDeps) => {
     return async (req: Request, res: Response): Promise<void> => {
         const { body } = validateRequest(req, verifyEmailSchema());
 

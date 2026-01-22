@@ -6,7 +6,7 @@ import { getAuthenticatedUserId } from '../../helpers/auth.js';
 import { validateRequest } from '../../helpers/validate-request.js';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 
-type Deps = {
+export type RequestEmailVerificationDeps = {
     requestEmailVerificationUseCase: RequestEmailVerificationUseCase;
     tokenManager: TokenManager;
     allowedOrigins: string[];
@@ -16,7 +16,7 @@ export const requestEmailVerificationHandler = ({
     requestEmailVerificationUseCase,
     tokenManager,
     allowedOrigins,
-}: Deps) => {
+}: RequestEmailVerificationDeps) => {
     return async (req: Request, res: Response): Promise<void> => {
         const userId = getAuthenticatedUserId(req, tokenManager);
 

@@ -6,12 +6,12 @@ import type { MeDto } from '../../../dto/user/me.dto.js';
 import { toMeDto } from '../../../mappers/user/me.mapper.js';
 import { getAuthenticatedUserId } from '../../helpers/auth.js';
 
-type Deps = {
+export type MeDeps = {
     getCurrentUserUseCase: GetCurrentUserUseCase;
     tokenManager: TokenManager;
 };
 
-export const meHandler = ({ getCurrentUserUseCase, tokenManager }: Deps) => {
+export const meHandler = ({ getCurrentUserUseCase, tokenManager }: MeDeps) => {
     return async (req: Request, res: Response): Promise<void> => {
         const userId = getAuthenticatedUserId(req, tokenManager);
 

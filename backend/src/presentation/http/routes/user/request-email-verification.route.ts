@@ -1,15 +1,10 @@
-import type { RequestEmailVerificationUseCase } from '../../../../application/user/request-email-verification.use-case.js';
-import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { Router } from 'express';
-import { requestEmailVerificationHandler } from '../../handlers/user/request-email-verification.handler.js';
+import {
+    type RequestEmailVerificationDeps,
+    requestEmailVerificationHandler,
+} from '../../handlers/user/request-email-verification.handler.js';
 
-type Deps = {
-    requestEmailVerificationUseCase: RequestEmailVerificationUseCase;
-    tokenManager: TokenManager;
-    allowedOrigins: string[];
-};
-
-export const requestEmailVerificationRoute = (router: Router, deps: Deps) => {
+export const requestEmailVerificationRoute = (router: Router, deps: RequestEmailVerificationDeps) => {
     /**
      * @openapi
      * /user/send-verification-email:

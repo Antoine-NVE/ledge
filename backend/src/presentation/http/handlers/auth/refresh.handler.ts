@@ -4,11 +4,11 @@ import { AuthenticationError } from '../../../../application/errors/authenticati
 import type { ApiSuccess } from '../../../types/api-response.js';
 import { findRefreshToken, findRememberMe, setAuthCookies } from '../../helpers/auth-cookies.js';
 
-type Deps = {
+export type RefreshDeps = {
     refreshUseCase: RefreshUseCase;
 };
 
-export const refreshHandler = ({ refreshUseCase }: Deps) => {
+export const refreshHandler = ({ refreshUseCase }: RefreshDeps) => {
     return async (req: Request, res: Response) => {
         const refreshToken = findRefreshToken(req);
         if (!refreshToken) throw new AuthenticationError();

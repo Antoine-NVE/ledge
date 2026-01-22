@@ -1,12 +1,7 @@
-import type { VerifyEmailUseCase } from '../../../../application/user/verify-email.use-case.js';
 import type { Router } from 'express';
-import { verifyEmailHandler } from '../../handlers/user/verify-email.handler.js';
+import { type VerifyEmailDeps, verifyEmailHandler } from '../../handlers/user/verify-email.handler.js';
 
-type Deps = {
-    verifyEmailUseCase: VerifyEmailUseCase;
-};
-
-export const verifyEmailRoute = (router: Router, deps: Deps) => {
+export const verifyEmailRoute = (router: Router, deps: VerifyEmailDeps) => {
     /**
      * @openapi
      * /user/verify-email:

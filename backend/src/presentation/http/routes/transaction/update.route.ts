@@ -1,16 +1,7 @@
-import type { UpdateTransactionUseCase } from '../../../../application/transaction/update-transaction.use-case.js';
-import type { TokenManager } from '../../../../domain/ports/token-manager.js';
-import type { IdManager } from '../../../../domain/ports/id-manager.js';
 import type { Router } from 'express';
-import { updateTransactionHandler } from '../../handlers/transaction/update.handler.js';
+import { type UpdateTransactionDeps, updateTransactionHandler } from '../../handlers/transaction/update.handler.js';
 
-type Deps = {
-    updateTransactionUseCase: UpdateTransactionUseCase;
-    tokenManager: TokenManager;
-    idManager: IdManager;
-};
-
-export const updateTransactionRoute = (router: Router, deps: Deps) => {
+export const updateTransactionRoute = (router: Router, deps: UpdateTransactionDeps) => {
     /**
      * @openapi
      * /transaction/:id:

@@ -1,12 +1,7 @@
-import type { RefreshUseCase } from '../../../../application/auth/refresh.use-case.js';
 import type { Router } from 'express';
-import { refreshHandler } from '../../handlers/auth/refresh.handler.js';
+import { type RefreshDeps, refreshHandler } from '../../handlers/auth/refresh.handler.js';
 
-type Deps = {
-    refreshUseCase: RefreshUseCase;
-};
-
-export const refreshRoute = (router: Router, deps: Deps) => {
+export const refreshRoute = (router: Router, deps: RefreshDeps) => {
     /**
      * @openapi
      * /auth/refresh:

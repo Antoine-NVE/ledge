@@ -1,14 +1,7 @@
-import type { CreateTransactionUseCase } from '../../../../application/transaction/create-transaction.use-case.js';
-import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { Router } from 'express';
-import { createTransactionHandler } from '../../handlers/transaction/create.handler.js';
+import { type CreateTransactionDeps, createTransactionHandler } from '../../handlers/transaction/create.handler.js';
 
-type Deps = {
-    createTransactionUseCase: CreateTransactionUseCase;
-    tokenManager: TokenManager;
-};
-
-export const createTransactionRoute = (router: Router, deps: Deps) => {
+export const createTransactionRoute = (router: Router, deps: CreateTransactionDeps) => {
     /**
      * @openapi
      * /transaction:

@@ -9,13 +9,13 @@ import { getAuthenticatedUserId } from '../../helpers/auth.js';
 import { validateRequest } from '../../helpers/validate-request.js';
 import type { IdManager } from '../../../../domain/ports/id-manager.js';
 
-type Deps = {
+export type ReadTransactionDeps = {
     getTransactionUseCase: GetTransactionUseCase;
     tokenManager: TokenManager;
     idManager: IdManager;
 };
 
-export const readTransactionHandler = ({ getTransactionUseCase, tokenManager, idManager }: Deps) => {
+export const readTransactionHandler = ({ getTransactionUseCase, tokenManager, idManager }: ReadTransactionDeps) => {
     return async (req: Request, res: Response) => {
         const userId = getAuthenticatedUserId(req, tokenManager);
 

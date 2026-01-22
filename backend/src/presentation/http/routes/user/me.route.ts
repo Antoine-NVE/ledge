@@ -1,14 +1,7 @@
-import type { GetCurrentUserUseCase } from '../../../../application/user/get-current-user.use-case.js';
-import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { Router } from 'express';
-import { meHandler } from '../../handlers/user/me.handler.js';
+import { type MeDeps, meHandler } from '../../handlers/user/me.handler.js';
 
-type Deps = {
-    getCurrentUserUseCase: GetCurrentUserUseCase;
-    tokenManager: TokenManager;
-};
-
-export const meRoute = (router: Router, deps: Deps) => {
+export const meRoute = (router: Router, deps: MeDeps) => {
     /**
      * @openapi
      * /user/me:

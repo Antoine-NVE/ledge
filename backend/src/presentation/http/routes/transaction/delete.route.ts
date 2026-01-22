@@ -1,16 +1,7 @@
-import type { DeleteTransactionUseCase } from '../../../../application/transaction/delete-transaction.use-case.js';
-import type { TokenManager } from '../../../../domain/ports/token-manager.js';
-import type { IdManager } from '../../../../domain/ports/id-manager.js';
 import type { Router } from 'express';
-import { deleteTransactionHandler } from '../../handlers/transaction/delete.handler.js';
+import { type DeleteTransactionDeps, deleteTransactionHandler } from '../../handlers/transaction/delete.handler.js';
 
-type Deps = {
-    deleteTransactionUseCase: DeleteTransactionUseCase;
-    tokenManager: TokenManager;
-    idManager: IdManager;
-};
-
-export const deleteTransactionRoute = (router: Router, deps: Deps) => {
+export const deleteTransactionRoute = (router: Router, deps: DeleteTransactionDeps) => {
     /**
      * @openapi
      * /transaction/:id:

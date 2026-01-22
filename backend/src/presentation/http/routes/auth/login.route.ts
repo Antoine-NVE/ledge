@@ -1,12 +1,7 @@
-import type { LoginUseCase } from '../../../../application/auth/login.use-case.js';
 import type { Router } from 'express';
-import { loginHandler } from '../../handlers/auth/login.handler.js';
+import { type LoginDeps, loginHandler } from '../../handlers/auth/login.handler.js';
 
-type Deps = {
-    loginUseCase: LoginUseCase;
-};
-
-export const loginRoute = (router: Router, deps: Deps) => {
+export const loginRoute = (router: Router, deps: LoginDeps) => {
     /**
      * @openapi
      * /auth/login:

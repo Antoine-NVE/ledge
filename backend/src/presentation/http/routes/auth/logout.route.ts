@@ -1,12 +1,7 @@
 import type { Router } from 'express';
-import type { LogoutUseCase } from '../../../../application/auth/logout.use-case.js';
-import { logoutHandler } from '../../handlers/auth/logout.handler.js';
+import { type LogoutDeps, logoutHandler } from '../../handlers/auth/logout.handler.js';
 
-type Deps = {
-    logoutUseCase: LogoutUseCase;
-};
-
-export const logoutRoute = (router: Router, deps: Deps) => {
+export const logoutRoute = (router: Router, deps: LogoutDeps) => {
     /**
      * @openapi
      * /auth/logout:

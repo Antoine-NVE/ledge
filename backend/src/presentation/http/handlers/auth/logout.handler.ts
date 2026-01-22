@@ -3,11 +3,11 @@ import type { LogoutUseCase } from '../../../../application/auth/logout.use-case
 import type { ApiSuccess } from '../../../types/api-response.js';
 import { clearAuthCookies, findRefreshToken } from '../../helpers/auth-cookies.js';
 
-type Deps = {
+export type LogoutDeps = {
     logoutUseCase: LogoutUseCase;
 };
 
-export const logoutHandler = ({ logoutUseCase }: Deps) => {
+export const logoutHandler = ({ logoutUseCase }: LogoutDeps) => {
     return async (req: Request, res: Response) => {
         const refreshToken = findRefreshToken(req);
 

@@ -6,12 +6,12 @@ import type { ReadAllDto } from '../../../dto/transaction/read-all.dto.js';
 import { toReadAllDto } from '../../../mappers/transaction/read-all.mapper.js';
 import { getAuthenticatedUserId } from '../../helpers/auth.js';
 
-type Deps = {
+export type ReadAllTransactionsDeps = {
     getUserTransactionsUseCase: GetUserTransactionsUseCase;
     tokenManager: TokenManager;
 };
 
-export const readAllTransactionsHandler = ({ getUserTransactionsUseCase, tokenManager }: Deps) => {
+export const readAllTransactionsHandler = ({ getUserTransactionsUseCase, tokenManager }: ReadAllTransactionsDeps) => {
     return async (req: Request, res: Response) => {
         const userId = getAuthenticatedUserId(req, tokenManager);
 

@@ -9,13 +9,17 @@ import { toDeleteDto } from '../../../mappers/transaction/delete.mapper.js';
 import { getAuthenticatedUserId } from '../../helpers/auth.js';
 import { validateRequest } from '../../helpers/validate-request.js';
 
-type Deps = {
+export type DeleteTransactionDeps = {
     deleteTransactionUseCase: DeleteTransactionUseCase;
     tokenManager: TokenManager;
     idManager: IdManager;
 };
 
-export const deleteTransactionHandler = ({ deleteTransactionUseCase, tokenManager, idManager }: Deps) => {
+export const deleteTransactionHandler = ({
+    deleteTransactionUseCase,
+    tokenManager,
+    idManager,
+}: DeleteTransactionDeps) => {
     return async (req: Request, res: Response) => {
         const userId = getAuthenticatedUserId(req, tokenManager);
 
