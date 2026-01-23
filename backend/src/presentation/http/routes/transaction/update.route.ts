@@ -4,11 +4,11 @@ import { type UpdateTransactionDeps, updateTransactionHandler } from '../../hand
 export const updateTransactionRoute = (router: Router, deps: UpdateTransactionDeps) => {
     /**
      * @openapi
-     * /transaction/:id:
+     * /transactions/:id:
      *   put:
      *     tags:
      *       - Transaction
-     *     summary: Update
+     *     summary: Update transaction
      *     requestBody:
      *       required: true
      *       content:

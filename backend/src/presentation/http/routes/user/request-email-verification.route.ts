@@ -7,11 +7,11 @@ import {
 export const requestEmailVerificationRoute = (router: Router, deps: RequestEmailVerificationDeps) => {
     /**
      * @openapi
-     * /user/send-verification-email:
+     * /users/request-email-verification:
      *   post:
      *     tags:
      *       - User
-     *     summary: Send verification email
+     *     summary: Request email verification
      *     requestBody:
      *       required: true
      *       content:

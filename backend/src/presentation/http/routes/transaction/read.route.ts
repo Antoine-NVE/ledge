@@ -4,11 +4,11 @@ import { type ReadTransactionDeps, readTransactionHandler } from '../../handlers
 export const readTransactionRoute = (router: Router, deps: ReadTransactionDeps) => {
     /**
      * @openapi
-     * /transaction/:id:
+     * /transactions/:id:
      *   get:
      *     tags:
      *       - Transaction
-     *     summary: Read
+     *     summary: Read transaction
      *     responses:
      *       200:
      *         description: Transaction retrieved successfully

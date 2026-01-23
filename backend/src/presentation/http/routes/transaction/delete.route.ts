@@ -4,11 +4,11 @@ import { type DeleteTransactionDeps, deleteTransactionHandler } from '../../hand
 export const deleteTransactionRoute = (router: Router, deps: DeleteTransactionDeps) => {
     /**
      * @openapi
-     * /transaction/:id:
+     * /transactions/:id:
      *   delete:
      *     tags:
      *       - Transaction
-     *     summary: Delete
+     *     summary: Delete transaction
      *     responses:
      *       200:
      *         description: Transaction deleted successfully

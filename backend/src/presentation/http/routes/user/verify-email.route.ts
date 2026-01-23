@@ -4,7 +4,7 @@ import { type VerifyEmailDeps, verifyEmailHandler } from '../../handlers/user/ve
 export const verifyEmailRoute = (router: Router, deps: VerifyEmailDeps) => {
     /**
      * @openapi
-     * /user/verify-email:
+     * /users/verify-email:
      *   post:
      *     tags:
      *       - User

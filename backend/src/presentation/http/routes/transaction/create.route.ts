@@ -4,11 +4,11 @@ import { type CreateTransactionDeps, createTransactionHandler } from '../../hand
 export const createTransactionRoute = (router: Router, deps: CreateTransactionDeps) => {
     /**
      * @openapi
-     * /transaction:
+     * /transactions:
      *   post:
      *     tags:
      *       - Transaction
-     *     summary: Create
+     *     summary: Create transaction
      *     requestBody:
      *       required: true
      *       content:

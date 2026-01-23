@@ -7,11 +7,11 @@ import {
 export const readAllTransactionRoute = (router: Router, deps: ReadAllTransactionsDeps) => {
     /**
      * @openapi
-     * /transaction:
+     * /transactions:
      *   get:
      *     tags:
      *       - Transaction
-     *     summary: Read all
+     *     summary: Read all transactions
      *     responses:
      *       200:
      *         description: Transactions retrieved successfully

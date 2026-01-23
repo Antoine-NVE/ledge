@@ -4,7 +4,7 @@ import { type MeDeps, meHandler } from '../../handlers/user/me.handler.js';
 export const meRoute = (router: Router, deps: MeDeps) => {
     /**
      * @openapi
-     * /user/me:
+     * /users/me:
      *   get:
      *     tags:
      *       - User

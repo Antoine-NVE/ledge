@@ -20,7 +20,7 @@ export const docsRoute = (router: Router) => {
                         version: '1.0.0',
                     },
                 },
-                apis: [path.join(__dirname, '../**/*.routes.{js,ts}')],
+                apis: [path.join(__dirname, '../**/*.route.{js,ts}')],
             }),
         ),
     );
