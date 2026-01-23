@@ -27,7 +27,7 @@ const expenseCategorySchema = () => {
     return z.enum(['need', 'want', 'investment']).nullable();
 };
 
-export const createSchema = () => {
+export const createTransactionSchema = () => {
     return z.object({
         body: z.discriminatedUnion('type', [
             z.object({
@@ -48,7 +48,7 @@ export const createSchema = () => {
     });
 };
 
-export const readSchema = (idManager: IdManager) => {
+export const readTransactionSchema = (idManager: IdManager) => {
     return z.object({
         params: z.object({
             transactionId: z.string().refine((value) => idManager.validate(value)),
@@ -56,7 +56,7 @@ export const readSchema = (idManager: IdManager) => {
     });
 };
 
-export const updateSchema = (idManager: IdManager) => {
+export const updateTransactionSchema = (idManager: IdManager) => {
     return z.object({
         body: z.discriminatedUnion('type', [
             z.object({
@@ -78,7 +78,7 @@ export const updateSchema = (idManager: IdManager) => {
     });
 };
 
-export const deleteSchema = (idManager: IdManager) => {
+export const deleteTransactionSchema = (idManager: IdManager) => {
     return z.object({
         params: z.object({
             transactionId: z.string().refine((value) => idManager.validate(value)),
