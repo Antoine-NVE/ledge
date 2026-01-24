@@ -1,7 +1,18 @@
 import type { Router } from 'express';
-import { type RegisterDeps, registerHandler } from '../../handlers/auth/register.handler.js';
+import type { RegisterUseCase } from '../../../../application/auth/register.use-case.js';
+import { validateRequest } from '../../helpers/validate-request.js';
+import { registerSchema } from '../../../schemas/auth.schemas.js';
+import { setAuthCookies } from '../../helpers/auth-cookies.js';
+import type { ApiSuccess } from '../../../types/api-response.js';
+import type { RegisterDto } from '../../../dto/auth/register.dto.js';
+import { toRegisterDto } from '../../../mappers/auth/register.mapper.js';
+import type { Request, Response } from 'express';
 
-export const registerRoute = (router: Router, deps: RegisterDeps) => {
+type Deps = {
+    registerUseCase: RegisterUseCase;
+};
+
+export const registerRoute = (router: Router, deps: Deps) => {
     /**
      * @openapi
      * /auth/register:
@@ -37,4 +48,20 @@ export const registerRoute = (router: Router, deps: RegisterDeps) => {
      *         description: Internal server error
      */
     router.post('/auth/register', registerHandler(deps));
+};
+
+export const registerHandler = ({ registerUseCase }: Deps) => {
+    return async (req: Request, res: Response) => {
+        const { body } = validateRequest(req, registerSchema());
+
+        const { user, accessToken, refreshToken } = await registerUseCase.execute(body);
+
+        setAuthCookies(res, accessToken, refreshToken, false);
+
+        const response: ApiSuccess<RegisterDto> = {
+            success: true,
+            data: toRegisterDto(user),
+        };
+        res.status(201).json(response);
+    };
 };

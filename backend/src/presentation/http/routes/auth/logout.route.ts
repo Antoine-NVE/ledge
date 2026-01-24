@@ -1,7 +1,14 @@
 import type { Router } from 'express';
-import { type LogoutDeps, logoutHandler } from '../../handlers/auth/logout.handler.js';
+import type { Request, Response } from 'express';
+import type { LogoutUseCase } from '../../../../application/auth/logout.use-case.js';
+import type { ApiSuccess } from '../../../types/api-response.js';
+import { clearAuthCookies, findRefreshToken } from '../../helpers/auth-cookies.js';
 
-export const logoutRoute = (router: Router, deps: LogoutDeps) => {
+type Deps = {
+    logoutUseCase: LogoutUseCase;
+};
+
+export const logoutRoute = (router: Router, deps: Deps) => {
     /**
      * @openapi
      * /auth/logout:
@@ -16,4 +23,19 @@ export const logoutRoute = (router: Router, deps: LogoutDeps) => {
      *         description: Internal server error
      */
     router.post('/auth/logout', logoutHandler(deps));
+};
+
+export const logoutHandler = ({ logoutUseCase }: Deps) => {
+    return async (req: Request, res: Response) => {
+        const refreshToken = findRefreshToken(req);
+
+        clearAuthCookies(res);
+
+        if (refreshToken) await logoutUseCase.execute({ refreshToken });
+
+        const response: ApiSuccess = {
+            success: true,
+        };
+        res.status(200).json(response);
+    };
 };

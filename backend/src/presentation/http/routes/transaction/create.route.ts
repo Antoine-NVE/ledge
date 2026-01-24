@@ -1,7 +1,20 @@
 import type { Router } from 'express';
-import { type CreateTransactionDeps, createTransactionHandler } from '../../handlers/transaction/create.handler.js';
+import type { CreateTransactionUseCase } from '../../../../application/transaction/create-transaction.use-case.js';
+import type { Request, Response } from 'express';
+import type { ApiSuccess } from '../../../types/api-response.js';
+import type { CreateDto } from '../../../dto/transaction/create.dto.js';
+import { toCreateDto } from '../../../mappers/transaction/create.mapper.js';
+import { validateRequest } from '../../helpers/validate-request.js';
+import { getAuthenticatedUserId } from '../../helpers/auth.js';
+import type { TokenManager } from '../../../../domain/ports/token-manager.js';
+import { createTransactionSchema } from '../../../schemas/transaction.schemas.js';
 
-export const createTransactionRoute = (router: Router, deps: CreateTransactionDeps) => {
+type Deps = {
+    createTransactionUseCase: CreateTransactionUseCase;
+    tokenManager: TokenManager;
+};
+
+export const createTransactionRoute = (router: Router, deps: Deps) => {
     /**
      * @openapi
      * /transactions:
@@ -41,4 +54,20 @@ export const createTransactionRoute = (router: Router, deps: CreateTransactionDe
      *         description: Internal server error
      */
     router.post('/transactions', createTransactionHandler(deps));
+};
+
+export const createTransactionHandler = ({ createTransactionUseCase, tokenManager }: Deps) => {
+    return async (req: Request, res: Response) => {
+        const userId = getAuthenticatedUserId(req, tokenManager);
+
+        const { body } = validateRequest(req, createTransactionSchema());
+
+        const { transaction } = await createTransactionUseCase.execute({ userId, ...body });
+
+        const response: ApiSuccess<CreateDto> = {
+            success: true,
+            data: toCreateDto(transaction),
+        };
+        res.status(201).json(response);
+    };
 };

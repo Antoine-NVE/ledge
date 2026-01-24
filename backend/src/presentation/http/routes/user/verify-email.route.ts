@@ -1,7 +1,15 @@
 import type { Router } from 'express';
-import { type VerifyEmailDeps, verifyEmailHandler } from '../../handlers/user/verify-email.handler.js';
+import type { VerifyEmailUseCase } from '../../../../application/user/verify-email.use-case.js';
+import type { Request, Response } from 'express';
+import { verifyEmailSchema } from '../../../schemas/user.schemas.js';
+import type { ApiSuccess } from '../../../types/api-response.js';
+import { validateRequest } from '../../helpers/validate-request.js';
 
-export const verifyEmailRoute = (router: Router, deps: VerifyEmailDeps) => {
+type Deps = {
+    verifyEmailUseCase: VerifyEmailUseCase;
+};
+
+export const verifyEmailRoute = (router: Router, deps: Deps) => {
     /**
      * @openapi
      * /users/verify-email:
@@ -35,4 +43,17 @@ export const verifyEmailRoute = (router: Router, deps: VerifyEmailDeps) => {
      *         description: Internal server error
      */
     router.post('/users/verify-email', verifyEmailHandler(deps));
+};
+
+export const verifyEmailHandler = ({ verifyEmailUseCase }: Deps) => {
+    return async (req: Request, res: Response): Promise<void> => {
+        const { body } = validateRequest(req, verifyEmailSchema());
+
+        await verifyEmailUseCase.execute({ emailVerificationToken: body.token });
+
+        const response: ApiSuccess = {
+            success: true,
+        };
+        res.status(200).json(response);
+    };
 };
