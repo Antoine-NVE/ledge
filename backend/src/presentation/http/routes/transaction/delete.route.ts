@@ -19,7 +19,7 @@ type Deps = {
 export const deleteTransactionRoute = (router: Router, deps: Deps) => {
     /**
      * @openapi
-     * /transactions/:id:
+     * /transactions/:transactionId:
      *   delete:
      *     tags:
      *       - Transaction

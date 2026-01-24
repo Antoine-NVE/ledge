@@ -19,7 +19,7 @@ type Deps = {
 export const updateTransactionRoute = (router: Router, deps: Deps) => {
     /**
      * @openapi
-     * /transactions/:id:
+     * /transactions/:transactionId:
      *   put:
      *     tags:
      *       - Transaction
