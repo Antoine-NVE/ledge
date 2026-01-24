@@ -1,8 +1,8 @@
 import type { Transaction } from '../../../domain/entities/transaction.js';
-import type { ReadDto } from '../../dto/transaction/read.dto.js';
 import { toTransactionDto } from '../common/transaction.mapper.js';
+import type { ReadTransactionDto } from '@shared/dto/transaction/read.dto.js';
 
-export const toReadDto = (transaction: Transaction): ReadDto => {
+export const toReadTransactionDto = (transaction: Transaction): ReadTransactionDto => {
     return {
         transaction: toTransactionDto(transaction),
     };

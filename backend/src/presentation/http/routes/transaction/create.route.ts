@@ -1,13 +1,13 @@
 import type { Router } from 'express';
 import type { CreateTransactionUseCase } from '../../../../application/transaction/create-transaction.use-case.js';
 import type { Request, Response } from 'express';
-import type { ApiSuccess } from '../../../types/api-response.js';
-import type { CreateDto } from '../../../dto/transaction/create.dto.js';
-import { toCreateDto } from '../../../mappers/transaction/create.mapper.js';
 import { validateRequest } from '../../helpers/validate-request.js';
 import { getAuthenticatedUserId } from '../../helpers/auth.js';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import { createTransactionSchema } from '../../../schemas/transaction.schemas.js';
+import type { ApiSuccess } from '@shared/api/api-response.js';
+import type { CreateTransactionDto } from '@shared/dto/transaction/create.dto.js';
+import { toCreateTransactionDto } from '../../../mappers/transaction/create.mapper.js';
 
 type Deps = {
     createTransactionUseCase: CreateTransactionUseCase;
@@ -64,9 +64,9 @@ export const createTransactionHandler = ({ createTransactionUseCase, tokenManage
 
         const { transaction } = await createTransactionUseCase.execute({ userId, ...body });
 
-        const response: ApiSuccess<CreateDto> = {
+        const response: ApiSuccess<CreateTransactionDto> = {
             success: true,
-            data: toCreateDto(transaction),
+            data: toCreateTransactionDto(transaction),
         };
         res.status(201).json(response);
     };

@@ -1,5 +1,5 @@
 import type { User } from '../../../domain/entities/user.js';
-import type { UserDto } from '../../dto/common/user.dto.js';
+import type { UserDto } from '@shared/dto/common/user.dto.js';
 
 export const toUserDto = (user: User): UserDto => {
     return {

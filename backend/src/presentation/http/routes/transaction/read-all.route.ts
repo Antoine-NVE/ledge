@@ -2,10 +2,10 @@ import type { Router } from 'express';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { GetUserTransactionsUseCase } from '../../../../application/transaction/get-user-transactions.use-case.js';
 import type { Request, Response } from 'express';
-import type { ApiSuccess } from '../../../types/api-response.js';
-import type { ReadAllDto } from '../../../dto/transaction/read-all.dto.js';
-import { toReadAllDto } from '../../../mappers/transaction/read-all.mapper.js';
 import { getAuthenticatedUserId } from '../../helpers/auth.js';
+import type { ApiSuccess } from '@shared/api/api-response.js';
+import type { ReadAllTransactionsDto } from '@shared/dto/transaction/read-all.dto.js';
+import { toReadAllTransactionsDto } from '../../../mappers/transaction/read-all.mapper.js';
 
 type Deps = {
     getUserTransactionsUseCase: GetUserTransactionsUseCase;
@@ -39,9 +39,9 @@ export const readAllTransactionsHandler = ({ getUserTransactionsUseCase, tokenMa
 
         const { transactions } = await getUserTransactionsUseCase.execute({ userId });
 
-        const response: ApiSuccess<ReadAllDto> = {
+        const response: ApiSuccess<ReadAllTransactionsDto> = {
             success: true,
-            data: toReadAllDto(transactions),
+            data: toReadAllTransactionsDto(transactions),
         };
         res.status(200).json(response);
     };

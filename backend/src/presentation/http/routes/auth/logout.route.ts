@@ -1,8 +1,8 @@
 import type { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { LogoutUseCase } from '../../../../application/auth/logout.use-case.js';
-import type { ApiSuccess } from '../../../types/api-response.js';
 import { clearAuthCookies, findRefreshToken } from '../../helpers/auth-cookies.js';
+import type { ApiSuccess } from '@shared/api/api-response.js';
 
 type Deps = {
     logoutUseCase: LogoutUseCase;

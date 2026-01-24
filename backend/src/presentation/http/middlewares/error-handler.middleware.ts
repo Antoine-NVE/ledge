@@ -1,5 +1,4 @@
 import type { NextFunction, Request, Response } from 'express';
-import type { ApiError, BusinessRuleErrorReason } from '../../types/api-response.js';
 import { RouteNotFoundError } from '../../errors/route-not-found.error.js';
 import { TooManyRequestsError } from '../../errors/too-many-requests.error.js';
 import { ValidationError } from '../../errors/validation.error.js';
@@ -7,6 +6,7 @@ import { AuthenticationError } from '../../../application/errors/authentication.
 import { AuthorizationError } from '../../../application/errors/authorization.error.js';
 import { ResourceNotFoundError } from '../../../application/errors/resource-not-found.error.js';
 import { BusinessRuleError } from '../../../application/errors/business-rule.error.js';
+import type { ApiError, BusinessRuleErrorReason } from '@shared/api/api-response.js';
 
 export const errorHandlerMiddleware = () => {
     return (

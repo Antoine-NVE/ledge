@@ -1,10 +1,12 @@
-import z from 'zod';
+import z, { type ZodType } from 'zod';
+import type { LoginSchema } from '@shared/schemas/auth/login.schema.js';
+import type { RegisterSchema } from '@shared/schemas/auth/register.schema.js';
 
 const emailSchema = () => {
     return z.string().trim().toLowerCase().check(z.email('Invalid email address'));
 };
 
-export const registerSchema = () => {
+export const registerSchema = (): ZodType<RegisterSchema> => {
     return z.object({
         body: z
             .object({
@@ -26,7 +28,7 @@ export const registerSchema = () => {
     });
 };
 
-export const loginSchema = () => {
+export const loginSchema = (): ZodType<LoginSchema> => {
     return z.object({
         body: z.object({
             email: emailSchema(),

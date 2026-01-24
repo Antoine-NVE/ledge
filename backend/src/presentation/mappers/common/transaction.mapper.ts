@@ -1,5 +1,5 @@
 import type { Transaction } from '../../../domain/entities/transaction.js';
-import type { TransactionDto } from '../../dto/common/transaction.dto.js';
+import type { TransactionDto } from '@shared/dto/common/transaction.dto.js';
 
 export const toTransactionDto = (transaction: Transaction): TransactionDto => {
     switch (transaction.type) {

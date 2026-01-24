@@ -2,7 +2,7 @@
     "name": "backend",
     "version": "1.0.0",
     "description": "",
-    "main": "dist/src/index.js",
+    "main": "dist/backend/src/index.js",
     "scripts": {
         "dev": "tsx watch src/index.ts",
         "build": "rimraf dist && tsc",

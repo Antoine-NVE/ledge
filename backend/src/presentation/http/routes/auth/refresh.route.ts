@@ -2,8 +2,8 @@ import type { Router } from 'express';
 import type { RefreshUseCase } from '../../../../application/auth/refresh.use-case.js';
 import type { Request, Response } from 'express';
 import { AuthenticationError } from '../../../../application/errors/authentication.error.js';
-import type { ApiSuccess } from '../../../types/api-response.js';
 import { findRefreshToken, findRememberMe, setAuthCookies } from '../../helpers/auth-cookies.js';
+import type { ApiSuccess } from '@shared/api/api-response.js';
 
 type Deps = {
     refreshUseCase: RefreshUseCase;

@@ -3,10 +3,10 @@ import type { RegisterUseCase } from '../../../../application/auth/register.use-
 import { validateRequest } from '../../helpers/validate-request.js';
 import { registerSchema } from '../../../schemas/auth.schemas.js';
 import { setAuthCookies } from '../../helpers/auth-cookies.js';
-import type { ApiSuccess } from '../../../types/api-response.js';
-import type { RegisterDto } from '../../../dto/auth/register.dto.js';
 import { toRegisterDto } from '../../../mappers/auth/register.mapper.js';
 import type { Request, Response } from 'express';
+import type { ApiSuccess } from '@shared/api/api-response.js';
+import type { RegisterDto } from '@shared/dto/auth/register.dto.js';
 
 type Deps = {
     registerUseCase: RegisterUseCase;

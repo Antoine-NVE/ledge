@@ -1,8 +1,8 @@
 import type { Transaction } from '../../../domain/entities/transaction.js';
-import type { UpdateDto } from '../../dto/transaction/update.dto.js';
 import { toTransactionDto } from '../common/transaction.mapper.js';
+import type { UpdateTransactionDto } from '@shared/dto/transaction/update.dto.js';
 
-export const toUpdateDto = (transaction: Transaction): UpdateDto => {
+export const toUpdateTransactionDto = (transaction: Transaction): UpdateTransactionDto => {
     return {
         transaction: toTransactionDto(transaction),
     };

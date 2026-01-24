@@ -2,8 +2,8 @@ import type { Router } from 'express';
 import type { VerifyEmailUseCase } from '../../../../application/user/verify-email.use-case.js';
 import type { Request, Response } from 'express';
 import { verifyEmailSchema } from '../../../schemas/user.schemas.js';
-import type { ApiSuccess } from '../../../types/api-response.js';
 import { validateRequest } from '../../helpers/validate-request.js';
+import type { ApiSuccess } from '@shared/api/api-response.js';
 
 type Deps = {
     verifyEmailUseCase: VerifyEmailUseCase;

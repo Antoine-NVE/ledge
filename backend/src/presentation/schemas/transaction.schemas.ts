@@ -1,5 +1,9 @@
-import z from 'zod';
+import z, { type ZodType } from 'zod';
 import type { IdManager } from '../../domain/ports/id-manager.js';
+import type { CreateTransactionSchema } from '@shared/schemas/transaction/create.schema.js';
+import type { ReadTransactionSchema } from '@shared/schemas/transaction/read.schema.js';
+import type { UpdateTransactionSchema } from '@shared/schemas/transaction/update.schema.js';
+import type { DeleteTransactionSchema } from '@shared/schemas/transaction/delete.schema.js';
 
 const monthSchema = () => {
     return z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
@@ -27,7 +31,7 @@ const expenseCategorySchema = () => {
     return z.enum(['need', 'want', 'investment']).nullable();
 };
 
-export const createTransactionSchema = () => {
+export const createTransactionSchema = (): ZodType<CreateTransactionSchema> => {
     return z.object({
         body: z.discriminatedUnion('type', [
             z.object({
@@ -48,7 +52,7 @@ export const createTransactionSchema = () => {
     });
 };
 
-export const readTransactionSchema = (idManager: IdManager) => {
+export const readTransactionSchema = (idManager: IdManager): ZodType<ReadTransactionSchema> => {
     return z.object({
         params: z.object({
             transactionId: z.string().refine((value) => idManager.validate(value)),
@@ -56,7 +60,7 @@ export const readTransactionSchema = (idManager: IdManager) => {
     });
 };
 
-export const updateTransactionSchema = (idManager: IdManager) => {
+export const updateTransactionSchema = (idManager: IdManager): ZodType<UpdateTransactionSchema> => {
     return z.object({
         body: z.discriminatedUnion('type', [
             z.object({
@@ -78,7 +82,7 @@ export const updateTransactionSchema = (idManager: IdManager) => {
     });
 };
 
-export const deleteTransactionSchema = (idManager: IdManager) => {
+export const deleteTransactionSchema = (idManager: IdManager): ZodType<DeleteTransactionSchema> => {
     return z.object({
         params: z.object({
             transactionId: z.string().refine((value) => idManager.validate(value)),

@@ -1,5 +1,5 @@
 import { ApplicationError } from './application.error.js';
-import type { BusinessRuleErrorReason } from '../../presentation/types/api-response.js';
+import type { BusinessRuleErrorReason } from '@shared/api/api-response.js';
 
 export class BusinessRuleError extends ApplicationError<'BUSINESS_RULE_ERROR'> {
     constructor(

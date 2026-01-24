@@ -1,12 +1,12 @@
 import type { Router } from 'express';
 import type { Request, Response } from 'express';
 import { loginSchema } from '../../../schemas/auth.schemas.js';
-import type { ApiSuccess } from '../../../types/api-response.js';
-import type { LoginDto } from '../../../dto/auth/login.dto.js';
 import { toLoginDto } from '../../../mappers/auth/login.mapper.js';
 import { validateRequest } from '../../helpers/validate-request.js';
 import { setAuthCookies } from '../../helpers/auth-cookies.js';
 import type { LoginUseCase } from '../../../../application/auth/login.use-case.js';
+import type { ApiSuccess } from '@shared/api/api-response.js';
+import type { LoginDto } from '@shared/dto/auth/login.dto.js';
 
 type Deps = {
     loginUseCase: LoginUseCase;

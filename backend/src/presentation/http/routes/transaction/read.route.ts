@@ -2,13 +2,13 @@ import type { Router } from 'express';
 import type { GetTransactionUseCase } from '../../../../application/transaction/get-transaction.use-case.js';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { Request, Response } from 'express';
-import type { ApiSuccess } from '../../../types/api-response.js';
-import type { ReadDto } from '../../../dto/transaction/read.dto.js';
-import { toReadDto } from '../../../mappers/transaction/read.mapper.js';
 import { getAuthenticatedUserId } from '../../helpers/auth.js';
 import { validateRequest } from '../../helpers/validate-request.js';
 import type { IdManager } from '../../../../domain/ports/id-manager.js';
 import { readTransactionSchema } from '../../../schemas/transaction.schemas.js';
+import type { ApiSuccess } from '@shared/api/api-response.js';
+import type { ReadTransactionDto } from '@shared/dto/transaction/read.dto.js';
+import { toReadTransactionDto } from '../../../mappers/transaction/read.mapper.js';
 
 type Deps = {
     getTransactionUseCase: GetTransactionUseCase;
@@ -49,9 +49,9 @@ export const readTransactionHandler = ({ getTransactionUseCase, tokenManager, id
 
         const { transaction } = await getTransactionUseCase.execute({ ...params, userId });
 
-        const response: ApiSuccess<ReadDto> = {
+        const response: ApiSuccess<ReadTransactionDto> = {
             success: true,
-            data: toReadDto(transaction),
+            data: toReadTransactionDto(transaction),
         };
         res.status(200).json(response);
     };

@@ -1,5 +1,5 @@
 import type { TransactionDto } from '../common/transaction.dto.js';
 
-export type DeleteDto = Readonly<{
+export type ReadTransactionDto = Readonly<{
     transaction: TransactionDto;
 }>;

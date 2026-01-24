@@ -3,12 +3,12 @@ import type { DeleteTransactionUseCase } from '../../../../application/transacti
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { IdManager } from '../../../../domain/ports/id-manager.js';
 import type { Request, Response } from 'express';
-import type { ApiSuccess } from '../../../types/api-response.js';
-import type { DeleteDto } from '../../../dto/transaction/delete.dto.js';
-import { toDeleteDto } from '../../../mappers/transaction/delete.mapper.js';
 import { getAuthenticatedUserId } from '../../helpers/auth.js';
 import { validateRequest } from '../../helpers/validate-request.js';
 import { deleteTransactionSchema } from '../../../schemas/transaction.schemas.js';
+import type { ApiSuccess } from '@shared/api/api-response.js';
+import type { DeleteTransactionDto } from '@shared/dto/transaction/delete.dto.js';
+import { toDeleteTransactionDto } from '../../../mappers/transaction/delete.mapper.js';
 
 type Deps = {
     deleteTransactionUseCase: DeleteTransactionUseCase;
@@ -49,9 +49,9 @@ export const deleteTransactionHandler = ({ deleteTransactionUseCase, tokenManage
 
         const { transaction } = await deleteTransactionUseCase.execute({ ...params, userId });
 
-        const response: ApiSuccess<DeleteDto> = {
+        const response: ApiSuccess<DeleteTransactionDto> = {
             success: true,
-            data: toDeleteDto(transaction),
+            data: toDeleteTransactionDto(transaction),
         };
         res.status(200).json(response);
     };
