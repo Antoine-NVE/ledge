@@ -47,7 +47,7 @@ export const deleteTransactionHandler = ({ deleteTransactionUseCase, tokenManage
 
         const { params } = validateRequest(req, deleteTransactionSchema(idManager));
 
-        const { transaction } = await deleteTransactionUseCase.execute({ ...params, userId });
+        const { transaction } = await deleteTransactionUseCase.execute({ ...params, userId }, req.logger);
 
         const response: ApiSuccess<DeleteTransactionDto> = {
             success: true,

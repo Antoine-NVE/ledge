@@ -1,6 +1,7 @@
 import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
 import type { Transaction } from '../../domain/entities/transaction.js';
 import type { IdManager } from '../../domain/ports/id-manager.js';
+import type { Logger } from '../../domain/ports/logger.js';
 
 type Input = {
     userId: string;
@@ -28,7 +29,7 @@ export class CreateTransactionUseCase {
         private idManager: IdManager,
     ) {}
 
-    execute = async (input: Input): Promise<Output> => {
+    execute = async (input: Input, logger: Logger): Promise<Output> => {
         const now = new Date();
 
         const transaction: Transaction = {
@@ -38,6 +39,7 @@ export class CreateTransactionUseCase {
             updatedAt: now,
         };
         await this.transactionRepository.create(transaction);
+        logger.info('Transaction created', { transactionId: transaction.id, userId: transaction.userId });
 
         return { transaction };
     };

@@ -18,6 +18,7 @@ export const errorHandlerMiddleware = () => {
         const err = rawErr instanceof Error ? rawErr : new Error('Unknown error', { cause: rawErr });
 
         if (err instanceof ValidationError) {
+            req.logger.warn(err.message, { err });
             const response: ApiError = {
                 success: false,
                 code: err.code,
@@ -35,6 +36,7 @@ export const errorHandlerMiddleware = () => {
                 EMAIL_ALREADY_VERIFIED: 409,
             };
 
+            req.logger.warn(err.message, { err });
             const response: ApiError = {
                 success: false,
                 code: err.code,
@@ -45,6 +47,7 @@ export const errorHandlerMiddleware = () => {
         }
 
         if (err instanceof AuthenticationError) {
+            req.logger.warn(err.message, { err });
             const response: ApiError = {
                 success: false,
                 code: err.code,
@@ -54,6 +57,7 @@ export const errorHandlerMiddleware = () => {
         }
 
         if (err instanceof AuthorizationError) {
+            req.logger.warn(err.message, { err });
             const response: ApiError = {
                 success: false,
                 code: err.code,
@@ -63,6 +67,7 @@ export const errorHandlerMiddleware = () => {
         }
 
         if (err instanceof ResourceNotFoundError) {
+            req.logger.warn(err.message, { err });
             const response: ApiError = {
                 success: false,
                 code: err.code,
@@ -72,6 +77,7 @@ export const errorHandlerMiddleware = () => {
         }
 
         if (err instanceof RouteNotFoundError) {
+            req.logger.warn(err.message, { err });
             const response: ApiError = {
                 success: false,
                 code: err.code,
@@ -81,6 +87,7 @@ export const errorHandlerMiddleware = () => {
         }
 
         if (err instanceof TooManyRequestsError) {
+            req.logger.warn(err.message, { err });
             const response: ApiError = {
                 success: false,
                 code: err.code,

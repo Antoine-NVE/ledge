@@ -49,7 +49,7 @@ export const verifyEmailHandler = ({ verifyEmailUseCase }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
         const { body } = validateRequest(req, verifyEmailSchema());
 
-        await verifyEmailUseCase.execute({ emailVerificationToken: body.token });
+        await verifyEmailUseCase.execute({ emailVerificationToken: body.token }, req.logger);
 
         const response: ApiSuccess = {
             success: true,

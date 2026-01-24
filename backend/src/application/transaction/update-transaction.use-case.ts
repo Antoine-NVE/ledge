@@ -2,6 +2,7 @@ import type { TransactionRepository } from '../../domain/repositories/transactio
 import type { Transaction } from '../../domain/entities/transaction.js';
 import { ResourceNotFoundError } from '../errors/resource-not-found.error.js';
 import { AuthorizationError } from '../errors/authorization.error.js';
+import type { Logger } from '../../domain/ports/logger.js';
 
 type Input = {
     transactionId: string;
@@ -26,7 +27,7 @@ type Output = {
 export class UpdateTransactionUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
-    execute = async ({ transactionId, userId, ...rest }: Input): Promise<Output> => {
+    execute = async ({ transactionId, userId, ...rest }: Input, logger: Logger): Promise<Output> => {
         const transaction = await this.transactionRepository.findById(transactionId);
         if (!transaction) throw new ResourceNotFoundError();
         if (transaction.userId !== userId) throw new AuthorizationError();
@@ -38,6 +39,7 @@ export class UpdateTransactionUseCase {
             updatedAt: new Date(),
         };
         await this.transactionRepository.save(updatedTransaction);
+        logger.info('Transaction updated', { transactionId: transaction.id, userId: transaction.userId });
 
         return { transaction: updatedTransaction };
     };

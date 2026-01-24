@@ -2,6 +2,7 @@ import type { UserRepository } from '../../domain/repositories/user.repository.j
 import type { TokenManager } from '../../domain/ports/token-manager.js';
 import { BusinessRuleError } from '../errors/business-rule.error.js';
 import type { User } from '../../domain/entities/user.js';
+import type { Logger } from '../../domain/ports/logger.js';
 
 type Input = {
     emailVerificationToken: string;
@@ -15,7 +16,7 @@ export class VerifyEmailUseCase {
         private tokenManager: TokenManager,
     ) {}
 
-    execute = async ({ emailVerificationToken }: Input): Promise<Output> => {
+    execute = async ({ emailVerificationToken }: Input, logger: Logger): Promise<Output> => {
         const { userId } = this.tokenManager.verifyEmailVerification(emailVerificationToken);
 
         const user = await this.userRepository.findById(userId);
@@ -28,5 +29,6 @@ export class VerifyEmailUseCase {
             updatedAt: new Date(),
         };
         await this.userRepository.save(updatedUser);
+        logger.info('User updated', { userId: user.id });
     };
 }

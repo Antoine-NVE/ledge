@@ -22,12 +22,16 @@ export const requestLoggerMiddleware = ({
             requestId: tokenGenerator.generate(16),
         });
 
-        req.logger.info('Request started', { method: req.method, url: req.url });
-
         res.on('finish', () => {
             const duration = Math.round(performance.now() - startTime);
 
-            req.logger.info('Request completed', {
+            const { statusCode } = res;
+            const logLevel = statusCode >= 500 ? 'error' : statusCode >= 400 ? 'warn' : 'info';
+
+            req.logger[logLevel]('Request completed', {
+                method: req.method,
+                url: req.url,
+                status: statusCode,
                 duration: `${duration}ms`,
             });
         });

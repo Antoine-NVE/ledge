@@ -3,6 +3,7 @@ import type { TokenManager } from '../../domain/ports/token-manager.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import { AuthenticationError } from '../errors/authentication.error.js';
 import type { RefreshToken } from '../../domain/entities/refresh-token.js';
+import type { Logger } from '../../domain/ports/logger.js';
 
 type Input = {
     refreshToken: string;
@@ -22,7 +23,7 @@ export class RefreshUseCase {
         private tokenGenerator: TokenGenerator,
     ) {}
 
-    execute = async (input: Input): Promise<Output> => {
+    execute = async (input: Input, logger: Logger): Promise<Output> => {
         const now = new Date();
 
         const refreshToken = await this.refreshTokenRepository.findByValue(input.refreshToken);
@@ -35,6 +36,7 @@ export class RefreshUseCase {
             updatedAt: now,
         };
         await this.refreshTokenRepository.save(updatedRefreshToken);
+        logger.info('Refresh token updated', { refreshTokenId: refreshToken.id, userId: refreshToken.userId });
 
         const accessToken = this.tokenManager.signAccess({ userId: refreshToken.userId });
 

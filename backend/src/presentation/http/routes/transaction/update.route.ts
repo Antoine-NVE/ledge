@@ -65,7 +65,7 @@ export const updateTransactionHandler = ({ updateTransactionUseCase, tokenManage
 
         const { body, params } = validateRequest(req, updateTransactionSchema(idManager));
 
-        const { transaction } = await updateTransactionUseCase.execute({ ...params, userId, ...body });
+        const { transaction } = await updateTransactionUseCase.execute({ ...params, userId, ...body }, req.logger);
 
         const response: ApiSuccess<UpdateTransactionDto> = {
             success: true,

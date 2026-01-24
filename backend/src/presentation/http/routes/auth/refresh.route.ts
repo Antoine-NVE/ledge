@@ -35,7 +35,7 @@ export const refreshHandler = ({ refreshUseCase }: Deps) => {
 
         const rememberMe = findRememberMe(req);
 
-        const output = await refreshUseCase.execute({ refreshToken });
+        const output = await refreshUseCase.execute({ refreshToken }, req.logger);
 
         setAuthCookies(res, output.accessToken, output.refreshToken, rememberMe);
 

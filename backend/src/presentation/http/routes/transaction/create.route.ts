@@ -62,7 +62,7 @@ export const createTransactionHandler = ({ createTransactionUseCase, tokenManage
 
         const { body } = validateRequest(req, createTransactionSchema());
 
-        const { transaction } = await createTransactionUseCase.execute({ userId, ...body });
+        const { transaction } = await createTransactionUseCase.execute({ userId, ...body }, req.logger);
 
         const response: ApiSuccess<CreateTransactionDto> = {
             success: true,
