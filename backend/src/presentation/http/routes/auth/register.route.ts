@@ -43,7 +43,7 @@ export const registerRoute = (router: Router, deps: Deps) => {
      *       400:
      *         description: Validation error
      *       409:
-     *         description: Email already exists
+     *         description: Duplicate email
      *       500:
      *         description: Internal server error
      */

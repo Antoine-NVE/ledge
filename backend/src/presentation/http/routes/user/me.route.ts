@@ -24,7 +24,7 @@ export const meRoute = (router: Router, deps: Deps) => {
      *       200:
      *         description: User retrieved successfully
      *       401:
-     *         description: Required access token / User not found / Inactive, invalid or expired JWT
+     *         description: Authentication error
      *       500:
      *         description: Internal server error
      */

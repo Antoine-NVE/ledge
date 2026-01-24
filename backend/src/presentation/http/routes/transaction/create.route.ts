@@ -47,9 +47,9 @@ export const createTransactionRoute = (router: Router, deps: Deps) => {
      *       201:
      *         description: Transaction created successfully
      *       400:
-     *         description: Validation error / Invalid JWT payload
+     *         description: Validation error
      *       401:
-     *         description: Required access token / Inactive, invalid or expired JWT / User not found
+     *         description: Authentication error
      *       500:
      *         description: Internal server error
      */

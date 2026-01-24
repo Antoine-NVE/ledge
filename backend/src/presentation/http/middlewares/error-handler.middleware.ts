@@ -30,9 +30,9 @@ export const errorHandlerMiddleware = () => {
 
         if (err instanceof BusinessRuleError) {
             const statusMap: Record<BusinessRuleErrorReason, number> = {
-                DUPLICATE_EMAIL: 400,
+                DUPLICATE_EMAIL: 409,
                 INVALID_TOKEN: 400,
-                ACTIVE_COOLDOWN: 409,
+                ACTIVE_COOLDOWN: 429,
                 EMAIL_ALREADY_VERIFIED: 409,
             };
 

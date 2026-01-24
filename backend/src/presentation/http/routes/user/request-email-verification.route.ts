@@ -36,13 +36,13 @@ export const requestEmailVerificationRoute = (router: Router, deps: Deps) => {
      *       200:
      *         description: Verification email sent successfully
      *       400:
-     *         description: Validation error / Invalid JWT payload
+     *         description: Validation error
      *       401:
-     *         description: Required access token / User not found / Inactive, invalid or expired JWT
+     *         description: Authentication error
      *       409:
      *         description: Email already verified
      *       429:
-     *         description: Cooldown
+     *         description: Active cooldown
      *       500:
      *         description: Internal server error
      */

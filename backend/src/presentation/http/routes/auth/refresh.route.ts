@@ -21,7 +21,7 @@ export const refreshRoute = (router: Router, deps: Deps) => {
      *       200:
      *         description: Tokens refreshed successfully
      *       401:
-     *         description: Required, invalid or expired refresh token
+     *         description: Missing (cookies or database) or expired refresh token
      *       500:
      *         description: Internal server error
      */

@@ -28,9 +28,9 @@ export const readTransactionRoute = (router: Router, deps: Deps) => {
      *       200:
      *         description: Transaction retrieved successfully
      *       400:
-     *         description: Invalid parameters / Invalid JWT payload
+     *         description: Validation error
      *       401:
-     *         description: Required access token / Inactive, invalid or expired JWT / User not found
+     *         description: Authentication error
      *       403:
      *         description: Forbidden access
      *       404:

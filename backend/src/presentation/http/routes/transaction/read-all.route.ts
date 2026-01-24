@@ -23,10 +23,8 @@ export const readAllTransactionRoute = (router: Router, deps: Deps) => {
      *     responses:
      *       200:
      *         description: Transactions retrieved successfully
-     *       400:
-     *         description: Invalid JWT payload
      *       401:
-     *         description: Required access token / Inactive, invalid or expired JWT / User not found
+     *         description: Authentication error
      *       500:
      *         description: Internal server error
      */

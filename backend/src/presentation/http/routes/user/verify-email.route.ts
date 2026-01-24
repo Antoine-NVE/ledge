@@ -32,11 +32,7 @@ export const verifyEmailRoute = (router: Router, deps: Deps) => {
      *       200:
      *         description: Email verified successfully
      *       400:
-     *         description: Validation error / Invalid JWT payload
-     *       401:
-     *         description: Inactive, invalid or expired JWT
-     *       404:
-     *         description: User not found
+     *         description: Validation error or invalid token
      *       409:
      *         description: Email already verified
      *       500:
