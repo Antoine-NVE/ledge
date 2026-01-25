@@ -5,7 +5,7 @@ import { loadEnv } from '../src/infrastructure/config/env.js';
 import { fail, ok } from '../src/core/utils/result.js';
 import type { Result } from '../src/core/types/result.js';
 import type { MongoClient } from 'mongodb';
-import { createMigrationRunner } from '../src/infrastructure/config/migration.js';
+import { createMigrationRunner } from '../src/infrastructure/config/umzug.js';
 
 type Output = {
     mongoClient: MongoClient;

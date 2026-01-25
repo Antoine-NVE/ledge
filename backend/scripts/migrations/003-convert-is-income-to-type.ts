@@ -1,4 +1,4 @@
-import type { Context } from '../../src/infrastructure/config/migration.js';
+import type { Context } from '../../src/infrastructure/config/umzug.js';
 
 export const up = async ({ context: { mongoDb } }: { context: Context }) => {
     const collection = mongoDb.collection('transactions');

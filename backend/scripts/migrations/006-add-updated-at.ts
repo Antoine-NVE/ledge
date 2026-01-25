@@ -1,4 +1,4 @@
-import type { Context } from '../../src/infrastructure/config/migration.js';
+import type { Context } from '../../src/infrastructure/config/umzug.js';
 
 const collections = ['users', 'transactions', 'refreshtokens'];
 
