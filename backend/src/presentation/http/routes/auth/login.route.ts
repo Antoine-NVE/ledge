@@ -2,11 +2,11 @@ import type { Router } from 'express';
 import type { Request, Response } from 'express';
 import { loginSchema } from '../../../schemas/auth.schemas.js';
 import { toLoginDto } from '../../../mappers/auth/login.mapper.js';
-import { validateRequest } from '../../helpers/validate-request.js';
 import { setAuthCookies } from '../../helpers/auth-cookies.js';
 import type { LoginUseCase } from '../../../../application/auth/login.use-case.js';
-import type { ApiSuccess } from '@shared/api/api-response.js';
+import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
 import type { LoginDto } from '@shared/dto/auth/login.dto.js';
+import { treeifyError } from 'zod';
 
 type Deps = {
     loginUseCase: LoginUseCase;
@@ -52,9 +52,32 @@ export const loginRoute = (router: Router, deps: Deps) => {
 
 export const loginHandler = ({ loginUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
-        const { body } = validateRequest(req, loginSchema());
+        const validation = loginSchema().safeParse(req);
+        if (!validation.success) {
+            const response: ApiError = {
+                success: false,
+                code: 'VALIDATION_ERROR',
+                tree: treeifyError(validation.error),
+            };
+            res.status(400).json(response);
+            return;
+        }
+        const { body } = validation.data;
 
-        const { user, accessToken, refreshToken } = await loginUseCase.execute(body, req.logger);
+        const login = await loginUseCase.execute(body, req.logger);
+        if (!login.success) {
+            switch (login.error.type) {
+                case 'INVALID_CREDENTIALS': {
+                    const response: ApiError = {
+                        success: false,
+                        code: 'INVALID_CREDENTIALS',
+                    };
+                    res.status(401).json(response);
+                    return;
+                }
+            }
+        }
+        const { user, accessToken, refreshToken } = login.data;
 
         setAuthCookies(res, accessToken, refreshToken, body.rememberMe);
 

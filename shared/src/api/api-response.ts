@@ -8,6 +8,7 @@ export type ApplicationErrorCode =
     | 'AUTHENTICATION_ERROR'
     | 'AUTHORIZATION_ERROR'
     | 'BUSINESS_RULE_ERROR'
+    | 'INVALID_CREDENTIALS'
     | 'RESOURCE_NOT_FOUND_ERROR';
 
 export type BusinessRuleErrorReason =
