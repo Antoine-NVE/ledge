@@ -1,7 +1,8 @@
 import { Collection, MongoServerError, ObjectId } from 'mongodb';
 import type { UserRepository } from '../../domain/repositories/user.repository.js';
 import type { User } from '../../domain/entities/user.js';
-import { BusinessRuleError } from '../../application/errors/business-rule.error.js';
+import type { Result } from '../../core/types/result.js';
+import { fail, ok } from '../../core/utils/result.js';
 
 type UserDocument = Readonly<{
     _id: ObjectId;
@@ -37,15 +38,16 @@ export class MongoUserRepository implements UserRepository {
         };
     };
 
-    create = async (user: User): Promise<void> => {
+    create = async (user: User): Promise<Result<void, { type: 'DUPLICATE_EMAIL' }>> => {
         const document = this.toDocument(user);
 
         try {
             await this.userCollection.insertOne(document);
+            return ok(undefined);
         } catch (err: unknown) {
             if (err instanceof MongoServerError && err.code === 11000 && err.keyPattern.email) {
-                // Here is a rare case where we throw an ApplicationError from infrastructure layer
-                throw new BusinessRuleError('DUPLICATE_EMAIL');
+                // Here is a rare case where we return an error from infrastructure layer
+                return fail({ type: 'DUPLICATE_EMAIL' });
             }
             throw err;
         }

@@ -7,17 +7,22 @@ import type { User } from '../../domain/entities/user.js';
 import type { RefreshToken } from '../../domain/entities/refresh-token.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import type { Logger } from '../../domain/ports/logger.js';
+import type { Result } from '../../core/types/result.js';
+import { fail, ok } from '../../core/utils/result.js';
 
-type Input = {
+type RegisterInput = {
     email: string;
     password: string;
 };
 
-type Output = {
-    user: User;
-    accessToken: string;
-    refreshToken: string;
-};
+type RegisterResult = Result<
+    {
+        user: User;
+        accessToken: string;
+        refreshToken: string;
+    },
+    { type: 'DUPLICATE_EMAIL' }
+>;
 
 export class RegisterUseCase {
     private readonly REFRESH_TOKEN_DURATION = 7 * 24 * 60 * 60 * 1000;
@@ -31,7 +36,7 @@ export class RegisterUseCase {
         private tokenGenerator: TokenGenerator,
     ) {}
 
-    execute = async ({ email, password }: Input, logger: Logger): Promise<Output> => {
+    execute = async ({ email, password }: RegisterInput, logger: Logger): Promise<RegisterResult> => {
         const now = new Date();
 
         const user: User = {
@@ -42,7 +47,8 @@ export class RegisterUseCase {
             createdAt: now,
             updatedAt: now,
         };
-        await this.userRepository.create(user);
+        const creation = await this.userRepository.create(user);
+        if (!creation.success) return fail(creation.error);
         logger.info('User created', { userId: user.id });
 
         const refreshToken: RefreshToken = {
@@ -58,6 +64,6 @@ export class RegisterUseCase {
 
         const accessToken = this.tokenManager.signAccess({ userId: user.id });
 
-        return { user, accessToken, refreshToken: refreshToken.value };
+        return ok({ user, accessToken, refreshToken: refreshToken.value });
     };
 }
