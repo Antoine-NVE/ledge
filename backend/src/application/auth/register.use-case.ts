@@ -10,19 +10,9 @@ import type { Logger } from '../../domain/ports/logger.js';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
 
-type RegisterInput = {
-    email: string;
-    password: string;
-};
+type RegisterInput = { email: string; password: string };
 
-type RegisterResult = Result<
-    {
-        user: User;
-        accessToken: string;
-        refreshToken: string;
-    },
-    { type: 'DUPLICATE_EMAIL' }
->;
+type RegisterResult = Result<{ user: User; accessToken: string; refreshToken: string }, { type: 'DUPLICATE_EMAIL' }>;
 
 export class RegisterUseCase {
     private readonly REFRESH_TOKEN_DURATION = 7 * 24 * 60 * 60 * 1000;

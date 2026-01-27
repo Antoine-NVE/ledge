@@ -10,17 +10,10 @@ import type { Logger } from '../../domain/ports/logger.js';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
 
-type LoginInput = {
-    email: string;
-    password: string;
-};
+type LoginInput = { email: string; password: string };
 
 type LoginResult = Result<
-    {
-        user: User;
-        accessToken: string;
-        refreshToken: string;
-    },
+    { user: User; accessToken: string; refreshToken: string },
     { type: 'USER_NOT_FOUND' } | { type: 'INVALID_PASSWORD' }
 >;
 

@@ -2,10 +2,10 @@ import type { Router } from 'express';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { GetUserTransactionsUseCase } from '../../../../application/transaction/get-user-transactions.use-case.js';
 import type { Request, Response } from 'express';
-import { getAuthenticatedUserId } from '../../helpers/auth.js';
-import type { ApiSuccess } from '@shared/api/api-response.js';
+import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
 import type { ReadAllTransactionsDto } from '@shared/dto/transaction/read-all.dto.js';
 import { toReadAllTransactionsDto } from '../../../mappers/transaction/read-all.mapper.js';
+import { findAccessToken } from '../../helpers/auth-cookies.js';
 
 type Deps = {
     getUserTransactionsUseCase: GetUserTransactionsUseCase;
@@ -33,7 +33,26 @@ export const readAllTransactionRoute = (router: Router, deps: Deps) => {
 
 export const readAllTransactionsHandler = ({ getUserTransactionsUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response) => {
-        const userId = getAuthenticatedUserId(req, tokenManager);
+        const accessToken = findAccessToken(req);
+        if (!accessToken) {
+            const response: ApiError = {
+                success: false,
+                code: 'UNAUTHORIZED',
+            };
+            res.status(401).json(response);
+            return;
+        }
+
+        const verification = tokenManager.verifyAccess(accessToken);
+        if (!verification.success) {
+            const response: ApiError = {
+                success: false,
+                code: 'UNAUTHORIZED',
+            };
+            res.status(401).json(response);
+            return;
+        }
+        const { userId } = verification.data;
 
         const { transactions } = await getUserTransactionsUseCase.execute({ userId });
 

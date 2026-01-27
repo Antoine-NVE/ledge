@@ -1,25 +1,23 @@
 import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
 import type { Transaction } from '../../domain/entities/transaction.js';
-import { ResourceNotFoundError } from '../errors/resource-not-found.error.js';
-import { AuthorizationError } from '../errors/authorization.error.js';
+import type { Result } from '../../core/types/result.js';
+import { fail, ok } from '../../core/utils/result.js';
 
-type Input = {
-    transactionId: string;
-    userId: string;
-};
+type GetTransactionInput = { transactionId: string; userId: string };
 
-type Output = {
-    transaction: Transaction;
-};
+type GetTransactionResult = Result<
+    { transaction: Transaction },
+    { type: 'TRANSACTION_NOT_FOUND' } | { type: 'TRANSACTION_NOT_OWNED' }
+>;
 
 export class GetTransactionUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
-    execute = async ({ transactionId, userId }: Input): Promise<Output> => {
+    execute = async ({ transactionId, userId }: GetTransactionInput): Promise<GetTransactionResult> => {
         const transaction = await this.transactionRepository.findById(transactionId);
-        if (!transaction) throw new ResourceNotFoundError();
-        if (transaction.userId !== userId) throw new AuthorizationError();
+        if (!transaction) return fail({ type: 'TRANSACTION_NOT_FOUND' });
+        if (transaction.userId !== userId) return fail({ type: 'TRANSACTION_NOT_OWNED' });
 
-        return { transaction };
+        return ok({ transaction });
     };
 }

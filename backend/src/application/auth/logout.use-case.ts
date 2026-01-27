@@ -1,14 +1,14 @@
 import type { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository.js';
 import type { Logger } from '../../domain/ports/logger.js';
 
-type LogoutInput = {
-    refreshToken: string;
-};
+type LogoutInput = { refreshToken: string };
+
+type LogoutOutput = void;
 
 export class LogoutUseCase {
     constructor(private refreshTokenRepository: RefreshTokenRepository) {}
 
-    execute = async (input: LogoutInput, logger: Logger): Promise<void> => {
+    execute = async (input: LogoutInput, logger: Logger): Promise<LogoutOutput> => {
         const refreshToken = await this.refreshTokenRepository.findByValue(input.refreshToken);
         if (!refreshToken) return;
 

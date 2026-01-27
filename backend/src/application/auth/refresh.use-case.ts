@@ -6,15 +6,10 @@ import type { Logger } from '../../domain/ports/logger.js';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
 
-type RefreshInput = {
-    refreshToken: string;
-};
+type RefreshInput = { refreshToken: string };
 
 type RefreshResult = Result<
-    {
-        accessToken: string;
-        refreshToken: string;
-    },
+    { accessToken: string; refreshToken: string },
     { type: 'REFRESH_TOKEN_NOT_FOUND' } | { type: 'EXPIRED_REFRESH_TOKEN' }
 >;
 

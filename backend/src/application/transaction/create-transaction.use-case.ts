@@ -3,25 +3,12 @@ import type { Transaction } from '../../domain/entities/transaction.js';
 import type { IdManager } from '../../domain/ports/id-manager.js';
 import type { Logger } from '../../domain/ports/logger.js';
 
-type Input = {
-    userId: string;
-    month: string;
-    name: string;
-    value: number;
-} & (
-    | {
-          type: 'expense';
-          expenseCategory: 'need' | 'want' | 'investment' | null;
-      }
-    | {
-          type: 'income';
-          expenseCategory: null;
-      }
+type CreateTransactionInput = { userId: string; month: string; name: string; value: number } & (
+    | { type: 'expense'; expenseCategory: 'need' | 'want' | 'investment' | null }
+    | { type: 'income'; expenseCategory: null }
 );
 
-type Output = {
-    transaction: Transaction;
-};
+type CreateTransactionOutput = { transaction: Transaction };
 
 export class CreateTransactionUseCase {
     constructor(
@@ -29,7 +16,7 @@ export class CreateTransactionUseCase {
         private idManager: IdManager,
     ) {}
 
-    execute = async (input: Input, logger: Logger): Promise<Output> => {
+    execute = async (input: CreateTransactionInput, logger: Logger): Promise<CreateTransactionOutput> => {
         const now = new Date();
 
         const transaction: Transaction = {

@@ -9,9 +9,12 @@ export type ApplicationErrorCode =
     | 'AUTHORIZATION_ERROR'
     | 'BUSINESS_RULE_ERROR'
     | 'DUPLICATE_EMAIL'
+    | 'FORBIDDEN'
     | 'INVALID_CREDENTIALS'
     | 'INVALID_REFRESH_TOKEN'
-    | 'RESOURCE_NOT_FOUND_ERROR';
+    | 'NOT_FOUND'
+    | 'RESOURCE_NOT_FOUND_ERROR'
+    | 'UNAUTHORIZED';
 
 export type BusinessRuleErrorReason =
     | 'ACTIVE_COOLDOWN'

@@ -2,13 +2,13 @@ import type { Router } from 'express';
 import type { UpdateTransactionUseCase } from '../../../../application/transaction/update-transaction.use-case.js';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { Request, Response } from 'express';
-import { getAuthenticatedUserId } from '../../helpers/auth.js';
-import { validateRequest } from '../../helpers/validate-request.js';
 import type { IdManager } from '../../../../domain/ports/id-manager.js';
 import { updateTransactionSchema } from '../../../schemas/transaction.schemas.js';
-import type { ApiSuccess } from '@shared/api/api-response.js';
+import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
 import type { UpdateTransactionDto } from '@shared/dto/transaction/update.dto.js';
 import { toUpdateTransactionDto } from '../../../mappers/transaction/update.mapper.js';
+import { findAccessToken } from '../../helpers/auth-cookies.js';
+import { treeifyError } from 'zod';
 
 type Deps = {
     updateTransactionUseCase: UpdateTransactionUseCase;
@@ -61,11 +61,61 @@ export const updateTransactionRoute = (router: Router, deps: Deps) => {
 
 export const updateTransactionHandler = ({ updateTransactionUseCase, tokenManager, idManager }: Deps) => {
     return async (req: Request, res: Response) => {
-        const userId = getAuthenticatedUserId(req, tokenManager);
+        const accessToken = findAccessToken(req);
+        if (!accessToken) {
+            const response: ApiError = {
+                success: false,
+                code: 'UNAUTHORIZED',
+            };
+            res.status(401).json(response);
+            return;
+        }
 
-        const { body, params } = validateRequest(req, updateTransactionSchema(idManager));
+        const verification = tokenManager.verifyAccess(accessToken);
+        if (!verification.success) {
+            const response: ApiError = {
+                success: false,
+                code: 'UNAUTHORIZED',
+            };
+            res.status(401).json(response);
+            return;
+        }
+        const { userId } = verification.data;
 
-        const { transaction } = await updateTransactionUseCase.execute({ ...params, userId, ...body }, req.logger);
+        const validation = updateTransactionSchema(idManager).safeParse(req);
+        if (!validation.success) {
+            const response: ApiError = {
+                success: false,
+                code: 'VALIDATION_ERROR',
+                tree: treeifyError(validation.error),
+            };
+            res.status(400).json(response);
+            return;
+        }
+        const { body, params } = validation.data;
+
+        const update = await updateTransactionUseCase.execute({ ...params, userId, ...body }, req.logger);
+        if (!update.success) {
+            switch (update.error.type) {
+                case 'TRANSACTION_NOT_OWNED': {
+                    const response: ApiError = {
+                        success: false,
+                        code: 'FORBIDDEN',
+                    };
+                    res.status(403).json(response);
+                    return;
+                }
+                case 'TRANSACTION_NOT_FOUND': {
+                    const response: ApiError = {
+                        success: false,
+                        code: 'NOT_FOUND',
+                    };
+                    res.status(404).json(response);
+                    return;
+                }
+            }
+        }
+        const { transaction } = update.data;
 
         const response: ApiSuccess<UpdateTransactionDto> = {
             success: true,

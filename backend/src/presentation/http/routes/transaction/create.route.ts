@@ -1,13 +1,13 @@
 import type { Router } from 'express';
 import type { CreateTransactionUseCase } from '../../../../application/transaction/create-transaction.use-case.js';
 import type { Request, Response } from 'express';
-import { validateRequest } from '../../helpers/validate-request.js';
-import { getAuthenticatedUserId } from '../../helpers/auth.js';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import { createTransactionSchema } from '../../../schemas/transaction.schemas.js';
-import type { ApiSuccess } from '@shared/api/api-response.js';
+import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
 import type { CreateTransactionDto } from '@shared/dto/transaction/create.dto.js';
 import { toCreateTransactionDto } from '../../../mappers/transaction/create.mapper.js';
+import { findAccessToken } from '../../helpers/auth-cookies.js';
+import { treeifyError } from 'zod';
 
 type Deps = {
     createTransactionUseCase: CreateTransactionUseCase;
@@ -58,9 +58,38 @@ export const createTransactionRoute = (router: Router, deps: Deps) => {
 
 export const createTransactionHandler = ({ createTransactionUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response) => {
-        const userId = getAuthenticatedUserId(req, tokenManager);
+        const accessToken = findAccessToken(req);
+        if (!accessToken) {
+            const response: ApiError = {
+                success: false,
+                code: 'UNAUTHORIZED',
+            };
+            res.status(401).json(response);
+            return;
+        }
 
-        const { body } = validateRequest(req, createTransactionSchema());
+        const verification = tokenManager.verifyAccess(accessToken);
+        if (!verification.success) {
+            const response: ApiError = {
+                success: false,
+                code: 'UNAUTHORIZED',
+            };
+            res.status(401).json(response);
+            return;
+        }
+        const { userId } = verification.data;
+
+        const validation = createTransactionSchema().safeParse(req);
+        if (!validation.success) {
+            const response: ApiError = {
+                success: false,
+                code: 'VALIDATION_ERROR',
+                tree: treeifyError(validation.error),
+            };
+            res.status(400).json(response);
+            return;
+        }
+        const { body } = validation.data;
 
         const { transaction } = await createTransactionUseCase.execute({ userId, ...body }, req.logger);
 

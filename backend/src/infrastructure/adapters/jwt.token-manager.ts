@@ -2,9 +2,8 @@ import jwt from 'jsonwebtoken';
 import z from 'zod';
 import type { TokenManager } from '../../domain/ports/token-manager.js';
 import type { IdManager } from '../../domain/ports/id-manager.js';
-import { AuthenticationError } from '../../application/errors/authentication.error.js';
-import { BusinessRuleError } from '../../application/errors/business-rule.error.js';
-import type { StringValue } from 'ms';
+import type { Result } from '../../core/types/result.js';
+import { fail, ok } from '../../core/utils/result.js';
 
 export class JwtTokenManager implements TokenManager {
     constructor(
@@ -12,46 +11,39 @@ export class JwtTokenManager implements TokenManager {
         private secret: string,
     ) {}
 
-    private sign = (payload: { sub: string }, options: { audience: string; expiresIn: StringValue }): string => {
-        return jwt.sign(payload, this.secret, options);
-    };
-
-    private verify = (token: string, options: { audience: string }): z.infer<typeof schema> => {
-        const schema = z.object({
-            sub: z.string().refine((value) => this.idManager.validate(value)),
-            aud: z.string(),
-            iat: z.number(),
-            exp: z.number(),
-        });
-
-        return schema.parse(jwt.verify(token, this.secret, options));
-    };
-
     signAccess = ({ userId }: { userId: string }): string => {
-        return this.sign({ sub: userId }, { audience: 'access', expiresIn: '15 minutes' });
+        return jwt.sign({ sub: userId }, this.secret, { audience: 'access', expiresIn: '15 minutes' });
     };
 
-    verifyAccess = (accessToken: string): { userId: string } => {
-        try {
-            const { sub } = this.verify(accessToken, { audience: 'access' });
+    verifyAccess = (accessToken: string): Result<{ userId: string }, { type: 'INVALID_TOKEN' }> => {
+        const schema = z.object({ sub: z.string().refine((value) => this.idManager.validate(value)) });
 
-            return { userId: sub };
-        } catch (err: unknown) {
-            throw new AuthenticationError({ cause: err });
+        try {
+            const { sub } = schema.parse(jwt.verify(accessToken, this.secret, { audience: 'access' }));
+
+            return ok({ userId: sub });
+        } catch {
+            return fail({ type: 'INVALID_TOKEN' });
         }
     };
 
     signEmailVerification = ({ userId }: { userId: string }): string => {
-        return this.sign({ sub: userId }, { audience: 'email-verification', expiresIn: '1 hour' });
+        return jwt.sign({ sub: userId }, this.secret, { audience: 'email-verification', expiresIn: '1 hour' });
     };
 
-    verifyEmailVerification = (emailVerificationToken: string): { userId: string } => {
-        try {
-            const { sub } = this.verify(emailVerificationToken, { audience: 'email-verification' });
+    verifyEmailVerification = (
+        emailVerificationToken: string,
+    ): Result<{ userId: string }, { type: 'INVALID_TOKEN' }> => {
+        const schema = z.object({ sub: z.string().refine((value) => this.idManager.validate(value)) });
 
-            return { userId: sub };
-        } catch (err: unknown) {
-            throw new BusinessRuleError('INVALID_TOKEN', { cause: err });
+        try {
+            const { sub } = schema.parse(
+                jwt.verify(emailVerificationToken, this.secret, { audience: 'email-verification' }),
+            );
+
+            return ok({ userId: sub });
+        } catch {
+            return fail({ type: 'INVALID_TOKEN' });
         }
     };
 }
