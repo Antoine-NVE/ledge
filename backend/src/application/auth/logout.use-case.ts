@@ -5,12 +5,10 @@ type Input = {
     refreshToken: string;
 };
 
-type Output = void;
-
 export class LogoutUseCase {
     constructor(private refreshTokenRepository: RefreshTokenRepository) {}
 
-    execute = async (input: Input, logger: Logger): Promise<Output> => {
+    execute = async (input: Input, logger: Logger): Promise<void> => {
         const refreshToken = await this.refreshTokenRepository.findByValue(input.refreshToken);
         if (!refreshToken) return;
 
