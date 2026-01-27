@@ -21,9 +21,7 @@ type LoginResult = Result<
         accessToken: string;
         refreshToken: string;
     },
-    {
-        type: 'INVALID_CREDENTIALS';
-    }
+    { type: 'INVALID_CREDENTIALS' }
 >;
 
 export class LoginUseCase {
