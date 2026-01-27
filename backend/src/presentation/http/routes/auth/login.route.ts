@@ -67,7 +67,8 @@ export const loginHandler = ({ loginUseCase }: Deps) => {
         const login = await loginUseCase.execute(body, req.logger);
         if (!login.success) {
             switch (login.error.type) {
-                case 'INVALID_CREDENTIALS': {
+                case 'USER_NOT_FOUND':
+                case 'INVALID_PASSWORD': {
                     const response: ApiError = {
                         success: false,
                         code: 'INVALID_CREDENTIALS',

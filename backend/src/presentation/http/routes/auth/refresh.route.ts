@@ -1,9 +1,8 @@
 import type { Router } from 'express';
 import type { RefreshUseCase } from '../../../../application/auth/refresh.use-case.js';
 import type { Request, Response } from 'express';
-import { AuthenticationError } from '../../../../application/errors/authentication.error.js';
 import { findRefreshToken, findRememberMe, setAuthCookies } from '../../helpers/auth-cookies.js';
-import type { ApiSuccess } from '@shared/api/api-response.js';
+import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
 
 type Deps = {
     refreshUseCase: RefreshUseCase;
@@ -31,13 +30,34 @@ export const refreshRoute = (router: Router, deps: Deps) => {
 export const refreshHandler = ({ refreshUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
         const refreshToken = findRefreshToken(req);
-        if (!refreshToken) throw new AuthenticationError();
+        if (!refreshToken) {
+            const response: ApiError = {
+                success: false,
+                code: 'INVALID_REFRESH_TOKEN',
+            };
+            res.status(401).json(response);
+            return;
+        }
 
         const rememberMe = findRememberMe(req);
 
-        const output = await refreshUseCase.execute({ refreshToken }, req.logger);
+        const refresh = await refreshUseCase.execute({ refreshToken }, req.logger);
+        if (!refresh.success) {
+            switch (refresh.error.type) {
+                case 'REFRESH_TOKEN_NOT_FOUND':
+                case 'EXPIRED_REFRESH_TOKEN': {
+                    const response: ApiError = {
+                        success: false,
+                        code: 'INVALID_REFRESH_TOKEN',
+                    };
+                    res.status(401).json(response);
+                    return;
+                }
+            }
+        }
+        const data = refresh.data;
 
-        setAuthCookies(res, output.accessToken, output.refreshToken, rememberMe);
+        setAuthCookies(res, data.accessToken, data.refreshToken, rememberMe);
 
         const response: ApiSuccess = {
             success: true,
