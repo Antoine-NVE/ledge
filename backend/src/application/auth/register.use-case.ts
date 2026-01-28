@@ -29,6 +29,9 @@ export class RegisterUseCase {
     execute = async ({ email, password }: RegisterInput, logger: Logger): Promise<RegisterResult> => {
         const now = new Date();
 
+        const existingUser = await this.userRepository.findByEmail(email);
+        if (existingUser) return fail({ type: 'DUPLICATE_EMAIL' });
+
         const user: User = {
             id: this.idManager.generate(),
             email,
@@ -37,8 +40,7 @@ export class RegisterUseCase {
             createdAt: now,
             updatedAt: now,
         };
-        const creation = await this.userRepository.create(user);
-        if (!creation.success) return fail(creation.error);
+        await this.userRepository.create(user);
         logger.info('User created', { userId: user.id });
 
         const refreshToken: RefreshToken = {
