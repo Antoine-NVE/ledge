@@ -2,15 +2,18 @@ import type { EmailSender } from '../../domain/ports/email-sender.js';
 import type { UserRepository } from '../../domain/repositories/user.repository.js';
 import type { TokenManager } from '../../domain/ports/token-manager.js';
 import type { CacheStore } from '../../domain/ports/cache-store.js';
-import { AuthenticationError } from '../errors/authentication.error.js';
-import { BusinessRuleError } from '../errors/business-rule.error.js';
+import type { Result } from '../../core/types/result.js';
+import { fail, ok } from '../../core/utils/result.js';
 
-type Input = {
+type RequestEmailVerificationInput = {
     userId: string;
     frontendBaseUrl: string;
 };
 
-type Output = void;
+type RequestEmailVerificationResult = Result<
+    void,
+    { type: 'USER_NOT_FOUND' } | { type: 'EMAIL_ALREADY_VERIFIED' } | { type: 'ACTIVE_COOLDOWN' }
+>;
 
 export class RequestEmailVerificationUseCase {
     constructor(
@@ -21,13 +24,16 @@ export class RequestEmailVerificationUseCase {
         private emailFrom: string,
     ) {}
 
-    execute = async ({ userId, frontendBaseUrl }: Input): Promise<Output> => {
+    execute = async ({
+        userId,
+        frontendBaseUrl,
+    }: RequestEmailVerificationInput): Promise<RequestEmailVerificationResult> => {
         const user = await this.userRepository.findById(userId);
-        if (!user) throw new AuthenticationError();
-        if (user.isEmailVerified) throw new BusinessRuleError('EMAIL_ALREADY_VERIFIED');
+        if (!user) return fail({ type: 'USER_NOT_FOUND' });
+        if (user.isEmailVerified) return fail({ type: 'EMAIL_ALREADY_VERIFIED' });
 
         const activeCooldown = await this.cacheStore.hasEmailVerificationCooldown(user.id);
-        if (activeCooldown) throw new BusinessRuleError('ACTIVE_COOLDOWN');
+        if (activeCooldown) return fail({ type: 'ACTIVE_COOLDOWN' });
 
         await this.emailSender.sendEmailVerification({
             from: this.emailFrom,
@@ -37,5 +43,7 @@ export class RequestEmailVerificationUseCase {
         });
 
         await this.cacheStore.setEmailVerificationCooldown(user.id);
+
+        return ok(undefined);
     };
 }

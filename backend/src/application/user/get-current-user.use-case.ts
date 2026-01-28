@@ -1,22 +1,21 @@
 import type { UserRepository } from '../../domain/repositories/user.repository.js';
 import type { User } from '../../domain/entities/user.js';
-import { AuthenticationError } from '../errors/authentication.error.js';
+import type { Result } from '../../core/types/result.js';
+import { fail, ok } from '../../core/utils/result.js';
 
-type Input = {
+type GetCurrentUserInput = {
     userId: string;
 };
 
-type Output = {
-    user: User;
-};
+type GetCurrentUserResult = Result<{ user: User }, { type: 'USER_NOT_FOUND' }>;
 
 export class GetCurrentUserUseCase {
     constructor(private userRepository: UserRepository) {}
 
-    execute = async ({ userId }: Input): Promise<Output> => {
+    execute = async ({ userId }: GetCurrentUserInput): Promise<GetCurrentUserResult> => {
         const user = await this.userRepository.findById(userId);
-        if (!user) throw new AuthenticationError();
+        if (!user) return fail({ type: 'USER_NOT_FOUND' });
 
-        return { user };
+        return ok({ user });
     };
 }

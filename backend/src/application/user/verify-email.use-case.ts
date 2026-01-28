@@ -1,14 +1,18 @@
 import type { UserRepository } from '../../domain/repositories/user.repository.js';
-import type { TokenManager } from '../../domain/ports/token-manager.js';
-import { BusinessRuleError } from '../errors/business-rule.error.js';
+import type { TokenManager, VerifyTokenError } from '../../domain/ports/token-manager.js';
 import type { User } from '../../domain/entities/user.js';
 import type { Logger } from '../../domain/ports/logger.js';
+import type { Result } from '../../core/types/result.js';
+import { fail, ok } from '../../core/utils/result.js';
 
-type Input = {
+type VerifyEmailInput = {
     emailVerificationToken: string;
 };
 
-type Output = void;
+type VerifyEmailResult = Result<
+    void,
+    VerifyTokenError | { type: 'USER_NOT_FOUND' } | { type: 'EMAIL_ALREADY_VERIFIED' }
+>;
 
 export class VerifyEmailUseCase {
     constructor(
@@ -16,12 +20,14 @@ export class VerifyEmailUseCase {
         private tokenManager: TokenManager,
     ) {}
 
-    execute = async ({ emailVerificationToken }: Input, logger: Logger): Promise<Output> => {
-        const { userId } = this.tokenManager.verifyEmailVerification(emailVerificationToken);
+    execute = async ({ emailVerificationToken }: VerifyEmailInput, logger: Logger): Promise<VerifyEmailResult> => {
+        const verification = this.tokenManager.verifyEmailVerification(emailVerificationToken);
+        if (!verification.success) return fail(verification.error);
+        const { userId } = verification.data;
 
         const user = await this.userRepository.findById(userId);
-        if (!user) throw new BusinessRuleError('INVALID_TOKEN');
-        if (user.isEmailVerified) throw new BusinessRuleError('EMAIL_ALREADY_VERIFIED');
+        if (!user) return fail({ type: 'USER_NOT_FOUND' });
+        if (user.isEmailVerified) return fail({ type: 'EMAIL_ALREADY_VERIFIED' });
 
         const updatedUser: User = {
             ...user,
@@ -30,5 +36,7 @@ export class VerifyEmailUseCase {
         };
         await this.userRepository.save(updatedUser);
         logger.info('User updated', { userId: user.id });
+
+        return ok(undefined);
     };
 }
