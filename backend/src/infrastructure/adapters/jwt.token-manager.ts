@@ -1,18 +1,16 @@
 import jwt from 'jsonwebtoken';
 import type { TokenManager, VerifyTokenResult } from '../../domain/ports/token-manager.js';
 import { fail, ok } from '../../core/utils/result.js';
+import type { TokenPayload } from '../../domain/types/token-payload.js';
 
 type JwtTokenPayload = {
     sub: string;
-    aud: string;
-    iat: number;
-    exp: number;
 };
 
 export class JwtTokenManager implements TokenManager {
     constructor(private secret: string) {}
 
-    signAccess = ({ userId }: { userId: string }): string => {
+    signAccess = ({ userId }: TokenPayload): string => {
         return jwt.sign({ sub: userId }, this.secret, { audience: 'access', expiresIn: '15 minutes' });
     };
 
@@ -29,7 +27,7 @@ export class JwtTokenManager implements TokenManager {
         }
     };
 
-    signEmailVerification = ({ userId }: { userId: string }): string => {
+    signEmailVerification = ({ userId }: TokenPayload): string => {
         return jwt.sign({ sub: userId }, this.secret, { audience: 'email-verification', expiresIn: '1 hour' });
     };
 

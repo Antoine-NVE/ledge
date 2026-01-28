@@ -1,13 +1,15 @@
 import type { Result } from '../../core/types/result.js';
+import type { TokenPayload } from '../types/token-payload.js';
 
-export type VerifyTokenError = { type: 'INACTIVE_TOKEN' } | { type: 'INVALID_TOKEN' } | { type: 'EXPIRED_TOKEN' };
-
-export type VerifyTokenResult = Result<{ userId: string }, VerifyTokenError>;
+export type VerifyTokenResult = Result<
+    TokenPayload,
+    { type: 'INACTIVE_TOKEN' } | { type: 'INVALID_TOKEN' } | { type: 'EXPIRED_TOKEN' }
+>;
 
 export interface TokenManager {
-    signAccess(payload: { userId: string }): string;
+    signAccess(payload: TokenPayload): string;
     verifyAccess(accessToken: string): VerifyTokenResult;
 
-    signEmailVerification(payload: { userId: string }): string;
+    signEmailVerification(payload: TokenPayload): string;
     verifyEmailVerification(emailVerificationToken: string): VerifyTokenResult;
 }
