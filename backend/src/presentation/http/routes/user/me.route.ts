@@ -3,9 +3,9 @@ import type { GetCurrentUserUseCase } from '../../../../application/user/get-cur
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { Request, Response } from 'express';
 import { toMeDto } from '../../../mappers/user/me.mapper.js';
-import { getAuthenticatedUserId } from '../../helpers/auth.js';
-import type { ApiSuccess } from '@shared/api/api-response.js';
+import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
 import type { MeDto } from '@shared/dto/user/me.dto.js';
+import { findAccessToken } from '../../helpers/auth-cookies.js';
 
 type Deps = {
     getCurrentUserUseCase: GetCurrentUserUseCase;
@@ -33,9 +33,41 @@ export const meRoute = (router: Router, deps: Deps) => {
 
 export const meHandler = ({ getCurrentUserUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
-        const userId = getAuthenticatedUserId(req, tokenManager);
+        const accessToken = findAccessToken(req);
+        if (!accessToken) {
+            const response: ApiError = {
+                success: false,
+                code: 'UNAUTHORIZED',
+            };
+            res.status(401).json(response);
+            return;
+        }
 
-        const { user } = await getCurrentUserUseCase.execute({ userId });
+        const verification = tokenManager.verifyAccess(accessToken);
+        if (!verification.success) {
+            const response: ApiError = {
+                success: false,
+                code: 'UNAUTHORIZED',
+            };
+            res.status(401).json(response);
+            return;
+        }
+        const { userId } = verification.data;
+
+        const getting = await getCurrentUserUseCase.execute({ userId });
+        if (!getting.success) {
+            switch (getting.error.type) {
+                case 'USER_NOT_FOUND': {
+                    const response: ApiError = {
+                        success: false,
+                        code: 'UNAUTHORIZED',
+                    };
+                    res.status(401).json(response);
+                    return;
+                }
+            }
+        }
+        const { user } = getting.data;
 
         const response: ApiSuccess<MeDto> = {
             success: true,

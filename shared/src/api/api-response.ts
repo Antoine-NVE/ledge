@@ -5,13 +5,16 @@ export type ApiSuccess<T = void> = T extends void ? { success: true } : { succes
 export type PresentationErrorCode = 'ROUTE_NOT_FOUND_ERROR' | 'TOO_MANY_REQUESTS_ERROR' | 'VALIDATION_ERROR';
 
 export type ApplicationErrorCode =
+    | 'ACTIVE_COOLDOWN'
     | 'AUTHENTICATION_ERROR'
     | 'AUTHORIZATION_ERROR'
     | 'BUSINESS_RULE_ERROR'
     | 'DUPLICATE_EMAIL'
+    | 'EMAIL_ALREADY_VERIFIED'
     | 'FORBIDDEN'
     | 'INVALID_CREDENTIALS'
     | 'INVALID_REFRESH_TOKEN'
+    | 'INVALID_TOKEN'
     | 'NOT_FOUND'
     | 'RESOURCE_NOT_FOUND_ERROR'
     | 'UNAUTHORIZED';

@@ -2,8 +2,8 @@ import type { Router } from 'express';
 import type { VerifyEmailUseCase } from '../../../../application/user/verify-email.use-case.js';
 import type { Request, Response } from 'express';
 import { verifyEmailSchema } from '../../../schemas/user.schemas.js';
-import { validateRequest } from '../../helpers/validate-request.js';
-import type { ApiSuccess } from '@shared/api/api-response.js';
+import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
+import { treeifyError } from 'zod';
 
 type Deps = {
     verifyEmailUseCase: VerifyEmailUseCase;
@@ -43,9 +43,42 @@ export const verifyEmailRoute = (router: Router, deps: Deps) => {
 
 export const verifyEmailHandler = ({ verifyEmailUseCase }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
-        const { body } = validateRequest(req, verifyEmailSchema());
+        const validation = verifyEmailSchema().safeParse(req);
+        if (!validation.success) {
+            const response: ApiError = {
+                success: false,
+                code: 'VALIDATION_ERROR',
+                tree: treeifyError(validation.error),
+            };
+            res.status(400).json(response);
+            return;
+        }
+        const { body } = validation.data;
 
-        await verifyEmailUseCase.execute({ emailVerificationToken: body.token }, req.logger);
+        const verification = await verifyEmailUseCase.execute({ emailVerificationToken: body.token }, req.logger);
+        if (!verification.success) {
+            switch (verification.error.type) {
+                case 'INACTIVE_TOKEN':
+                case 'INVALID_TOKEN':
+                case 'EXPIRED_TOKEN':
+                case 'USER_NOT_FOUND': {
+                    const response: ApiError = {
+                        success: false,
+                        code: 'INVALID_TOKEN',
+                    };
+                    res.status(400).json(response);
+                    return;
+                }
+                case 'EMAIL_ALREADY_VERIFIED': {
+                    const response: ApiError = {
+                        success: false,
+                        code: 'EMAIL_ALREADY_VERIFIED',
+                    };
+                    res.status(409).json(response);
+                    return;
+                }
+            }
+        }
 
         const response: ApiSuccess = {
             success: true,
