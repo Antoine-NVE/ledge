@@ -16,7 +16,9 @@ export type ApplicationErrorCode =
     | 'INVALID_REFRESH_TOKEN'
     | 'INVALID_TOKEN'
     | 'NOT_FOUND'
+    | 'ROUTE_NOT_FOUND'
     | 'RESOURCE_NOT_FOUND_ERROR'
+    | 'TOO_MANY_REQUESTS'
     | 'UNAUTHORIZED';
 
 export type BusinessRuleErrorReason =

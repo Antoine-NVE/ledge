@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { type Request, type Response } from 'express';
 import cookieParser from 'cookie-parser';
 import { corsMiddleware } from './middlewares/cors.middleware.js';
 import { rateLimiterMiddleware } from './middlewares/rate-limiter.middleware.js';
@@ -20,8 +20,8 @@ import type { GetCurrentUserUseCase } from '../../application/user/get-current-u
 import type { Logger } from '../../domain/ports/logger.js';
 import { requestLoggerMiddleware } from './middlewares/request-logger.middleware.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
-import { RouteNotFoundError } from '../errors/route-not-found.error.js';
 import { routes } from './routes/routes.js';
+import type { ApiError } from '@shared/api/api-response.js';
 
 type Input = {
     logger: Logger;
@@ -96,8 +96,12 @@ export const createHttpApp = ({
             allowedOrigins,
         }),
     );
-    app.use(() => {
-        throw new RouteNotFoundError();
+    app.use((req: Request, res: Response) => {
+        const response: ApiError = {
+            success: false,
+            code: 'ROUTE_NOT_FOUND',
+        };
+        res.status(404).json(response);
     });
 
     // Error handler
