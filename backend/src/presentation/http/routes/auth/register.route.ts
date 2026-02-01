@@ -56,7 +56,7 @@ export const registerHandler = ({ registerUseCase }: Deps) => {
         if (!validation.success) {
             const response: ApiError = {
                 success: false,
-                code: 'VALIDATION_ERROR',
+                code: 'BAD_REQUEST',
                 tree: treeifyError(validation.error),
             };
             res.status(400).json(response);

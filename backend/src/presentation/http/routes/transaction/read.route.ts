@@ -68,7 +68,7 @@ export const readTransactionHandler = ({ getTransactionUseCase, tokenManager, id
         if (!validation.success) {
             const response: ApiError = {
                 success: false,
-                code: 'VALIDATION_ERROR',
+                code: 'BAD_REQUEST',
                 tree: treeifyError(validation.error),
             };
             res.status(400).json(response);
@@ -90,7 +90,7 @@ export const readTransactionHandler = ({ getTransactionUseCase, tokenManager, id
                 case 'TRANSACTION_NOT_FOUND': {
                     const response: ApiError = {
                         success: false,
-                        code: 'NOT_FOUND',
+                        code: 'TRANSACTION_NOT_FOUND',
                     };
                     res.status(404).json(response);
                     return;
