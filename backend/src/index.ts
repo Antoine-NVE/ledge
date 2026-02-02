@@ -49,7 +49,7 @@ const start = async (): Promise<Result<void, Error>> => {
     logger.info('SMTP connected');
 
     const idManager = new MongoIdManager();
-    const tokenManager = new JwtTokenManager(idManager, tokenSecret);
+    const tokenManager = new JwtTokenManager(tokenSecret);
     const tokenGenerator = new CryptoTokenGenerator();
     const container = buildContainer({
         tokenManager,
