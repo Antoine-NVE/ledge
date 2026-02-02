@@ -4,21 +4,21 @@ export const setAuthCookies = (res: Response, accessToken: string, refreshToken:
     const refreshMaxAge = rememberMe ? 7 * 24 * 60 * 60 * 1000 : undefined;
     const accessMaxAge = rememberMe ? 15 * 60 * 1000 : undefined;
 
-    res.cookie('access_token', accessToken, {
+    res.cookie('accessToken', accessToken, {
         maxAge: accessMaxAge,
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
     });
 
-    res.cookie('refresh_token', refreshToken, {
+    res.cookie('refreshToken', refreshToken, {
         maxAge: refreshMaxAge,
         httpOnly: true,
         secure: true,
         sameSite: 'strict',
     });
 
-    res.cookie('remember_me', String(rememberMe), {
+    res.cookie('rememberMe', String(rememberMe), {
         maxAge: refreshMaxAge,
         httpOnly: false,
         secure: true,
@@ -27,19 +27,19 @@ export const setAuthCookies = (res: Response, accessToken: string, refreshToken:
 };
 
 export const clearAuthCookies = (res: Response): void => {
-    res.clearCookie('access_token');
-    res.clearCookie('refresh_token');
-    res.clearCookie('remember_me');
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    res.clearCookie('rememberMe');
 };
 
 export const findAccessToken = (req: Request): string | null => {
-    return req.cookies['access_token'] ?? null;
+    return req.cookies['accessToken'] ?? null;
 };
 
 export const findRefreshToken = (req: Request): string | null => {
-    return req.cookies['refresh_token'] ?? null;
+    return req.cookies['refreshToken'] ?? null;
 };
 
 export const findRememberMe = (req: Request): boolean => {
-    return req.cookies['remember_me'] === 'true';
+    return req.cookies['rememberMe'] === 'true';
 };
