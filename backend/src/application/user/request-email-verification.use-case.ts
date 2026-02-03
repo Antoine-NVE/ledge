@@ -24,11 +24,8 @@ export class RequestEmailVerificationUseCase {
         private emailFrom: string,
     ) {}
 
-    execute = async ({
-        userId,
-        frontendBaseUrl,
-    }: RequestEmailVerificationInput): Promise<RequestEmailVerificationResult> => {
-        const user = await this.userRepository.findById(userId);
+    execute = async (input: RequestEmailVerificationInput): Promise<RequestEmailVerificationResult> => {
+        const user = await this.userRepository.findById(input.userId);
         if (!user) return fail({ type: 'USER_NOT_FOUND' });
         if (user.isEmailVerified) return fail({ type: 'EMAIL_ALREADY_VERIFIED' });
 
@@ -38,8 +35,8 @@ export class RequestEmailVerificationUseCase {
         await this.emailSender.sendEmailVerification({
             from: this.emailFrom,
             to: user.email,
-            frontendBaseUrl,
-            emailVerificationToken: this.tokenManager.signEmailVerification({ userId }),
+            frontendBaseUrl: input.frontendBaseUrl,
+            emailVerificationToken: this.tokenManager.signEmailVerification({ userId: user.id }),
         });
 
         await this.cacheStore.setEmailVerificationCooldown(user.id);

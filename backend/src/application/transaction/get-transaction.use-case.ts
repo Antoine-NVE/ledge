@@ -13,10 +13,10 @@ type GetTransactionResult = Result<
 export class GetTransactionUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
-    execute = async ({ transactionId, userId }: GetTransactionInput): Promise<GetTransactionResult> => {
-        const transaction = await this.transactionRepository.findById(transactionId);
+    execute = async (input: GetTransactionInput): Promise<GetTransactionResult> => {
+        const transaction = await this.transactionRepository.findById(input.transactionId);
         if (!transaction) return fail({ type: 'TRANSACTION_NOT_FOUND' });
-        if (transaction.userId !== userId) return fail({ type: 'TRANSACTION_NOT_OWNED' });
+        if (transaction.userId !== input.userId) return fail({ type: 'TRANSACTION_NOT_OWNED' });
 
         return ok({ transaction });
     };

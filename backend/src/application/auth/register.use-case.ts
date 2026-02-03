@@ -26,16 +26,16 @@ export class RegisterUseCase {
         private tokenGenerator: TokenGenerator,
     ) {}
 
-    execute = async ({ email, password }: RegisterInput, logger: Logger): Promise<RegisterResult> => {
+    execute = async (input: RegisterInput, logger: Logger): Promise<RegisterResult> => {
         const now = new Date();
 
-        const existingUser = await this.userRepository.findByEmail(email);
+        const existingUser = await this.userRepository.findByEmail(input.email);
         if (existingUser) return fail({ type: 'DUPLICATE_EMAIL' });
 
         const user: User = {
             id: this.idManager.generate(),
-            email,
-            passwordHash: await this.hasher.hash(password),
+            email: input.email,
+            passwordHash: await this.hasher.hash(input.password),
             isEmailVerified: false,
             createdAt: now,
             updatedAt: now,

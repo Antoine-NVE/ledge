@@ -20,8 +20,8 @@ export class VerifyEmailUseCase {
         private tokenManager: TokenManager,
     ) {}
 
-    execute = async ({ emailVerificationToken }: VerifyEmailInput, logger: Logger): Promise<VerifyEmailResult> => {
-        const verification = this.tokenManager.verifyEmailVerification(emailVerificationToken);
+    execute = async (input: VerifyEmailInput, logger: Logger): Promise<VerifyEmailResult> => {
+        const verification = this.tokenManager.verifyEmailVerification(input.emailVerificationToken);
         if (!verification.success) return fail(verification.error);
         const { userId } = verification.data;
 
@@ -30,8 +30,11 @@ export class VerifyEmailUseCase {
         if (user.isEmailVerified) return fail({ type: 'EMAIL_ALREADY_VERIFIED' });
 
         const updatedUser: User = {
-            ...user,
+            id: user.id,
+            email: user.email,
+            passwordHash: user.passwordHash,
             isEmailVerified: true,
+            createdAt: user.createdAt,
             updatedAt: new Date(),
         };
         await this.userRepository.save(updatedUser);

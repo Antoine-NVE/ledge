@@ -30,9 +30,11 @@ export class RefreshUseCase {
         if (refreshToken.expiresAt < now) return fail({ type: 'EXPIRED_REFRESH_TOKEN' });
 
         const updatedRefreshToken: RefreshToken = {
-            ...refreshToken,
+            id: refreshToken.id,
+            userId: refreshToken.userId,
             value: this.tokenGenerator.generate(),
             expiresAt: new Date(now.getTime() + this.REFRESH_TOKEN_DURATION),
+            createdAt: refreshToken.createdAt,
             updatedAt: now,
         };
         await this.refreshTokenRepository.save(updatedRefreshToken);

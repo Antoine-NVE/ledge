@@ -12,8 +12,8 @@ type GetCurrentUserResult = Result<{ user: User }, { type: 'USER_NOT_FOUND' }>;
 export class GetCurrentUserUseCase {
     constructor(private userRepository: UserRepository) {}
 
-    execute = async ({ userId }: GetCurrentUserInput): Promise<GetCurrentUserResult> => {
-        const user = await this.userRepository.findById(userId);
+    execute = async (input: GetCurrentUserInput): Promise<GetCurrentUserResult> => {
+        const user = await this.userRepository.findById(input.userId);
         if (!user) return fail({ type: 'USER_NOT_FOUND' });
 
         return ok({ user });

@@ -14,13 +14,10 @@ type DeleteTransactionResult = Result<
 export class DeleteTransactionUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
-    execute = async (
-        { transactionId, userId }: DeleteTransactionInput,
-        logger: Logger,
-    ): Promise<DeleteTransactionResult> => {
-        const transaction = await this.transactionRepository.findById(transactionId);
+    execute = async (input: DeleteTransactionInput, logger: Logger): Promise<DeleteTransactionResult> => {
+        const transaction = await this.transactionRepository.findById(input.transactionId);
         if (!transaction) return fail({ type: 'TRANSACTION_NOT_FOUND' });
-        if (transaction.userId !== userId) return fail({ type: 'TRANSACTION_NOT_OWNED' });
+        if (transaction.userId !== input.userId) return fail({ type: 'TRANSACTION_NOT_OWNED' });
 
         await this.transactionRepository.delete(transaction);
         logger.info('Transaction deleted', { transactionId: transaction.id, userId: transaction.userId });

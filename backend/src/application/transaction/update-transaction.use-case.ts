@@ -17,22 +17,47 @@ type UpdateTransactionResult = Result<
 export class UpdateTransactionUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
-    execute = async (
-        { transactionId, userId, ...rest }: UpdateTransactionInput,
-        logger: Logger,
-    ): Promise<UpdateTransactionResult> => {
-        const transaction = await this.transactionRepository.findById(transactionId);
+    execute = async (input: UpdateTransactionInput, logger: Logger): Promise<UpdateTransactionResult> => {
+        const transaction = await this.transactionRepository.findById(input.transactionId);
         if (!transaction) return fail({ type: 'TRANSACTION_NOT_FOUND' });
-        if (transaction.userId !== userId) return fail({ type: 'TRANSACTION_NOT_OWNED' });
+        if (transaction.userId !== input.userId) return fail({ type: 'TRANSACTION_NOT_OWNED' });
 
-        const updatedTransaction: Transaction = {
-            ...transaction,
-            ...rest,
-            updatedAt: new Date(),
-        };
-        await this.transactionRepository.save(updatedTransaction);
-        logger.info('Transaction updated', { transactionId: transaction.id, userId: transaction.userId });
+        switch (input.type) {
+            case 'expense': {
+                const updatedTransaction: Transaction = {
+                    id: transaction.id,
+                    userId: transaction.userId,
+                    month: transaction.month,
+                    name: input.name,
+                    value: input.value,
+                    type: input.type,
+                    expenseCategory: input.expenseCategory,
+                    createdAt: transaction.createdAt,
+                    updatedAt: new Date(),
+                };
+                await this.transactionRepository.save(updatedTransaction);
+                logger.info('Transaction updated', { transactionId: transaction.id, userId: transaction.userId });
 
-        return ok({ transaction: updatedTransaction });
+                return ok({ transaction: updatedTransaction });
+            }
+
+            case 'income': {
+                const updatedTransaction: Transaction = {
+                    id: transaction.id,
+                    userId: transaction.userId,
+                    month: transaction.month,
+                    name: input.name,
+                    value: input.value,
+                    type: input.type,
+                    expenseCategory: input.expenseCategory,
+                    createdAt: transaction.createdAt,
+                    updatedAt: new Date(),
+                };
+                await this.transactionRepository.save(updatedTransaction);
+                logger.info('Transaction updated', { transactionId: transaction.id, userId: transaction.userId });
+
+                return ok({ transaction: updatedTransaction });
+            }
+        }
     };
 }

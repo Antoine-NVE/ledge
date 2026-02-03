@@ -8,8 +8,8 @@ type GetUserTransactionsOutput = { transactions: Transaction[] };
 export class GetUserTransactionsUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
-    execute = async ({ userId }: GetUserTransactionsInput): Promise<GetUserTransactionsOutput> => {
-        const transactions = await this.transactionRepository.findManyByUserId(userId);
+    execute = async (input: GetUserTransactionsInput): Promise<GetUserTransactionsOutput> => {
+        const transactions = await this.transactionRepository.findManyByUserId(input.userId);
 
         return { transactions };
     };

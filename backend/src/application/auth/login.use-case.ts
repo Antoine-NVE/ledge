@@ -29,13 +29,13 @@ export class LoginUseCase {
         private tokenGenerator: TokenGenerator,
     ) {}
 
-    execute = async ({ email, password }: LoginInput, logger: Logger): Promise<LoginResult> => {
+    execute = async (input: LoginInput, logger: Logger): Promise<LoginResult> => {
         const now = new Date();
 
-        const user = await this.userRepository.findByEmail(email);
+        const user = await this.userRepository.findByEmail(input.email);
         if (!user) return fail({ type: 'USER_NOT_FOUND' });
 
-        const isPasswordValid = await this.hasher.compare(password, user.passwordHash);
+        const isPasswordValid = await this.hasher.compare(input.password, user.passwordHash);
         if (!isPasswordValid) return fail({ type: 'INVALID_PASSWORD' });
 
         const refreshToken: RefreshToken = {
