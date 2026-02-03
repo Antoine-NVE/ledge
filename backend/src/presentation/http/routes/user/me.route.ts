@@ -6,6 +6,8 @@ import { toMeDto } from '../../../mappers/user/me.mapper.js';
 import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
 import type { MeDto } from '@shared/dto/user/me.dto.js';
 import { findAccessToken } from '../../helpers/auth-cookies.js';
+import { meSchema } from '../../../schemas/user.schemas.js';
+import { treeifyError } from 'zod';
 
 type Deps = {
     getCurrentUserUseCase: GetCurrentUserUseCase;
@@ -33,8 +35,19 @@ export const meRoute = (router: Router, deps: Deps) => {
 
 export const meHandler = ({ getCurrentUserUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
-        const accessToken = findAccessToken(req);
-        if (!accessToken) {
+        const validation = meSchema().safeParse(req);
+        if (!validation.success) {
+            const response: ApiError = {
+                success: false,
+                code: 'BAD_REQUEST',
+                tree: treeifyError(validation.error),
+            };
+            res.status(400).json(response);
+            return;
+        }
+        const { cookies } = validation.data;
+
+        if (!cookies.accessToken) {
             const response: ApiError = {
                 success: false,
                 code: 'UNAUTHORIZED',
@@ -43,8 +56,8 @@ export const meHandler = ({ getCurrentUserUseCase, tokenManager }: Deps) => {
             return;
         }
 
-        const verification = tokenManager.verifyAccess(accessToken);
-        if (!verification.success) {
+        const authentication = tokenManager.verifyAccess(cookies.accessToken);
+        if (!authentication.success) {
             const response: ApiError = {
                 success: false,
                 code: 'UNAUTHORIZED',
@@ -52,7 +65,7 @@ export const meHandler = ({ getCurrentUserUseCase, tokenManager }: Deps) => {
             res.status(401).json(response);
             return;
         }
-        const { userId } = verification.data;
+        const { userId } = authentication.data;
 
         const getting = await getCurrentUserUseCase.execute({ userId });
         if (!getting.success) {

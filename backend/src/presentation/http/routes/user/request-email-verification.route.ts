@@ -55,27 +55,6 @@ export const requestEmailVerificationHandler = ({
     allowedOrigins,
 }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
-        const accessToken = findAccessToken(req);
-        if (!accessToken) {
-            const response: ApiError = {
-                success: false,
-                code: 'UNAUTHORIZED',
-            };
-            res.status(401).json(response);
-            return;
-        }
-
-        const verification = tokenManager.verifyAccess(accessToken);
-        if (!verification.success) {
-            const response: ApiError = {
-                success: false,
-                code: 'UNAUTHORIZED',
-            };
-            res.status(401).json(response);
-            return;
-        }
-        const { userId } = verification.data;
-
         const validation = requestEmailVerificationSchema(allowedOrigins).safeParse(req);
         if (!validation.success) {
             const response: ApiError = {
@@ -86,7 +65,27 @@ export const requestEmailVerificationHandler = ({
             res.status(400).json(response);
             return;
         }
-        const { body } = validation.data;
+        const { body, cookies } = validation.data;
+
+        if (!cookies.accessToken) {
+            const response: ApiError = {
+                success: false,
+                code: 'UNAUTHORIZED',
+            };
+            res.status(401).json(response);
+            return;
+        }
+
+        const authentication = tokenManager.verifyAccess(cookies.accessToken);
+        if (!authentication.success) {
+            const response: ApiError = {
+                success: false,
+                code: 'UNAUTHORIZED',
+            };
+            res.status(401).json(response);
+            return;
+        }
+        const { userId } = authentication.data;
 
         const requesting = await requestEmailVerificationUseCase.execute({ userId, ...body });
         if (!requesting.success) {

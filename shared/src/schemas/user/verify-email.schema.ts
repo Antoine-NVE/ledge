@@ -1,5 +1,5 @@
 export type VerifyEmailSchema = {
     body: {
-        token: string;
+        emailVerificationToken: string;
     };
 };
