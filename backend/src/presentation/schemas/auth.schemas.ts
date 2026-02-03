@@ -1,6 +1,7 @@
 import z, { type ZodType } from 'zod';
 import type { LoginSchema } from '@shared/schemas/auth/login.schema.js';
 import type { RegisterSchema } from '@shared/schemas/auth/register.schema.js';
+import type { RefreshSchema } from '@shared/schemas/auth/refresh.schema.js';
 
 const emailSchema = () => {
     return z.string().trim().toLowerCase().check(z.email('Invalid email address'));
@@ -34,6 +35,15 @@ export const loginSchema = (): ZodType<LoginSchema> => {
             email: emailSchema(),
             password: z.string().min(1, 'Password is required'),
             rememberMe: z.boolean(),
+        }),
+    });
+};
+
+export const refreshSchema = (): ZodType<RefreshSchema> => {
+    return z.object({
+        cookies: z.object({
+            refreshToken: z.string().optional(),
+            rememberMe: z.coerce.boolean(),
         }),
     });
 };
