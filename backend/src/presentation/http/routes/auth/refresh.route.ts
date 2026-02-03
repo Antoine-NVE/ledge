@@ -66,9 +66,9 @@ export const refreshHandler = ({ refreshUseCase }: Deps) => {
                 }
             }
         }
-        const { accessToken, newRefreshToken } = refresh.data;
+        const { accessToken, refreshToken } = refresh.data;
 
-        setAuthCookies(res, accessToken, newRefreshToken, cookies.rememberMe);
+        setAuthCookies(res, accessToken, refreshToken, cookies.rememberMe);
 
         const response: ApiSuccess = {
             success: true,

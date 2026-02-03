@@ -9,7 +9,7 @@ import { fail, ok } from '../../core/utils/result.js';
 type RefreshInput = { refreshToken: string };
 
 type RefreshResult = Result<
-    { accessToken: string; newRefreshToken: string },
+    { accessToken: string; refreshToken: string },
     { type: 'REFRESH_TOKEN_NOT_FOUND' } | { type: 'EXPIRED_REFRESH_TOKEN' }
 >;
 
@@ -42,6 +42,6 @@ export class RefreshUseCase {
 
         const accessToken = this.tokenManager.signAccess({ userId: refreshToken.userId });
 
-        return ok({ accessToken, newRefreshToken: updatedRefreshToken.value });
+        return ok({ accessToken, refreshToken: updatedRefreshToken.value });
     };
 }
