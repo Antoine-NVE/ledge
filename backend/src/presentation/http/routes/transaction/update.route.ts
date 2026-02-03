@@ -7,7 +7,6 @@ import { updateTransactionSchema } from '../../../schemas/transaction.schemas.js
 import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
 import type { UpdateTransactionDto } from '@shared/dto/transaction/update.dto.js';
 import { toUpdateTransactionDto } from '../../../mappers/transaction/update.mapper.js';
-import { findAccessToken } from '../../helpers/auth-cookies.js';
 import { treeifyError } from 'zod';
 
 type Deps = {
@@ -61,27 +60,6 @@ export const updateTransactionRoute = (router: Router, deps: Deps) => {
 
 export const updateTransactionHandler = ({ updateTransactionUseCase, tokenManager, idManager }: Deps) => {
     return async (req: Request, res: Response) => {
-        const accessToken = findAccessToken(req);
-        if (!accessToken) {
-            const response: ApiError = {
-                success: false,
-                code: 'UNAUTHORIZED',
-            };
-            res.status(401).json(response);
-            return;
-        }
-
-        const verification = tokenManager.verifyAccess(accessToken);
-        if (!verification.success) {
-            const response: ApiError = {
-                success: false,
-                code: 'UNAUTHORIZED',
-            };
-            res.status(401).json(response);
-            return;
-        }
-        const { userId } = verification.data;
-
         const validation = updateTransactionSchema(idManager).safeParse(req);
         if (!validation.success) {
             const response: ApiError = {
@@ -92,7 +70,27 @@ export const updateTransactionHandler = ({ updateTransactionUseCase, tokenManage
             res.status(400).json(response);
             return;
         }
-        const { body, params } = validation.data;
+        const { body, params, cookies } = validation.data;
+
+        if (!cookies.accessToken) {
+            const response: ApiError = {
+                success: false,
+                code: 'UNAUTHORIZED',
+            };
+            res.status(401).json(response);
+            return;
+        }
+
+        const authentication = tokenManager.verifyAccess(cookies.accessToken);
+        if (!authentication.success) {
+            const response: ApiError = {
+                success: false,
+                code: 'UNAUTHORIZED',
+            };
+            res.status(401).json(response);
+            return;
+        }
+        const { userId } = authentication.data;
 
         const update = await updateTransactionUseCase.execute({ ...params, userId, ...body }, req.logger);
         if (!update.success) {

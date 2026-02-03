@@ -4,6 +4,7 @@ import type { CreateTransactionSchema } from '@shared/schemas/transaction/create
 import type { ReadTransactionSchema } from '@shared/schemas/transaction/read.schema.js';
 import type { UpdateTransactionSchema } from '@shared/schemas/transaction/update.schema.js';
 import type { DeleteTransactionSchema } from '@shared/schemas/transaction/delete.schema.js';
+import type { ReadAllTransactionSchema } from '@shared/schemas/transaction/read-all.schema.js';
 
 const monthSchema = () => {
     return z.string().regex(/^\d{4}-(0[1-9]|1[0-2])$/);
@@ -49,6 +50,17 @@ export const createTransactionSchema = (): ZodType<CreateTransactionSchema> => {
                 expenseCategory: z.null(),
             }),
         ]),
+        cookies: z.object({
+            accessToken: z.string().optional(),
+        }),
+    });
+};
+
+export const readAllTransactionsSchema = (): ZodType<ReadAllTransactionSchema> => {
+    return z.object({
+        cookies: z.object({
+            accessToken: z.string().optional(),
+        }),
     });
 };
 
@@ -56,6 +68,9 @@ export const readTransactionSchema = (idManager: IdManager): ZodType<ReadTransac
     return z.object({
         params: z.object({
             transactionId: z.string().refine((value) => idManager.validate(value)),
+        }),
+        cookies: z.object({
+            accessToken: z.string().optional(),
         }),
     });
 };
@@ -79,6 +94,9 @@ export const updateTransactionSchema = (idManager: IdManager): ZodType<UpdateTra
         params: z.object({
             transactionId: z.string().refine((value) => idManager.validate(value)),
         }),
+        cookies: z.object({
+            accessToken: z.string().optional(),
+        }),
     });
 };
 
@@ -86,6 +104,9 @@ export const deleteTransactionSchema = (idManager: IdManager): ZodType<DeleteTra
     return z.object({
         params: z.object({
             transactionId: z.string().refine((value) => idManager.validate(value)),
+        }),
+        cookies: z.object({
+            accessToken: z.string().optional(),
         }),
     });
 };

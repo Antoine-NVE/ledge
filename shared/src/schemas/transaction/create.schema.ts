@@ -14,4 +14,7 @@ export type CreateTransactionSchema = {
               type: 'income';
               expenseCategory: null;
           };
+    cookies: {
+        accessToken?: string | undefined;
+    };
 };

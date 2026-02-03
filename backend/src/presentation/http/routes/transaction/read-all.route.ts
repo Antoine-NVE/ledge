@@ -5,7 +5,8 @@ import type { Request, Response } from 'express';
 import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
 import type { ReadAllTransactionsDto } from '@shared/dto/transaction/read-all.dto.js';
 import { toReadAllTransactionsDto } from '../../../mappers/transaction/read-all.mapper.js';
-import { findAccessToken } from '../../helpers/auth-cookies.js';
+import { readAllTransactionsSchema } from '../../../schemas/transaction.schemas.js';
+import { treeifyError } from 'zod';
 
 type Deps = {
     getUserTransactionsUseCase: GetUserTransactionsUseCase;
@@ -33,8 +34,19 @@ export const readAllTransactionRoute = (router: Router, deps: Deps) => {
 
 export const readAllTransactionsHandler = ({ getUserTransactionsUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response) => {
-        const accessToken = findAccessToken(req);
-        if (!accessToken) {
+        const validation = readAllTransactionsSchema().safeParse(req);
+        if (!validation.success) {
+            const response: ApiError = {
+                success: false,
+                code: 'BAD_REQUEST',
+                tree: treeifyError(validation.error),
+            };
+            res.status(400).json(response);
+            return;
+        }
+        const { cookies } = validation.data;
+
+        if (!cookies.accessToken) {
             const response: ApiError = {
                 success: false,
                 code: 'UNAUTHORIZED',
@@ -43,8 +55,8 @@ export const readAllTransactionsHandler = ({ getUserTransactionsUseCase, tokenMa
             return;
         }
 
-        const verification = tokenManager.verifyAccess(accessToken);
-        if (!verification.success) {
+        const authentication = tokenManager.verifyAccess(cookies.accessToken);
+        if (!authentication.success) {
             const response: ApiError = {
                 success: false,
                 code: 'UNAUTHORIZED',
@@ -52,7 +64,7 @@ export const readAllTransactionsHandler = ({ getUserTransactionsUseCase, tokenMa
             res.status(401).json(response);
             return;
         }
-        const { userId } = verification.data;
+        const { userId } = authentication.data;
 
         const { transactions } = await getUserTransactionsUseCase.execute({ userId });
 

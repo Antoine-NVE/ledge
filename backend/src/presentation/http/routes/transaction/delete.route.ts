@@ -7,7 +7,6 @@ import { deleteTransactionSchema } from '../../../schemas/transaction.schemas.js
 import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
 import type { DeleteTransactionDto } from '@shared/dto/transaction/delete.dto.js';
 import { toDeleteTransactionDto } from '../../../mappers/transaction/delete.mapper.js';
-import { findAccessToken } from '../../helpers/auth-cookies.js';
 import { treeifyError } from 'zod';
 
 type Deps = {
@@ -43,27 +42,6 @@ export const deleteTransactionRoute = (router: Router, deps: Deps) => {
 
 export const deleteTransactionHandler = ({ deleteTransactionUseCase, tokenManager, idManager }: Deps) => {
     return async (req: Request, res: Response) => {
-        const accessToken = findAccessToken(req);
-        if (!accessToken) {
-            const response: ApiError = {
-                success: false,
-                code: 'UNAUTHORIZED',
-            };
-            res.status(401).json(response);
-            return;
-        }
-
-        const verification = tokenManager.verifyAccess(accessToken);
-        if (!verification.success) {
-            const response: ApiError = {
-                success: false,
-                code: 'UNAUTHORIZED',
-            };
-            res.status(401).json(response);
-            return;
-        }
-        const { userId } = verification.data;
-
         const validation = deleteTransactionSchema(idManager).safeParse(req);
         if (!validation.success) {
             const response: ApiError = {
@@ -74,7 +52,27 @@ export const deleteTransactionHandler = ({ deleteTransactionUseCase, tokenManage
             res.status(400).json(response);
             return;
         }
-        const { params } = validation.data;
+        const { params, cookies } = validation.data;
+
+        if (!cookies.accessToken) {
+            const response: ApiError = {
+                success: false,
+                code: 'UNAUTHORIZED',
+            };
+            res.status(401).json(response);
+            return;
+        }
+
+        const authentication = tokenManager.verifyAccess(cookies.accessToken);
+        if (!authentication.success) {
+            const response: ApiError = {
+                success: false,
+                code: 'UNAUTHORIZED',
+            };
+            res.status(401).json(response);
+            return;
+        }
+        const { userId } = authentication.data;
 
         const deletion = await deleteTransactionUseCase.execute({ ...params, userId }, req.logger);
         if (!deletion.success) {

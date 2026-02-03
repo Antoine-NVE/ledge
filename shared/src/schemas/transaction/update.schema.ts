@@ -15,4 +15,7 @@ export type UpdateTransactionSchema = {
     params: {
         transactionId: string;
     };
+    cookies: {
+        accessToken?: string | undefined;
+    };
 };
