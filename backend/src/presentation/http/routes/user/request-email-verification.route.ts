@@ -4,7 +4,6 @@ import type { Request, Response } from 'express';
 import { requestEmailVerificationSchema } from '../../../schemas/user.schemas.js';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
-import { findAccessToken } from '../../helpers/auth-cookies.js';
 import { treeifyError } from 'zod';
 
 type Deps = {

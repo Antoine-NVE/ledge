@@ -5,7 +5,6 @@ import type { Request, Response } from 'express';
 import { toMeDto } from '../../../mappers/user/me.mapper.js';
 import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
 import type { MeDto } from '@shared/dto/user/me.dto.js';
-import { findAccessToken } from '../../helpers/auth-cookies.js';
 import { meSchema } from '../../../schemas/user.schemas.js';
 import { treeifyError } from 'zod';
 
