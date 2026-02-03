@@ -43,7 +43,7 @@ export const refreshSchema = (): ZodType<RefreshSchema> => {
     return z.object({
         cookies: z.object({
             refreshToken: z.string().optional(),
-            rememberMe: z.coerce.boolean(),
+            rememberMe: z.transform((value) => value === 'true'),
         }),
     });
 };
