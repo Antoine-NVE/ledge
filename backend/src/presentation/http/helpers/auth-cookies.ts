@@ -18,12 +18,14 @@ export const setAuthCookies = (res: Response, accessToken: string, refreshToken:
         sameSite: 'strict',
     });
 
-    res.cookie('rememberMe', String(rememberMe), {
-        maxAge: refreshMaxAge,
-        httpOnly: false,
-        secure: true,
-        sameSite: 'strict',
-    });
+    if (rememberMe) {
+        res.cookie('rememberMe', 'true', {
+            maxAge: refreshMaxAge,
+            httpOnly: false,
+            secure: true,
+            sameSite: 'strict',
+        });
+    }
 };
 
 export const clearAuthCookies = (res: Response): void => {
