@@ -62,11 +62,9 @@ export const registerHandler = ({ registerUseCase }: Deps) => {
             res.status(400).json(response);
             return;
         }
-        const {
-            body: { email, password },
-        } = validation.data;
+        const { body } = validation.data;
 
-        const registration = await registerUseCase.execute({ email, password }, req.logger);
+        const registration = await registerUseCase.execute(body, req.logger);
         if (!registration.success) {
             switch (registration.error.type) {
                 case 'DUPLICATE_EMAIL': {

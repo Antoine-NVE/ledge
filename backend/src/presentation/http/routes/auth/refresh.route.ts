@@ -41,11 +41,9 @@ export const refreshHandler = ({ refreshUseCase }: Deps) => {
             res.status(400).json(response);
             return;
         }
-        const {
-            cookies: { refreshToken, rememberMe },
-        } = validation.data;
+        const { cookies } = validation.data;
 
-        if (!refreshToken) {
+        if (!cookies.refreshToken) {
             const response: ApiError = {
                 success: false,
                 code: 'INVALID_REFRESH_TOKEN',
@@ -54,7 +52,7 @@ export const refreshHandler = ({ refreshUseCase }: Deps) => {
             return;
         }
 
-        const refresh = await refreshUseCase.execute({ refreshToken }, req.logger);
+        const refresh = await refreshUseCase.execute({ refreshToken: cookies.refreshToken }, req.logger);
         if (!refresh.success) {
             switch (refresh.error.type) {
                 case 'REFRESH_TOKEN_NOT_FOUND':
@@ -70,7 +68,7 @@ export const refreshHandler = ({ refreshUseCase }: Deps) => {
         }
         const { accessToken, newRefreshToken } = refresh.data;
 
-        setAuthCookies(res, accessToken, newRefreshToken, rememberMe);
+        setAuthCookies(res, accessToken, newRefreshToken, cookies.rememberMe);
 
         const response: ApiSuccess = {
             success: true,
