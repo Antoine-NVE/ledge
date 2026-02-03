@@ -62,9 +62,11 @@ export const loginHandler = ({ loginUseCase }: Deps) => {
             res.status(400).json(response);
             return;
         }
-        const { body } = validation.data;
+        const {
+            body: { email, password, rememberMe },
+        } = validation.data;
 
-        const login = await loginUseCase.execute(body, req.logger);
+        const login = await loginUseCase.execute({ email, password }, req.logger);
         if (!login.success) {
             switch (login.error.type) {
                 case 'USER_NOT_FOUND':
@@ -80,7 +82,7 @@ export const loginHandler = ({ loginUseCase }: Deps) => {
         }
         const { user, accessToken, refreshToken } = login.data;
 
-        setAuthCookies(res, accessToken, refreshToken, body.rememberMe);
+        setAuthCookies(res, accessToken, refreshToken, rememberMe);
 
         const response: ApiSuccess<LoginDto> = {
             success: true,

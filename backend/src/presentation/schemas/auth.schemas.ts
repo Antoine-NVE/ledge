@@ -2,6 +2,7 @@ import z, { type ZodType } from 'zod';
 import type { LoginSchema } from '@shared/schemas/auth/login.schema.js';
 import type { RegisterSchema } from '@shared/schemas/auth/register.schema.js';
 import type { RefreshSchema } from '@shared/schemas/auth/refresh.schema.js';
+import type { LogoutSchema } from '@shared/schemas/auth/logout.schema.js';
 
 const emailSchema = () => {
     return z.string().trim().toLowerCase().check(z.email('Invalid email address'));
@@ -44,6 +45,14 @@ export const refreshSchema = (): ZodType<RefreshSchema> => {
         cookies: z.object({
             refreshToken: z.string().optional(),
             rememberMe: z.transform((value) => value === 'true'),
+        }),
+    });
+};
+
+export const logoutSchema = (): ZodType<LogoutSchema> => {
+    return z.object({
+        cookies: z.object({
+            refreshToken: z.string().optional(),
         }),
     });
 };
