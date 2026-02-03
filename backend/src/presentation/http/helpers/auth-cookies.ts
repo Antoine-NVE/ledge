@@ -1,4 +1,4 @@
-import type { Request, Response } from 'express';
+import type { Response } from 'express';
 
 export const setAuthCookies = (res: Response, accessToken: string, refreshToken: string, rememberMe: boolean): void => {
     const refreshMaxAge = rememberMe ? 7 * 24 * 60 * 60 * 1000 : undefined;
@@ -30,16 +30,4 @@ export const clearAuthCookies = (res: Response): void => {
     res.clearCookie('accessToken');
     res.clearCookie('refreshToken');
     res.clearCookie('rememberMe');
-};
-
-export const findAccessToken = (req: Request): string | null => {
-    return req.cookies['accessToken'] ?? null;
-};
-
-export const findRefreshToken = (req: Request): string | null => {
-    return req.cookies['refreshToken'] ?? null;
-};
-
-export const findRememberMe = (req: Request): boolean => {
-    return req.cookies['rememberMe'] === 'true';
 };
