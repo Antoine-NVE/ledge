@@ -43,7 +43,15 @@ export const logoutHandler = ({ logoutUseCase }: Deps) => {
 
         clearAuthCookies(res);
 
-        if (cookies.refreshToken) await logoutUseCase.execute({ refreshToken: cookies.refreshToken }, req.logger);
+        if (!cookies.refreshToken) {
+            const response: ApiSuccess = {
+                success: true,
+            };
+            res.status(200).json(response);
+            return;
+        }
+
+        await logoutUseCase.execute({ refreshToken: cookies.refreshToken }, req.logger);
 
         const response: ApiSuccess = {
             success: true,
