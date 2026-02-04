@@ -55,7 +55,10 @@ export const verifyEmailHandler = ({ verifyEmailUseCase }: Deps) => {
         }
         const { body } = validation.data;
 
-        const verification = await verifyEmailUseCase.execute(body, req.logger);
+        const verification = await verifyEmailUseCase.execute(
+            { emailVerificationToken: body.emailVerificationToken },
+            req.logger,
+        );
         if (!verification.success) {
             switch (verification.error.type) {
                 case 'INACTIVE_TOKEN':

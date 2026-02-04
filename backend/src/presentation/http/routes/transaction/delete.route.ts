@@ -74,7 +74,10 @@ export const deleteTransactionHandler = ({ deleteTransactionUseCase, tokenManage
         }
         const { userId } = authentication.data;
 
-        const deletion = await deleteTransactionUseCase.execute({ ...params, userId }, req.logger);
+        const deletion = await deleteTransactionUseCase.execute(
+            { transactionId: params.transactionId, userId },
+            req.logger,
+        );
         if (!deletion.success) {
             switch (deletion.error.type) {
                 case 'TRANSACTION_NOT_OWNED': {

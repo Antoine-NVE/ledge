@@ -92,7 +92,18 @@ export const updateTransactionHandler = ({ updateTransactionUseCase, tokenManage
         }
         const { userId } = authentication.data;
 
-        const update = await updateTransactionUseCase.execute({ ...params, userId, ...body }, req.logger);
+        const update = await updateTransactionUseCase.execute(
+            {
+                transactionId: params.transactionId,
+                userId,
+                name: body.name,
+                value: body.value,
+                ...(body.type === 'expense'
+                    ? { type: 'expense', expenseCategory: body.expenseCategory }
+                    : { type: 'income', expenseCategory: null }),
+            },
+            req.logger,
+        );
         if (!update.success) {
             switch (update.error.type) {
                 case 'TRANSACTION_NOT_OWNED': {

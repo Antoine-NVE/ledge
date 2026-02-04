@@ -74,7 +74,7 @@ export const readTransactionHandler = ({ getTransactionUseCase, tokenManager, id
         }
         const { userId } = authentication.data;
 
-        const getting = await getTransactionUseCase.execute({ ...params, userId });
+        const getting = await getTransactionUseCase.execute({ transactionId: params.transactionId, userId });
         if (!getting.success) {
             switch (getting.error.type) {
                 case 'TRANSACTION_NOT_OWNED': {

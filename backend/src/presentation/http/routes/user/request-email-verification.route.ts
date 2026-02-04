@@ -86,7 +86,10 @@ export const requestEmailVerificationHandler = ({
         }
         const { userId } = authentication.data;
 
-        const requesting = await requestEmailVerificationUseCase.execute({ userId, ...body });
+        const requesting = await requestEmailVerificationUseCase.execute({
+            userId,
+            frontendBaseUrl: body.frontendBaseUrl,
+        });
         if (!requesting.success) {
             switch (requesting.error.type) {
                 case 'USER_NOT_FOUND': {
