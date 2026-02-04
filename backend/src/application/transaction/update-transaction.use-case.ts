@@ -22,42 +22,21 @@ export class UpdateTransactionUseCase {
         if (!transaction) return fail({ type: 'TRANSACTION_NOT_FOUND' });
         if (transaction.userId !== input.userId) return fail({ type: 'TRANSACTION_NOT_OWNED' });
 
-        switch (input.type) {
-            case 'expense': {
-                const updatedTransaction: Transaction = {
-                    id: transaction.id,
-                    userId: transaction.userId,
-                    month: transaction.month,
-                    name: input.name,
-                    value: input.value,
-                    type: input.type,
-                    expenseCategory: input.expenseCategory,
-                    createdAt: transaction.createdAt,
-                    updatedAt: new Date(),
-                };
-                await this.transactionRepository.save(updatedTransaction);
-                logger.info('Transaction updated', { transactionId: transaction.id, userId: transaction.userId });
+        const updatedTransaction: Transaction = {
+            id: transaction.id,
+            userId: transaction.userId,
+            month: transaction.month,
+            name: input.name,
+            value: input.value,
+            ...(input.type === 'expense'
+                ? { type: 'expense', expenseCategory: input.expenseCategory }
+                : { type: 'income', expenseCategory: null }),
+            createdAt: transaction.createdAt,
+            updatedAt: new Date(),
+        };
+        await this.transactionRepository.save(updatedTransaction);
+        logger.info('Transaction updated', { transactionId: transaction.id, userId: transaction.userId });
 
-                return ok({ transaction: updatedTransaction });
-            }
-
-            case 'income': {
-                const updatedTransaction: Transaction = {
-                    id: transaction.id,
-                    userId: transaction.userId,
-                    month: transaction.month,
-                    name: input.name,
-                    value: input.value,
-                    type: input.type,
-                    expenseCategory: input.expenseCategory,
-                    createdAt: transaction.createdAt,
-                    updatedAt: new Date(),
-                };
-                await this.transactionRepository.save(updatedTransaction);
-                logger.info('Transaction updated', { transactionId: transaction.id, userId: transaction.userId });
-
-                return ok({ transaction: updatedTransaction });
-            }
-        }
+        return ok({ transaction: updatedTransaction });
     };
 }

@@ -44,32 +44,18 @@ export class MongoTransactionRepository implements TransactionRepository {
     };
 
     private toDomain = (document: TransactionDocument): Transaction => {
-        switch (document.type) {
-            case 'expense':
-                return {
-                    id: document._id.toString(),
-                    userId: document.userId.toString(),
-                    month: document.month,
-                    name: document.name,
-                    value: document.value,
-                    type: document.type,
-                    expenseCategory: document.expenseCategory ?? null,
-                    createdAt: document.createdAt,
-                    updatedAt: document.updatedAt,
-                };
-            case 'income':
-                return {
-                    id: document._id.toString(),
-                    userId: document.userId.toString(),
-                    month: document.month,
-                    name: document.name,
-                    value: document.value,
-                    type: document.type,
-                    expenseCategory: null,
-                    createdAt: document.createdAt,
-                    updatedAt: document.updatedAt,
-                };
-        }
+        return {
+            id: document._id.toString(),
+            userId: document.userId.toString(),
+            month: document.month,
+            name: document.name,
+            value: document.value,
+            ...(document.type === 'expense'
+                ? { type: 'expense', expenseCategory: document.expenseCategory ?? null }
+                : { type: 'income', expenseCategory: null }),
+            createdAt: document.createdAt,
+            updatedAt: document.updatedAt,
+        };
     };
 
     create = async (transaction: Transaction): Promise<void> => {

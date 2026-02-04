@@ -19,42 +19,21 @@ export class CreateTransactionUseCase {
     execute = async (input: CreateTransactionInput, logger: Logger): Promise<CreateTransactionOutput> => {
         const now = new Date();
 
-        switch (input.type) {
-            case 'expense': {
-                const transaction: Transaction = {
-                    id: this.idManager.generate(),
-                    userId: input.userId,
-                    month: input.month,
-                    name: input.name,
-                    value: input.value,
-                    type: input.type,
-                    expenseCategory: input.expenseCategory,
-                    createdAt: now,
-                    updatedAt: now,
-                };
-                await this.transactionRepository.create(transaction);
-                logger.info('Transaction created', { transactionId: transaction.id, userId: transaction.userId });
+        const transaction: Transaction = {
+            id: this.idManager.generate(),
+            userId: input.userId,
+            month: input.month,
+            name: input.name,
+            value: input.value,
+            ...(input.type === 'expense'
+                ? { type: 'expense', expenseCategory: input.expenseCategory }
+                : { type: 'income', expenseCategory: null }),
+            createdAt: now,
+            updatedAt: now,
+        };
+        await this.transactionRepository.create(transaction);
+        logger.info('Transaction created', { transactionId: transaction.id, userId: transaction.userId });
 
-                return { transaction };
-            }
-
-            case 'income': {
-                const transaction: Transaction = {
-                    id: this.idManager.generate(),
-                    userId: input.userId,
-                    month: input.month,
-                    name: input.name,
-                    value: input.value,
-                    type: input.type,
-                    expenseCategory: input.expenseCategory,
-                    createdAt: now,
-                    updatedAt: now,
-                };
-                await this.transactionRepository.create(transaction);
-                logger.info('Transaction created', { transactionId: transaction.id, userId: transaction.userId });
-
-                return { transaction };
-            }
-        }
+        return { transaction };
     };
 }
