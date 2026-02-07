@@ -66,7 +66,7 @@ export const loginHandler = ({ loginUseCase }: Deps) => {
 
         const login = await loginUseCase.execute({ email: body.email, password: body.password }, req.logger);
         if (!login.success) {
-            switch (login.error.type) {
+            switch (login.error) {
                 case 'USER_NOT_FOUND':
                 case 'INVALID_PASSWORD': {
                     const response: ApiError = {

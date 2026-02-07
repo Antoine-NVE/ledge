@@ -14,7 +14,7 @@ type LoginInput = { email: string; password: string };
 
 type LoginResult = Result<
     { user: User; accessToken: string; refreshToken: string },
-    { type: 'USER_NOT_FOUND' } | { type: 'INVALID_PASSWORD' }
+    'USER_NOT_FOUND' | 'INVALID_PASSWORD'
 >;
 
 export class LoginUseCase {
@@ -33,10 +33,10 @@ export class LoginUseCase {
         const now = new Date();
 
         const user = await this.userRepository.findByEmail(input.email);
-        if (!user) return fail({ type: 'USER_NOT_FOUND' });
+        if (!user) return fail('USER_NOT_FOUND');
 
         const isPasswordValid = await this.hasher.compare(input.password, user.passwordHash);
-        if (!isPasswordValid) return fail({ type: 'INVALID_PASSWORD' });
+        if (!isPasswordValid) return fail('INVALID_PASSWORD');
 
         const refreshToken: RefreshToken = {
             id: this.idManager.generate(),
