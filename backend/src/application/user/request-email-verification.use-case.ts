@@ -10,10 +10,7 @@ type RequestEmailVerificationInput = {
     frontendBaseUrl: string;
 };
 
-type RequestEmailVerificationResult = Result<
-    void,
-    { type: 'USER_NOT_FOUND' } | { type: 'EMAIL_ALREADY_VERIFIED' } | { type: 'ACTIVE_COOLDOWN' }
->;
+type RequestEmailVerificationResult = Result<void, 'USER_NOT_FOUND' | 'EMAIL_ALREADY_VERIFIED' | 'ACTIVE_COOLDOWN'>;
 
 export class RequestEmailVerificationUseCase {
     constructor(
@@ -26,11 +23,11 @@ export class RequestEmailVerificationUseCase {
 
     execute = async (input: RequestEmailVerificationInput): Promise<RequestEmailVerificationResult> => {
         const user = await this.userRepository.findById(input.userId);
-        if (!user) return fail({ type: 'USER_NOT_FOUND' });
-        if (user.isEmailVerified) return fail({ type: 'EMAIL_ALREADY_VERIFIED' });
+        if (!user) return fail('USER_NOT_FOUND');
+        if (user.isEmailVerified) return fail('EMAIL_ALREADY_VERIFIED');
 
         const activeCooldown = await this.cacheStore.hasEmailVerificationCooldown(user.id);
-        if (activeCooldown) return fail({ type: 'ACTIVE_COOLDOWN' });
+        if (activeCooldown) return fail('ACTIVE_COOLDOWN');
 
         await this.emailSender.sendEmailVerification({
             from: this.emailFrom,

@@ -79,7 +79,7 @@ export const deleteTransactionHandler = ({ deleteTransactionUseCase, tokenManage
             req.logger,
         );
         if (!deletion.success) {
-            switch (deletion.error.type) {
+            switch (deletion.error) {
                 case 'TRANSACTION_NOT_OWNED': {
                     const response: ApiError = {
                         success: false,

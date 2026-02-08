@@ -105,7 +105,7 @@ export const updateTransactionHandler = ({ updateTransactionUseCase, tokenManage
             req.logger,
         );
         if (!update.success) {
-            switch (update.error.type) {
+            switch (update.error) {
                 case 'TRANSACTION_NOT_OWNED': {
                     const response: ApiError = {
                         success: false,

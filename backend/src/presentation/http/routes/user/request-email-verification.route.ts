@@ -91,7 +91,7 @@ export const requestEmailVerificationHandler = ({
             frontendBaseUrl: body.frontendBaseUrl,
         });
         if (!requesting.success) {
-            switch (requesting.error.type) {
+            switch (requesting.error) {
                 case 'USER_NOT_FOUND': {
                     const response: ApiError = {
                         success: false,

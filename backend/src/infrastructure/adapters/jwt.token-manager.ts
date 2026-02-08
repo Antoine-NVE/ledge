@@ -20,9 +20,9 @@ export class JwtTokenManager implements TokenManager {
 
             return ok({ userId: sub });
         } catch (err: unknown) {
-            if (err instanceof jwt.NotBeforeError) return fail({ type: 'INACTIVE_TOKEN' });
-            if (err instanceof jwt.JsonWebTokenError) return fail({ type: 'INVALID_TOKEN' });
-            if (err instanceof jwt.TokenExpiredError) return fail({ type: 'EXPIRED_TOKEN' });
+            if (err instanceof jwt.NotBeforeError) return fail('INACTIVE_TOKEN');
+            if (err instanceof jwt.JsonWebTokenError) return fail('INVALID_TOKEN');
+            if (err instanceof jwt.TokenExpiredError) return fail('EXPIRED_TOKEN');
             throw err;
         }
     };
@@ -39,9 +39,9 @@ export class JwtTokenManager implements TokenManager {
 
             return ok({ userId: sub });
         } catch (err: unknown) {
-            if (err instanceof jwt.NotBeforeError) return fail({ type: 'INACTIVE_TOKEN' });
-            if (err instanceof jwt.JsonWebTokenError) return fail({ type: 'INVALID_TOKEN' });
-            if (err instanceof jwt.TokenExpiredError) return fail({ type: 'EXPIRED_TOKEN' });
+            if (err instanceof jwt.NotBeforeError) return fail('INACTIVE_TOKEN');
+            if (err instanceof jwt.JsonWebTokenError) return fail('INVALID_TOKEN');
+            if (err instanceof jwt.TokenExpiredError) return fail('EXPIRED_TOKEN');
             throw err;
         }
     };

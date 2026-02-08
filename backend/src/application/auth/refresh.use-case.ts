@@ -10,7 +10,7 @@ type RefreshInput = { refreshToken: string };
 
 type RefreshResult = Result<
     { accessToken: string; refreshToken: string },
-    { type: 'REFRESH_TOKEN_NOT_FOUND' } | { type: 'EXPIRED_REFRESH_TOKEN' }
+    'REFRESH_TOKEN_NOT_FOUND' | 'EXPIRED_REFRESH_TOKEN'
 >;
 
 export class RefreshUseCase {
@@ -26,8 +26,8 @@ export class RefreshUseCase {
         const now = new Date();
 
         const refreshToken = await this.refreshTokenRepository.findByValue(input.refreshToken);
-        if (!refreshToken) return fail({ type: 'REFRESH_TOKEN_NOT_FOUND' });
-        if (refreshToken.expiresAt < now) return fail({ type: 'EXPIRED_REFRESH_TOKEN' });
+        if (!refreshToken) return fail('REFRESH_TOKEN_NOT_FOUND');
+        if (refreshToken.expiresAt < now) return fail('EXPIRED_REFRESH_TOKEN');
 
         const updatedRefreshToken: RefreshToken = {
             id: refreshToken.id,

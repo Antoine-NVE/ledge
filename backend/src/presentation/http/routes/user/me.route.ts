@@ -68,7 +68,7 @@ export const meHandler = ({ getCurrentUserUseCase, tokenManager }: Deps) => {
 
         const getting = await getCurrentUserUseCase.execute({ userId });
         if (!getting.success) {
-            switch (getting.error.type) {
+            switch (getting.error) {
                 case 'USER_NOT_FOUND': {
                     const response: ApiError = {
                         success: false,

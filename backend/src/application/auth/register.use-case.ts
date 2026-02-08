@@ -12,7 +12,7 @@ import { fail, ok } from '../../core/utils/result.js';
 
 type RegisterInput = { email: string; password: string };
 
-type RegisterResult = Result<{ user: User; accessToken: string; refreshToken: string }, { type: 'DUPLICATE_EMAIL' }>;
+type RegisterResult = Result<{ user: User; accessToken: string; refreshToken: string }, 'DUPLICATE_EMAIL'>;
 
 export class RegisterUseCase {
     private readonly REFRESH_TOKEN_DURATION = 7 * 24 * 60 * 60 * 1000;
@@ -30,7 +30,7 @@ export class RegisterUseCase {
         const now = new Date();
 
         const existingUser = await this.userRepository.findByEmail(input.email);
-        if (existingUser) return fail({ type: 'DUPLICATE_EMAIL' });
+        if (existingUser) return fail('DUPLICATE_EMAIL');
 
         const user: User = {
             id: this.idManager.generate(),

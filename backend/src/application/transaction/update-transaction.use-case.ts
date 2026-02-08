@@ -9,18 +9,15 @@ type UpdateTransactionInput = { transactionId: string; userId: string; name: str
     | { type: 'income'; expenseCategory: null }
 );
 
-type UpdateTransactionResult = Result<
-    { transaction: Transaction },
-    { type: 'TRANSACTION_NOT_FOUND' } | { type: 'TRANSACTION_NOT_OWNED' }
->;
+type UpdateTransactionResult = Result<{ transaction: Transaction }, 'TRANSACTION_NOT_FOUND' | 'TRANSACTION_NOT_OWNED'>;
 
 export class UpdateTransactionUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
     execute = async (input: UpdateTransactionInput, logger: Logger): Promise<UpdateTransactionResult> => {
         const transaction = await this.transactionRepository.findById(input.transactionId);
-        if (!transaction) return fail({ type: 'TRANSACTION_NOT_FOUND' });
-        if (transaction.userId !== input.userId) return fail({ type: 'TRANSACTION_NOT_OWNED' });
+        if (!transaction) return fail('TRANSACTION_NOT_FOUND');
+        if (transaction.userId !== input.userId) return fail('TRANSACTION_NOT_OWNED');
 
         const updatedTransaction: Transaction = {
             id: transaction.id,

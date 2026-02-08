@@ -3,7 +3,7 @@ import type { TokenPayload } from '../types/token-payload.js';
 
 export type VerifyTokenResult = Result<TokenPayload, VerifyTokenError>;
 
-export type VerifyTokenError = { type: 'INACTIVE_TOKEN' } | { type: 'INVALID_TOKEN' } | { type: 'EXPIRED_TOKEN' };
+export type VerifyTokenError = 'INACTIVE_TOKEN' | 'INVALID_TOKEN' | 'EXPIRED_TOKEN';
 
 export interface TokenManager {
     signAccess(payload: TokenPayload): string;

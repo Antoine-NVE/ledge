@@ -54,7 +54,7 @@ export const refreshHandler = ({ refreshUseCase }: Deps) => {
 
         const refresh = await refreshUseCase.execute({ refreshToken: cookies.refreshToken }, req.logger);
         if (!refresh.success) {
-            switch (refresh.error.type) {
+            switch (refresh.error) {
                 case 'REFRESH_TOKEN_NOT_FOUND':
                 case 'EXPIRED_REFRESH_TOKEN': {
                     const response: ApiError = {

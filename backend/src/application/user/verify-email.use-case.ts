@@ -9,10 +9,7 @@ type VerifyEmailInput = {
     emailVerificationToken: string;
 };
 
-type VerifyEmailResult = Result<
-    void,
-    VerifyTokenError | { type: 'USER_NOT_FOUND' } | { type: 'EMAIL_ALREADY_VERIFIED' }
->;
+type VerifyEmailResult = Result<void, VerifyTokenError | 'USER_NOT_FOUND' | 'EMAIL_ALREADY_VERIFIED'>;
 
 export class VerifyEmailUseCase {
     constructor(
@@ -26,8 +23,8 @@ export class VerifyEmailUseCase {
         const { userId } = verification.data;
 
         const user = await this.userRepository.findById(userId);
-        if (!user) return fail({ type: 'USER_NOT_FOUND' });
-        if (user.isEmailVerified) return fail({ type: 'EMAIL_ALREADY_VERIFIED' });
+        if (!user) return fail('USER_NOT_FOUND');
+        if (user.isEmailVerified) return fail('EMAIL_ALREADY_VERIFIED');
 
         const updatedUser: User = {
             id: user.id,

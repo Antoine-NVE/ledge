@@ -5,18 +5,15 @@ import { fail, ok } from '../../core/utils/result.js';
 
 type GetTransactionInput = { transactionId: string; userId: string };
 
-type GetTransactionResult = Result<
-    { transaction: Transaction },
-    { type: 'TRANSACTION_NOT_FOUND' } | { type: 'TRANSACTION_NOT_OWNED' }
->;
+type GetTransactionResult = Result<{ transaction: Transaction }, 'TRANSACTION_NOT_FOUND' | 'TRANSACTION_NOT_OWNED'>;
 
 export class GetTransactionUseCase {
     constructor(private transactionRepository: TransactionRepository) {}
 
     execute = async (input: GetTransactionInput): Promise<GetTransactionResult> => {
         const transaction = await this.transactionRepository.findById(input.transactionId);
-        if (!transaction) return fail({ type: 'TRANSACTION_NOT_FOUND' });
-        if (transaction.userId !== input.userId) return fail({ type: 'TRANSACTION_NOT_OWNED' });
+        if (!transaction) return fail('TRANSACTION_NOT_FOUND');
+        if (transaction.userId !== input.userId) return fail('TRANSACTION_NOT_OWNED');
 
         return ok({ transaction });
     };

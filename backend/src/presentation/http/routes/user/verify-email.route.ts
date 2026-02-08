@@ -60,7 +60,7 @@ export const verifyEmailHandler = ({ verifyEmailUseCase }: Deps) => {
             req.logger,
         );
         if (!verification.success) {
-            switch (verification.error.type) {
+            switch (verification.error) {
                 case 'INACTIVE_TOKEN':
                 case 'INVALID_TOKEN':
                 case 'EXPIRED_TOKEN':

@@ -66,7 +66,7 @@ export const registerHandler = ({ registerUseCase }: Deps) => {
 
         const registration = await registerUseCase.execute({ email: body.email, password: body.password }, req.logger);
         if (!registration.success) {
-            switch (registration.error.type) {
+            switch (registration.error) {
                 case 'DUPLICATE_EMAIL': {
                     const response: ApiError = {
                         success: false,
