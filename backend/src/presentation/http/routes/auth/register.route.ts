@@ -6,9 +6,8 @@ import { toRegisterDto } from '../../../mappers/auth/register.mapper.js';
 import type { Request, Response } from 'express';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import type { RegisterDto } from '@shared/dto/auth/register.dto.js';
-import { treeifyError } from 'zod';
-import { BadRequestError } from '../../errors/bad-request.error.js';
 import { DuplicateEmailError } from '../../errors/duplicate-email.error.js';
+import { validateOrThrow } from '../../helpers/validate.js';
 
 type Deps = {
     registerUseCase: RegisterUseCase;
@@ -54,9 +53,7 @@ export const registerRoute = (router: Router, deps: Deps) => {
 
 export const registerHandler = ({ registerUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
-        const validation = registerSchema().safeParse(req);
-        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
-        const { body } = validation.data;
+        const { body } = validateOrThrow(req, registerSchema());
 
         const registration = await registerUseCase.execute({ email: body.email, password: body.password }, req.logger);
         if (!registration.success) {

@@ -6,9 +6,8 @@ import { toMeDto } from '../../../mappers/user/me.mapper.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import type { MeDto } from '@shared/dto/user/me.dto.js';
 import { meSchema } from '../../../schemas/user.schemas.js';
-import { treeifyError } from 'zod';
-import { BadRequestError } from '../../errors/bad-request.error.js';
 import { UnauthorizedError } from '../../errors/unauthorized.error.js';
+import { validateOrThrow } from '../../helpers/validate.js';
 
 type Deps = {
     getCurrentUserUseCase: GetCurrentUserUseCase;
@@ -36,9 +35,7 @@ export const meRoute = (router: Router, deps: Deps) => {
 
 export const meHandler = ({ getCurrentUserUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
-        const validation = meSchema().safeParse(req);
-        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
-        const { cookies } = validation.data;
+        const { cookies } = validateOrThrow(req, meSchema());
 
         if (!cookies.accessToken) throw new UnauthorizedError();
 

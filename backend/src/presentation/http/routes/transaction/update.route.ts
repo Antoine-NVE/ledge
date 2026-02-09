@@ -7,11 +7,10 @@ import { updateTransactionSchema } from '../../../schemas/transaction.schemas.js
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import type { UpdateTransactionDto } from '@shared/dto/transaction/update.dto.js';
 import { toUpdateTransactionDto } from '../../../mappers/transaction/update.mapper.js';
-import { treeifyError } from 'zod';
-import { BadRequestError } from '../../errors/bad-request.error.js';
 import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { ForbiddenError } from '../../errors/forbidden.error.js';
 import { TransactionNotFoundError } from '../../errors/transaction-not-found.error.js';
+import { validateOrThrow } from '../../helpers/validate.js';
 
 type Deps = {
     updateTransactionUseCase: UpdateTransactionUseCase;
@@ -64,9 +63,7 @@ export const updateTransactionRoute = (router: Router, deps: Deps) => {
 
 export const updateTransactionHandler = ({ updateTransactionUseCase, tokenManager, idManager }: Deps) => {
     return async (req: Request, res: Response) => {
-        const validation = updateTransactionSchema(idManager).safeParse(req);
-        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
-        const { body, params, cookies } = validation.data;
+        const { body, params, cookies } = validateOrThrow(req, updateTransactionSchema(idManager));
 
         if (!cookies.accessToken) throw new UnauthorizedError();
 

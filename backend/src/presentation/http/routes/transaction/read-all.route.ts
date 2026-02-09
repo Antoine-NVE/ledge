@@ -6,9 +6,8 @@ import type { ApiSuccess } from '@shared/api/api-response.js';
 import type { ReadAllTransactionsDto } from '@shared/dto/transaction/read-all.dto.js';
 import { toReadAllTransactionsDto } from '../../../mappers/transaction/read-all.mapper.js';
 import { readAllTransactionsSchema } from '../../../schemas/transaction.schemas.js';
-import { treeifyError } from 'zod';
-import { BadRequestError } from '../../errors/bad-request.error.js';
 import { UnauthorizedError } from '../../errors/unauthorized.error.js';
+import { validateOrThrow } from '../../helpers/validate.js';
 
 type Deps = {
     getUserTransactionsUseCase: GetUserTransactionsUseCase;
@@ -36,9 +35,7 @@ export const readAllTransactionRoute = (router: Router, deps: Deps) => {
 
 export const readAllTransactionsHandler = ({ getUserTransactionsUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response) => {
-        const validation = readAllTransactionsSchema().safeParse(req);
-        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
-        const { cookies } = validation.data;
+        const { cookies } = validateOrThrow(req, readAllTransactionsSchema());
 
         if (!cookies.accessToken) throw new UnauthorizedError();
 

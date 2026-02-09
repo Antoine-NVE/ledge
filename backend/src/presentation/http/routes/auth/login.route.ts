@@ -6,9 +6,8 @@ import { setAuthCookies } from '../../helpers/cookies.js';
 import type { LoginUseCase } from '../../../../application/auth/login.use-case.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import type { LoginDto } from '@shared/dto/auth/login.dto.js';
-import { treeifyError } from 'zod';
-import { BadRequestError } from '../../errors/bad-request.error.js';
 import { InvalidCredentialsError } from '../../errors/invalid-credentials.error.js';
+import { validateOrThrow } from '../../helpers/validate.js';
 
 type Deps = {
     loginUseCase: LoginUseCase;
@@ -54,9 +53,7 @@ export const loginRoute = (router: Router, deps: Deps) => {
 
 export const loginHandler = ({ loginUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
-        const validation = loginSchema().safeParse(req);
-        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
-        const { body } = validation.data;
+        const { body } = validateOrThrow(req, loginSchema());
 
         const login = await loginUseCase.execute({ email: body.email, password: body.password }, req.logger);
         if (!login.success) {

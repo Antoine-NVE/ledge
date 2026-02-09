@@ -4,9 +4,8 @@ import type { Request, Response } from 'express';
 import { setAuthCookies } from '../../helpers/cookies.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import { refreshSchema } from '../../../schemas/auth.schemas.js';
-import { treeifyError } from 'zod';
-import { BadRequestError } from '../../errors/bad-request.error.js';
 import { InvalidRefreshTokenError } from '../../errors/invalid-refresh-token.error.js';
+import { validateOrThrow } from '../../helpers/validate.js';
 
 type Deps = {
     refreshUseCase: RefreshUseCase;
@@ -33,9 +32,7 @@ export const refreshRoute = (router: Router, deps: Deps) => {
 
 export const refreshHandler = ({ refreshUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
-        const validation = refreshSchema().safeParse(req);
-        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
-        const { cookies } = validation.data;
+        const { cookies } = validateOrThrow(req, refreshSchema());
 
         if (!cookies.refreshToken) throw new InvalidRefreshTokenError();
 

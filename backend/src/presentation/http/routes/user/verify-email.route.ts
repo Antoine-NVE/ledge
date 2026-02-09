@@ -3,10 +3,9 @@ import type { VerifyEmailUseCase } from '../../../../application/user/verify-ema
 import type { Request, Response } from 'express';
 import { verifyEmailSchema } from '../../../schemas/user.schemas.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
-import { treeifyError } from 'zod';
-import { BadRequestError } from '../../errors/bad-request.error.js';
 import { InvalidTokenError } from '../../errors/invalid-token.error.js';
 import { EmailAlreadyVerifiedError } from '../../errors/email-already-verified.error.js';
+import { validateOrThrow } from '../../helpers/validate.js';
 
 type Deps = {
     verifyEmailUseCase: VerifyEmailUseCase;
@@ -46,9 +45,7 @@ export const verifyEmailRoute = (router: Router, deps: Deps) => {
 
 export const verifyEmailHandler = ({ verifyEmailUseCase }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
-        const validation = verifyEmailSchema().safeParse(req);
-        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
-        const { body } = validation.data;
+        const { body } = validateOrThrow(req, verifyEmailSchema());
 
         const verification = await verifyEmailUseCase.execute(
             { emailVerificationToken: body.emailVerificationToken },

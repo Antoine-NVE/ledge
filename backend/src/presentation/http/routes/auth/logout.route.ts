@@ -4,8 +4,7 @@ import type { LogoutUseCase } from '../../../../application/auth/logout.use-case
 import { clearAuthCookies } from '../../helpers/cookies.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import { logoutSchema } from '../../../schemas/auth.schemas.js';
-import { treeifyError } from 'zod';
-import { BadRequestError } from '../../errors/bad-request.error.js';
+import { validateOrThrow } from '../../helpers/validate.js';
 
 type Deps = {
     logoutUseCase: LogoutUseCase;
@@ -30,9 +29,7 @@ export const logoutRoute = (router: Router, deps: Deps) => {
 
 export const logoutHandler = ({ logoutUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
-        const validation = logoutSchema().safeParse(req);
-        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
-        const { cookies } = validation.data;
+        const { cookies } = validateOrThrow(req, logoutSchema());
 
         clearAuthCookies(res);
 

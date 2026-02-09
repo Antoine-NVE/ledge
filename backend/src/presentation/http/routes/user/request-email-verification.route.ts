@@ -4,11 +4,10 @@ import type { Request, Response } from 'express';
 import { requestEmailVerificationSchema } from '../../../schemas/user.schemas.js';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
-import { treeifyError } from 'zod';
-import { BadRequestError } from '../../errors/bad-request.error.js';
 import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { ActiveCooldownError } from '../../errors/active-cooldown.error.js';
 import { EmailAlreadyVerifiedError } from '../../errors/email-already-verified.error.js';
+import { validateOrThrow } from '../../helpers/validate.js';
 
 type Deps = {
     requestEmailVerificationUseCase: RequestEmailVerificationUseCase;
@@ -58,9 +57,7 @@ export const requestEmailVerificationHandler = ({
     allowedOrigins,
 }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
-        const validation = requestEmailVerificationSchema(allowedOrigins).safeParse(req);
-        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
-        const { body, cookies } = validation.data;
+        const { body, cookies } = validateOrThrow(req, requestEmailVerificationSchema(allowedOrigins));
 
         if (!cookies.accessToken) throw new UnauthorizedError();
 

@@ -6,9 +6,8 @@ import { createTransactionSchema } from '../../../schemas/transaction.schemas.js
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import type { CreateTransactionDto } from '@shared/dto/transaction/create.dto.js';
 import { toCreateTransactionDto } from '../../../mappers/transaction/create.mapper.js';
-import { treeifyError } from 'zod';
 import { UnauthorizedError } from '../../errors/unauthorized.error.js';
-import { BadRequestError } from '../../errors/bad-request.error.js';
+import { validateOrThrow } from '../../helpers/validate.js';
 
 type Deps = {
     createTransactionUseCase: CreateTransactionUseCase;
@@ -59,9 +58,7 @@ export const createTransactionRoute = (router: Router, deps: Deps) => {
 
 export const createTransactionHandler = ({ createTransactionUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response) => {
-        const validation = createTransactionSchema().safeParse(req);
-        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
-        const { body, cookies } = validation.data;
+        const { body, cookies } = validateOrThrow(req, createTransactionSchema());
 
         if (!cookies.accessToken) throw new UnauthorizedError();
 

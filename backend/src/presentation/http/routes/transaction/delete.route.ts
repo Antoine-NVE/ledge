@@ -7,11 +7,10 @@ import { deleteTransactionSchema } from '../../../schemas/transaction.schemas.js
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import type { DeleteTransactionDto } from '@shared/dto/transaction/delete.dto.js';
 import { toDeleteTransactionDto } from '../../../mappers/transaction/delete.mapper.js';
-import { treeifyError } from 'zod';
-import { BadRequestError } from '../../errors/bad-request.error.js';
 import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { ForbiddenError } from '../../errors/forbidden.error.js';
 import { TransactionNotFoundError } from '../../errors/transaction-not-found.error.js';
+import { validateOrThrow } from '../../helpers/validate.js';
 
 type Deps = {
     deleteTransactionUseCase: DeleteTransactionUseCase;
@@ -46,9 +45,7 @@ export const deleteTransactionRoute = (router: Router, deps: Deps) => {
 
 export const deleteTransactionHandler = ({ deleteTransactionUseCase, tokenManager, idManager }: Deps) => {
     return async (req: Request, res: Response) => {
-        const validation = deleteTransactionSchema(idManager).safeParse(req);
-        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
-        const { params, cookies } = validation.data;
+        const { params, cookies } = validateOrThrow(req, deleteTransactionSchema(idManager));
 
         if (!cookies.accessToken) throw new UnauthorizedError();
 
