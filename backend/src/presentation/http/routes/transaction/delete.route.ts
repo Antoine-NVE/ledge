@@ -7,10 +7,10 @@ import { deleteTransactionSchema } from '../../../schemas/transaction.schemas.js
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import type { DeleteTransactionDto } from '@shared/dto/transaction/delete.dto.js';
 import { toDeleteTransactionDto } from '../../../mappers/transaction/delete.mapper.js';
-import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { ForbiddenError } from '../../errors/forbidden.error.js';
 import { TransactionNotFoundError } from '../../errors/transaction-not-found.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
+import { authenticateOrThrow } from '../../helpers/authenticate.js';
 
 type Deps = {
     deleteTransactionUseCase: DeleteTransactionUseCase;
@@ -46,26 +46,21 @@ export const deleteTransactionRoute = (router: Router, deps: Deps) => {
 export const deleteTransactionHandler = ({ deleteTransactionUseCase, tokenManager, idManager }: Deps) => {
     return async (req: Request, res: Response) => {
         const { params, cookies } = validateOrThrow(req, deleteTransactionSchema(idManager));
+        const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
-        if (!cookies.accessToken) throw new UnauthorizedError();
-
-        const authentication = tokenManager.verifyAccess(cookies.accessToken);
-        if (!authentication.success) throw new UnauthorizedError();
-        const { userId } = authentication.data;
-
-        const deletion = await deleteTransactionUseCase.execute(
+        const result = await deleteTransactionUseCase.execute(
             { transactionId: params.transactionId, userId },
             req.logger,
         );
-        if (!deletion.success) {
-            switch (deletion.error) {
+        if (!result.success) {
+            switch (result.error) {
                 case 'TRANSACTION_NOT_OWNED':
                     throw new ForbiddenError();
                 case 'TRANSACTION_NOT_FOUND':
                     throw new TransactionNotFoundError();
             }
         }
-        const { transaction } = deletion.data;
+        const { transaction } = result.data;
 
         const response: ApiSuccess<DeleteTransactionDto> = {
             success: true,

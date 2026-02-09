@@ -6,8 +6,8 @@ import { createTransactionSchema } from '../../../schemas/transaction.schemas.js
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import type { CreateTransactionDto } from '@shared/dto/transaction/create.dto.js';
 import { toCreateTransactionDto } from '../../../mappers/transaction/create.mapper.js';
-import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
+import { authenticateOrThrow } from '../../helpers/authenticate.js';
 
 type Deps = {
     createTransactionUseCase: CreateTransactionUseCase;
@@ -59,12 +59,7 @@ export const createTransactionRoute = (router: Router, deps: Deps) => {
 export const createTransactionHandler = ({ createTransactionUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response) => {
         const { body, cookies } = validateOrThrow(req, createTransactionSchema());
-
-        if (!cookies.accessToken) throw new UnauthorizedError();
-
-        const authentication = tokenManager.verifyAccess(cookies.accessToken);
-        if (!authentication.success) throw new UnauthorizedError();
-        const { userId } = authentication.data;
+        const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
         const { transaction } = await createTransactionUseCase.execute(
             {

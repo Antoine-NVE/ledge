@@ -7,10 +7,10 @@ import { readTransactionSchema } from '../../../schemas/transaction.schemas.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import type { ReadTransactionDto } from '@shared/dto/transaction/read.dto.js';
 import { toReadTransactionDto } from '../../../mappers/transaction/read.mapper.js';
-import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { ForbiddenError } from '../../errors/forbidden.error.js';
 import { TransactionNotFoundError } from '../../errors/transaction-not-found.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
+import { authenticateOrThrow } from '../../helpers/authenticate.js';
 
 type Deps = {
     getTransactionUseCase: GetTransactionUseCase;
@@ -46,23 +46,18 @@ export const readTransactionRoute = (router: Router, deps: Deps) => {
 export const readTransactionHandler = ({ getTransactionUseCase, tokenManager, idManager }: Deps) => {
     return async (req: Request, res: Response) => {
         const { params, cookies } = validateOrThrow(req, readTransactionSchema(idManager));
+        const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
-        if (!cookies.accessToken) throw new UnauthorizedError();
-
-        const authentication = tokenManager.verifyAccess(cookies.accessToken);
-        if (!authentication.success) throw new UnauthorizedError();
-        const { userId } = authentication.data;
-
-        const getting = await getTransactionUseCase.execute({ transactionId: params.transactionId, userId });
-        if (!getting.success) {
-            switch (getting.error) {
+        const result = await getTransactionUseCase.execute({ transactionId: params.transactionId, userId });
+        if (!result.success) {
+            switch (result.error) {
                 case 'TRANSACTION_NOT_OWNED':
                     throw new ForbiddenError();
                 case 'TRANSACTION_NOT_FOUND':
                     throw new TransactionNotFoundError();
             }
         }
-        const { transaction } = getting.data;
+        const { transaction } = result.data;
 
         const response: ApiSuccess<ReadTransactionDto> = {
             success: true,

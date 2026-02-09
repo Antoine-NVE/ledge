@@ -36,15 +36,15 @@ export const refreshHandler = ({ refreshUseCase }: Deps) => {
 
         if (!cookies.refreshToken) throw new InvalidRefreshTokenError();
 
-        const refresh = await refreshUseCase.execute({ refreshToken: cookies.refreshToken }, req.logger);
-        if (!refresh.success) {
-            switch (refresh.error) {
+        const result = await refreshUseCase.execute({ refreshToken: cookies.refreshToken }, req.logger);
+        if (!result.success) {
+            switch (result.error) {
                 case 'REFRESH_TOKEN_NOT_FOUND':
                 case 'EXPIRED_REFRESH_TOKEN':
                     throw new InvalidRefreshTokenError();
             }
         }
-        const { accessToken, refreshToken } = refresh.data;
+        const { accessToken, refreshToken } = result.data;
 
         setAuthCookies(res, accessToken, refreshToken, cookies.rememberMe);
 

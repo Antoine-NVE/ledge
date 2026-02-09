@@ -8,6 +8,7 @@ import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { ActiveCooldownError } from '../../errors/active-cooldown.error.js';
 import { EmailAlreadyVerifiedError } from '../../errors/email-already-verified.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
+import { authenticateOrThrow } from '../../helpers/authenticate.js';
 
 type Deps = {
     requestEmailVerificationUseCase: RequestEmailVerificationUseCase;
@@ -58,19 +59,14 @@ export const requestEmailVerificationHandler = ({
 }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
         const { body, cookies } = validateOrThrow(req, requestEmailVerificationSchema(allowedOrigins));
+        const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
-        if (!cookies.accessToken) throw new UnauthorizedError();
-
-        const authentication = tokenManager.verifyAccess(cookies.accessToken);
-        if (!authentication.success) throw new UnauthorizedError();
-        const { userId } = authentication.data;
-
-        const requesting = await requestEmailVerificationUseCase.execute({
+        const result = await requestEmailVerificationUseCase.execute({
             userId,
             frontendBaseUrl: body.frontendBaseUrl,
         });
-        if (!requesting.success) {
-            switch (requesting.error) {
+        if (!result.success) {
+            switch (result.error) {
                 case 'USER_NOT_FOUND':
                     throw new UnauthorizedError();
                 case 'ACTIVE_COOLDOWN':

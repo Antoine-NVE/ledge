@@ -55,15 +55,15 @@ export const loginHandler = ({ loginUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
         const { body } = validateOrThrow(req, loginSchema());
 
-        const login = await loginUseCase.execute({ email: body.email, password: body.password }, req.logger);
-        if (!login.success) {
-            switch (login.error) {
+        const result = await loginUseCase.execute({ email: body.email, password: body.password }, req.logger);
+        if (!result.success) {
+            switch (result.error) {
                 case 'USER_NOT_FOUND':
                 case 'INVALID_PASSWORD':
                     throw new InvalidCredentialsError();
             }
         }
-        const { user, accessToken, refreshToken } = login.data;
+        const { user, accessToken, refreshToken } = result.data;
 
         setAuthCookies(res, accessToken, refreshToken, body.rememberMe);
 

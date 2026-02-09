@@ -55,14 +55,14 @@ export const registerHandler = ({ registerUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
         const { body } = validateOrThrow(req, registerSchema());
 
-        const registration = await registerUseCase.execute({ email: body.email, password: body.password }, req.logger);
-        if (!registration.success) {
-            switch (registration.error) {
+        const result = await registerUseCase.execute({ email: body.email, password: body.password }, req.logger);
+        if (!result.success) {
+            switch (result.error) {
                 case 'DUPLICATE_EMAIL':
                     throw new DuplicateEmailError();
             }
         }
-        const { user, accessToken, refreshToken } = registration.data;
+        const { user, accessToken, refreshToken } = result.data;
 
         setAuthCookies(res, accessToken, refreshToken, false);
 

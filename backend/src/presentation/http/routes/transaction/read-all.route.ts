@@ -6,8 +6,8 @@ import type { ApiSuccess } from '@shared/api/api-response.js';
 import type { ReadAllTransactionsDto } from '@shared/dto/transaction/read-all.dto.js';
 import { toReadAllTransactionsDto } from '../../../mappers/transaction/read-all.mapper.js';
 import { readAllTransactionsSchema } from '../../../schemas/transaction.schemas.js';
-import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
+import { authenticateOrThrow } from '../../helpers/authenticate.js';
 
 type Deps = {
     getUserTransactionsUseCase: GetUserTransactionsUseCase;
@@ -36,12 +36,7 @@ export const readAllTransactionRoute = (router: Router, deps: Deps) => {
 export const readAllTransactionsHandler = ({ getUserTransactionsUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response) => {
         const { cookies } = validateOrThrow(req, readAllTransactionsSchema());
-
-        if (!cookies.accessToken) throw new UnauthorizedError();
-
-        const authentication = tokenManager.verifyAccess(cookies.accessToken);
-        if (!authentication.success) throw new UnauthorizedError();
-        const { userId } = authentication.data;
+        const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
         const { transactions } = await getUserTransactionsUseCase.execute({ userId });
 

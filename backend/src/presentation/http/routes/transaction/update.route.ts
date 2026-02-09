@@ -7,10 +7,10 @@ import { updateTransactionSchema } from '../../../schemas/transaction.schemas.js
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import type { UpdateTransactionDto } from '@shared/dto/transaction/update.dto.js';
 import { toUpdateTransactionDto } from '../../../mappers/transaction/update.mapper.js';
-import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { ForbiddenError } from '../../errors/forbidden.error.js';
 import { TransactionNotFoundError } from '../../errors/transaction-not-found.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
+import { authenticateOrThrow } from '../../helpers/authenticate.js';
 
 type Deps = {
     updateTransactionUseCase: UpdateTransactionUseCase;
@@ -64,14 +64,9 @@ export const updateTransactionRoute = (router: Router, deps: Deps) => {
 export const updateTransactionHandler = ({ updateTransactionUseCase, tokenManager, idManager }: Deps) => {
     return async (req: Request, res: Response) => {
         const { body, params, cookies } = validateOrThrow(req, updateTransactionSchema(idManager));
+        const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
-        if (!cookies.accessToken) throw new UnauthorizedError();
-
-        const authentication = tokenManager.verifyAccess(cookies.accessToken);
-        if (!authentication.success) throw new UnauthorizedError();
-        const { userId } = authentication.data;
-
-        const update = await updateTransactionUseCase.execute(
+        const result = await updateTransactionUseCase.execute(
             {
                 transactionId: params.transactionId,
                 userId,
@@ -83,15 +78,15 @@ export const updateTransactionHandler = ({ updateTransactionUseCase, tokenManage
             },
             req.logger,
         );
-        if (!update.success) {
-            switch (update.error) {
+        if (!result.success) {
+            switch (result.error) {
                 case 'TRANSACTION_NOT_OWNED':
                     throw new ForbiddenError();
                 case 'TRANSACTION_NOT_FOUND':
                     throw new TransactionNotFoundError();
             }
         }
-        const { transaction } = update.data;
+        const { transaction } = result.data;
 
         const response: ApiSuccess<UpdateTransactionDto> = {
             success: true,

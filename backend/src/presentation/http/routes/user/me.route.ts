@@ -8,6 +8,7 @@ import type { MeDto } from '@shared/dto/user/me.dto.js';
 import { meSchema } from '../../../schemas/user.schemas.js';
 import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
+import { authenticateOrThrow } from '../../helpers/authenticate.js';
 
 type Deps = {
     getCurrentUserUseCase: GetCurrentUserUseCase;
@@ -36,21 +37,16 @@ export const meRoute = (router: Router, deps: Deps) => {
 export const meHandler = ({ getCurrentUserUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
         const { cookies } = validateOrThrow(req, meSchema());
+        const { userId } = authenticateOrThrow(tokenManager, cookies.accessToken);
 
-        if (!cookies.accessToken) throw new UnauthorizedError();
-
-        const authentication = tokenManager.verifyAccess(cookies.accessToken);
-        if (!authentication.success) throw new UnauthorizedError();
-        const { userId } = authentication.data;
-
-        const getting = await getCurrentUserUseCase.execute({ userId });
-        if (!getting.success) {
-            switch (getting.error) {
+        const result = await getCurrentUserUseCase.execute({ userId });
+        if (!result.success) {
+            switch (result.error) {
                 case 'USER_NOT_FOUND':
                     throw new UnauthorizedError();
             }
         }
-        const { user } = getting.data;
+        const { user } = result.data;
 
         const response: ApiSuccess<MeDto> = {
             success: true,
