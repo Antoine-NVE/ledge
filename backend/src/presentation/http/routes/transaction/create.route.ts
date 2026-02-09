@@ -3,10 +3,12 @@ import type { CreateTransactionUseCase } from '../../../../application/transacti
 import type { Request, Response } from 'express';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import { createTransactionSchema } from '../../../schemas/transaction.schemas.js';
-import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
+import type { ApiSuccess } from '@shared/api/api-response.js';
 import type { CreateTransactionDto } from '@shared/dto/transaction/create.dto.js';
 import { toCreateTransactionDto } from '../../../mappers/transaction/create.mapper.js';
 import { treeifyError } from 'zod';
+import { UnauthorizedError } from '../../errors/unauthorized.error.js';
+import { BadRequestError } from '../../errors/bad-request.error.js';
 
 type Deps = {
     createTransactionUseCase: CreateTransactionUseCase;
@@ -58,35 +60,13 @@ export const createTransactionRoute = (router: Router, deps: Deps) => {
 export const createTransactionHandler = ({ createTransactionUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response) => {
         const validation = createTransactionSchema().safeParse(req);
-        if (!validation.success) {
-            const response: ApiError = {
-                success: false,
-                code: 'BAD_REQUEST',
-                tree: treeifyError(validation.error),
-            };
-            res.status(400).json(response);
-            return;
-        }
+        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
         const { body, cookies } = validation.data;
 
-        if (!cookies.accessToken) {
-            const response: ApiError = {
-                success: false,
-                code: 'UNAUTHORIZED',
-            };
-            res.status(401).json(response);
-            return;
-        }
+        if (!cookies.accessToken) throw new UnauthorizedError();
 
         const authentication = tokenManager.verifyAccess(cookies.accessToken);
-        if (!authentication.success) {
-            const response: ApiError = {
-                success: false,
-                code: 'UNAUTHORIZED',
-            };
-            res.status(401).json(response);
-            return;
-        }
+        if (!authentication.success) throw new UnauthorizedError();
         const { userId } = authentication.data;
 
         const { transaction } = await createTransactionUseCase.execute(

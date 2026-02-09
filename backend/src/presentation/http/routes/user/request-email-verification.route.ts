@@ -3,8 +3,12 @@ import type { RequestEmailVerificationUseCase } from '../../../../application/us
 import type { Request, Response } from 'express';
 import { requestEmailVerificationSchema } from '../../../schemas/user.schemas.js';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
-import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
+import type { ApiSuccess } from '@shared/api/api-response.js';
 import { treeifyError } from 'zod';
+import { BadRequestError } from '../../errors/bad-request.error.js';
+import { UnauthorizedError } from '../../errors/unauthorized.error.js';
+import { ActiveCooldownError } from '../../errors/active-cooldown.error.js';
+import { EmailAlreadyVerifiedError } from '../../errors/email-already-verified.error.js';
 
 type Deps = {
     requestEmailVerificationUseCase: RequestEmailVerificationUseCase;
@@ -55,35 +59,13 @@ export const requestEmailVerificationHandler = ({
 }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
         const validation = requestEmailVerificationSchema(allowedOrigins).safeParse(req);
-        if (!validation.success) {
-            const response: ApiError = {
-                success: false,
-                code: 'BAD_REQUEST',
-                tree: treeifyError(validation.error),
-            };
-            res.status(400).json(response);
-            return;
-        }
+        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
         const { body, cookies } = validation.data;
 
-        if (!cookies.accessToken) {
-            const response: ApiError = {
-                success: false,
-                code: 'UNAUTHORIZED',
-            };
-            res.status(401).json(response);
-            return;
-        }
+        if (!cookies.accessToken) throw new UnauthorizedError();
 
         const authentication = tokenManager.verifyAccess(cookies.accessToken);
-        if (!authentication.success) {
-            const response: ApiError = {
-                success: false,
-                code: 'UNAUTHORIZED',
-            };
-            res.status(401).json(response);
-            return;
-        }
+        if (!authentication.success) throw new UnauthorizedError();
         const { userId } = authentication.data;
 
         const requesting = await requestEmailVerificationUseCase.execute({
@@ -92,30 +74,12 @@ export const requestEmailVerificationHandler = ({
         });
         if (!requesting.success) {
             switch (requesting.error) {
-                case 'USER_NOT_FOUND': {
-                    const response: ApiError = {
-                        success: false,
-                        code: 'UNAUTHORIZED',
-                    };
-                    res.status(401).json(response);
-                    return;
-                }
-                case 'ACTIVE_COOLDOWN': {
-                    const response: ApiError = {
-                        success: false,
-                        code: 'ACTIVE_COOLDOWN',
-                    };
-                    res.status(409).json(response);
-                    return;
-                }
-                case 'EMAIL_ALREADY_VERIFIED': {
-                    const response: ApiError = {
-                        success: false,
-                        code: 'EMAIL_ALREADY_VERIFIED',
-                    };
-                    res.status(409).json(response);
-                    return;
-                }
+                case 'USER_NOT_FOUND':
+                    throw new UnauthorizedError();
+                case 'ACTIVE_COOLDOWN':
+                    throw new ActiveCooldownError();
+                case 'EMAIL_ALREADY_VERIFIED':
+                    throw new EmailAlreadyVerifiedError();
             }
         }
 

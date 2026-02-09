@@ -3,10 +3,12 @@ import type { GetCurrentUserUseCase } from '../../../../application/user/get-cur
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { Request, Response } from 'express';
 import { toMeDto } from '../../../mappers/user/me.mapper.js';
-import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
+import type { ApiSuccess } from '@shared/api/api-response.js';
 import type { MeDto } from '@shared/dto/user/me.dto.js';
 import { meSchema } from '../../../schemas/user.schemas.js';
 import { treeifyError } from 'zod';
+import { BadRequestError } from '../../errors/bad-request.error.js';
+import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 
 type Deps = {
     getCurrentUserUseCase: GetCurrentUserUseCase;
@@ -35,48 +37,20 @@ export const meRoute = (router: Router, deps: Deps) => {
 export const meHandler = ({ getCurrentUserUseCase, tokenManager }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
         const validation = meSchema().safeParse(req);
-        if (!validation.success) {
-            const response: ApiError = {
-                success: false,
-                code: 'BAD_REQUEST',
-                tree: treeifyError(validation.error),
-            };
-            res.status(400).json(response);
-            return;
-        }
+        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
         const { cookies } = validation.data;
 
-        if (!cookies.accessToken) {
-            const response: ApiError = {
-                success: false,
-                code: 'UNAUTHORIZED',
-            };
-            res.status(401).json(response);
-            return;
-        }
+        if (!cookies.accessToken) throw new UnauthorizedError();
 
         const authentication = tokenManager.verifyAccess(cookies.accessToken);
-        if (!authentication.success) {
-            const response: ApiError = {
-                success: false,
-                code: 'UNAUTHORIZED',
-            };
-            res.status(401).json(response);
-            return;
-        }
+        if (!authentication.success) throw new UnauthorizedError();
         const { userId } = authentication.data;
 
         const getting = await getCurrentUserUseCase.execute({ userId });
         if (!getting.success) {
             switch (getting.error) {
-                case 'USER_NOT_FOUND': {
-                    const response: ApiError = {
-                        success: false,
-                        code: 'UNAUTHORIZED',
-                    };
-                    res.status(401).json(response);
-                    return;
-                }
+                case 'USER_NOT_FOUND':
+                    throw new UnauthorizedError();
             }
         }
         const { user } = getting.data;

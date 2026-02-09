@@ -4,10 +4,14 @@ import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { Request, Response } from 'express';
 import type { IdManager } from '../../../../domain/ports/id-manager.js';
 import { readTransactionSchema } from '../../../schemas/transaction.schemas.js';
-import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
+import type { ApiSuccess } from '@shared/api/api-response.js';
 import type { ReadTransactionDto } from '@shared/dto/transaction/read.dto.js';
 import { toReadTransactionDto } from '../../../mappers/transaction/read.mapper.js';
 import { treeifyError } from 'zod';
+import { BadRequestError } from '../../errors/bad-request.error.js';
+import { UnauthorizedError } from '../../errors/unauthorized.error.js';
+import { ForbiddenError } from '../../errors/forbidden.error.js';
+import { TransactionNotFoundError } from '../../errors/transaction-not-found.error.js';
 
 type Deps = {
     getTransactionUseCase: GetTransactionUseCase;
@@ -43,56 +47,22 @@ export const readTransactionRoute = (router: Router, deps: Deps) => {
 export const readTransactionHandler = ({ getTransactionUseCase, tokenManager, idManager }: Deps) => {
     return async (req: Request, res: Response) => {
         const validation = readTransactionSchema(idManager).safeParse(req);
-        if (!validation.success) {
-            const response: ApiError = {
-                success: false,
-                code: 'BAD_REQUEST',
-                tree: treeifyError(validation.error),
-            };
-            res.status(400).json(response);
-            return;
-        }
+        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
         const { params, cookies } = validation.data;
 
-        if (!cookies.accessToken) {
-            const response: ApiError = {
-                success: false,
-                code: 'UNAUTHORIZED',
-            };
-            res.status(401).json(response);
-            return;
-        }
+        if (!cookies.accessToken) throw new UnauthorizedError();
 
         const authentication = tokenManager.verifyAccess(cookies.accessToken);
-        if (!authentication.success) {
-            const response: ApiError = {
-                success: false,
-                code: 'UNAUTHORIZED',
-            };
-            res.status(401).json(response);
-            return;
-        }
+        if (!authentication.success) throw new UnauthorizedError();
         const { userId } = authentication.data;
 
         const getting = await getTransactionUseCase.execute({ transactionId: params.transactionId, userId });
         if (!getting.success) {
             switch (getting.error) {
-                case 'TRANSACTION_NOT_OWNED': {
-                    const response: ApiError = {
-                        success: false,
-                        code: 'FORBIDDEN',
-                    };
-                    res.status(403).json(response);
-                    return;
-                }
-                case 'TRANSACTION_NOT_FOUND': {
-                    const response: ApiError = {
-                        success: false,
-                        code: 'TRANSACTION_NOT_FOUND',
-                    };
-                    res.status(404).json(response);
-                    return;
-                }
+                case 'TRANSACTION_NOT_OWNED':
+                    throw new ForbiddenError();
+                case 'TRANSACTION_NOT_FOUND':
+                    throw new TransactionNotFoundError();
             }
         }
         const { transaction } = getting.data;

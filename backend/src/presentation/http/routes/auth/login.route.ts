@@ -4,9 +4,11 @@ import { loginSchema } from '../../../schemas/auth.schemas.js';
 import { toLoginDto } from '../../../mappers/auth/login.mapper.js';
 import { setAuthCookies } from '../../helpers/auth-cookies.js';
 import type { LoginUseCase } from '../../../../application/auth/login.use-case.js';
-import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
+import type { ApiSuccess } from '@shared/api/api-response.js';
 import type { LoginDto } from '@shared/dto/auth/login.dto.js';
 import { treeifyError } from 'zod';
+import { BadRequestError } from '../../errors/bad-request.error.js';
+import { InvalidCredentialsError } from '../../errors/invalid-credentials.error.js';
 
 type Deps = {
     loginUseCase: LoginUseCase;
@@ -53,29 +55,15 @@ export const loginRoute = (router: Router, deps: Deps) => {
 export const loginHandler = ({ loginUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
         const validation = loginSchema().safeParse(req);
-        if (!validation.success) {
-            const response: ApiError = {
-                success: false,
-                code: 'BAD_REQUEST',
-                tree: treeifyError(validation.error),
-            };
-            res.status(400).json(response);
-            return;
-        }
+        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
         const { body } = validation.data;
 
         const login = await loginUseCase.execute({ email: body.email, password: body.password }, req.logger);
         if (!login.success) {
             switch (login.error) {
                 case 'USER_NOT_FOUND':
-                case 'INVALID_PASSWORD': {
-                    const response: ApiError = {
-                        success: false,
-                        code: 'INVALID_CREDENTIALS',
-                    };
-                    res.status(401).json(response);
-                    return;
-                }
+                case 'INVALID_PASSWORD':
+                    throw new InvalidCredentialsError();
             }
         }
         const { user, accessToken, refreshToken } = login.data;

@@ -2,8 +2,11 @@ import type { Router } from 'express';
 import type { VerifyEmailUseCase } from '../../../../application/user/verify-email.use-case.js';
 import type { Request, Response } from 'express';
 import { verifyEmailSchema } from '../../../schemas/user.schemas.js';
-import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
+import type { ApiSuccess } from '@shared/api/api-response.js';
 import { treeifyError } from 'zod';
+import { BadRequestError } from '../../errors/bad-request.error.js';
+import { InvalidTokenError } from '../../errors/invalid-token.error.js';
+import { EmailAlreadyVerifiedError } from '../../errors/email-already-verified.error.js';
 
 type Deps = {
     verifyEmailUseCase: VerifyEmailUseCase;
@@ -44,15 +47,7 @@ export const verifyEmailRoute = (router: Router, deps: Deps) => {
 export const verifyEmailHandler = ({ verifyEmailUseCase }: Deps) => {
     return async (req: Request, res: Response): Promise<void> => {
         const validation = verifyEmailSchema().safeParse(req);
-        if (!validation.success) {
-            const response: ApiError = {
-                success: false,
-                code: 'BAD_REQUEST',
-                tree: treeifyError(validation.error),
-            };
-            res.status(400).json(response);
-            return;
-        }
+        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
         const { body } = validation.data;
 
         const verification = await verifyEmailUseCase.execute(
@@ -64,22 +59,10 @@ export const verifyEmailHandler = ({ verifyEmailUseCase }: Deps) => {
                 case 'INACTIVE_TOKEN':
                 case 'INVALID_TOKEN':
                 case 'EXPIRED_TOKEN':
-                case 'USER_NOT_FOUND': {
-                    const response: ApiError = {
-                        success: false,
-                        code: 'INVALID_TOKEN',
-                    };
-                    res.status(400).json(response);
-                    return;
-                }
-                case 'EMAIL_ALREADY_VERIFIED': {
-                    const response: ApiError = {
-                        success: false,
-                        code: 'EMAIL_ALREADY_VERIFIED',
-                    };
-                    res.status(409).json(response);
-                    return;
-                }
+                case 'USER_NOT_FOUND':
+                    throw new InvalidTokenError();
+                case 'EMAIL_ALREADY_VERIFIED':
+                    throw new EmailAlreadyVerifiedError();
             }
         }
 

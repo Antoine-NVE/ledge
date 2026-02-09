@@ -2,9 +2,10 @@ import type { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { LogoutUseCase } from '../../../../application/auth/logout.use-case.js';
 import { clearAuthCookies } from '../../helpers/auth-cookies.js';
-import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
+import type { ApiSuccess } from '@shared/api/api-response.js';
 import { logoutSchema } from '../../../schemas/auth.schemas.js';
 import { treeifyError } from 'zod';
+import { BadRequestError } from '../../errors/bad-request.error.js';
 
 type Deps = {
     logoutUseCase: LogoutUseCase;
@@ -30,15 +31,7 @@ export const logoutRoute = (router: Router, deps: Deps) => {
 export const logoutHandler = ({ logoutUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
         const validation = logoutSchema().safeParse(req);
-        if (!validation.success) {
-            const response: ApiError = {
-                success: false,
-                code: 'BAD_REQUEST',
-                tree: treeifyError(validation.error),
-            };
-            res.status(400).json(response);
-            return;
-        }
+        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
         const { cookies } = validation.data;
 
         clearAuthCookies(res);

@@ -2,9 +2,11 @@ import type { Router } from 'express';
 import type { RefreshUseCase } from '../../../../application/auth/refresh.use-case.js';
 import type { Request, Response } from 'express';
 import { setAuthCookies } from '../../helpers/auth-cookies.js';
-import type { ApiError, ApiSuccess } from '@shared/api/api-response.js';
+import type { ApiSuccess } from '@shared/api/api-response.js';
 import { refreshSchema } from '../../../schemas/auth.schemas.js';
 import { treeifyError } from 'zod';
+import { BadRequestError } from '../../errors/bad-request.error.js';
+import { InvalidRefreshTokenError } from '../../errors/invalid-refresh-token.error.js';
 
 type Deps = {
     refreshUseCase: RefreshUseCase;
@@ -32,38 +34,17 @@ export const refreshRoute = (router: Router, deps: Deps) => {
 export const refreshHandler = ({ refreshUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
         const validation = refreshSchema().safeParse(req);
-        if (!validation.success) {
-            const response: ApiError = {
-                success: false,
-                code: 'BAD_REQUEST',
-                tree: treeifyError(validation.error),
-            };
-            res.status(400).json(response);
-            return;
-        }
+        if (!validation.success) throw new BadRequestError(treeifyError(validation.error));
         const { cookies } = validation.data;
 
-        if (!cookies.refreshToken) {
-            const response: ApiError = {
-                success: false,
-                code: 'INVALID_REFRESH_TOKEN',
-            };
-            res.status(401).json(response);
-            return;
-        }
+        if (!cookies.refreshToken) throw new InvalidRefreshTokenError();
 
         const refresh = await refreshUseCase.execute({ refreshToken: cookies.refreshToken }, req.logger);
         if (!refresh.success) {
             switch (refresh.error) {
                 case 'REFRESH_TOKEN_NOT_FOUND':
-                case 'EXPIRED_REFRESH_TOKEN': {
-                    const response: ApiError = {
-                        success: false,
-                        code: 'INVALID_REFRESH_TOKEN',
-                    };
-                    res.status(401).json(response);
-                    return;
-                }
+                case 'EXPIRED_REFRESH_TOKEN':
+                    throw new InvalidRefreshTokenError();
             }
         }
         const { accessToken, refreshToken } = refresh.data;
