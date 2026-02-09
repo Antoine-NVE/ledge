@@ -34,11 +34,10 @@ export const refreshHandler = ({ refreshUseCase }: Deps) => {
     return async (req: Request, res: Response) => {
         const { cookies } = validateOrThrow(req, refreshSchema());
 
-        if (!cookies.refreshToken) throw new InvalidRefreshTokenError();
-
         const result = await refreshUseCase.execute({ refreshToken: cookies.refreshToken }, req.logger);
         if (!result.success) {
             switch (result.error) {
+                case 'MISSING_REFRESH_TOKEN':
                 case 'REFRESH_TOKEN_NOT_FOUND':
                 case 'EXPIRED_REFRESH_TOKEN':
                     throw new InvalidRefreshTokenError();

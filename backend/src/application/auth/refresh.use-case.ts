@@ -6,11 +6,11 @@ import type { Logger } from '../../domain/ports/logger.js';
 import type { Result } from '../../core/types/result.js';
 import { fail, ok } from '../../core/utils/result.js';
 
-type RefreshInput = { refreshToken: string };
+type RefreshInput = { refreshToken: string | undefined };
 
 type RefreshResult = Result<
     { accessToken: string; refreshToken: string },
-    'REFRESH_TOKEN_NOT_FOUND' | 'EXPIRED_REFRESH_TOKEN'
+    'MISSING_REFRESH_TOKEN' | 'REFRESH_TOKEN_NOT_FOUND' | 'EXPIRED_REFRESH_TOKEN'
 >;
 
 export class RefreshUseCase {
@@ -24,6 +24,8 @@ export class RefreshUseCase {
 
     execute = async (input: RefreshInput, logger: Logger): Promise<RefreshResult> => {
         const now = new Date();
+
+        if (!input.refreshToken) return fail('MISSING_REFRESH_TOKEN');
 
         const refreshToken = await this.refreshTokenRepository.findByValue(input.refreshToken);
         if (!refreshToken) return fail('REFRESH_TOKEN_NOT_FOUND');
