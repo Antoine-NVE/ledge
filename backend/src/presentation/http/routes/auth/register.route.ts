@@ -1,7 +1,7 @@
 import type { Router } from 'express';
 import type { RegisterUseCase } from '../../../../application/auth/register.use-case.js';
 import { registerSchema } from '../../../schemas/auth.schemas.js';
-import { setAuthCookies } from '../../helpers/auth-cookies.js';
+import { setAuthCookies } from '../../helpers/cookies.js';
 import { toRegisterDto } from '../../../mappers/auth/register.mapper.js';
 import type { Request, Response } from 'express';
 import type { ApiSuccess } from '@shared/api/api-response.js';

@@ -1,7 +1,7 @@
 import type { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { LogoutUseCase } from '../../../../application/auth/logout.use-case.js';
-import { clearAuthCookies } from '../../helpers/auth-cookies.js';
+import { clearAuthCookies } from '../../helpers/cookies.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import { logoutSchema } from '../../../schemas/auth.schemas.js';
 import { treeifyError } from 'zod';

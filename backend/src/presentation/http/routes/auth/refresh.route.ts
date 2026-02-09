@@ -1,7 +1,7 @@
 import type { Router } from 'express';
 import type { RefreshUseCase } from '../../../../application/auth/refresh.use-case.js';
 import type { Request, Response } from 'express';
-import { setAuthCookies } from '../../helpers/auth-cookies.js';
+import { setAuthCookies } from '../../helpers/cookies.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
 import { refreshSchema } from '../../../schemas/auth.schemas.js';
 import { treeifyError } from 'zod';
