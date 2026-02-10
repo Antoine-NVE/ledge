@@ -1,6 +1,6 @@
 import { Collection, ObjectId } from 'mongodb';
-import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
-import type { Transaction } from '../../domain/entities/transaction.js';
+import type { TransactionRepository } from '../../../domain/repositories/transaction.repository.js';
+import type { Transaction } from '../../../domain/entities/transaction.js';
 
 type TransactionDocument = Readonly<
     | {
