@@ -1,6 +1,6 @@
 import { Collection, ObjectId } from 'mongodb';
-import type { RefreshTokenRepository } from '../../../domain/repositories/refresh-token.repository.js';
-import type { RefreshToken } from '../../../domain/entities/refresh-token.js';
+import type { RefreshTokenRepository } from '../../domain/repositories/refresh-token.repository.js';
+import type { RefreshToken } from '../../domain/entities/refresh-token.js';
 
 type RefreshTokenDocument = Readonly<{
     _id: ObjectId;

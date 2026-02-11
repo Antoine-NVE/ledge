@@ -1,6 +1,6 @@
 import { Collection, ObjectId } from 'mongodb';
-import type { UserRepository } from '../../../domain/repositories/user.repository.js';
-import type { User } from '../../../domain/entities/user.js';
+import type { UserRepository } from '../../domain/repositories/user.repository.js';
+import type { User } from '../../domain/entities/user.js';
 
 type UserDocument = Readonly<{
     _id: ObjectId;
