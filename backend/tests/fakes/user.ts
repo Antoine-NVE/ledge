@@ -1,4 +1,4 @@
-import type { User } from '../../src/domain/entities/user';
+import type { User } from '../../src/domain/entities/user.js';
 
 export const fakeUser = (overrides: Partial<User> = {}): User => ({
     id: '507f1f77bcf86cd799439011',

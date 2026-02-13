@@ -5,8 +5,7 @@
     "compilerOptions": {
         // File Layout
         // "rootDir": "./src",
-        "rootDirs": ["./src", "./scripts", "../shared/src"], // Added by me
-        "outDir": "./dist", // Original value: same but commented
+        "outDir": "./dist", // Uncommented by me
 
         // Environment Settings
         // See also https://aka.ms/tsconfig/module
@@ -44,10 +43,10 @@
         "moduleDetection": "force",
         "skipLibCheck": true,
 
-        // Added by me, for access to shared/ folder
+        // Added by me
         "paths": {
             "@shared/*": ["../shared/src/*"]
         }
     },
-    "include": ["./src", "./scripts", "../shared/src"] // Added by me
+    "include": ["./scripts", "./src", "./tests", "../shared/src"] // Added by me
 }
