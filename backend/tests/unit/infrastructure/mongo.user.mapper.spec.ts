@@ -7,11 +7,13 @@ describe('MongoUserMapper', () => {
     describe('toUserDocument', () => {
         it('should map a valid User to a UserDocument correctly', () => {
             const user = fakeUser();
-            const userDocument = toUserDocument(user);
 
-            expect(userDocument._id).toBeInstanceOf(ObjectId);
-            expect(userDocument._id.toString()).toBe(user.id);
-            expect(userDocument).toMatchObject({
+            const document = toUserDocument(user);
+
+            expect(document._id).toBeInstanceOf(ObjectId);
+            expect(document._id.toString()).toBe(user.id);
+
+            expect(document).toMatchObject({
                 email: user.email,
                 passwordHash: user.passwordHash,
                 isEmailVerified: user.isEmailVerified,
@@ -29,11 +31,12 @@ describe('MongoUserMapper', () => {
 
     describe('toUser', () => {
         it('should map a UserDocument back to a User domain entity', () => {
-            const user1 = fakeUser();
-            const userDocument = toUserDocument(user1);
-            const user2 = toUser(userDocument);
+            const originalUser = fakeUser();
+            const document = toUserDocument(originalUser);
 
-            expect(user2).toEqual(user1);
+            const domainUser = toUser(document);
+
+            expect(domainUser).toEqual(originalUser);
         });
     });
 });
