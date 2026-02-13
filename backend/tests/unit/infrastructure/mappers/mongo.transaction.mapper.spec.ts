@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { fakeExpenseTransaction, fakeIncomeTransaction } from '../../fakes/transaction.js';
-import { toTransaction, toTransactionDocument } from '../../../src/infrastructure/mappers/mongo.transaction.mapper.js';
+import { fakeExpenseTransaction, fakeIncomeTransaction } from '../../../fakes/transaction.js';
+import {
+    toTransaction,
+    toTransactionDocument,
+} from '../../../../src/infrastructure/mappers/mongo.transaction.mapper.js';
 import { ObjectId } from 'mongodb';
 
 describe('MongoTransactionMapper', () => {

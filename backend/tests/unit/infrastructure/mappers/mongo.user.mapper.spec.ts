@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { fakeUser } from '../../fakes/user.js';
-import { toUser, toUserDocument } from '../../../src/infrastructure/mappers/mongo.user.mapper.js';
+import { fakeUser } from '../../../fakes/user.js';
+import { toUser, toUserDocument } from '../../../../src/infrastructure/mappers/mongo.user.mapper.js';
 import { ObjectId } from 'mongodb';
 
 describe('MongoUserMapper', () => {
