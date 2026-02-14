@@ -1,3 +1,3 @@
 export interface TokenGenerator {
-    generate(length?: number): string;
+    generate: (length?: number) => string;
 }
