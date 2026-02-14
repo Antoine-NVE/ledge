@@ -1,4 +1,4 @@
-import type { Result } from '../../core/types/result.js';
+import type { Result } from '../../core/result.js';
 import type { TokenPayload } from '../types/token-payload.js';
 
 export type VerifyTokenResult = Result<TokenPayload, VerifyTokenError>;

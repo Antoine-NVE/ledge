@@ -2,8 +2,7 @@ import type { EmailSender } from '../../domain/ports/email-sender.js';
 import type { UserRepository } from '../../domain/repositories/user.repository.js';
 import type { TokenManager } from '../../domain/ports/token-manager.js';
 import type { CacheStore } from '../../domain/ports/cache-store.js';
-import type { Result } from '../../core/types/result.js';
-import { fail, ok } from '../../core/utils/result.js';
+import { fail, ok, type Result } from '../../core/result.js';
 
 type RequestEmailVerificationInput = {
     userId: string;

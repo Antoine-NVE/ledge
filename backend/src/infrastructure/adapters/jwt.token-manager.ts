@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import type { TokenManager, VerifyTokenResult } from '../../domain/ports/token-manager.js';
-import { fail, ok } from '../../core/utils/result.js';
+import { fail, ok } from '../../core/result.js';
 import type { TokenPayload } from '../../domain/types/token-payload.js';
 
 type JwtTokenPayload = {

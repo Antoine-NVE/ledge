@@ -1,6 +1,5 @@
 import z from 'zod';
-import type { Result } from '../../core/types/result.js';
-import { fail, ok } from '../../core/utils/result.js';
+import { fail, ok, type Result } from '../../core/result.js';
 
 export const loadEnv = (): Result<z.infer<typeof schema>, unknown> => {
     const schema = z.object({

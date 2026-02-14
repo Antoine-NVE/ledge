@@ -2,8 +2,7 @@ import type { UserRepository } from '../../domain/repositories/user.repository.j
 import type { TokenManager, VerifyTokenError } from '../../domain/ports/token-manager.js';
 import type { User } from '../../domain/entities/user.js';
 import type { Logger } from '../../domain/ports/logger.js';
-import type { Result } from '../../core/types/result.js';
-import { fail, ok } from '../../core/utils/result.js';
+import { fail, ok, type Result } from '../../core/result.js';
 
 type VerifyEmailInput = {
     emailVerificationToken: string;

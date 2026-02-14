@@ -1,6 +1,5 @@
 import { Db, MongoClient } from 'mongodb';
-import type { Result } from '../../core/types/result.js';
-import { fail, ok } from '../../core/utils/result.js';
+import { fail, ok, type Result } from '../../core/result.js';
 
 type Input = {
     mongoUrl: string;

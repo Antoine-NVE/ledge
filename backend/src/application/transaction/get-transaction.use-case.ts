@@ -1,7 +1,6 @@
 import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
 import type { Transaction } from '../../domain/entities/transaction.js';
-import type { Result } from '../../core/types/result.js';
-import { fail, ok } from '../../core/utils/result.js';
+import { fail, ok, type Result } from '../../core/result.js';
 
 type GetTransactionInput = { transactionId: string; userId: string };
 

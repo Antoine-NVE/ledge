@@ -7,8 +7,7 @@ import type { RefreshToken } from '../../domain/entities/refresh-token.js';
 import type { IdManager } from '../../domain/ports/id-manager.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import type { Logger } from '../../domain/ports/logger.js';
-import type { Result } from '../../core/types/result.js';
-import { fail, ok } from '../../core/utils/result.js';
+import { fail, ok, type Result } from '../../core/result.js';
 
 type LoginInput = { email: string; password: string };
 

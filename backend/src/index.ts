@@ -14,8 +14,7 @@ import { MongoRefreshTokenRepository } from './infrastructure/repositories/mongo
 import { createHttpApp } from './presentation/http/app.js';
 import { buildContainer } from './presentation/container.js';
 import { startServer } from './presentation/server.js';
-import { fail, ok } from './core/utils/result.js';
-import type { Result } from './core/types/result.js';
+import { fail, ok, type Result } from './core/result.js';
 import { MongoIdManager } from './infrastructure/adapters/mongo.id-manager.js';
 import { CryptoTokenGenerator } from './infrastructure/adapters/crypto.token-generator.js';
 
