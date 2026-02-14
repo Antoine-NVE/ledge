@@ -20,7 +20,12 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
-        "noUncheckedSideEffectImports": true
+        "noUncheckedSideEffectImports": true,
+
+        // Added by me
+        "paths": {
+            "@shared/*": ["../shared/src/*"]
+        }
     },
     "include": ["src"]
 }
