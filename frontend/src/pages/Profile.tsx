@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { sendVerificationEmail } from '../api/user';
+import { sendVerificationEmail } from '../api/users.ts';
 import useUser from '../hooks/useUser';
 
 const Profile = () => {

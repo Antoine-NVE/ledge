@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import UserContext from '../contexts/UserContext';
-import { getCurrentUser } from '../api/user';
+import { getCurrentUser } from '../api/users.ts';
 import { User } from '../types/user';
 
 const UserProvider = ({ children }: { children: React.ReactNode }) => {

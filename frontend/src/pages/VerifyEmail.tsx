@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { verifyEmail } from '../api/user';
+import { verifyEmail } from '../api/users.ts';
 import { useParams } from 'react-router-dom';
 
 export default function VerifyEmail() {
