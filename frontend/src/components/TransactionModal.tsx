@@ -38,13 +38,7 @@ const EMPTY_ERRORS: FormErrors = {
     type: '',
 };
 
-const TransactionModal = ({
-    isOpen,
-    onClose,
-    initialTransaction,
-    month,
-    onSave,
-}: Props) => {
+const TransactionModal = ({ isOpen, onClose, initialTransaction, month, onSave }: Props) => {
     // === State ===
     const [form, setForm] = useState<FormTransaction>(EMPTY_FORM);
     const [formErrors, setFormErrors] = useState<FormErrors>(EMPTY_ERRORS);
@@ -85,8 +79,7 @@ const TransactionModal = ({
                 ...form,
                 value,
                 type: form.type!,
-                expenseCategory:
-                    form.type === 'expense' ? form.expenseCategory : undefined,
+                expenseCategory: form.type === 'expense' ? form.expenseCategory : undefined,
             };
             handleUpdate(transaction);
         } else {
@@ -95,8 +88,7 @@ const TransactionModal = ({
                 value,
                 type: form.type!,
                 month,
-                expenseCategory:
-                    form.type === 'expense' ? form.expenseCategory : undefined,
+                expenseCategory: form.type === 'expense' ? form.expenseCategory : undefined,
             };
             handleCreate(transaction);
         }
@@ -197,9 +189,7 @@ const TransactionModal = ({
                       value: String(initialTransaction.value),
                       type: initialTransaction.type,
                       expenseCategory:
-                          initialTransaction.type === 'expense'
-                              ? (initialTransaction.expenseCategory ?? null)
-                              : null,
+                          initialTransaction.type === 'expense' ? (initialTransaction.expenseCategory ?? null) : null,
                   }
                 : EMPTY_FORM,
         );
@@ -211,10 +201,7 @@ const TransactionModal = ({
     return (
         isOpen &&
         isFormReady && (
-            <div
-                className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
-                onClick={onClose}
-            >
+            <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
                 <div
                     className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative"
                     onClick={(e) => e.stopPropagation()}
@@ -227,79 +214,52 @@ const TransactionModal = ({
                     </button>
 
                     <h2 className="text-xl font-bold mb-6">
-                        {initialTransaction
-                            ? 'Update transaction'
-                            : 'Add transaction'}
+                        {initialTransaction ? 'Update transaction' : 'Add transaction'}
                     </h2>
 
                     <form onSubmit={handleSubmit} className="space-y-4">
                         {/* Name */}
                         <div>
-                            <label className="block text-sm font-medium mb-1">
-                                Name
-                            </label>
+                            <label className="block text-sm font-medium mb-1">Name</label>
                             <input
                                 autoFocus
                                 type="text"
                                 value={form.name}
-                                onChange={(e) =>
-                                    setForm({ ...form, name: e.target.value })
-                                }
+                                onChange={(e) => setForm({ ...form, name: e.target.value })}
                                 className="w-full border rounded px-3 py-2 text-sm"
                             />
-                            {formErrors.name && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {formErrors.name}
-                                </p>
-                            )}
+                            {formErrors.name && <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>}
                         </div>
 
                         {/* Value */}
                         <div>
-                            <label className="block text-sm font-medium mb-1">
-                                Value (€)
-                            </label>
+                            <label className="block text-sm font-medium mb-1">Value (€)</label>
                             <input
                                 type="text"
                                 inputMode="decimal"
                                 value={form.value}
                                 onChange={(e) => {
-                                    const val = e.target.value.replace(
-                                        ',',
-                                        '.',
-                                    );
+                                    const val = e.target.value.replace(',', '.');
 
-                                    if (
-                                        val === '' ||
-                                        /^(?:\d+(?:\.\d{0,2})?)?$/.test(val)
-                                    ) {
+                                    if (val === '' || /^(?:\d+(?:\.\d{0,2})?)?$/.test(val)) {
                                         setForm({ ...form, value: val });
                                     }
                                 }}
                                 onBlur={() => {
                                     if (form.value !== '') {
-                                        const cleaned = form.value.replace(
-                                            /\.$/,
-                                            '',
-                                        );
+                                        const cleaned = form.value.replace(/\.$/, '');
 
                                         setForm({ ...form, value: cleaned });
                                     }
                                 }}
                                 className="w-full border rounded px-3 py-2 text-sm"
                             />
-                            {formErrors.value && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {formErrors.value}
-                                </p>
-                            )}
+                            {formErrors.value && <p className="text-red-500 text-sm mt-1">{formErrors.value}</p>}
                         </div>
 
                         {/* Type */}
                         <div>
-                            <label className="block text-sm font-medium mb-1">
-                                Type
-                            </label>
+                            <label className="block text-sm font-medium mb-1">Type</label>
                             <div className="flex items-center gap-4">
                                 <label className="flex items-center gap-2 cursor-pointer select-none">
                                     <input
@@ -334,19 +294,13 @@ const TransactionModal = ({
                                     <span>Expense</span>
                                 </label>
                             </div>
-                            {formErrors.type && (
-                                <p className="text-red-500 text-sm mt-1">
-                                    {formErrors.type}
-                                </p>
-                            )}
+                            {formErrors.type && <p className="text-red-500 text-sm mt-1">{formErrors.type}</p>}
                         </div>
 
                         {/* Expense category */}
                         {form.type === 'expense' && (
                             <div>
-                                <label className="block text-sm font-medium mb-1">
-                                    Category
-                                </label>
+                                <label className="block text-sm font-medium mb-1">Category</label>
                                 <div className="flex gap-2 flex-wrap">
                                     {[
                                         {
@@ -372,20 +326,13 @@ const TransactionModal = ({
                                                 setForm({
                                                     ...form,
                                                     expenseCategory:
-                                                        form.expenseCategory ===
-                                                        cat.key
-                                                            ? null
-                                                            : (cat.key as any),
+                                                        form.expenseCategory === cat.key ? null : (cat.key as any),
                                                 })
                                             }
                                             className={`
                         px-3 py-1 rounded-full text-white text-sm cursor-pointer transition
                         ${cat.color}
-                        ${
-                            form.expenseCategory === cat.key
-                                ? 'opacity-100'
-                                : 'opacity-40 hover:opacity-70'
-                        }
+                        ${form.expenseCategory === cat.key ? 'opacity-100' : 'opacity-40 hover:opacity-70'}
                     `}
                                         >
                                             {cat.label}
@@ -396,11 +343,7 @@ const TransactionModal = ({
                         )}
 
                         {/* General error */}
-                        {formErrors.general && (
-                            <p className="text-red-600 text-sm">
-                                {formErrors.general}
-                            </p>
-                        )}
+                        {formErrors.general && <p className="text-red-600 text-sm">{formErrors.general}</p>}
 
                         {/* Submit */}
                         <button

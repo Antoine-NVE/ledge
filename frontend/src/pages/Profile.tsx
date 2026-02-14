@@ -40,13 +40,7 @@ const Profile = () => {
                     {isLoading ? 'Sending...' : 'Send verification email'}
                 </button>
             )}
-            {message && (
-                <div
-                    className={`mt-4 ${success ? 'text-green-600' : 'text-red-600'}`}
-                >
-                    {message}
-                </div>
-            )}
+            {message && <div className={`mt-4 ${success ? 'text-green-600' : 'text-red-600'}`}>{message}</div>}
         </div>
     );
 };

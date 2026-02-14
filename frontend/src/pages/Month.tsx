@@ -7,11 +7,7 @@ import DeleteTransactionModal from '../components/DeleteTransactionModal';
 import { getAllTransactions } from '../api/transactions';
 import useUser from '../hooks/useUser';
 
-type SortOption =
-    | 'value-desc'
-    | 'value-asc'
-    | 'alphabetical'
-    | 'reverse-alphabetical';
+type SortOption = 'value-desc' | 'value-asc' | 'alphabetical' | 'reverse-alphabetical';
 
 const Month = () => {
     const params = useParams<{ month: string }>();
@@ -25,11 +21,7 @@ const Month = () => {
         setTransactions((prev) => [...prev, transaction]);
     };
     const updateTransaction = (updatedTransaction: Transaction) => {
-        setTransactions((prev) =>
-            prev.map((t) =>
-                t.id === updatedTransaction.id ? updatedTransaction : t,
-            ),
-        );
+        setTransactions((prev) => prev.map((t) => (t.id === updatedTransaction.id ? updatedTransaction : t)));
     };
     const deleteTransaction = (transaction: Transaction) => {
         setTransactions((prev) => prev.filter((t) => t.id !== transaction.id));
@@ -89,10 +81,8 @@ const Month = () => {
     const total = totalIncomes - totalExpenses;
 
     const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
-    const [isDeleteTransactionModalOpen, setIsDeleteTransactionModalOpen] =
-        useState(false);
-    const [selectedTransaction, setSelectedTransaction] =
-        useState<Transaction | null>(null);
+    const [isDeleteTransactionModalOpen, setIsDeleteTransactionModalOpen] = useState(false);
+    const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
 
     const handleAddTransaction = () => {
         setSelectedTransaction(null);
@@ -156,14 +146,8 @@ const Month = () => {
                 <div className="flex flex-col items-center gap-4 mb-6 w-full max-w-5xl">
                     {/* Bouton "Aujourd'hui" */}
                     <button
-                        onClick={() =>
-                            navigate(
-                                `/month/${new Date().toISOString().slice(0, 7)}`,
-                            )
-                        }
-                        disabled={
-                            month === new Date().toISOString().slice(0, 7)
-                        }
+                        onClick={() => navigate(`/month/${new Date().toISOString().slice(0, 7)}`)}
+                        disabled={month === new Date().toISOString().slice(0, 7)}
                         className={`rounded-md px-3 py-1 text-sm shadow cursor-pointer transition ${
                             month === new Date().toISOString().slice(0, 7)
                                 ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
@@ -179,26 +163,20 @@ const Month = () => {
                             onClick={() => {
                                 const [y, m] = month.split('-').map(Number);
                                 const date = new Date(y, m - 1); // mois précédent
-                                navigate(
-                                    `/month/${date.toISOString().slice(0, 7)}`,
-                                );
+                                navigate(`/month/${date.toISOString().slice(0, 7)}`);
                             }}
                             className="text-2xl px-2 hover:text-gray-600 cursor-pointer"
                         >
                             ←
                         </button>
 
-                        <div className="text-lg font-semibold text-center">
-                            {label}
-                        </div>
+                        <div className="text-lg font-semibold text-center">{label}</div>
 
                         <button
                             onClick={() => {
                                 const [y, m] = month.split('-').map(Number);
                                 const date = new Date(y, m + 1); // mois suivant
-                                navigate(
-                                    `/month/${date.toISOString().slice(0, 7)}`,
-                                );
+                                navigate(`/month/${date.toISOString().slice(0, 7)}`);
                             }}
                             className="text-2xl px-2 hover:text-gray-600 cursor-pointer"
                         >
@@ -218,9 +196,7 @@ const Month = () => {
                         ].map((option) => (
                             <button
                                 key={option.value}
-                                onClick={() =>
-                                    setSort(option.value as SortOption)
-                                }
+                                onClick={() => setSort(option.value as SortOption)}
                                 className={`px-3 py-2 rounded-md text-sm shadow transition cursor-pointer w-full ${
                                     sort === option.value
                                         ? 'bg-blue-600 text-white'
@@ -243,16 +219,10 @@ const Month = () => {
 
                 {/* Total global */}
                 <div className="w-full max-w-5xl bg-white shadow-md rounded-lg p-4 mb-6 text-center">
-                    <h3 className="text-xl font-semibold text-gray-800">
-                        Total balance
-                    </h3>
+                    <h3 className="text-xl font-semibold text-gray-800">Total balance</h3>
                     <p
                         className={`text-2xl font-bold ${
-                            total > 0
-                                ? 'text-green-900'
-                                : total < 0
-                                  ? 'text-red-900'
-                                  : 'text-black'
+                            total > 0 ? 'text-green-900' : total < 0 ? 'text-red-900' : 'text-black'
                         }`}
                     >
                         {total.toFixed(2)} €
@@ -266,12 +236,8 @@ const Month = () => {
                         transactions={incomes}
                         total={totalIncomes}
                         type={'income'}
-                        onEdit={(transaction: Transaction) =>
-                            handleEditTransaction(transaction)
-                        }
-                        onDelete={(transaction: Transaction) =>
-                            handleDeleteTransaction(transaction)
-                        }
+                        onEdit={(transaction: Transaction) => handleEditTransaction(transaction)}
+                        onDelete={(transaction: Transaction) => handleDeleteTransaction(transaction)}
                     />
 
                     {/* Expenses */}
@@ -279,12 +245,8 @@ const Month = () => {
                         transactions={expenses}
                         total={totalExpenses}
                         type={'expense'}
-                        onEdit={(transaction: Transaction) =>
-                            handleEditTransaction(transaction)
-                        }
-                        onDelete={(transaction: Transaction) =>
-                            handleDeleteTransaction(transaction)
-                        }
+                        onEdit={(transaction: Transaction) => handleEditTransaction(transaction)}
+                        onDelete={(transaction: Transaction) => handleDeleteTransaction(transaction)}
                     />
                 </div>
             </div>

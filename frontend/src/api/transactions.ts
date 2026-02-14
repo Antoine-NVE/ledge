@@ -6,12 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL + '/transactions';
 
 export const createTransaction = async (
     transaction: NewTransaction,
-): Promise<
-    [
-        ApiResponse<{ transaction: Transaction } | null, object | null>,
-        Response | null,
-    ]
-> => {
+): Promise<[ApiResponse<{ transaction: Transaction } | null, object | null>, Response | null]> => {
     try {
         const response = await customFetch(API_URL, {
             method: 'POST',
@@ -24,8 +19,7 @@ export const createTransaction = async (
 
         // Can be any status code, including 200, 401, or 500
         // We will handle this in the component
-        const result: ApiResponse<{ transaction: Transaction } | null, null> =
-            await response.json();
+        const result: ApiResponse<{ transaction: Transaction } | null, null> = await response.json();
         return [result, response];
     } catch (error: unknown) {
         console.error(error);
@@ -55,10 +49,7 @@ export const getAllTransactions = async (): Promise<
 
         // Can be any status code, including 200, 401, or 500
         // We will handle this in the component
-        const result: ApiResponse<
-            { transactions: Transaction[] } | null,
-            null
-        > = await response.json();
+        const result: ApiResponse<{ transactions: Transaction[] } | null, null> = await response.json();
         return [result, response];
     } catch (error: unknown) {
         console.error(error);
@@ -76,9 +67,7 @@ export const getAllTransactions = async (): Promise<
 
 export const getTransactionById = async (
     transaction: Transaction,
-): Promise<
-    [ApiResponse<{ transaction: Transaction } | null, null>, Response | null]
-> => {
+): Promise<[ApiResponse<{ transaction: Transaction } | null, null>, Response | null]> => {
     try {
         const response = await customFetch(API_URL + '/' + transaction.id, {
             method: 'GET',
@@ -90,8 +79,7 @@ export const getTransactionById = async (
 
         // Can be any status code, including 200, 401, or 500
         // We will handle this in the component
-        const result: ApiResponse<{ transaction: Transaction } | null, null> =
-            await response.json();
+        const result: ApiResponse<{ transaction: Transaction } | null, null> = await response.json();
         return [result, response];
     } catch (error: unknown) {
         console.error(error);
@@ -109,12 +97,7 @@ export const getTransactionById = async (
 
 export const updateTransaction = async (
     transaction: Transaction,
-): Promise<
-    [
-        ApiResponse<{ transaction: Transaction } | null, object | null>,
-        Response | null,
-    ]
-> => {
+): Promise<[ApiResponse<{ transaction: Transaction } | null, object | null>, Response | null]> => {
     try {
         const response = await customFetch(API_URL + '/' + transaction.id, {
             method: 'PUT',
@@ -126,16 +109,13 @@ export const updateTransaction = async (
                 name: transaction.name,
                 value: transaction.value,
                 type: transaction.type,
-                ...(transaction.type === 'expense'
-                    ? { expenseCategory: transaction.expenseCategory }
-                    : undefined),
+                ...(transaction.type === 'expense' ? { expenseCategory: transaction.expenseCategory } : undefined),
             }),
         });
 
         // Can be any status code, including 200, 401, or 500
         // We will handle this in the component
-        const result: ApiResponse<{ transaction: Transaction } | null, null> =
-            await response.json();
+        const result: ApiResponse<{ transaction: Transaction } | null, null> = await response.json();
         return [result, response];
     } catch (error: unknown) {
         console.error(error);
@@ -153,9 +133,7 @@ export const updateTransaction = async (
 
 export const deleteTransaction = async (
     transaction: Transaction,
-): Promise<
-    [ApiResponse<{ transaction: Transaction } | null, null>, Response | null]
-> => {
+): Promise<[ApiResponse<{ transaction: Transaction } | null, null>, Response | null]> => {
     try {
         const response = await customFetch(API_URL + '/' + transaction.id, {
             method: 'DELETE',
@@ -167,8 +145,7 @@ export const deleteTransaction = async (
 
         // Can be any status code, including 200, 401, or 500
         // We will handle this in the component
-        const result: ApiResponse<{ transaction: Transaction } | null, null> =
-            await response.json();
+        const result: ApiResponse<{ transaction: Transaction } | null, null> = await response.json();
         return [result, response];
     } catch (error: unknown) {
         console.error(error);

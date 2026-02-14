@@ -33,11 +33,7 @@ const Login = () => {
         setError(null);
         setSuccess(null);
 
-        const [result, response] = await login(
-            form.email,
-            form.password,
-            form.rememberMe,
-        );
+        const [result, response] = await login(form.email, form.password, form.rememberMe);
 
         if (!response || !response.ok) {
             setError(result.message);
@@ -66,10 +62,7 @@ const Login = () => {
 
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4">
-                        <label
-                            htmlFor="email"
-                            className="block text-sm font-medium text-gray-700"
-                        >
+                        <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                             Email
                         </label>
                         <input
@@ -83,10 +76,7 @@ const Login = () => {
                     </div>
 
                     <div className="mb-6">
-                        <label
-                            htmlFor="password"
-                            className="block text-sm font-medium text-gray-700"
-                        >
+                        <label htmlFor="password" className="block text-sm font-medium text-gray-700">
                             Password
                         </label>
                         <input
@@ -100,10 +90,7 @@ const Login = () => {
                     </div>
 
                     <div className="mb-4">
-                        <label
-                            htmlFor="rememberMe"
-                            className="flex items-center cursor-pointer"
-                        >
+                        <label htmlFor="rememberMe" className="flex items-center cursor-pointer">
                             <input
                                 type="checkbox"
                                 id="rememberMe"
@@ -121,16 +108,8 @@ const Login = () => {
                         </label>
                     </div>
 
-                    {error && (
-                        <div className="mb-4 text-red-600 text-sm text-center">
-                            {error}
-                        </div>
-                    )}
-                    {success && (
-                        <div className="mb-4 text-green-600 text-sm text-center">
-                            {success}
-                        </div>
-                    )}
+                    {error && <div className="mb-4 text-red-600 text-sm text-center">{error}</div>}
+                    {success && <div className="mb-4 text-green-600 text-sm text-center">{success}</div>}
 
                     <button
                         type="submit"
@@ -143,10 +122,7 @@ const Login = () => {
 
                 <div className="mt-4 text-center text-sm text-gray-600">
                     Don't have an account?{' '}
-                    <Link
-                        to="/register"
-                        className="text-blue-600 hover:underline"
-                    >
+                    <Link to="/register" className="text-blue-600 hover:underline">
                         Register
                     </Link>
                 </div>

@@ -9,12 +9,7 @@ interface Props {
     onDelete: (transaction: Transaction) => void;
 }
 
-const DeleteTransactionModal = ({
-    isOpen,
-    onClose,
-    transaction,
-    onDelete,
-}: Props) => {
+const DeleteTransactionModal = ({ isOpen, onClose, transaction, onDelete }: Props) => {
     // Close modal on Escape key press
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
@@ -66,10 +61,7 @@ const DeleteTransactionModal = ({
 
     return (
         isOpen && (
-            <div
-                className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4"
-                onClick={onClose}
-            >
+            <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center p-4" onClick={onClose}>
                 <div
                     className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative"
                     onClick={(e) => e.stopPropagation()}
@@ -81,22 +73,15 @@ const DeleteTransactionModal = ({
                         ✕
                     </button>
 
-                    <h2 className="text-xl font-bold mb-6">
-                        Delete transaction
-                    </h2>
+                    <h2 className="text-xl font-bold mb-6">Delete transaction</h2>
 
                     <p className="mb-4">
-                        Are you sure you want to delete the transaction{' '}
-                        <strong>{transaction.name}</strong> of{' '}
+                        Are you sure you want to delete the transaction <strong>{transaction.name}</strong> of{' '}
                         <strong>{transaction.value} €</strong>?
                     </p>
-                    <p className="text-sm text-gray-500 mb-4">
-                        This action cannot be undone. Please confirm.
-                    </p>
+                    <p className="text-sm text-gray-500 mb-4">This action cannot be undone. Please confirm.</p>
 
-                    {error && (
-                        <p className="text-sm text-red-500 mb-4">{error}</p>
-                    )}
+                    {error && <p className="text-sm text-red-500 mb-4">{error}</p>}
 
                     <div className="flex justify-end gap-4">
                         <button

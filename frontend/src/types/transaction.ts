@@ -9,7 +9,4 @@ export type Transaction = {
     updatedAt: string;
 };
 
-export type NewTransaction = Omit<
-    Transaction,
-    'id' | 'createdAt' | 'updatedAt'
->;
+export type NewTransaction = Omit<Transaction, 'id' | 'createdAt' | 'updatedAt'>;

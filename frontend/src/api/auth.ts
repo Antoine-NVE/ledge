@@ -21,8 +21,7 @@ export const register = async (
 
         // Can be any status code, including 200, 401, or 500
         // We will handle this in the component
-        const result: ApiResponse<{ user: User } | null, null> =
-            await response.json();
+        const result: ApiResponse<{ user: User } | null, null> = await response.json();
         return [result, response];
     } catch (error: unknown) {
         console.error(error);
@@ -59,8 +58,7 @@ export const login = async (
 
         // Can be any status code, including 200, 401, or 500
         // We will handle this in the component
-        const result: ApiResponse<{ user: User } | null, null> =
-            await response.json();
+        const result: ApiResponse<{ user: User } | null, null> = await response.json();
         return [result, response];
     } catch (error: unknown) {
         console.error(error);
@@ -76,9 +74,7 @@ export const login = async (
     }
 };
 
-export const refresh = async (): Promise<
-    [ApiResponse<{ user: User } | null, null>, Response | null]
-> => {
+export const refresh = async (): Promise<[ApiResponse<{ user: User } | null, null>, Response | null]> => {
     try {
         const response = await customFetch(
             API_URL + '/refresh',
@@ -94,8 +90,7 @@ export const refresh = async (): Promise<
 
         // Can be any status code, including 200, 401, or 500
         // We will handle this in the component
-        const result: ApiResponse<{ user: User } | null, null> =
-            await response.json();
+        const result: ApiResponse<{ user: User } | null, null> = await response.json();
         return [result, response];
     } catch (error: unknown) {
         console.error(error);
@@ -111,9 +106,7 @@ export const refresh = async (): Promise<
     }
 };
 
-export const logout = async (): Promise<
-    [ApiResponse<null, null>, Response | null]
-> => {
+export const logout = async (): Promise<[ApiResponse<null, null>, Response | null]> => {
     try {
         const response = await customFetch(API_URL + '/logout', {
             method: 'POST',

@@ -16,8 +16,7 @@ const Home = () => {
             const label = `${monthStr}/${baseYear}`;
             const value = `${baseYear}-${monthStr}`;
 
-            const isCurrent =
-                baseYear === currentDate.getFullYear() && m === currentMonth;
+            const isCurrent = baseYear === currentDate.getFullYear() && m === currentMonth;
 
             list.push({ label, value, isCurrent });
         }
@@ -53,9 +52,7 @@ const Home = () => {
                     ←
                 </button>
 
-                <div className="text-lg font-semibold text-center">
-                    {baseYear}
-                </div>
+                <div className="text-lg font-semibold text-center">{baseYear}</div>
 
                 <button
                     onClick={() => setYearOffset((prev) => prev + 1)}
@@ -71,15 +68,10 @@ const Home = () => {
                     const monthNumber = index + 1;
                     const isPast =
                         baseYear < currentDate.getFullYear() ||
-                        (baseYear === currentDate.getFullYear() &&
-                            monthNumber < currentMonth);
+                        (baseYear === currentDate.getFullYear() && monthNumber < currentMonth);
 
                     return (
-                        <Link
-                            key={month.value}
-                            to={`/month/${month.value}`}
-                            className="w-full"
-                        >
+                        <Link key={month.value} to={`/month/${month.value}`} className="w-full">
                             <div
                                 className={`rounded-lg p-6 w-full h-24 flex items-center justify-center text-center cursor-pointer transition
                                     ${

@@ -28,10 +28,7 @@ const Navbar = () => {
             {/* Partie gauche : logo + liens */}
             <div className="flex items-center gap-6">
                 {/* Logo */}
-                <NavLink
-                    to="/"
-                    className="text-xl font-bold text-gray-800 hover:text-blue-600 transition"
-                >
+                <NavLink to="/" className="text-xl font-bold text-gray-800 hover:text-blue-600 transition">
                     Ledge
                 </NavLink>
 
