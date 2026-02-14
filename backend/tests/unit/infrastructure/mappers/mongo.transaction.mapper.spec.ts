@@ -57,5 +57,18 @@ describe('MongoTransactionMapper', () => {
             expect(result).toEqual(originalIncome);
             expect(result.expenseCategory).toBeNull();
         });
+
+        it('should map an EXPENSE document without category back to null (handling optional field)', () => {
+            const expenseWithNullCategory = fakeExpenseTransaction({ expenseCategory: null });
+            const document = toTransactionDocument(expenseWithNullCategory);
+
+            expect(document).not.toHaveProperty('expenseCategory');
+
+            const result = toTransaction(document);
+
+            expect(result.type).toBe('expense');
+            expect(result.expenseCategory).toBeNull();
+            expect(result).toEqual(expenseWithNullCategory);
+        });
     });
 });
