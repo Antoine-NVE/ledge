@@ -1,10 +1,11 @@
 import type { Express } from 'express';
 import { Server } from 'node:http';
 import { fail, ok, type Result } from '../core/result.js';
+import type { Env } from '../infrastructure/config/env.js';
 
 type Input = {
     app: Express;
-    port: number;
+    port: Env['port'];
 };
 
 type Output = {

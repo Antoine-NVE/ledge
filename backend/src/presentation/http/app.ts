@@ -22,6 +22,7 @@ import { requestLoggerMiddleware } from './middlewares/request-logger.middleware
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import { routes } from './routes/routes.js';
 import type { ApiError } from '@shared/api/api-response.js';
+import type { Env } from '../../infrastructure/config/env.js';
 
 type Input = {
     logger: Logger;
@@ -40,7 +41,7 @@ type Input = {
     requestEmailVerificationUseCase: RequestEmailVerificationUseCase;
     verifyEmailUseCase: VerifyEmailUseCase;
     getCurrentUserUseCase: GetCurrentUserUseCase;
-    allowedOrigins: string[];
+    allowedOrigins: Env['allowedOrigins'];
 };
 
 export const createHttpApp = ({

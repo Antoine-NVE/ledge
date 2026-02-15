@@ -19,6 +19,7 @@ import { RequestEmailVerificationUseCase } from '../application/user/request-ema
 import { VerifyEmailUseCase } from '../application/user/verify-email.use-case.js';
 import { GetCurrentUserUseCase } from '../application/user/get-current-user.use-case.js';
 import type { TokenGenerator } from '../domain/ports/token-generator.js';
+import type { Env } from '../infrastructure/config/env.js';
 
 type Input = {
     tokenManager: TokenManager;
@@ -30,7 +31,7 @@ type Input = {
     userRepository: UserRepository;
     transactionRepository: TransactionRepository;
     refreshTokenRepository: RefreshTokenRepository;
-    emailFrom: string;
+    emailFrom: Env['emailFrom'];
 };
 
 export const buildContainer = ({

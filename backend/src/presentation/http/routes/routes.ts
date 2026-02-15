@@ -26,6 +26,7 @@ import { requestEmailVerificationRoute } from './user/request-email-verification
 import { verifyEmailRoute } from './user/verify-email.route.js';
 import { meRoute } from './user/me.route.js';
 import { docsRoute } from './docs/docs.route.js';
+import type { Env } from '../../../infrastructure/config/env.js';
 
 type Deps = {
     tokenManager: TokenManager;
@@ -46,7 +47,7 @@ type Deps = {
     verifyEmailUseCase: VerifyEmailUseCase;
     getCurrentUserUseCase: GetCurrentUserUseCase;
 
-    allowedOrigins: string[];
+    allowedOrigins: Env['allowedOrigins'];
 };
 
 export const routes = (

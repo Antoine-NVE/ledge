@@ -1,8 +1,9 @@
 import pino, { type Logger as BaseLogger } from 'pino';
+import type { Env } from './env.js';
 
 type Input = {
-    nodeEnv: 'development' | 'production';
-    lokiUrl: string;
+    nodeEnv: Env['nodeEnv'];
+    lokiUrl: Env['lokiUrl'];
 };
 
 type Output = BaseLogger;

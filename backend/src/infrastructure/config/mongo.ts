@@ -1,8 +1,9 @@
 import { Db, MongoClient } from 'mongodb';
 import { fail, ok, type Result } from '../../core/result.js';
+import type { Env } from './env.js';
 
 type Input = {
-    mongoUrl: string;
+    mongoUrl: Env['mongoUrl'];
 };
 
 type Output = {

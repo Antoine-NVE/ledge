@@ -1,8 +1,9 @@
 import { createClient, type RedisClientType } from 'redis';
 import { fail, ok, type Result } from '../../core/result.js';
+import type { Env } from './env.js';
 
 type Input = {
-    redisUrl: string;
+    redisUrl: Env['redisUrl'];
 };
 
 type Output = {

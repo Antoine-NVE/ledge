@@ -2,8 +2,11 @@ import z, { type ZodType } from 'zod';
 import type { RequestEmailVerificationSchema } from '@shared/schemas/user/request-email-verification.schema.js';
 import type { VerifyEmailSchema } from '@shared/schemas/user/verify-email.schema.js';
 import type { MeSchema } from '@shared/schemas/user/me.schema.js';
+import type { Env } from '../../infrastructure/config/env.js';
 
-export const requestEmailVerificationSchema = (allowedOrigins: string[]): ZodType<RequestEmailVerificationSchema> => {
+export const requestEmailVerificationSchema = (
+    allowedOrigins: Env['allowedOrigins'],
+): ZodType<RequestEmailVerificationSchema> => {
     return z.object({
         body: z.object({
             frontendBaseUrl: z.url().refine((value) => allowedOrigins.includes(value)),

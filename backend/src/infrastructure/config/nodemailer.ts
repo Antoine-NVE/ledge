@@ -1,8 +1,9 @@
 import { createTransport, type Transporter } from 'nodemailer';
 import { fail, ok, type Result } from '../../core/result.js';
+import type { Env } from './env.js';
 
 type Input = {
-    smtpUrl: string;
+    smtpUrl: Env['smtpUrl'];
 };
 
 type Output = {
