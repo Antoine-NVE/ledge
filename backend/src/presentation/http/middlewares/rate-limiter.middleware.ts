@@ -11,7 +11,7 @@ export const rateLimiterMiddleware = () => {
                 success: false,
                 code: 'TOO_MANY_REQUESTS',
             };
-            res.json(429).json(response);
+            res.status(429).json(response);
         },
     });
 };
