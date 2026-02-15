@@ -2,6 +2,7 @@ import { ApiResponse } from '@shared/api/api-response.ts';
 import { RequestEmailVerificationSchema } from '@shared/schemas/user/request-email-verification.schema.ts';
 import { VerifyEmailSchema } from '@shared/schemas/user/verify-email.schema.ts';
 import { MeSchema } from '@shared/schemas/user/me.schema.ts';
+import { MeDto } from '@shared/dto/user/me.dto.ts';
 
 export const requestEmailVerification = async (
     body: RequestEmailVerificationSchema['body'],
@@ -45,7 +46,7 @@ export const verifyEmail = async (body: VerifyEmailSchema['body']): Promise<ApiR
     }
 };
 
-export const me = async (): Promise<ApiResponse<void, MeSchema>> => {
+export const me = async (): Promise<ApiResponse<MeDto, MeSchema>> => {
     try {
         const response = await fetch(import.meta.env.VITE_API_URL + '/users/me', {
             method: 'GET',
