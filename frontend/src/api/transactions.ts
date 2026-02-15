@@ -1,18 +1,14 @@
 import { ApiResponse } from '@shared/api/api-response.ts';
-import { CreateTransactionDto } from '@shared/dto/transaction/create.dto.ts';
 import { CreateTransactionSchema } from '@shared/schemas/transaction/create.schema.ts';
-import { ReadAllTransactionsDto } from '@shared/dto/transaction/read-all.dto.ts';
 import { ReadAllTransactionSchema } from '@shared/schemas/transaction/read-all.schema.ts';
-import { ReadTransactionDto } from '@shared/dto/transaction/read.dto.ts';
 import { ReadTransactionSchema } from '@shared/schemas/transaction/read.schema.ts';
-import { UpdateTransactionDto } from '@shared/dto/transaction/update.dto.ts';
 import { UpdateTransactionSchema } from '@shared/schemas/transaction/update.schema.ts';
-import { DeleteTransactionDto } from '@shared/dto/transaction/delete.dto.ts';
 import { DeleteTransactionSchema } from '@shared/schemas/transaction/delete.schema.ts';
+import { TransactionDto } from '@shared/dto/transaction.dto.ts';
 
 export const createTransaction = async (
     body: CreateTransactionSchema['body'],
-): Promise<ApiResponse<CreateTransactionDto, CreateTransactionSchema>> => {
+): Promise<ApiResponse<TransactionDto, CreateTransactionSchema>> => {
     try {
         const response = await fetch(import.meta.env.VITE_API_URL + '/transactions', {
             method: 'POST',
@@ -32,7 +28,7 @@ export const createTransaction = async (
     }
 };
 
-export const readAllTransactions = async (): Promise<ApiResponse<ReadAllTransactionsDto, ReadAllTransactionSchema>> => {
+export const readAllTransactions = async (): Promise<ApiResponse<TransactionDto[], ReadAllTransactionSchema>> => {
     try {
         const response = await fetch(import.meta.env.VITE_API_URL + '/transactions', {
             method: 'GET',
@@ -53,7 +49,7 @@ export const readAllTransactions = async (): Promise<ApiResponse<ReadAllTransact
 
 export const readTransaction = async (
     params: ReadTransactionSchema['params'],
-): Promise<ApiResponse<ReadTransactionDto, ReadTransactionSchema>> => {
+): Promise<ApiResponse<TransactionDto, ReadTransactionSchema>> => {
     try {
         const response = await fetch(import.meta.env.VITE_API_URL + '/transactions/' + params.transactionId, {
             method: 'GET',
@@ -75,7 +71,7 @@ export const readTransaction = async (
 export const updateTransaction = async (
     body: UpdateTransactionSchema['body'],
     params: UpdateTransactionSchema['params'],
-): Promise<ApiResponse<UpdateTransactionDto, UpdateTransactionSchema>> => {
+): Promise<ApiResponse<TransactionDto, UpdateTransactionSchema>> => {
     try {
         const response = await fetch(import.meta.env.VITE_API_URL + '/transactions/' + params.transactionId, {
             method: 'PUT',
@@ -97,7 +93,7 @@ export const updateTransaction = async (
 
 export const deleteTransaction = async (
     params: DeleteTransactionSchema['params'],
-): Promise<ApiResponse<DeleteTransactionDto, DeleteTransactionSchema>> => {
+): Promise<ApiResponse<TransactionDto, DeleteTransactionSchema>> => {
     try {
         const response = await fetch(import.meta.env.VITE_API_URL + '/transactions/' + params.transactionId, {
             method: 'DELETE',

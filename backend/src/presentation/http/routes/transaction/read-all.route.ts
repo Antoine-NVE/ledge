@@ -3,11 +3,11 @@ import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { GetUserTransactionsUseCase } from '../../../../application/transaction/get-user-transactions.use-case.js';
 import type { Request, Response } from 'express';
 import type { ApiSuccess } from '@shared/api/api-response.js';
-import type { ReadAllTransactionsDto } from '@shared/dto/transaction/read-all.dto.js';
-import { toReadAllTransactionsDto } from '../../../mappers/transaction/read-all.mapper.js';
 import { readAllTransactionsSchema } from '../../../schemas/transaction.schemas.js';
 import { validateOrThrow } from '../../helpers/validate.js';
 import { authenticateOrThrow } from '../../helpers/authenticate.js';
+import type { TransactionDto } from '@shared/dto/transaction.dto.js';
+import { toTransactionDto } from '../../../mappers/transaction.mapper.js';
 
 type Deps = {
     getUserTransactionsUseCase: GetUserTransactionsUseCase;
@@ -40,9 +40,9 @@ export const readAllTransactionsHandler = ({ getUserTransactionsUseCase, tokenMa
 
         const { transactions } = await getUserTransactionsUseCase.execute({ userId });
 
-        const response: ApiSuccess<ReadAllTransactionsDto> = {
+        const response: ApiSuccess<TransactionDto[]> = {
             success: true,
-            data: toReadAllTransactionsDto(transactions),
+            data: transactions.map((transaction) => toTransactionDto(transaction)),
         };
         res.status(200).json(response);
     };

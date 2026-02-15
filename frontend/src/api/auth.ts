@@ -1,12 +1,11 @@
 import { ApiResponse } from '@shared/api/api-response.ts';
 import { RegisterSchema } from '@shared/schemas/auth/register.schema.ts';
-import { RegisterDto } from '@shared/dto/auth/register.dto.ts';
 import { LoginSchema } from '@shared/schemas/auth/login.schema.ts';
-import { LoginDto } from '@shared/dto/auth/login.dto.ts';
 import { RefreshSchema } from '@shared/schemas/auth/refresh.schema.ts';
 import { LogoutSchema } from '@shared/schemas/auth/logout.schema.ts';
+import { UserDto } from '@shared/dto/user.dto.ts';
 
-export const register = async (body: RegisterSchema['body']): Promise<ApiResponse<RegisterDto, RegisterSchema>> => {
+export const register = async (body: RegisterSchema['body']): Promise<ApiResponse<UserDto, RegisterSchema>> => {
     try {
         const response = await fetch(import.meta.env.VITE_API_URL + '/auth/register', {
             method: 'POST',
@@ -26,7 +25,7 @@ export const register = async (body: RegisterSchema['body']): Promise<ApiRespons
     }
 };
 
-export const login = async (body: LoginSchema['body']): Promise<ApiResponse<LoginDto, LoginSchema>> => {
+export const login = async (body: LoginSchema['body']): Promise<ApiResponse<UserDto, LoginSchema>> => {
     try {
         const response = await fetch(import.meta.env.VITE_API_URL + '/auth/login', {
             method: 'POST',

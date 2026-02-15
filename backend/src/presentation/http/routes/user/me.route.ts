@@ -2,13 +2,13 @@ import type { Router } from 'express';
 import type { GetCurrentUserUseCase } from '../../../../application/user/get-current-user.use-case.js';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import type { Request, Response } from 'express';
-import { toMeDto } from '../../../mappers/user/me.mapper.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
-import type { MeDto } from '@shared/dto/user/me.dto.js';
 import { meSchema } from '../../../schemas/user.schemas.js';
 import { UnauthorizedError } from '../../errors/unauthorized.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
 import { authenticateOrThrow } from '../../helpers/authenticate.js';
+import type { UserDto } from '@shared/dto/user.dto.js';
+import { toUserDto } from '../../../mappers/user.mapper.js';
 
 type Deps = {
     getCurrentUserUseCase: GetCurrentUserUseCase;
@@ -48,9 +48,9 @@ export const meHandler = ({ getCurrentUserUseCase, tokenManager }: Deps) => {
         }
         const { user } = result.data;
 
-        const response: ApiSuccess<MeDto> = {
+        const response: ApiSuccess<UserDto> = {
             success: true,
-            data: toMeDto(user),
+            data: toUserDto(user),
         };
         res.status(200).json(response);
     };

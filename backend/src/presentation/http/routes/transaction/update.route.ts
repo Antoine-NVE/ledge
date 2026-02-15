@@ -5,12 +5,12 @@ import type { Request, Response } from 'express';
 import type { IdManager } from '../../../../domain/ports/id-manager.js';
 import { updateTransactionSchema } from '../../../schemas/transaction.schemas.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
-import type { UpdateTransactionDto } from '@shared/dto/transaction/update.dto.js';
-import { toUpdateTransactionDto } from '../../../mappers/transaction/update.mapper.js';
 import { ForbiddenError } from '../../errors/forbidden.error.js';
 import { TransactionNotFoundError } from '../../errors/transaction-not-found.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
 import { authenticateOrThrow } from '../../helpers/authenticate.js';
+import type { TransactionDto } from '@shared/dto/transaction.dto.js';
+import { toTransactionDto } from '../../../mappers/transaction.mapper.js';
 
 type Deps = {
     updateTransactionUseCase: UpdateTransactionUseCase;
@@ -88,9 +88,9 @@ export const updateTransactionHandler = ({ updateTransactionUseCase, tokenManage
         }
         const { transaction } = result.data;
 
-        const response: ApiSuccess<UpdateTransactionDto> = {
+        const response: ApiSuccess<TransactionDto> = {
             success: true,
-            data: toUpdateTransactionDto(transaction),
+            data: toTransactionDto(transaction),
         };
         res.status(200).json(response);
     };

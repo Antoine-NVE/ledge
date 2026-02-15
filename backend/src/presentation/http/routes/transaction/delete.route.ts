@@ -5,12 +5,12 @@ import type { IdManager } from '../../../../domain/ports/id-manager.js';
 import type { Request, Response } from 'express';
 import { deleteTransactionSchema } from '../../../schemas/transaction.schemas.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
-import type { DeleteTransactionDto } from '@shared/dto/transaction/delete.dto.js';
-import { toDeleteTransactionDto } from '../../../mappers/transaction/delete.mapper.js';
 import { ForbiddenError } from '../../errors/forbidden.error.js';
 import { TransactionNotFoundError } from '../../errors/transaction-not-found.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
 import { authenticateOrThrow } from '../../helpers/authenticate.js';
+import type { TransactionDto } from '@shared/dto/transaction.dto.js';
+import { toTransactionDto } from '../../../mappers/transaction.mapper.js';
 
 type Deps = {
     deleteTransactionUseCase: DeleteTransactionUseCase;
@@ -62,9 +62,9 @@ export const deleteTransactionHandler = ({ deleteTransactionUseCase, tokenManage
         }
         const { transaction } = result.data;
 
-        const response: ApiSuccess<DeleteTransactionDto> = {
+        const response: ApiSuccess<TransactionDto> = {
             success: true,
-            data: toDeleteTransactionDto(transaction),
+            data: toTransactionDto(transaction),
         };
         res.status(200).json(response);
     };

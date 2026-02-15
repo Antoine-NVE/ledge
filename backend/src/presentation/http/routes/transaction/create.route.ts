@@ -4,10 +4,10 @@ import type { Request, Response } from 'express';
 import type { TokenManager } from '../../../../domain/ports/token-manager.js';
 import { createTransactionSchema } from '../../../schemas/transaction.schemas.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
-import type { CreateTransactionDto } from '@shared/dto/transaction/create.dto.js';
-import { toCreateTransactionDto } from '../../../mappers/transaction/create.mapper.js';
 import { validateOrThrow } from '../../helpers/validate.js';
 import { authenticateOrThrow } from '../../helpers/authenticate.js';
+import type { TransactionDto } from '@shared/dto/transaction.dto.js';
+import { toTransactionDto } from '../../../mappers/transaction.mapper.js';
 
 type Deps = {
     createTransactionUseCase: CreateTransactionUseCase;
@@ -74,9 +74,9 @@ export const createTransactionHandler = ({ createTransactionUseCase, tokenManage
             req.logger,
         );
 
-        const response: ApiSuccess<CreateTransactionDto> = {
+        const response: ApiSuccess<TransactionDto> = {
             success: true,
-            data: toCreateTransactionDto(transaction),
+            data: toTransactionDto(transaction),
         };
         res.status(201).json(response);
     };

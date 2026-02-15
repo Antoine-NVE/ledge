@@ -5,12 +5,12 @@ import type { Request, Response } from 'express';
 import type { IdManager } from '../../../../domain/ports/id-manager.js';
 import { readTransactionSchema } from '../../../schemas/transaction.schemas.js';
 import type { ApiSuccess } from '@shared/api/api-response.js';
-import type { ReadTransactionDto } from '@shared/dto/transaction/read.dto.js';
-import { toReadTransactionDto } from '../../../mappers/transaction/read.mapper.js';
 import { ForbiddenError } from '../../errors/forbidden.error.js';
 import { TransactionNotFoundError } from '../../errors/transaction-not-found.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
 import { authenticateOrThrow } from '../../helpers/authenticate.js';
+import type { TransactionDto } from '@shared/dto/transaction.dto.js';
+import { toTransactionDto } from '../../../mappers/transaction.mapper.js';
 
 type Deps = {
     getTransactionUseCase: GetTransactionUseCase;
@@ -59,9 +59,9 @@ export const readTransactionHandler = ({ getTransactionUseCase, tokenManager, id
         }
         const { transaction } = result.data;
 
-        const response: ApiSuccess<ReadTransactionDto> = {
+        const response: ApiSuccess<TransactionDto> = {
             success: true,
-            data: toReadTransactionDto(transaction),
+            data: toTransactionDto(transaction),
         };
         res.status(200).json(response);
     };

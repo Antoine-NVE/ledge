@@ -2,12 +2,12 @@ import type { Router } from 'express';
 import type { RegisterUseCase } from '../../../../application/auth/register.use-case.js';
 import { registerSchema } from '../../../schemas/auth.schemas.js';
 import { setAuthCookies } from '../../helpers/cookies.js';
-import { toRegisterDto } from '../../../mappers/auth/register.mapper.js';
 import type { Request, Response } from 'express';
 import type { ApiSuccess } from '@shared/api/api-response.js';
-import type { RegisterDto } from '@shared/dto/auth/register.dto.js';
 import { DuplicateEmailError } from '../../errors/duplicate-email.error.js';
 import { validateOrThrow } from '../../helpers/validate.js';
+import type { UserDto } from '@shared/dto/user.dto.js';
+import { toUserDto } from '../../../mappers/user.mapper.js';
 
 type Deps = {
     registerUseCase: RegisterUseCase;
@@ -66,9 +66,9 @@ export const registerHandler = ({ registerUseCase }: Deps) => {
 
         setAuthCookies(res, accessToken, refreshToken, false);
 
-        const response: ApiSuccess<RegisterDto> = {
+        const response: ApiSuccess<UserDto> = {
             success: true,
-            data: toRegisterDto(user),
+            data: toUserDto(user),
         };
         res.status(201).json(response);
     };
