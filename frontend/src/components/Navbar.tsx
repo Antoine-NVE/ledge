@@ -1,38 +1,28 @@
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { logout } from '../api/auth';
 import { useState } from 'react';
-import useUser from '../hooks/useUser';
+import { useAuth } from '../contexts/AuthContext.tsx';
 
 const Navbar = () => {
     const [isLoading, setIsLoading] = useState(false);
-    const { setUser } = useUser();
-    const navigate = useNavigate();
+
+    const { setUser } = useAuth();
 
     const handleLogout = async () => {
         setIsLoading(true);
-        const [result, response] = await logout();
-        if (!response || !response.ok) {
-            console.error(result.message);
 
-            setIsLoading(false);
-            return;
-        }
+        await logout(); // We don't really care if an error occurred
 
-        setUser(null);
-        navigate('/login');
-        setIsLoading(false);
+        setUser(null); // The main component should redirect us to the login page
     };
 
     return (
         <nav className="bg-white shadow px-6 py-4 flex items-center justify-between">
-            {/* Partie gauche : logo + liens */}
             <div className="flex items-center gap-6">
-                {/* Logo */}
                 <NavLink to="/" className="text-xl font-bold text-gray-800 hover:text-blue-600 transition">
                     Ledge
                 </NavLink>
 
-                {/* Liens de navigation */}
                 <NavLink
                     to="/"
                     end
@@ -46,12 +36,9 @@ const Navbar = () => {
                 >
                     Home
                 </NavLink>
-
-                {/* Tu peux ajouter d'autres liens ici si besoin */}
             </div>
 
             <div className="flex items-center gap-4">
-                {/* Profile */}
                 <NavLink
                     to="/profile"
                     className={({ isActive }) =>
