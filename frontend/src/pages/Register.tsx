@@ -1,146 +1,153 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { FormEvent, useState } from 'react';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import type { $ZodErrorTree } from 'zod/v4/core';
 import { register } from '../api/auth';
-
-interface Form {
-    email: string;
-    password: string;
-    confirmPassword: string;
-}
-
-interface FormErrors {
-    email?: string[];
-    password?: string[];
-    confirmPassword?: string[];
-}
+import { useAuth } from '../contexts/AuthContext';
+import type { RegisterSchema } from '@shared/schemas/auth/register.schema';
 
 const Register = () => {
-    const [form, setForm] = useState<Form>({
-        email: '',
-        password: '',
-        confirmPassword: '',
-    });
-    const [formErrors, setFormErrors] = useState<FormErrors>({});
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
     const navigate = useNavigate();
+    const { user, setUser } = useAuth();
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
-        setFormErrors((prev) => {
-            const updated = { ...prev };
-            delete updated[name as keyof FormErrors];
-            return updated;
-        });
-        setError(null);
-    };
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [globalError, setGlobalError] = useState<string | null>(null);
+
+    const [fieldErrors, setFieldErrors] = useState<$ZodErrorTree<RegisterSchema['body']> | null>(null);
+
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+
         setIsLoading(true);
-        setError(null);
-        setSuccess(null);
+        setGlobalError(null);
+        setFieldErrors(null);
 
-        const [result, response] = await register(form.email, form.password, form.confirmPassword);
+        const response = await register({ email, password, confirmPassword });
 
-        if (!response || !response.ok) {
-            setError(result.message);
-            setFormErrors(result.fields || {});
-            setIsLoading(false);
-            return;
-        }
-
-        setSuccess(result.message);
         setIsLoading(false);
-        navigate('/');
+
+        if (response.success) {
+            setUser(response.data);
+            navigate('/');
+        } else {
+            if (response.code === 'BAD_REQUEST' && response.tree.properties?.body) {
+                setFieldErrors(response.tree.properties.body);
+            } else {
+                setGlobalError(response.code);
+            }
+        }
     };
 
-    const inputBaseClass = 'w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500';
+    const properties = fieldErrors?.properties;
+
+    if (user) return <Navigate to="/" replace />;
 
     return (
-        <div className="flex min-h-screen items-center justify-center bg-gray-100">
-            <div className="w-full max-w-md bg-white rounded-lg shadow-md p-8">
-                <h2 className="text-2xl font-bold mb-6 text-center">Create an Account</h2>
+        <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+            <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+                <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Create an Account</h2>
 
-                {error && <div className="mb-4 text-red-600 text-center">{error}</div>}
-                {success && <div className="mb-4 text-green-600 text-center">{success}</div>}
-
-                <form className="space-y-5" onSubmit={handleSubmit}>
+                <form onSubmit={handleSubmit} className="space-y-6" noValidate>
                     <div>
-                        <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                            htmlFor="email"
+                            className="block text-sm font-medium text-gray-700 mb-1 cursor-pointer select-none"
+                        >
                             Email
                         </label>
                         <input
-                            name="email"
+                            type="email"
                             id="email"
-                            type="text"
-                            value={form.email}
-                            onChange={handleChange}
-                            disabled={isLoading}
-                            className={`${inputBaseClass} ${formErrors.email ? 'border-red-500' : 'border-gray-300'}`}
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
+                                ${
+                                    properties?.email?.errors?.length
+                                        ? 'border-red-500 focus:ring-red-200'
+                                        : 'border-gray-300'
+                                }`}
+                            required
                         />
-                        {formErrors.email && formErrors.email[0] && (
-                            <p className="mt-1 text-xs text-red-600">{formErrors.email[0]}</p>
+                        {properties?.email?.errors?.[0] && (
+                            <p className="mt-1 text-xs text-red-600">{properties.email.errors[0]}</p>
                         )}
                     </div>
 
                     <div>
-                        <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                            htmlFor="password"
+                            className="block text-sm font-medium text-gray-700 mb-1 cursor-pointer select-none"
+                        >
                             Password
                         </label>
                         <input
-                            name="password"
-                            id="password"
                             type="password"
-                            value={form.password}
-                            onChange={handleChange}
-                            disabled={isLoading}
-                            className={`${inputBaseClass} ${
-                                formErrors.password ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            id="password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
+                                ${
+                                    properties?.password?.errors?.length
+                                        ? 'border-red-500 focus:ring-red-200'
+                                        : 'border-gray-300'
+                                }`}
+                            required
                         />
-                        {formErrors.password && formErrors.password[0] && (
-                            <p className="mt-1 text-xs text-red-600">{formErrors.password[0]}</p>
+                        {properties?.password?.errors?.[0] && (
+                            <p className="mt-1 text-xs text-red-600">{properties.password.errors[0]}</p>
                         )}
                     </div>
 
                     <div>
-                        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+                        <label
+                            htmlFor="confirmPassword"
+                            className="block text-sm font-medium text-gray-700 mb-1 cursor-pointer select-none"
+                        >
                             Confirm Password
                         </label>
                         <input
-                            name="confirmPassword"
-                            id="confirmPassword"
                             type="password"
-                            value={form.confirmPassword}
-                            onChange={handleChange}
-                            disabled={isLoading}
-                            className={`${inputBaseClass} ${
-                                formErrors.confirmPassword ? 'border-red-500' : 'border-gray-300'
-                            }`}
+                            id="confirmPassword"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
+                                ${
+                                    properties?.confirmPassword?.errors?.length
+                                        ? 'border-red-500 focus:ring-red-200'
+                                        : 'border-gray-300'
+                                }`}
+                            required
                         />
-                        {formErrors.confirmPassword && formErrors.confirmPassword[0] && (
-                            <p className="mt-1 text-xs text-red-600">{formErrors.confirmPassword[0]}</p>
+                        {properties?.confirmPassword?.errors?.[0] && (
+                            <p className="mt-1 text-xs text-red-600">{properties.confirmPassword.errors[0]}</p>
                         )}
                     </div>
 
+                    {globalError && (
+                        <div className="p-3 rounded bg-red-50 text-red-600 text-sm text-center font-medium border border-red-100">
+                            {globalError}
+                        </div>
+                    )}
+
                     <button
                         type="submit"
-                        className="w-full py-2 px-4 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition"
                         disabled={isLoading}
+                        className={`w-full text-white font-semibold py-2 px-4 rounded transition duration-200 select-none
+                            ${isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'}`}
                     >
                         {isLoading ? 'Registering...' : 'Register'}
                     </button>
                 </form>
 
-                <p className="mt-4 text-center text-sm text-gray-600">
+                <div className="mt-6 text-center text-sm text-gray-600">
                     Already have an account?{' '}
-                    <Link to="/login" className="text-blue-600 hover:underline">
+                    <Link to="/login" className="text-blue-600 hover:underline font-medium">
                         Login
                     </Link>
-                </p>
+                </div>
             </div>
         </div>
     );
