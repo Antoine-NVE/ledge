@@ -3,21 +3,26 @@ import { RequestEmailVerificationSchema } from '@shared/schemas/user/request-ema
 import { VerifyEmailSchema } from '@shared/schemas/user/verify-email.schema.ts';
 import { MeSchema } from '@shared/schemas/user/me.schema.ts';
 import { UserDto } from '@shared/dto/user.dto.ts';
+import axios from 'axios';
+
+const usersApi = axios.create({
+    baseURL: import.meta.env.VITE_API_URL + '/users',
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    validateStatus: () => true,
+});
 
 export const requestEmailVerification = async (
     body: RequestEmailVerificationSchema['body'],
 ): Promise<ApiResponse<void, RequestEmailVerificationSchema>> => {
     try {
-        const response = await fetch(import.meta.env.VITE_API_URL + '/users/request-email-verification', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-        });
-
-        return await response.json();
+        const response = await usersApi.post<ApiResponse<void, RequestEmailVerificationSchema>>(
+            '/request-email-verification',
+            body,
+        );
+        return response.data;
     } catch {
         return {
             success: false,
@@ -28,16 +33,8 @@ export const requestEmailVerification = async (
 
 export const verifyEmail = async (body: VerifyEmailSchema['body']): Promise<ApiResponse<void, VerifyEmailSchema>> => {
     try {
-        const response = await fetch(import.meta.env.VITE_API_URL + `/users/verify-email`, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-        });
-
-        return await response.json();
+        const response = await usersApi.post<ApiResponse<void, VerifyEmailSchema>>('/verify-email', body);
+        return response.data;
     } catch {
         return {
             success: false,
@@ -48,15 +45,8 @@ export const verifyEmail = async (body: VerifyEmailSchema['body']): Promise<ApiR
 
 export const me = async (): Promise<ApiResponse<UserDto, MeSchema>> => {
     try {
-        const response = await fetch(import.meta.env.VITE_API_URL + '/users/me', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        return await response.json();
+        const response = await usersApi.get<ApiResponse<UserDto, MeSchema>>('/me');
+        return response.data;
     } catch {
         return {
             success: false,

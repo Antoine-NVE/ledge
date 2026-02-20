@@ -4,19 +4,21 @@ import { LoginSchema } from '@shared/schemas/auth/login.schema.ts';
 import { RefreshSchema } from '@shared/schemas/auth/refresh.schema.ts';
 import { LogoutSchema } from '@shared/schemas/auth/logout.schema.ts';
 import { UserDto } from '@shared/dto/user.dto.ts';
+import axios from 'axios';
+
+const authApi = axios.create({
+    baseURL: import.meta.env.VITE_API_URL + '/auth',
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    validateStatus: () => true,
+});
 
 export const register = async (body: RegisterSchema['body']): Promise<ApiResponse<UserDto, RegisterSchema>> => {
     try {
-        const response = await fetch(import.meta.env.VITE_API_URL + '/auth/register', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-        });
-
-        return await response.json();
+        const response = await authApi.post<ApiResponse<UserDto, RegisterSchema>>('/register', body);
+        return response.data;
     } catch {
         return {
             success: false,
@@ -27,16 +29,8 @@ export const register = async (body: RegisterSchema['body']): Promise<ApiRespons
 
 export const login = async (body: LoginSchema['body']): Promise<ApiResponse<UserDto, LoginSchema>> => {
     try {
-        const response = await fetch(import.meta.env.VITE_API_URL + '/auth/login', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-        });
-
-        return await response.json();
+        const response = await authApi.post<ApiResponse<UserDto, LoginSchema>>('/login', body);
+        return response.data;
     } catch {
         return {
             success: false,
@@ -47,15 +41,8 @@ export const login = async (body: LoginSchema['body']): Promise<ApiResponse<User
 
 export const refresh = async (): Promise<ApiResponse<void, RefreshSchema>> => {
     try {
-        const response = await fetch(import.meta.env.VITE_API_URL + '/auth/refresh', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        return await response.json();
+        const response = await authApi.post<ApiResponse<void, RefreshSchema>>('/refresh');
+        return response.data;
     } catch {
         return {
             success: false,
@@ -66,15 +53,8 @@ export const refresh = async (): Promise<ApiResponse<void, RefreshSchema>> => {
 
 export const logout = async (): Promise<ApiResponse<void, LogoutSchema>> => {
     try {
-        const response = await fetch(import.meta.env.VITE_API_URL + '/auth/logout', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        return await response.json();
+        const response = await authApi.post<ApiResponse<void, LogoutSchema>>('/logout');
+        return response.data;
     } catch {
         return {
             success: false,

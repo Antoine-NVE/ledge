@@ -5,21 +5,23 @@ import { ReadTransactionSchema } from '@shared/schemas/transaction/read.schema.t
 import { UpdateTransactionSchema } from '@shared/schemas/transaction/update.schema.ts';
 import { DeleteTransactionSchema } from '@shared/schemas/transaction/delete.schema.ts';
 import { TransactionDto } from '@shared/dto/transaction.dto.ts';
+import axios from 'axios';
+
+const transactionsApi = axios.create({
+    baseURL: import.meta.env.VITE_API_URL + '/transactions',
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    validateStatus: () => true,
+});
 
 export const createTransaction = async (
     body: CreateTransactionSchema['body'],
 ): Promise<ApiResponse<TransactionDto, CreateTransactionSchema>> => {
     try {
-        const response = await fetch(import.meta.env.VITE_API_URL + '/transactions', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-        });
-
-        return await response.json();
+        const response = await transactionsApi.post<ApiResponse<TransactionDto, CreateTransactionSchema>>('', body);
+        return response.data;
     } catch {
         return {
             success: false,
@@ -30,15 +32,8 @@ export const createTransaction = async (
 
 export const readAllTransactions = async (): Promise<ApiResponse<TransactionDto[], ReadAllTransactionSchema>> => {
     try {
-        const response = await fetch(import.meta.env.VITE_API_URL + '/transactions', {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        return await response.json();
+        const response = await transactionsApi.get<ApiResponse<TransactionDto[], ReadAllTransactionSchema>>('');
+        return response.data;
     } catch {
         return {
             success: false,
@@ -51,15 +46,10 @@ export const readTransaction = async (
     params: ReadTransactionSchema['params'],
 ): Promise<ApiResponse<TransactionDto, ReadTransactionSchema>> => {
     try {
-        const response = await fetch(import.meta.env.VITE_API_URL + '/transactions/' + params.transactionId, {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        return await response.json();
+        const response = await transactionsApi.get<ApiResponse<TransactionDto, ReadTransactionSchema>>(
+            '/' + params.transactionId,
+        );
+        return response.data;
     } catch {
         return {
             success: false,
@@ -73,16 +63,11 @@ export const updateTransaction = async (
     params: UpdateTransactionSchema['params'],
 ): Promise<ApiResponse<TransactionDto, UpdateTransactionSchema>> => {
     try {
-        const response = await fetch(import.meta.env.VITE_API_URL + '/transactions/' + params.transactionId, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(body),
-        });
-
-        return await response.json();
+        const response = await transactionsApi.put<ApiResponse<TransactionDto, UpdateTransactionSchema>>(
+            '/' + params.transactionId,
+            body,
+        );
+        return response.data;
     } catch {
         return {
             success: false,
@@ -95,15 +80,10 @@ export const deleteTransaction = async (
     params: DeleteTransactionSchema['params'],
 ): Promise<ApiResponse<TransactionDto, DeleteTransactionSchema>> => {
     try {
-        const response = await fetch(import.meta.env.VITE_API_URL + '/transactions/' + params.transactionId, {
-            method: 'DELETE',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        return await response.json();
+        const response = await transactionsApi.delete<ApiResponse<TransactionDto, DeleteTransactionSchema>>(
+            '/' + params.transactionId,
+        );
+        return response.data;
     } catch {
         return {
             success: false,
