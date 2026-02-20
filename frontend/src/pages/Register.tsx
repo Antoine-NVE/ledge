@@ -2,8 +2,8 @@ import { FormEvent, useState } from 'react';
 import { Link, Navigate, useNavigate } from 'react-router-dom';
 import type { $ZodErrorTree } from 'zod/v4/core';
 import { register } from '../api/auth';
-import { useAuth } from '../contexts/AuthContext';
 import type { RegisterSchema } from '@shared/schemas/auth/register.schema';
+import { useAuth } from '../hooks/useAuth.ts';
 
 const Register = () => {
     const navigate = useNavigate();

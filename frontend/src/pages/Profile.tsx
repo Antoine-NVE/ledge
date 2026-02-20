@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext.tsx';
 import { requestEmailVerification } from '../api/users.ts';
 import { Navigate } from 'react-router-dom';
 import Navbar from '../components/Navbar.tsx';
+import { useAuth } from '../hooks/useAuth.ts';
 
 const Profile = () => {
     const [isSending, setIsSending] = useState(false);

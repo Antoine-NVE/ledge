@@ -4,10 +4,10 @@ import Navbar from '../components/Navbar';
 import TransactionListSection from '../components/TransactionListSection';
 import TransactionModal from '../components/TransactionModal';
 import DeleteTransactionModal from '../components/DeleteTransactionModal';
-import DateNavigator from '../components/DateNavigator'; // Import
-import { useAuth } from '../contexts/AuthContext';
+import DateNavigator from '../components/DateNavigator';
 import { readAllTransactions } from '../api/transactions';
 import type { TransactionDto } from '@shared/dto/transaction.dto';
+import { useAuth } from '../hooks/useAuth.ts';
 
 const Month = () => {
     const { user, isLoading: isUserLoading } = useAuth();

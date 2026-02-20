@@ -1,7 +1,7 @@
 import { NavLink } from 'react-router-dom';
 import { logout } from '../api/auth';
 import { useState } from 'react';
-import { useAuth } from '../contexts/AuthContext.tsx';
+import { useAuth } from '../hooks/useAuth.ts';
 
 const Navbar = () => {
     const [isLoading, setIsLoading] = useState(false);
