@@ -1,0 +1,75 @@
+import type { Router } from 'express';
+import type { RegisterUseCase } from '../../../../application/auth/register.use-case.js';
+import { registerSchema } from '../../../schemas/auth.schemas.js';
+import { setAuthCookies } from '../../helpers/cookies.js';
+import type { Request, Response } from 'express';
+import type { ApiSuccess } from '@shared/api/api-response.js';
+import { DuplicateEmailError } from '../../errors/duplicate-email.error.js';
+import { validateOrThrow } from '../../helpers/validate.js';
+import type { UserDto } from '@shared/dto/user.dto.js';
+import { toUserDto } from '../../../mappers/user.mapper.js';
+
+type Deps = {
+    registerUseCase: RegisterUseCase;
+};
+
+export const registerRoute = (router: Router, deps: Deps) => {
+    /**
+     * @openapi
+     * /auth/register:
+     *   post:
+     *     tags:
+     *       - Auth
+     *     summary: Register
+     *     requestBody:
+     *       required: true
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             required:
+     *               - email
+     *               - password
+     *               - confirmPassword
+     *             properties:
+     *               email:
+     *                 type: string
+     *               password:
+     *                 type: string
+     *               confirmPassword:
+     *                 type: string
+     *     responses:
+     *       201:
+     *         description: User registered successfully
+     *       400:
+     *         description: Validation error
+     *       409:
+     *         description: Duplicate email
+     *       500:
+     *         description: Internal server error
+     */
+    router.post('/auth/register', registerHandler(deps));
+};
+
+export const registerHandler = ({ registerUseCase }: Deps) => {
+    return async (req: Request, res: Response) => {
+        const { body } = validateOrThrow(req, registerSchema());
+
+        const result = await registerUseCase.execute({ email: body.email, password: body.password }, req.logger);
+        if (!result.success) {
+            switch (result.error) {
+                case 'DUPLICATE_EMAIL':
+                    throw new DuplicateEmailError();
+            }
+        }
+        const { user, accessToken, refreshToken } = result.data;
+
+        setAuthCookies(res, accessToken, refreshToken, false);
+
+        const response: ApiSuccess<UserDto> = {
+            success: true,
+            data: toUserDto(user),
+        };
+        res.status(201).json(response);
+    };
+};

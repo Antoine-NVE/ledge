@@ -1,7 +1,23 @@
-import { createClient, RedisClientType } from 'redis';
+import { createClient, type RedisClientType } from 'redis';
+import { fail, ok, type Result } from '../../core/result.js';
+import type { Env } from './env.js';
 
-export const connectToRedis = async ({ url }: { url: string }) => {
-    const client: RedisClientType = createClient({ url });
-    await client.connect();
-    return client;
+type Input = {
+    redisUrl: Env['redisUrl'];
+};
+
+type Output = {
+    redisClient: RedisClientType;
+};
+
+export const connectToRedis = async ({ redisUrl }: Input): Promise<Result<Output, unknown>> => {
+    try {
+        const redisClient: RedisClientType = createClient({ url: redisUrl });
+
+        await redisClient.connect();
+
+        return ok({ redisClient });
+    } catch (err: unknown) {
+        return fail(err);
+    }
 };

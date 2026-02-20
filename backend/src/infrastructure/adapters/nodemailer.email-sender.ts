@@ -1,0 +1,23 @@
+import type { Transporter } from 'nodemailer';
+import type { EmailSender } from '../../domain/ports/email-sender.js';
+
+export class NodemailerEmailSender implements EmailSender {
+    constructor(private transporter: Transporter) {}
+
+    sendEmailVerification = async ({
+        from,
+        to,
+        frontendBaseUrl,
+        emailVerificationToken,
+    }: {
+        from: string;
+        to: string;
+        frontendBaseUrl: string;
+        emailVerificationToken: string;
+    }): Promise<void> => {
+        const subject = 'Please verify your email address';
+        const html = `Click here to verify your email address: <a href="${frontendBaseUrl}/verify-email/${emailVerificationToken}">verify email</a>. This link will expire in 1 hour.`;
+
+        await this.transporter.sendMail({ from, to, subject, html });
+    };
+}

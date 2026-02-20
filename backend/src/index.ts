@@ -1,94 +1,86 @@
-import { loadEnv } from './infrastructure/config/env';
-import { createBaseLogger } from './infrastructure/config/pino';
-import { connectToRedis } from './infrastructure/config/redis';
-import { connectToMongo } from './infrastructure/config/mongo';
-import { PinoLogger } from './infrastructure/adapters/pino-logger';
-import { JwtTokenManager } from './infrastructure/adapters/jwt-token-manager';
-import { BcryptHasher } from './infrastructure/adapters/bcrypt-hasher';
-import { NodemailerEmailSender } from './infrastructure/adapters/nodemailer-email-sender';
-import { connectToSmtp } from './infrastructure/config/nodemailer';
-import { RedisCacheStore } from './infrastructure/adapters/redis-cache-store';
-import { MongoUserRepository } from './infrastructure/repositories/mongo-user-repository';
-import { MongoTransactionRepository } from './infrastructure/repositories/mongo-transaction-repository';
-import { MongoRefreshTokenRepository } from './infrastructure/repositories/mongo-refresh-token-repository';
-import { createHttpApp } from './presentation/http/app';
-import { buildContainer } from './presentation/container';
-import { startHttpServer } from './presentation/http/server';
-import { step } from './core/utils/lifecycle';
+import { loadEnv } from './infrastructure/config/env.js';
+import { createBaseLogger } from './infrastructure/config/pino.js';
+import { connectToRedis } from './infrastructure/config/redis.js';
+import { connectToMongo } from './infrastructure/config/mongo.js';
+import { PinoLogger } from './infrastructure/adapters/pino.logger.js';
+import { JwtTokenManager } from './infrastructure/adapters/jwt.token-manager.js';
+import { BcryptHasher } from './infrastructure/adapters/bcrypt.hasher.js';
+import { NodemailerEmailSender } from './infrastructure/adapters/nodemailer.email-sender.js';
+import { connectToSmtp } from './infrastructure/config/nodemailer.js';
+import { RedisCacheStore } from './infrastructure/adapters/redis.cache-store.js';
+import { MongoUserRepository } from './infrastructure/repositories/mongo.user.repository.js';
+import { MongoTransactionRepository } from './infrastructure/repositories/mongo.transaction.repository.js';
+import { MongoRefreshTokenRepository } from './infrastructure/repositories/mongo.refresh-token.repository.js';
+import { createHttpApp } from './presentation/http/app.js';
+import { buildContainer } from './presentation/container.js';
+import { startServer } from './presentation/server.js';
+import { fail, ok, type Result } from './core/result.js';
+import { MongoIdManager } from './infrastructure/adapters/mongo.id-manager.js';
+import { CryptoTokenGenerator } from './infrastructure/adapters/crypto.token-generator.js';
 
-const start = async () => {
-    // .env is not verified yet, but we need a logger now
-    const logger = new PinoLogger(
-        createBaseLogger({
-            nodeEnv:
-                process.env.NODE_ENV === 'production'
-                    ? 'production'
-                    : 'development',
-        }),
-    );
+// .env is not verified yet, but we need a logger now
+const logger = new PinoLogger(
+    createBaseLogger({
+        nodeEnv: process.env.NODE_ENV === 'development' ? 'development' : 'production',
+        lokiUrl: process.env.LOKI_URL || 'http://loki:3100',
+    }),
+);
 
-    const {
-        databaseUrl,
-        cacheUrl,
-        port,
-        smtpUrl,
-        tokenSecret,
-        emailFrom,
-        allowedOrigins,
-    } = await step('Environment validation', logger, async () => {
-        return loadEnv();
-    });
+const start = async (): Promise<Result<void, Error>> => {
+    const envResult = loadEnv();
+    if (!envResult.success) return fail(new Error('Failed to load environment', { cause: envResult.error }));
+    const { redisUrl, mongoUrl, smtpUrl, tokenSecret, emailFrom, allowedOrigins, port } = envResult.data;
+    logger.info('Environment loaded');
 
-    const client = await step('Redis connection', logger, async () => {
-        return await connectToRedis({ url: cacheUrl });
-    });
+    const redisResult = await connectToRedis({ redisUrl });
+    if (!redisResult.success) return fail(new Error('Failed to connect to redis', { cause: redisResult.error }));
+    const { redisClient } = redisResult.data;
+    logger.info('Redis connected');
 
-    const { db } = await step('Mongo connection', logger, async () => {
-        return await connectToMongo({ url: databaseUrl });
-    });
+    const mongoResult = await connectToMongo({ mongoUrl });
+    if (!mongoResult.success) return fail(new Error('Failed to connect to Mongo', { cause: mongoResult.error }));
+    const { mongoDb } = mongoResult.data;
+    logger.info('Mongo connected');
 
-    const transporter = await step('SMTP connection', logger, async () => {
-        return await connectToSmtp({ url: smtpUrl });
-    });
+    const smtpResult = await connectToSmtp({ smtpUrl });
+    if (!smtpResult.success) return fail(new Error('Failed to connect to SMTP', { cause: smtpResult.error }));
+    const { smtpTransporter } = smtpResult.data;
+    logger.info('SMTP connected');
 
-    const {
-        transactionService,
-        authOrchestrator,
-        userOrchestrator,
+    const idManager = new MongoIdManager();
+    const tokenManager = new JwtTokenManager(tokenSecret);
+    const tokenGenerator = new CryptoTokenGenerator();
+    const container = buildContainer({
         tokenManager,
-        userService,
-    } = await step('Container build', logger, async () => {
-        return buildContainer({
-            tokenManager: new JwtTokenManager(tokenSecret),
-            hasher: new BcryptHasher(),
-            emailSender: new NodemailerEmailSender(transporter),
-            cacheStore: new RedisCacheStore(client),
-            emailFrom,
-            userRepository: new MongoUserRepository(db.collection('users')),
-            transactionRepository: new MongoTransactionRepository(
-                db.collection('transactions'),
-            ),
-            refreshTokenRepository: new MongoRefreshTokenRepository(
-                db.collection('refreshtokens'),
-            ),
-        });
+        hasher: new BcryptHasher(),
+        emailSender: new NodemailerEmailSender(smtpTransporter),
+        cacheStore: new RedisCacheStore(redisClient),
+        idManager,
+        tokenGenerator,
+        userRepository: new MongoUserRepository(mongoDb.collection('users')),
+        transactionRepository: new MongoTransactionRepository(mongoDb.collection('transactions')),
+        refreshTokenRepository: new MongoRefreshTokenRepository(mongoDb.collection('refreshtokens')),
+        emailFrom,
     });
 
-    const app = await step('HTTP app creation', logger, async () => {
-        return createHttpApp({
-            allowedOrigins,
-            transactionService,
-            authOrchestrator,
-            userOrchestrator,
-            logger,
-            tokenManager,
-            userService,
-        });
+    const app = createHttpApp({
+        logger,
+        tokenManager,
+        idManager,
+        tokenGenerator,
+        ...container,
+        allowedOrigins,
     });
 
-    await step('HTTP server startup', logger, async () => {
-        return startHttpServer({ app, port });
-    });
+    const serverResult = await startServer({ app, port });
+    if (!serverResult.success) return fail(new Error('Failed to start server', { cause: serverResult.error }));
+    logger.info('Server started');
+
+    return ok(undefined);
 };
 
-start().then();
+const result = await start();
+if (!result.success) {
+    logger.fatal(result.error.message, { err: result.error });
+    process.exit(1);
+}

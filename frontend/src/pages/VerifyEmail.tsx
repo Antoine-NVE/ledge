@@ -1,37 +1,34 @@
 import { useState } from 'react';
-import { verifyEmail } from '../api/user';
+import { verifyEmail } from '../api/users.ts';
 import { useParams } from 'react-router-dom';
 
 export default function VerifyEmail() {
-    const { token } = useParams<{ token: string }>();
+    const { emailVerificationToken } = useParams<{ emailVerificationToken: string }>();
 
-    const [isLoading, setIsLoading] = useState(false);
+    const [isVerifying, setIsVerifying] = useState(false);
     const [success, setSuccess] = useState<boolean | null>(null);
     const [message, setMessage] = useState<string | null>(null);
 
-    const handleClick = async () => {
+    if (!emailVerificationToken) {
+        return <div className="text-center p-10 text-red-600">Lien invalide (token manquant).</div>;
+    }
+
+    const handleVerify = async () => {
         setSuccess(null);
         setMessage(null);
 
-        // Should not happen, but just in case
-        if (!token) {
+        setIsVerifying(true);
+        const response = await verifyEmail({ emailVerificationToken });
+        setIsVerifying(false);
+
+        if (!response.success) {
             setSuccess(false);
-            setMessage('Invalid or missing verification token.');
-            return;
-        }
-
-        setIsLoading(true);
-        const [result, response] = await verifyEmail(token);
-        setIsLoading(false);
-
-        setMessage(result.message);
-
-        if (!response || !response.ok) {
-            setSuccess(false);
+            setMessage(response.code);
             return;
         }
 
         setSuccess(true);
+        setMessage('Email verified successfully!');
     };
 
     return (
@@ -40,15 +37,13 @@ export default function VerifyEmail() {
                 <h1 className="text-2xl font-bold mb-4">Verify your email</h1>
                 {success === null && (
                     <>
-                        <p className="mb-4">
-                            Click the button below to verify your email address.
-                        </p>
+                        <p className="mb-4">Click the button below to verify your email address.</p>
                         <button
-                            onClick={handleClick}
+                            onClick={handleVerify}
                             className="w-full bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 cursor-pointer"
-                            disabled={isLoading}
+                            disabled={isVerifying}
                         >
-                            {isLoading ? 'Verifying...' : 'Verify Email'}
+                            {isVerifying ? 'Verifying...' : 'Verify Email'}
                         </button>
                     </>
                 )}

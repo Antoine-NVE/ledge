@@ -67,7 +67,7 @@ services:
     depends_on:
       - database
       - logstore
-    entrypoint: ["node", "dist/scripts/migrate.js", "up"]
+    entrypoint: ["node", "dist/backend/scripts/migrate.js", "up"]
 
 volumes:
   database:

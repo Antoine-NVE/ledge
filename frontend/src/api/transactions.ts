@@ -1,185 +1,93 @@
-import { ApiResponse } from '../types/apiResponse';
-import { NewTransaction, Transaction } from '../types/transaction';
-import { customFetch } from '../utils/customFetch';
+import { ApiResponse } from '@shared/api/api-response.ts';
+import { CreateTransactionSchema } from '@shared/schemas/transaction/create.schema.ts';
+import { ReadAllTransactionSchema } from '@shared/schemas/transaction/read-all.schema.ts';
+import { ReadTransactionSchema } from '@shared/schemas/transaction/read.schema.ts';
+import { UpdateTransactionSchema } from '@shared/schemas/transaction/update.schema.ts';
+import { DeleteTransactionSchema } from '@shared/schemas/transaction/delete.schema.ts';
+import { TransactionDto } from '@shared/dto/transaction.dto.ts';
+import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL + '/transactions';
+const transactionsApi = axios.create({
+    baseURL: import.meta.env.VITE_API_URL + '/transactions',
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    validateStatus: () => true,
+});
 
 export const createTransaction = async (
-    transaction: NewTransaction,
-): Promise<
-    [
-        ApiResponse<{ transaction: Transaction } | null, object | null>,
-        Response | null,
-    ]
-> => {
+    body: CreateTransactionSchema['body'],
+): Promise<ApiResponse<TransactionDto, CreateTransactionSchema>> => {
     try {
-        const response = await customFetch(API_URL, {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(transaction),
-        });
-
-        // Can be any status code, including 200, 401, or 500
-        // We will handle this in the component
-        const result: ApiResponse<{ transaction: Transaction } | null, null> =
-            await response.json();
-        return [result, response];
-    } catch (error: unknown) {
-        console.error(error);
-
-        return [
-            {
-                message: 'An error occurred while creating the transaction',
-                data: null,
-                fields: null,
-            },
-            null, // In this case, we didn't receive a response from the server
-        ];
+        const response = await transactionsApi.post<ApiResponse<TransactionDto, CreateTransactionSchema>>('', body);
+        return response.data;
+    } catch {
+        return {
+            success: false,
+            code: 'INTERNAL_SERVER_ERROR',
+        };
     }
 };
 
-export const getAllTransactions = async (): Promise<
-    [ApiResponse<{ transactions: Transaction[] } | null, null>, Response | null]
-> => {
+export const readAllTransactions = async (): Promise<ApiResponse<TransactionDto[], ReadAllTransactionSchema>> => {
     try {
-        const response = await customFetch(API_URL, {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        // Can be any status code, including 200, 401, or 500
-        // We will handle this in the component
-        const result: ApiResponse<
-            { transactions: Transaction[] } | null,
-            null
-        > = await response.json();
-        return [result, response];
-    } catch (error: unknown) {
-        console.error(error);
-
-        return [
-            {
-                message: 'An error occurred while fetching transactions',
-                data: null,
-                fields: null,
-            },
-            null, // In this case, we didn't receive a response from the server
-        ];
+        const response = await transactionsApi.get<ApiResponse<TransactionDto[], ReadAllTransactionSchema>>('');
+        return response.data;
+    } catch {
+        return {
+            success: false,
+            code: 'INTERNAL_SERVER_ERROR',
+        };
     }
 };
 
-export const getTransactionById = async (
-    transaction: Transaction,
-): Promise<
-    [ApiResponse<{ transaction: Transaction } | null, null>, Response | null]
-> => {
+export const readTransaction = async (
+    params: ReadTransactionSchema['params'],
+): Promise<ApiResponse<TransactionDto, ReadTransactionSchema>> => {
     try {
-        const response = await customFetch(API_URL + '/' + transaction.id, {
-            method: 'GET',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        // Can be any status code, including 200, 401, or 500
-        // We will handle this in the component
-        const result: ApiResponse<{ transaction: Transaction } | null, null> =
-            await response.json();
-        return [result, response];
-    } catch (error: unknown) {
-        console.error(error);
-
-        return [
-            {
-                message: 'An error occurred while fetching the transaction',
-                data: null,
-                fields: null,
-            },
-            null, // In this case, we didn't receive a response from the server
-        ];
+        const response = await transactionsApi.get<ApiResponse<TransactionDto, ReadTransactionSchema>>(
+            '/' + params.transactionId,
+        );
+        return response.data;
+    } catch {
+        return {
+            success: false,
+            code: 'INTERNAL_SERVER_ERROR',
+        };
     }
 };
 
 export const updateTransaction = async (
-    transaction: Transaction,
-): Promise<
-    [
-        ApiResponse<{ transaction: Transaction } | null, object | null>,
-        Response | null,
-    ]
-> => {
+    body: UpdateTransactionSchema['body'],
+    params: UpdateTransactionSchema['params'],
+): Promise<ApiResponse<TransactionDto, UpdateTransactionSchema>> => {
     try {
-        const response = await customFetch(API_URL + '/' + transaction.id, {
-            method: 'PUT',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                name: transaction.name,
-                value: transaction.value,
-                type: transaction.type,
-                ...(transaction.type === 'expense'
-                    ? { expenseCategory: transaction.expenseCategory }
-                    : undefined),
-            }),
-        });
-
-        // Can be any status code, including 200, 401, or 500
-        // We will handle this in the component
-        const result: ApiResponse<{ transaction: Transaction } | null, null> =
-            await response.json();
-        return [result, response];
-    } catch (error: unknown) {
-        console.error(error);
-
-        return [
-            {
-                message: 'An error occurred while updating the transaction',
-                data: null,
-                fields: null,
-            },
-            null, // In this case, we didn't receive a response from the server
-        ];
+        const response = await transactionsApi.put<ApiResponse<TransactionDto, UpdateTransactionSchema>>(
+            '/' + params.transactionId,
+            body,
+        );
+        return response.data;
+    } catch {
+        return {
+            success: false,
+            code: 'INTERNAL_SERVER_ERROR',
+        };
     }
 };
 
 export const deleteTransaction = async (
-    transaction: Transaction,
-): Promise<
-    [ApiResponse<{ transaction: Transaction } | null, null>, Response | null]
-> => {
+    params: DeleteTransactionSchema['params'],
+): Promise<ApiResponse<TransactionDto, DeleteTransactionSchema>> => {
     try {
-        const response = await customFetch(API_URL + '/' + transaction.id, {
-            method: 'DELETE',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        // Can be any status code, including 200, 401, or 500
-        // We will handle this in the component
-        const result: ApiResponse<{ transaction: Transaction } | null, null> =
-            await response.json();
-        return [result, response];
-    } catch (error: unknown) {
-        console.error(error);
-
-        return [
-            {
-                message: 'An error occurred while deleting the transaction',
-                data: null,
-                fields: null,
-            },
-            null, // In this case, we didn't receive a response from the server
-        ];
+        const response = await transactionsApi.delete<ApiResponse<TransactionDto, DeleteTransactionSchema>>(
+            '/' + params.transactionId,
+        );
+        return response.data;
+    } catch {
+        return {
+            success: false,
+            code: 'INTERNAL_SERVER_ERROR',
+        };
     }
 };

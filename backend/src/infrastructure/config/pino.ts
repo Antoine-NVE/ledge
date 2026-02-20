@@ -1,13 +1,17 @@
-import pino, { BaseLogger } from 'pino';
+import pino, { type Logger as BaseLogger } from 'pino';
+import type { Env } from './env.js';
 
-export const createBaseLogger = ({
-    nodeEnv,
-}: {
-    nodeEnv: 'development' | 'production';
-}) => {
+type Input = {
+    nodeEnv: Env['nodeEnv'];
+    lokiUrl: Env['lokiUrl'];
+};
+
+type Output = BaseLogger;
+
+export const createBaseLogger = ({ nodeEnv, lokiUrl }: Input): Output => {
     const isDev = nodeEnv === 'development';
 
-    const baseLogger: BaseLogger = pino({
+    return pino({
         level: isDev ? 'debug' : 'info', // Minimum level to show. List: fatal > error > warn > info > debug > trace
         transport: isDev
             ? {
@@ -19,7 +23,7 @@ export const createBaseLogger = ({
             : {
                   target: 'pino-loki',
                   options: {
-                      host: 'http://logstore:3100',
+                      host: lokiUrl,
                       batching: false,
                       labels: {
                           service_name: 'backend',
@@ -27,6 +31,4 @@ export const createBaseLogger = ({
                   },
               },
     });
-
-    return baseLogger;
 };

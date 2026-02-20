@@ -1,6 +1,6 @@
 FROM node:24-slim AS build
 
-WORKDIR /app
+WORKDIR /app/backend
 
 COPY package*.json ./
 
@@ -13,7 +13,7 @@ RUN npm run build
 
 FROM node:24-slim
 
-WORKDIR /app
+WORKDIR /app/backend
 
 COPY package*.json ./
 

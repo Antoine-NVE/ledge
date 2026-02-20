@@ -1,71 +1,63 @@
-import { MongoDBStorage, Umzug } from 'umzug';
-import path from 'node:path';
-import { createBaseLogger } from '../src/infrastructure/config/pino';
-import { connectToMongo } from '../src/infrastructure/config/mongo';
-import { PinoLogger } from '../src/infrastructure/adapters/pino-logger';
-import { step } from '../src/core/utils/lifecycle';
-import { loadEnv } from '../src/infrastructure/config/env';
+import { createBaseLogger } from '../src/infrastructure/config/pino.js';
+import { connectToMongo } from '../src/infrastructure/config/mongo.js';
+import { PinoLogger } from '../src/infrastructure/adapters/pino.logger.js';
+import { loadEnv } from '../src/infrastructure/config/env.js';
+import { fail, ok, type Result } from '../src/core/result.js';
+import type { MongoClient } from 'mongodb';
+import { createMigrationRunner } from '../src/infrastructure/config/umzug.js';
 
-const start = async () => {
-    const logger = new PinoLogger(
-        createBaseLogger({
-            nodeEnv:
-                process.env.NODE_ENV === 'production'
-                    ? 'production'
-                    : 'development',
-        }),
-    );
-
-    const { databaseUrl } = await step(
-        'Environment validation',
-        logger,
-        async () => {
-            return loadEnv();
-        },
-    );
-
-    const { db, client } = await step('Mongo connection', logger, async () => {
-        return await connectToMongo({ url: databaseUrl });
-    });
-
-    const umzug = new Umzug({
-        migrations: {
-            glob: path.join(__dirname, 'migrations', `*.{js,ts}`),
-        },
-        context: db,
-        storage: new MongoDBStorage({
-            connection: db,
-        }),
-        logger: undefined,
-    });
-    umzug.on('migrating', (migration) => {
-        logger.info('Migration started', { migrationName: migration.name });
-    });
-    umzug.on('migrated', (migration) => {
-        logger.info('Migration finished', { migrationName: migration.name });
-    });
-
-    await step('Migration', logger, async () => {
-        const direction = process.argv[2];
-        switch (direction) {
-            case 'up':
-                await umzug.up();
-                break;
-            case 'down':
-                await umzug.down();
-                break;
-            default:
-                logger.error('Invalid migration direction');
-        }
-    });
-
-    return { client, logger };
+type Output = {
+    mongoClient: MongoClient;
 };
 
-start().then(async ({ client, logger }) => {
-    await client.close();
-    logger.info('Mongo disconnected');
+// .env is not verified yet, but we need a logger now
+const logger = new PinoLogger(
+    createBaseLogger({
+        nodeEnv: process.env.NODE_ENV === 'development' ? 'development' : 'production',
+        lokiUrl: process.env.LOKI_URL || 'http://loki:3100',
+    }),
+);
 
-    // Without this, Pino doesn't always have time to send all the logs to Loki
-    await new Promise((r) => setTimeout(r, 100));
-});
+const start = async (): Promise<Result<Output, Error>> => {
+    const envResult = loadEnv();
+    if (!envResult.success) return fail(new Error('Failed to load environment', { cause: envResult.error }));
+    const { mongoUrl } = envResult.data;
+    logger.info('Environment loaded');
+
+    const mongoResult = await connectToMongo({ mongoUrl });
+    if (!mongoResult.success) return fail(new Error('Failed to connect to Mongo', { cause: mongoResult.error }));
+    const { mongoDb, mongoClient } = mongoResult.data;
+    logger.info('Mongo connected');
+
+    const umzug = createMigrationRunner({ mongoDb, logger });
+
+    const commands: Record<string, () => Promise<unknown>> = {
+        up: () => umzug.up(),
+        down: () => umzug.down(),
+    };
+    const commandName = process.argv[2] || '';
+    const command = commands[commandName];
+    if (!command) return fail(new Error("Invalid migration command. Please choose between 'up' and 'down'"));
+
+    const migrationResult = await command()
+        .then(() => ok(undefined))
+        .catch((err) => fail(err));
+    if (!migrationResult.success) return fail(new Error('Failed to run migration', { cause: migrationResult.error }));
+    logger.info('Migration run');
+
+    return ok({ mongoClient });
+};
+
+const result = await start();
+if (!result.success) {
+    logger.fatal(result.error.message, { err: result.error });
+    process.exit(1);
+}
+const { mongoClient } = result.data;
+
+await mongoClient.close().catch(() => {});
+logger.info('Mongo disconnected');
+
+// Without this, Pino doesn't always have time to send all the logs to Loki
+await new Promise((r) => setTimeout(r, 250));
+process.exit(0);

@@ -1,152 +1,141 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import useUser from '../hooks/useUser';
+import { FormEvent, useState } from 'react';
+import { Link, Navigate, useNavigate } from 'react-router-dom';
+import type { $ZodErrorTree } from 'zod/v4/core';
 import { login } from '../api/auth';
-
-interface Form {
-    email: string;
-    password: string;
-    rememberMe: boolean;
-}
+import type { LoginSchema } from '@shared/schemas/auth/login.schema';
+import { useAuth } from '../hooks/useAuth.ts';
 
 const Login = () => {
-    const [form, setForm] = useState<Form>({
-        email: '',
-        password: '',
-        rememberMe: false,
-    });
-    const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    const [success, setSuccess] = useState<string | null>(null);
-    const { user, setUser } = useUser();
     const navigate = useNavigate();
+    const { user, setUser } = useAuth();
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setForm((prev) => ({ ...prev, [name]: value }));
-        setError(null);
-    };
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [rememberMe, setRememberMe] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const [isLoading, setIsLoading] = useState(false);
+    const [globalError, setGlobalError] = useState<string | null>(null);
+
+    const [fieldErrors, setFieldErrors] = useState<$ZodErrorTree<LoginSchema['body']> | null>(null);
+
+    const handleSubmit = async (e: FormEvent) => {
         e.preventDefault();
+
         setIsLoading(true);
-        setError(null);
-        setSuccess(null);
+        setGlobalError(null);
+        setFieldErrors(null);
 
-        const [result, response] = await login(
-            form.email,
-            form.password,
-            form.rememberMe,
-        );
-
-        if (!response || !response.ok) {
-            setError(result.message);
-        } else {
-            setSuccess(result.message);
-            setUser(result.data!.user);
-            navigate('/');
-        }
+        const response = await login({ email, password, rememberMe });
 
         setIsLoading(false);
+
+        if (response.success) {
+            setUser(response.data);
+            navigate('/');
+        } else {
+            if (response.code === 'BAD_REQUEST' && response.tree.properties?.body) {
+                setFieldErrors(response.tree.properties.body);
+            } else {
+                setGlobalError(response.code);
+            }
+        }
     };
 
+    const properties = fieldErrors?.properties;
+
+    if (user) return <Navigate to="/" replace />;
+
     return (
-        <div className="flex items-center justify-center h-screen bg-gray-100">
-            <div className="bg-white p-8 rounded shadow-md w-96">
-                <h2 className="text-2xl font-bold mb-6 text-center">Login</h2>
+        <div className="flex items-center justify-center min-h-screen bg-gray-100 px-4">
+            <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+                <h2 className="text-2xl font-bold mb-6 text-center text-gray-800">Login</h2>
 
-                {user && (
-                    <div className="mt-4 text-center text-sm text-gray-600">
-                        Already logged in:{' '}
-                        <Link to="/" className="text-blue-600 hover:underline">
-                            Go to Dashboard
-                        </Link>
-                    </div>
-                )}
-
-                <form onSubmit={handleSubmit}>
-                    <div className="mb-4">
+                <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+                    <div>
                         <label
                             htmlFor="email"
-                            className="block text-sm font-medium text-gray-700"
+                            className="block text-sm font-medium text-gray-700 mb-1 cursor-pointer select-none"
                         >
                             Email
                         </label>
                         <input
-                            type="text"
+                            type="email"
                             id="email"
-                            name="email"
-                            value={form.email}
-                            onChange={handleChange}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
+                                ${
+                                    properties?.email?.errors?.length
+                                        ? 'border-red-500 focus:ring-red-200'
+                                        : 'border-gray-300'
+                                }`}
+                            required
                         />
+                        {properties?.email?.errors?.[0] && (
+                            <p className="mt-1 text-xs text-red-600">{properties.email.errors[0]}</p>
+                        )}
                     </div>
 
-                    <div className="mb-6">
+                    <div>
                         <label
                             htmlFor="password"
-                            className="block text-sm font-medium text-gray-700"
+                            className="block text-sm font-medium text-gray-700 mb-1 cursor-pointer select-none"
                         >
                             Password
                         </label>
                         <input
                             type="password"
                             id="password"
-                            name="password"
-                            value={form.password}
-                            onChange={handleChange}
-                            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className={`block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors
+                                ${
+                                    properties?.password?.errors?.length
+                                        ? 'border-red-500 focus:ring-red-200'
+                                        : 'border-gray-300'
+                                }`}
+                            required
                         />
+                        {properties?.password?.errors?.[0] && (
+                            <p className="mt-1 text-xs text-red-600">{properties.password.errors[0]}</p>
+                        )}
                     </div>
 
-                    <div className="mb-4">
+                    <div className="flex items-center">
+                        <input
+                            id="rememberMe"
+                            type="checkbox"
+                            checked={rememberMe}
+                            onChange={(e) => setRememberMe(e.target.checked)}
+                            className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+                        />
                         <label
                             htmlFor="rememberMe"
-                            className="flex items-center cursor-pointer"
+                            className="ml-2 block text-sm text-gray-900 cursor-pointer select-none"
                         >
-                            <input
-                                type="checkbox"
-                                id="rememberMe"
-                                name="rememberMe"
-                                checked={form.rememberMe}
-                                onChange={(e) =>
-                                    setForm((prev) => ({
-                                        ...prev,
-                                        rememberMe: e.target.checked,
-                                    }))
-                                }
-                                className="mr-2 cursor-pointer"
-                            />
                             Remember me
                         </label>
                     </div>
 
-                    {error && (
-                        <div className="mb-4 text-red-600 text-sm text-center">
-                            {error}
-                        </div>
-                    )}
-                    {success && (
-                        <div className="mb-4 text-green-600 text-sm text-center">
-                            {success}
+                    {globalError && (
+                        <div className="p-3 rounded bg-red-50 text-red-600 text-sm text-center font-medium border border-red-100">
+                            {globalError}
                         </div>
                     )}
 
                     <button
                         type="submit"
-                        className="w-full bg-blue-600 text-white font-semibold py-2 px-4 rounded hover:bg-blue-700 transition duration-200"
                         disabled={isLoading}
+                        className={`w-full text-white font-semibold py-2 px-4 rounded transition duration-200
+                            ${isLoading ? 'bg-blue-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700 cursor-pointer'}`}
                     >
                         {isLoading ? 'Logging in...' : 'Login'}
                     </button>
                 </form>
 
-                <div className="mt-4 text-center text-sm text-gray-600">
+                <div className="mt-6 text-center text-sm text-gray-600">
                     Don't have an account?{' '}
-                    <Link
-                        to="/register"
-                        className="text-blue-600 hover:underline"
-                    >
+                    <Link to="/register" className="text-blue-600 hover:underline font-medium">
                         Register
                     </Link>
                 </div>

@@ -1,142 +1,64 @@
-import { ApiResponse } from '../types/apiResponse';
-import { User } from '../types/user';
-import { customFetch } from '../utils/customFetch';
+import { ApiResponse } from '@shared/api/api-response.ts';
+import { RegisterSchema } from '@shared/schemas/auth/register.schema.ts';
+import { LoginSchema } from '@shared/schemas/auth/login.schema.ts';
+import { RefreshSchema } from '@shared/schemas/auth/refresh.schema.ts';
+import { LogoutSchema } from '@shared/schemas/auth/logout.schema.ts';
+import { UserDto } from '@shared/dto/user.dto.ts';
+import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL + '/auth';
+const authApi = axios.create({
+    baseURL: import.meta.env.VITE_API_URL + '/auth',
+    withCredentials: true,
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    validateStatus: () => true,
+});
 
-export const register = async (
-    email: string,
-    password: string,
-    confirmPassword: string,
-): Promise<[ApiResponse<{ user: User } | null, null>, Response | null]> => {
+export const register = async (body: RegisterSchema['body']): Promise<ApiResponse<UserDto, RegisterSchema>> => {
     try {
-        const response = await customFetch(API_URL + '/register', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ email, password, confirmPassword }),
-        });
-
-        // Can be any status code, including 200, 401, or 500
-        // We will handle this in the component
-        const result: ApiResponse<{ user: User } | null, null> =
-            await response.json();
-        return [result, response];
-    } catch (error: unknown) {
-        console.error(error);
-
-        return [
-            {
-                message: 'An error occurred while registering',
-                data: null,
-                fields: null,
-            },
-            null, // In this case, we didn't receive a response from the server
-        ];
+        const response = await authApi.post<ApiResponse<UserDto, RegisterSchema>>('/register', body);
+        return response.data;
+    } catch {
+        return {
+            success: false,
+            code: 'INTERNAL_SERVER_ERROR',
+        };
     }
 };
 
-export const login = async (
-    email: string,
-    password: string,
-    rememberMe: boolean,
-): Promise<[ApiResponse<{ user: User } | null, null>, Response | null]> => {
+export const login = async (body: LoginSchema['body']): Promise<ApiResponse<UserDto, LoginSchema>> => {
     try {
-        const response = await customFetch(
-            API_URL + '/login',
-            {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password, rememberMe }),
-            },
-            false, // We don't want to retry on 401 for the login endpoint
-        );
-
-        // Can be any status code, including 200, 401, or 500
-        // We will handle this in the component
-        const result: ApiResponse<{ user: User } | null, null> =
-            await response.json();
-        return [result, response];
-    } catch (error: unknown) {
-        console.error(error);
-
-        return [
-            {
-                message: 'An error occurred while logging in',
-                data: null,
-                fields: null,
-            },
-            null, // In this case, we didn't receive a response from the server
-        ];
+        const response = await authApi.post<ApiResponse<UserDto, LoginSchema>>('/login', body);
+        return response.data;
+    } catch {
+        return {
+            success: false,
+            code: 'INTERNAL_SERVER_ERROR',
+        };
     }
 };
 
-export const refresh = async (): Promise<
-    [ApiResponse<{ user: User } | null, null>, Response | null]
-> => {
+export const refresh = async (): Promise<ApiResponse<void, RefreshSchema>> => {
     try {
-        const response = await customFetch(
-            API_URL + '/refresh',
-            {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            },
-            false, // We don't want to retry on 401 for the refresh endpoint
-        );
-
-        // Can be any status code, including 200, 401, or 500
-        // We will handle this in the component
-        const result: ApiResponse<{ user: User } | null, null> =
-            await response.json();
-        return [result, response];
-    } catch (error: unknown) {
-        console.error(error);
-
-        return [
-            {
-                message: 'An error occurred while refreshing the session',
-                data: null,
-                fields: null,
-            },
-            null, // In this case, we didn't receive a response from the server
-        ];
+        const response = await authApi.post<ApiResponse<void, RefreshSchema>>('/refresh');
+        return response.data;
+    } catch {
+        return {
+            success: false,
+            code: 'INTERNAL_SERVER_ERROR',
+        };
     }
 };
 
-export const logout = async (): Promise<
-    [ApiResponse<null, null>, Response | null]
-> => {
+export const logout = async (): Promise<ApiResponse<void, LogoutSchema>> => {
     try {
-        const response = await customFetch(API_URL + '/logout', {
-            method: 'POST',
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        // Can be any status code, including 200, 401, or 500
-        // We will handle this in the component
-        const result: ApiResponse<null, null> = await response.json();
-        return [result, response];
-    } catch (error: unknown) {
-        console.error(error);
-
-        return [
-            {
-                message: 'An error occurred while logging out',
-                data: null,
-                fields: null,
-            },
-            null, // In this case, we didn't receive a response from the server
-        ];
+        const response = await authApi.post<ApiResponse<void, LogoutSchema>>('/logout');
+        return response.data;
+    } catch {
+        return {
+            success: false,
+            code: 'INTERNAL_SERVER_ERROR',
+        };
     }
 };

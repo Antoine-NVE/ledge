@@ -1,7 +1,7 @@
-import { Db } from 'mongodb';
+import type { Context } from '../../src/infrastructure/config/umzug.js';
 
-export const up = async ({ context: db }: { context: Db }) => {
-    const collection = db.collection('transactions');
+export const up = async ({ context: { mongoDb } }: { context: Context }) => {
+    const collection = mongoDb.collection('transactions');
 
     await collection.updateMany(
         { isIncome: true },
@@ -20,8 +20,8 @@ export const up = async ({ context: db }: { context: Db }) => {
     );
 };
 
-export const down = async ({ context: db }: { context: Db }) => {
-    const collection = db.collection('transactions');
+export const down = async ({ context: { mongoDb } }: { context: Context }) => {
+    const collection = mongoDb.collection('transactions');
 
     await collection.updateMany(
         { type: 'income' },
