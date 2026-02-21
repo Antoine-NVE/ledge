@@ -2,7 +2,6 @@
     "name": "shared",
     "version": "1.0.0",
     "description": "",
-    "main": "index.js",
     "scripts": {
         "build": "rimraf dist && tsc",
         "format:check": "prettier --check .",
@@ -15,9 +14,7 @@
     "devDependencies": {
         "prettier": "^3.8.1",
         "rimraf": "^6.1.3",
-        "typescript": "^5.9.3"
-    },
-    "dependencies": {
+        "typescript": "^5.9.3",
         "zod": "^4.3.6"
     }
 }
