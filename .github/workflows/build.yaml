@@ -35,7 +35,7 @@ jobs:
             -t ghcr.io/antoine-nve/ledge-backend:latest \
             -f backend/Dockerfile \
             --push \
-            backend
+            .
 
   frontend:
     name: Frontend
@@ -62,4 +62,4 @@ jobs:
             -t ghcr.io/antoine-nve/ledge-frontend:latest \
             -f frontend/Dockerfile \
             --push \
-            frontend
+            .

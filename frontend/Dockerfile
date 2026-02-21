@@ -2,11 +2,11 @@ FROM node:24-slim AS build
 
 WORKDIR /app/frontend
 
-COPY package*.json ./
-
+COPY frontend/package*.json ./
 RUN npm ci
 
-COPY . .
+COPY frontend .
+COPY shared ../shared
 
 ENV VITE_API_URL="PLACEHOLDER_API_URL"
 
@@ -15,9 +15,9 @@ RUN npm run build
 
 FROM nginx:alpine
 
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY entrypoint.sh /entrypoint.sh
+COPY --from=build /app/frontend/dist /usr/share/nginx/html
+COPY frontend/nginx.conf /etc/nginx/conf.d/default.conf
+COPY frontend/entrypoint.sh /entrypoint.sh
 
 RUN chmod +x /entrypoint.sh
 
