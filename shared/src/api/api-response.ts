@@ -1,6 +1,6 @@
 import type { $ZodErrorTree } from 'zod/v4/core';
 
-export type ApiSuccess<T = void> = T extends void ? { success: true } : { success: true; data: T };
+export type ApiSuccess<T = void> = [T] extends [void] ? { success: true } : { success: true; data: T };
 
 export type ApiError<E = void> = { success: false } & (
     | {
