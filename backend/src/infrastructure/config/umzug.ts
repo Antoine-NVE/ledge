@@ -18,7 +18,9 @@ export const createMigrationRunner = ({ mongoDb, logger }: Input) => {
     const __dirname = path.dirname(__filename);
 
     return new Umzug<Context>({
-        migrations: { glob: path.join(__dirname, '../../../scripts/migrations', '*.{js,ts}') },
+        migrations: {
+            glob: [path.join(__dirname, '../../../scripts/migrations', '*.{js,ts}'), { ignore: '**/*.d.ts' }],
+        },
         context: { mongoDb },
         storage: new MongoDBStorage({ connection: mongoDb }),
         logger: {
