@@ -5,7 +5,7 @@
     "main": "dist/backend/src/index.js",
     "scripts": {
         "dev": "tsx watch src/index.ts",
-        "build": "rimraf dist && tsc && tsc-alias",
+        "build": "rimraf dist && tsc",
         "start": "node .",
         "format:check": "prettier --check .",
         "format:write": "prettier --write .",
@@ -33,7 +33,6 @@
         "globals": "^16.4.0",
         "prettier": "^3.5.3",
         "rimraf": "^6.0.1",
-        "tsc-alias": "^1.8.16",
         "tsx": "^4.19.4",
         "typescript": "^5.8.3",
         "typescript-eslint": "^8.46.1",
