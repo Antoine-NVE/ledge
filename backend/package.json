@@ -12,9 +12,29 @@
         "lint": "eslint",
         "test:unit": "vitest run --coverage"
     },
+    "keywords": [],
     "author": "",
     "license": "ISC",
     "type": "module",
+    "dependencies": {
+        "bcrypt": "^6.0.0",
+        "cookie-parser": "^1.4.7",
+        "cors": "^2.8.5",
+        "express": "^5.1.0",
+        "express-rate-limit": "^8.1.0",
+        "jiti": "^2.6.1",
+        "jsonwebtoken": "^9.0.2",
+        "mongodb": "^6.20.0",
+        "nodemailer": "^7.0.3",
+        "pino": "^10.1.0",
+        "pino-loki": "^2.6.0",
+        "pino-pretty": "^13.1.2",
+        "redis": "^5.9.0",
+        "swagger-jsdoc": "^6.2.8",
+        "swagger-ui-express": "^5.0.1",
+        "umzug": "^3.8.2",
+        "zod": "^4.1.11"
+    },
     "devDependencies": {
         "@eslint/js": "^9.37.0",
         "@types/bcrypt": "^5.0.2",
@@ -37,24 +57,5 @@
         "typescript": "^5.8.3",
         "typescript-eslint": "^8.46.1",
         "vitest": "^4.0.18"
-    },
-    "dependencies": {
-        "bcrypt": "^6.0.0",
-        "cookie-parser": "^1.4.7",
-        "cors": "^2.8.5",
-        "express": "^5.1.0",
-        "express-rate-limit": "^8.1.0",
-        "jiti": "^2.6.1",
-        "jsonwebtoken": "^9.0.2",
-        "mongodb": "^6.20.0",
-        "nodemailer": "^7.0.3",
-        "pino": "^10.1.0",
-        "pino-loki": "^2.6.0",
-        "pino-pretty": "^13.1.2",
-        "redis": "^5.9.0",
-        "swagger-jsdoc": "^6.2.8",
-        "swagger-ui-express": "^5.0.1",
-        "umzug": "^3.8.2",
-        "zod": "^4.1.11"
     }
 }
