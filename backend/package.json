@@ -6,7 +6,6 @@
     "scripts": {
         "dev": "tsx watch src/index.ts",
         "build": "rimraf dist && tsc",
-        "start": "node .",
         "format:check": "prettier --check .",
         "format:write": "prettier --write .",
         "lint": "eslint",
