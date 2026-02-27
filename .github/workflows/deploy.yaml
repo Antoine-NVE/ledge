@@ -44,10 +44,10 @@ jobs:
           cd "$TARGET_PATH"
           docker compose down --remove-orphans
 
-      - name: Start database and logstore only
+      - name: Start Mongo and Loki only
         run: |
           cd "$TARGET_PATH"
-          docker compose up -d database logstore
+          docker compose up -d mongo loki
 
       - name: Run migrations
         run: |
