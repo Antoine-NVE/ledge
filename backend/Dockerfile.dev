@@ -1,5 +1,7 @@
 FROM node:24-slim
 
+ENV NODE_ENV=development
+
 WORKDIR /app/backend
 
 EXPOSE 3000

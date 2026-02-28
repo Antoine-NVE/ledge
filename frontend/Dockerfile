@@ -1,5 +1,7 @@
 FROM node:24-slim AS build
 
+ENV VITE_API_URL="PLACEHOLDER_API_URL"
+
 WORKDIR /app/shared
 COPY shared/package*.json ./
 RUN npm ci
@@ -9,7 +11,6 @@ WORKDIR /app/frontend
 COPY frontend/package*.json ./
 RUN npm ci
 COPY frontend ./
-ENV VITE_API_URL="PLACEHOLDER_API_URL"
 RUN npm run build
 
 
