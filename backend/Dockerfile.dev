@@ -1,0 +1,8 @@
+FROM node:24-slim
+
+ENV NODE_ENV=development
+
+WORKDIR /app/backend
+
+EXPOSE 3000
+CMD ["sh", "-c", "npm --prefix ../shared install && npm install && exec node_modules/.bin/tsx watch src/index.ts"]

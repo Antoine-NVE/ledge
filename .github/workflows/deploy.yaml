@@ -2,60 +2,73 @@ name: Deploy to Raspberry Pi
 
 on:
   workflow_run:
-    workflows: [ "Build images" ]
-    types: [ completed ]
+    workflows: ["Build images"]
+    types: [completed]
 
-  workflow_dispatch:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: write
 
 jobs:
-  deploy:
-    runs-on: [ self-hosted, ledge ]
-
-    # Conditions :
-    # - workflow_run: deploy only if build is successful
-    # - workflow_dispatch: manually only on 'main'
-    if: >
-      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success') ||
-      (github.event_name == 'workflow_dispatch' && github.ref_name == 'main')
+  staging:
+    name: Deploy to Staging
+    if: github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'
+    runs-on: [self-hosted, ledge]
+    env:
+      TARGET_PATH: /srv/apps/ledge/staging
+      IMAGE_TAG: ${{ github.event.workflow_run.head_sha }}
 
     steps:
-      - name: Determine environment (dev or prod)
+      - name: Pull latest code
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "TARGET_PATH=/srv/apps/ledge/prod" >> $GITHUB_ENV
-            echo "ENV=production" >> $GITHUB_ENV
-          else
-            echo "TARGET_PATH=/srv/apps/ledge/dev" >> $GITHUB_ENV
-            echo "ENV=development" >> $GITHUB_ENV
-          fi
+          cd "$TARGET_PATH"
+          git pull
+
+      - name: Deploy Staging
+        run: |
+          cd "$TARGET_PATH"
+          IMAGE_TAG=$IMAGE_TAG docker compose pull
+          IMAGE_TAG=$IMAGE_TAG docker compose down --remove-orphans
+          IMAGE_TAG=$IMAGE_TAG docker compose up -d mongo loki
+          IMAGE_TAG=$IMAGE_TAG docker compose run --rm migrate
+          IMAGE_TAG=$IMAGE_TAG docker compose up -d
+
+  prod:
+    name: Deploy to Production
+    if: github.event_name == 'pull_request' && github.event.pull_request.merged == true
+    runs-on: [self-hosted, ledge]
+    env:
+      TARGET_PATH: /srv/apps/ledge/prod
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+
+    steps:
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u antoine-nve --password-stdin
+
+      - name: Retag images to latest (Multi-arch safe)
+        run: |
+          docker buildx imagetools create \
+            ghcr.io/antoine-nve/ledge-backend:$HEAD_SHA \
+            --tag ghcr.io/antoine-nve/ledge-backend:latest
+
+          docker buildx imagetools create \
+            ghcr.io/antoine-nve/ledge-frontend:$HEAD_SHA \
+            --tag ghcr.io/antoine-nve/ledge-frontend:latest
 
       - name: Pull latest code
         run: |
           cd "$TARGET_PATH"
           git pull
 
-      - name: Pull latest images
+      - name: Deploy Production
         run: |
           cd "$TARGET_PATH"
           docker compose pull
-
-      - name: Stop existing containers
-        run: |
-          cd "$TARGET_PATH"
           docker compose down --remove-orphans
-
-      - name: Start database and logstore only
-        run: |
-          cd "$TARGET_PATH"
-          docker compose up -d database logstore
-
-      - name: Run migrations
-        run: |
-          cd "$TARGET_PATH"
+          docker compose up -d mongo loki
           docker compose run --rm migrate
-
-      - name: Start full stack
-        run: |
-          cd "$TARGET_PATH"
           docker compose up -d
-          echo "Deployment to $ENV completed."

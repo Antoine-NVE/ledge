@@ -1,0 +1,6 @@
+FROM node:24-slim
+
+WORKDIR /app/frontend
+
+EXPOSE 5173
+CMD ["sh", "-c", "npm --prefix ../shared install && npm install && exec node_modules/.bin/vite --host"]

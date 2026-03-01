@@ -1,0 +1,82 @@
+name: Quality checks
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  frontend:
+    name: Frontend checks (format, lint)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: frontend
+
+      - name: Prettier format check
+        run: npm run format:check
+        working-directory: frontend
+
+      - name: ESLint check
+        run: npm run lint
+        working-directory: frontend
+
+  backend:
+    name: Backend checks (format, lint, unit tests)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install backend dependencies
+        run: npm ci
+        working-directory: backend
+
+      - name: Prettier format check
+        run: npm run format:check
+        working-directory: backend
+
+      - name: ESLint check
+        run: npm run lint
+        working-directory: backend
+
+      - name: Run unit tests
+        run: npm run test:unit
+        working-directory: backend
+
+  shared:
+    name: Shared checks (format)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install shared dependencies
+        run: npm ci
+        working-directory: shared
+
+      - name: Prettier format check
+        run: npm run format:check
+        working-directory: shared
