@@ -28,6 +28,9 @@ jobs:
           cd "$TARGET_PATH"
           git pull
 
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u antoine-nve --password-stdin
+
       - name: Deploy Staging
         run: |
           cd "$TARGET_PATH"
