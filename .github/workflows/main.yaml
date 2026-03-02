@@ -1,0 +1,47 @@
+name: Deploy to Production
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  deploy_prod:
+    name: Deploy to Production
+    if: github.event.pull_request.merged == true
+    runs-on: [self-hosted, ledge]
+    env:
+      TARGET_PATH: /srv/apps/ledge/prod
+      HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+
+    steps:
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u antoine-nve --password-stdin
+
+      - name: Retag images to latest
+        run: |
+          docker buildx imagetools create \
+            ghcr.io/antoine-nve/ledge-backend:$HEAD_SHA \
+            --tag ghcr.io/antoine-nve/ledge-backend:latest
+
+          docker buildx imagetools create \
+            ghcr.io/antoine-nve/ledge-frontend:$HEAD_SHA \
+            --tag ghcr.io/antoine-nve/ledge-frontend:latest
+
+      - name: Pull latest code
+        run: |
+          cd "$TARGET_PATH"
+          git pull
+
+      - name: Deploy
+        run: |
+          cd "$TARGET_PATH"
+          docker compose pull
+          docker compose down --remove-orphans
+          docker compose up -d mongo loki
+          docker compose run --rm migrate
+          docker compose up -d
