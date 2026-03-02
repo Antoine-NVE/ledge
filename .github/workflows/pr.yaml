@@ -1,0 +1,124 @@
+name: PR Lifecycle (Quality, Build, Staging)
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  # ==========================================
+  # 1. QUALITY CHECKS
+  # ==========================================
+  quality_frontend:
+    name: Frontend checks (format, lint)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - run: npm ci
+        working-directory: frontend
+      - run: npm run format:check
+        working-directory: frontend
+      - run: npm run lint
+        working-directory: frontend
+
+  quality_backend:
+    name: Backend checks (format, lint, unit tests)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - run: npm ci
+        working-directory: backend
+      - run: npm run format:check
+        working-directory: backend
+      - run: npm run lint
+        working-directory: backend
+      - run: npm run test:unit
+        working-directory: backend
+
+  quality_shared:
+    name: Shared checks (format)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 24 }
+      - run: npm ci
+        working-directory: shared
+      - run: npm run format:check
+        working-directory: shared
+
+  # ==========================================
+  # 2. BUILD IMAGES
+  # ==========================================
+  build_frontend:
+    name: Build Frontend
+    needs: [quality_frontend, quality_backend, quality_shared]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u antoine-nve --password-stdin
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - name: Build & push
+        run: |
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            -t ghcr.io/antoine-nve/ledge-frontend:${{ github.event.pull_request.head.sha }} \
+            -f frontend/Dockerfile \
+            --push .
+
+  build_backend:
+    name: Build Backend
+    needs: [quality_frontend, quality_backend, quality_shared]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u antoine-nve --password-stdin
+      - uses: docker/setup-qemu-action@v3
+      - uses: docker/setup-buildx-action@v3
+      - name: Build & push
+        run: |
+          docker buildx build \
+            --platform linux/amd64,linux/arm64 \
+            -t ghcr.io/antoine-nve/ledge-backend:${{ github.event.pull_request.head.sha }} \
+            -f backend/Dockerfile \
+            --push .
+
+  # ==========================================
+  # 3. DEPLOY STAGING
+  # ==========================================
+  deploy_staging:
+    name: Deploy to Staging
+    needs: [build_frontend, build_backend]
+    runs-on: [self-hosted, ledge]
+    env:
+      TARGET_PATH: /srv/apps/ledge/staging
+      IMAGE_TAG: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - name: Pull latest code
+        run: |
+          cd "$TARGET_PATH"
+          git pull
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u antoine-nve --password-stdin
+      - name: Deploy
+        run: |
+          cd "$TARGET_PATH"
+          IMAGE_TAG=$IMAGE_TAG docker compose pull
+          IMAGE_TAG=$IMAGE_TAG docker compose down --remove-orphans
+          IMAGE_TAG=$IMAGE_TAG docker compose up -d mongo loki
+          IMAGE_TAG=$IMAGE_TAG docker compose run --rm migrate
+          IMAGE_TAG=$IMAGE_TAG docker compose up -d
