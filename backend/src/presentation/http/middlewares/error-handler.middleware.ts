@@ -16,11 +16,41 @@ export const errorHandlerMiddleware = () => {
             return;
         }
 
+        if (err instanceof SyntaxError) {
+            req.logger.warn(err.message, { err });
+            const response: ApiError = {
+                success: false,
+                code: 'INVALID_SYNTAX',
+            };
+            res.status(400).json(response);
+            return;
+        }
+
+        if (err instanceof httpErrors.NotFound) {
+            req.logger.warn(err.message, { err });
+            const response: ApiError = {
+                success: false,
+                code: 'NOT_FOUND',
+            };
+            res.status(err.status).json(response);
+            return;
+        }
+
         if (err instanceof httpErrors.PayloadTooLarge) {
             req.logger.warn(err.message, { err });
             const response: ApiError = {
                 success: false,
                 code: 'PAYLOAD_TOO_LARGE',
+            };
+            res.status(err.status).json(response);
+            return;
+        }
+
+        if (err instanceof httpErrors.TooManyRequests) {
+            req.logger.warn(err.message, { err });
+            const response: ApiError = {
+                success: false,
+                code: 'TOO_MANY_REQUESTS',
             };
             res.status(err.status).json(response);
             return;

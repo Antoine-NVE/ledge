@@ -16,9 +16,10 @@ export type ApiError<E = void> = { success: false } & (
               | 'INTERNAL_SERVER_ERROR'
               | 'INVALID_CREDENTIALS'
               | 'INVALID_REFRESH_TOKEN'
+              | 'INVALID_SYNTAX'
               | 'INVALID_TOKEN'
+              | 'NOT_FOUND'
               | 'PAYLOAD_TOO_LARGE'
-              | 'ROUTE_NOT_FOUND'
               | 'TOO_MANY_REQUESTS'
               | 'TRANSACTION_NOT_FOUND'
               | 'UNAUTHORIZED';
