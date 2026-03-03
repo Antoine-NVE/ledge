@@ -73,7 +73,7 @@ export const createHttpApp = ({
     app.use(rateLimiterMiddleware());
 
     // Parsing
-    app.use(express.json());
+    app.use(express.json({ limit: '100kb' }));
     app.use(cookieParser());
 
     // Routes
