@@ -65,6 +65,8 @@ export const createHttpApp = ({
 }: Input) => {
     const app = express();
 
+    app.set('trust proxy', 1);
+
     // Logger
     app.use(requestLoggerMiddleware({ logger, tokenGenerator }));
 
