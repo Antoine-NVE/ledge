@@ -17,6 +17,7 @@ export type ApiError<E = void> = { success: false } & (
               | 'INVALID_CREDENTIALS'
               | 'INVALID_REFRESH_TOKEN'
               | 'INVALID_TOKEN'
+              | 'PAYLOAD_TOO_LARGE'
               | 'ROUTE_NOT_FOUND'
               | 'TOO_MANY_REQUESTS'
               | 'TRANSACTION_NOT_FOUND'

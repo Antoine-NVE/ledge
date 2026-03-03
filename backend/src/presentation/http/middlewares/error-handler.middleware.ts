@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from 'express';
 import type { ApiError } from '@shared/api/api-response.js';
 import { HttpError } from '../errors/http.error.js';
+import httpErrors from 'http-errors';
 
 export const errorHandlerMiddleware = () => {
     return (
@@ -12,6 +13,16 @@ export const errorHandlerMiddleware = () => {
         if (err instanceof HttpError) {
             req.logger.warn(err.message, { err });
             res.status(err.status).json(err.body);
+            return;
+        }
+
+        if (err instanceof httpErrors.PayloadTooLarge) {
+            req.logger.warn(err.message, { err });
+            const response: ApiError = {
+                success: false,
+                code: 'PAYLOAD_TOO_LARGE',
+            };
+            res.status(err.status).json(response);
             return;
         }
 
