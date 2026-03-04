@@ -1,4 +1,4 @@
-import pino, { type Logger as BaseLogger } from 'pino';
+import pino, { type Logger as PinoInstance } from 'pino';
 import type { Env } from './env.js';
 
 type Input = {
@@ -6,9 +6,7 @@ type Input = {
     lokiUrl: Env['lokiUrl'];
 };
 
-type Output = BaseLogger;
-
-export const createBaseLogger = ({ nodeEnv, lokiUrl }: Input): Output => {
+export const createPinoInstance = ({ nodeEnv, lokiUrl }: Input): PinoInstance => {
     const isDev = nodeEnv === 'development';
 
     return pino({

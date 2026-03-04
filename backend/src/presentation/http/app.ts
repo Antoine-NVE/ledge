@@ -1,4 +1,4 @@
-import express, { type Request, type Response } from 'express';
+import express from 'express';
 import cookieParser from 'cookie-parser';
 import { corsMiddleware } from './middlewares/cors.middleware.js';
 import { rateLimiterMiddleware } from './middlewares/rate-limiter.middleware.js';
@@ -21,8 +21,8 @@ import type { Logger } from '../../domain/ports/logger.js';
 import { requestLoggerMiddleware } from './middlewares/request-logger.middleware.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
 import { routes } from './routes/routes.js';
-import type { ApiError } from '@shared/api/api-response.js';
 import type { Env } from '../../infrastructure/config/env.js';
+import httpErrors from 'http-errors';
 
 type Input = {
     logger: Logger;
@@ -65,6 +65,8 @@ export const createHttpApp = ({
 }: Input) => {
     const app = express();
 
+    app.set('trust proxy', 1);
+
     // Logger
     app.use(requestLoggerMiddleware({ logger, tokenGenerator }));
 
@@ -73,7 +75,7 @@ export const createHttpApp = ({
     app.use(rateLimiterMiddleware());
 
     // Parsing
-    app.use(express.json());
+    app.use(express.json({ limit: '100kb' }));
     app.use(cookieParser());
 
     // Routes
@@ -97,12 +99,8 @@ export const createHttpApp = ({
             allowedOrigins,
         }),
     );
-    app.use((req: Request, res: Response) => {
-        const response: ApiError = {
-            success: false,
-            code: 'ROUTE_NOT_FOUND',
-        };
-        res.status(404).json(response);
+    app.use(() => {
+        throw new httpErrors.NotFound();
     });
 
     // Error handler

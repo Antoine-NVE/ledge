@@ -46,7 +46,7 @@ export class LoginUseCase {
             updatedAt: now,
         };
         await this.refreshTokenRepository.create(refreshToken);
-        logger.info('Refresh token created', { refreshTokenId: refreshToken.id, userId: refreshToken.userId });
+        logger.info({ refreshTokenId: refreshToken.id, userId: refreshToken.userId }, 'Refresh token created');
 
         const accessToken = this.tokenManager.signAccess({ userId: user.id });
 

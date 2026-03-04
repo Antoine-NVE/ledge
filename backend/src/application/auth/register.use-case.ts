@@ -40,7 +40,7 @@ export class RegisterUseCase {
             updatedAt: now,
         };
         await this.userRepository.create(user);
-        logger.info('User created', { userId: user.id });
+        logger.info({ userId: user.id }, 'User created');
 
         const refreshToken: RefreshToken = {
             id: this.idManager.generate(),
@@ -51,7 +51,7 @@ export class RegisterUseCase {
             updatedAt: now,
         };
         await this.refreshTokenRepository.create(refreshToken);
-        logger.info('Refresh token created', { refreshTokenId: refreshToken.id, userId: refreshToken.userId });
+        logger.info({ refreshTokenId: refreshToken.id, userId: refreshToken.userId }, 'Refresh token created');
 
         const accessToken = this.tokenManager.signAccess({ userId: user.id });
 

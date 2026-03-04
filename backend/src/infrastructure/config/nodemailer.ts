@@ -1,5 +1,4 @@
 import { createTransport, type Transporter } from 'nodemailer';
-import { fail, ok, type Result } from '../../core/result.js';
 import type { Env } from './env.js';
 
 type Input = {
@@ -10,14 +9,10 @@ type Output = {
     smtpTransporter: Transporter;
 };
 
-export const connectToSmtp = async ({ smtpUrl }: Input): Promise<Result<Output, unknown>> => {
-    try {
-        const smtpTransporter: Transporter = createTransport(smtpUrl);
+export const connectToSmtp = async ({ smtpUrl }: Input): Promise<Output> => {
+    const smtpTransporter: Transporter = createTransport(smtpUrl);
 
-        await smtpTransporter.verify();
+    await smtpTransporter.verify();
 
-        return ok({ smtpTransporter });
-    } catch (err: unknown) {
-        return fail(err);
-    }
+    return { smtpTransporter };
 };

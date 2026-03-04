@@ -15,6 +15,6 @@ export class LogoutUseCase {
         if (!refreshToken) return;
 
         await this.refreshTokenRepository.delete(refreshToken);
-        logger.info('Refresh token deleted', { refreshTokenId: refreshToken.id, userId: refreshToken.userId });
+        logger.info({ refreshTokenId: refreshToken.id, userId: refreshToken.userId }, 'Refresh token deleted');
     };
 }

@@ -32,7 +32,7 @@ export class CreateTransactionUseCase {
             updatedAt: now,
         };
         await this.transactionRepository.create(transaction);
-        logger.info('Transaction created', { transactionId: transaction.id, userId: transaction.userId });
+        logger.info({ transactionId: transaction.id, userId: transaction.userId }, 'Transaction created');
 
         return { transaction };
     };

@@ -23,11 +23,6 @@ export const createMigrationRunner = ({ mongoDb, logger }: Input) => {
         },
         context: { mongoDb },
         storage: new MongoDBStorage({ connection: mongoDb }),
-        logger: {
-            error: (msg) => logger.error('Migration error', msg),
-            warn: (msg) => logger.warn('Migration warn', msg),
-            info: (msg) => logger.info('Migration info', msg),
-            debug: (msg) => logger.debug('Migration debug', msg),
-        },
+        logger,
     });
 };

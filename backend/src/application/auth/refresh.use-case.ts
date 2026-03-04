@@ -39,7 +39,7 @@ export class RefreshUseCase {
             updatedAt: now,
         };
         await this.refreshTokenRepository.save(updatedRefreshToken);
-        logger.info('Refresh token updated', { refreshTokenId: refreshToken.id, userId: refreshToken.userId });
+        logger.info({ refreshTokenId: refreshToken.id, userId: refreshToken.userId }, 'Refresh token updated');
 
         const accessToken = this.tokenManager.signAccess({ userId: refreshToken.userId });
 

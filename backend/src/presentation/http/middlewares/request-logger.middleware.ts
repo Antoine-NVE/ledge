@@ -28,12 +28,15 @@ export const requestLoggerMiddleware = ({
             const { statusCode } = res;
             const logLevel = statusCode >= 500 ? 'error' : statusCode >= 400 ? 'warn' : 'info';
 
-            req.logger[logLevel]('Request completed', {
-                method: req.method,
-                url: req.url,
-                status: statusCode,
-                duration: `${duration}ms`,
-            });
+            req.logger[logLevel](
+                {
+                    method: req.method,
+                    url: req.url,
+                    status: statusCode,
+                    duration: `${duration}ms`,
+                },
+                'Request completed',
+            );
         });
 
         next();
