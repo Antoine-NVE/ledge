@@ -14,11 +14,9 @@ import { MongoRefreshTokenRepository } from './infrastructure/repositories/mongo
 import { createHttpApp } from './presentation/http/app.js';
 import { buildContainer } from './presentation/container.js';
 import { startServer } from './presentation/server.js';
-import { fail, ok, type Result } from './core/result.js';
 import { MongoIdManager } from './infrastructure/adapters/mongo.id-manager.js';
 import { CryptoTokenGenerator } from './infrastructure/adapters/crypto.token-generator.js';
 
-// .env is not verified yet, but we need a logger now
 const logger = new PinoLogger(
     createBaseLogger({
         nodeEnv: process.env.NODE_ENV === 'development' ? 'development' : 'production',
@@ -26,30 +24,23 @@ const logger = new PinoLogger(
     }),
 );
 
-const start = async (): Promise<Result<void, Error>> => {
-    const envResult = loadEnv();
-    if (!envResult.success) return fail(new Error('Failed to load environment', { cause: envResult.error }));
-    const { redisUrl, mongoUrl, smtpUrl, tokenSecret, emailFrom, allowedOrigins, port } = envResult.data;
+const start = async () => {
+    const { redisUrl, mongoUrl, smtpUrl, tokenSecret, emailFrom, allowedOrigins, port } = loadEnv();
     logger.info('Environment loaded');
 
-    const redisResult = await connectToRedis({ redisUrl });
-    if (!redisResult.success) return fail(new Error('Failed to connect to redis', { cause: redisResult.error }));
-    const { redisClient } = redisResult.data;
+    const { redisClient } = await connectToRedis({ redisUrl });
     logger.info('Redis connected');
 
-    const mongoResult = await connectToMongo({ mongoUrl });
-    if (!mongoResult.success) return fail(new Error('Failed to connect to Mongo', { cause: mongoResult.error }));
-    const { mongoDb } = mongoResult.data;
+    const { mongoClient, mongoDb } = await connectToMongo({ mongoUrl });
     logger.info('Mongo connected');
 
-    const smtpResult = await connectToSmtp({ smtpUrl });
-    if (!smtpResult.success) return fail(new Error('Failed to connect to SMTP', { cause: smtpResult.error }));
-    const { smtpTransporter } = smtpResult.data;
+    const { smtpTransporter } = await connectToSmtp({ smtpUrl });
     logger.info('SMTP connected');
 
     const idManager = new MongoIdManager();
     const tokenManager = new JwtTokenManager(tokenSecret);
     const tokenGenerator = new CryptoTokenGenerator();
+
     const container = buildContainer({
         tokenManager,
         hasher: new BcryptHasher(),
@@ -72,15 +63,42 @@ const start = async (): Promise<Result<void, Error>> => {
         allowedOrigins,
     });
 
-    const serverResult = await startServer({ app, port });
-    if (!serverResult.success) return fail(new Error('Failed to start server', { cause: serverResult.error }));
+    const { server } = await startServer({ app, port });
     logger.info('Server started');
 
-    return ok(undefined);
+    const gracefulShutdown = async (signal: 'SIGINT' | 'SIGTERM') => {
+        logger.info(`Received ${signal}. Starting graceful shutdown...`);
+
+        try {
+            await new Promise<void>((resolve, reject) => {
+                server.close((err?: Error) => (err ? reject(err) : resolve()));
+            });
+            logger.info('HTTP server closed');
+
+            await mongoClient.close();
+            logger.info('Mongo disconnected');
+
+            await redisClient.quit();
+            logger.info('Redis disconnected');
+
+            smtpTransporter.close();
+            logger.info('SMTP disconnected');
+
+            logger.info('Graceful shutdown completed successfully. Exiting.');
+            process.exit(0);
+        } catch (err) {
+            logger.fatal('Error during graceful shutdown', { err });
+            process.exit(1);
+        }
+    };
+
+    process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+    process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 };
 
-const result = await start();
-if (!result.success) {
-    logger.fatal(result.error.message, { err: result.error });
+try {
+    await start();
+} catch (error) {
+    logger.fatal(error instanceof Error ? error.message : 'Unknown error', { err: error });
     process.exit(1);
 }

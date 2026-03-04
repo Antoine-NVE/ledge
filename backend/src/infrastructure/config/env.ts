@@ -1,5 +1,4 @@
 import z from 'zod';
-import { fail, ok, type Result } from '../../core/result.js';
 
 const envSchema = z.object({
     nodeEnv: z.enum(['development', 'production']),
@@ -18,22 +17,16 @@ const envSchema = z.object({
 
 export type Env = z.infer<typeof envSchema>;
 
-export const loadEnv = (): Result<z.infer<typeof envSchema>, unknown> => {
-    try {
-        return ok(
-            envSchema.parse({
-                nodeEnv: process.env.NODE_ENV,
-                tokenSecret: process.env.TOKEN_SECRET,
-                allowedOrigins: process.env.ALLOWED_ORIGINS,
-                port: process.env.PORT,
-                mongoUrl: process.env.MONGO_URL,
-                redisUrl: process.env.REDIS_URL,
-                smtpUrl: process.env.SMTP_URL,
-                emailFrom: process.env.EMAIL_FROM,
-                lokiUrl: process.env.LOKI_URL,
-            }),
-        );
-    } catch (err: unknown) {
-        return fail(err);
-    }
+export const loadEnv = (): z.infer<typeof envSchema> => {
+    return envSchema.parse({
+        nodeEnv: process.env.NODE_ENV,
+        tokenSecret: process.env.TOKEN_SECRET,
+        allowedOrigins: process.env.ALLOWED_ORIGINS,
+        port: process.env.PORT,
+        mongoUrl: process.env.MONGO_URL,
+        redisUrl: process.env.REDIS_URL,
+        smtpUrl: process.env.SMTP_URL,
+        emailFrom: process.env.EMAIL_FROM,
+        lokiUrl: process.env.LOKI_URL,
+    });
 };

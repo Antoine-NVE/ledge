@@ -1,5 +1,4 @@
 import { Db, MongoClient } from 'mongodb';
-import { fail, ok, type Result } from '../../core/result.js';
 import type { Env } from './env.js';
 
 type Input = {
@@ -11,18 +10,14 @@ type Output = {
     mongoDb: Db;
 };
 
-export const connectToMongo = async ({ mongoUrl }: Input): Promise<Result<Output, unknown>> => {
-    try {
-        const mongoClient = new MongoClient(mongoUrl);
-        await mongoClient.connect();
-        const mongoDb = mongoClient.db();
+export const connectToMongo = async ({ mongoUrl }: Input): Promise<Output> => {
+    const mongoClient = new MongoClient(mongoUrl);
+    await mongoClient.connect();
+    const mongoDb = mongoClient.db();
 
-        await setupIndexes(mongoDb);
+    await setupIndexes(mongoDb);
 
-        return ok({ mongoClient, mongoDb });
-    } catch (err: unknown) {
-        return fail(err);
-    }
+    return { mongoClient, mongoDb };
 };
 
 const setupIndexes = async (db: Db) => {
