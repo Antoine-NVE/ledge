@@ -1,4 +1,4 @@
-import express, { type Request, type Response } from 'express';
+import express from 'express';
 import cookieParser from 'cookie-parser';
 import { corsMiddleware } from './middlewares/cors.middleware.js';
 import { rateLimiterMiddleware } from './middlewares/rate-limiter.middleware.js';
