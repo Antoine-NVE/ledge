@@ -1,4 +1,4 @@
-import { createBaseLogger } from '../src/infrastructure/config/pino.js';
+import { createPinoInstance } from '../src/infrastructure/config/pino.js';
 import { connectToMongo } from '../src/infrastructure/config/mongo.js';
 import { PinoLogger } from '../src/infrastructure/adapters/pino.logger.js';
 import { loadEnv } from '../src/infrastructure/config/env.js';
@@ -6,7 +6,7 @@ import { createMigrationRunner } from '../src/infrastructure/config/umzug.js';
 
 // .env is not verified yet, but we need a logger now
 const logger = new PinoLogger(
-    createBaseLogger({
+    createPinoInstance({
         nodeEnv: process.env.NODE_ENV === 'development' ? 'development' : 'production',
         lokiUrl: process.env.LOKI_URL || 'http://loki:3100',
     }),
@@ -40,7 +40,7 @@ try {
     await new Promise((r) => setTimeout(r, 250));
     process.exit(0);
 } catch (error) {
-    logger.fatal(error instanceof Error ? error.message : 'Unknown error', { err: error });
+    logger.fatal({ err: error }, error instanceof Error ? error.message : 'Unknown error');
     await new Promise((r) => setTimeout(r, 250));
     process.exit(1);
 }

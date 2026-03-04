@@ -34,7 +34,7 @@ export class VerifyEmailUseCase {
             updatedAt: new Date(),
         };
         await this.userRepository.save(updatedUser);
-        logger.info('User updated', { userId: user.id });
+        logger.info({ userId: user.id }, 'User updated');
 
         return ok(undefined);
     };

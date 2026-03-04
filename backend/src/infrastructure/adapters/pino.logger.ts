@@ -1,30 +1,35 @@
-import type { Logger as BaseLogger } from 'pino';
+import type { Logger as PinoInstance } from 'pino';
 import type { Logger } from '../../domain/ports/logger.js';
 
 export class PinoLogger implements Logger {
-    constructor(private baseLogger: BaseLogger) {}
+    constructor(private pinoInstance: PinoInstance) {}
 
-    fatal = (message: string, meta?: Record<string, unknown>): void => {
-        this.baseLogger.fatal(meta, message);
+    fatal = (...args: [msg: string] | [obj: Record<string, unknown>, msg?: string]) => {
+        if (typeof args[0] === 'string') this.pinoInstance.fatal(args[0]);
+        else this.pinoInstance.fatal(args[0], args[1]);
     };
 
-    error = (message: string, meta?: Record<string, unknown>): void => {
-        this.baseLogger.error(meta, message);
+    error = (...args: [msg: string] | [obj: Record<string, unknown>, msg?: string]) => {
+        if (typeof args[0] === 'string') this.pinoInstance.error(args[0]);
+        else this.pinoInstance.error(args[0], args[1]);
     };
 
-    warn = (message: string, meta?: Record<string, unknown>): void => {
-        this.baseLogger.warn(meta, message);
+    warn = (...args: [msg: string] | [obj: Record<string, unknown>, msg?: string]) => {
+        if (typeof args[0] === 'string') this.pinoInstance.warn(args[0]);
+        else this.pinoInstance.warn(args[0], args[1]);
     };
 
-    info = (message: string, meta?: Record<string, unknown>): void => {
-        this.baseLogger.info(meta, message);
+    info = (...args: [msg: string] | [obj: Record<string, unknown>, msg?: string]) => {
+        if (typeof args[0] === 'string') this.pinoInstance.info(args[0]);
+        else this.pinoInstance.info(args[0], args[1]);
     };
 
-    debug = (message: string, meta?: Record<string, unknown>): void => {
-        this.baseLogger.debug(meta, message);
+    debug = (...args: [msg: string] | [obj: Record<string, unknown>, msg?: string]) => {
+        if (typeof args[0] === 'string') this.pinoInstance.debug(args[0]);
+        else this.pinoInstance.debug(args[0], args[1]);
     };
 
     child = (bindings: Record<string, unknown>): Logger => {
-        return new PinoLogger(this.baseLogger.child(bindings));
+        return new PinoLogger(this.pinoInstance.child(bindings));
     };
 }

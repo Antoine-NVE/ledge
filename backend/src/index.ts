@@ -1,5 +1,5 @@
 import { loadEnv } from './infrastructure/config/env.js';
-import { createBaseLogger } from './infrastructure/config/pino.js';
+import { createPinoInstance } from './infrastructure/config/pino.js';
 import { connectToRedis } from './infrastructure/config/redis.js';
 import { connectToMongo } from './infrastructure/config/mongo.js';
 import { PinoLogger } from './infrastructure/adapters/pino.logger.js';
@@ -18,7 +18,7 @@ import { MongoIdManager } from './infrastructure/adapters/mongo.id-manager.js';
 import { CryptoTokenGenerator } from './infrastructure/adapters/crypto.token-generator.js';
 
 const logger = new PinoLogger(
-    createBaseLogger({
+    createPinoInstance({
         nodeEnv: process.env.NODE_ENV === 'development' ? 'development' : 'production',
         lokiUrl: process.env.LOKI_URL || 'http://loki:3100',
     }),
@@ -87,7 +87,7 @@ const start = async () => {
             logger.info('Graceful shutdown completed successfully. Exiting.');
             process.exit(0);
         } catch (err) {
-            logger.fatal('Error during graceful shutdown', { err });
+            logger.fatal({ err }, 'Error during graceful shutdown');
             process.exit(1);
         }
     };
@@ -99,6 +99,6 @@ const start = async () => {
 try {
     await start();
 } catch (error) {
-    logger.fatal(error instanceof Error ? error.message : 'Unknown error', { err: error });
+    logger.fatal({ err: error }, error instanceof Error ? error.message : 'Unknown error');
     process.exit(1);
 }

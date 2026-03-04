@@ -31,7 +31,7 @@ export class UpdateTransactionUseCase {
             updatedAt: new Date(),
         };
         await this.transactionRepository.save(updatedTransaction);
-        logger.info('Transaction updated', { transactionId: transaction.id, userId: transaction.userId });
+        logger.info({ transactionId: transaction.id, userId: transaction.userId }, 'Transaction updated');
 
         return ok({ transaction: updatedTransaction });
     };

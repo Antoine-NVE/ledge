@@ -16,7 +16,7 @@ export class DeleteTransactionUseCase {
         if (transaction.userId !== input.userId) return fail('TRANSACTION_NOT_OWNED');
 
         await this.transactionRepository.delete(transaction);
-        logger.info('Transaction deleted', { transactionId: transaction.id, userId: transaction.userId });
+        logger.info({ transactionId: transaction.id, userId: transaction.userId }, 'Transaction deleted');
 
         return ok({ transaction });
     };
