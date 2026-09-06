@@ -1,5 +1,5 @@
 import type { TransactionRepository } from '../../domain/repositories/transaction.repository.js';
-import type { Transaction } from '../../domain/entities/transaction.js';
+import { Transaction } from '../../domain/entities/transaction.js';
 import type { IdGenerator } from '../../domain/ports/id-generator.js';
 
 export class CreateTransactionUseCase {
@@ -16,21 +16,12 @@ export class CreateTransactionUseCase {
         category: 'need' | 'want' | 'investment' | undefined,
         date: Date,
     ) => {
-        const now = new Date();
+        const result = Transaction.create(this.idGenerator.generate(), userId, name, value, type, category, date);
+        if (!result.success) return result;
+        const transaction = result.data;
 
-        const transaction: Transaction = {
-            id: this.idGenerator.generate(),
-            userId,
-            name,
-            value,
-            type,
-            ...(type === 'expense' && category ? { category } : {}),
-            date,
-            createdAt: now,
-            updatedAt: now,
-        };
         await this.transactionRepository.create(transaction);
 
-        return transaction;
+        return { success: true, data: transaction } as const;
     };
 }

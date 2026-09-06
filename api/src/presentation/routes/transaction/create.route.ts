@@ -11,6 +11,7 @@ import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
 import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
 import { TransactionMapper } from '../../mappers/transaction.mapper.js';
+import { unprocessableContentSchema } from '../../schemas/unprocessable-content.schema.js';
 
 type Options = {
     createTransactionUseCase: CreateTransactionUseCase;
@@ -27,27 +28,18 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
         schema: {
             tags: ['Transaction'],
             body: z.object({
-                name: z.string().min(1).max(99),
-                value: z
-                    .number()
-                    .min(0.01)
-                    .refine((val) => {
-                        // We cannot return Number.isInteger(val * 100)
-                        // It doesn't work with some values (ex.: 542.42) due to binary conversions
-                        const str = val.toString();
-                        const decimals = str.split('.')[1];
-                        return !decimals || decimals.length <= 2;
-                    })
-                    .max(999999999.99),
+                name: z.string(),
+                value: z.number(),
                 type: z.enum(['income', 'expense']),
                 category: z.enum(['need', 'want', 'investment']).optional(),
-                date: z.iso.date().transform((value) => new Date(value)),
+                date: z.string().transform((value) => new Date(value)),
             }),
             response: {
                 201: transactionSchema,
                 400: badRequestSchema,
                 401: unauthorizedSchema,
                 413: payloadTooLargeSchema,
+                422: unprocessableContentSchema,
                 429: tooManyRequestsSchema,
                 500: internalServerErrorSchema,
             },
@@ -56,7 +48,7 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
         handler: async (request, reply) => {
             const { name, value, type, category, date } = request.body;
 
-            const transaction = await createTransactionUseCase.execute(
+            const result = await createTransactionUseCase.execute(
                 request.session.userId,
                 name,
                 value,
@@ -64,6 +56,17 @@ export const createTransactionRoute: FastifyPluginAsync<Options> = async (
                 category,
                 date,
             );
+            if (!result.success) {
+                switch (result.code) {
+                    case 'TRANSACTION_NAME_INVALID':
+                    case 'TRANSACTION_VALUE_INVALID':
+                    case 'TRANSACTION_CATEGORY_INVALID':
+                    case 'TRANSACTION_DATE_INVALID':
+                        request.log.warn({ code: result.code }, 'Unprocessable content');
+                        return reply.status(422).send({ code: 'UNPROCESSABLE_CONTENT' });
+                }
+            }
+            const transaction = result.data;
 
             request.log.info({ transactionId: transaction.id }, 'Transaction created');
             return reply.status(201).send(TransactionMapper.toSchema(transaction));
