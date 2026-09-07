@@ -13,6 +13,7 @@ import { payloadTooLargeSchema } from '../../schemas/payload-too-large.schema.js
 import { tooManyRequestsSchema } from '../../schemas/too-many-requests.schema.js';
 import { internalServerErrorSchema } from '../../schemas/internal-server-error.schema.js';
 import { TransactionMapper } from '../../mappers/transaction.mapper.js';
+import { unprocessableContentSchema } from '../../schemas/unprocessable-content.schema.js';
 
 type Options = {
     updateTransactionUseCase: UpdateTransactionUseCase;
@@ -32,21 +33,11 @@ export const updateTransactionByIdRoute: FastifyPluginAsync<Options> = async (
                 id: z.string(),
             }),
             body: z.object({
-                name: z.string().min(1).max(99),
-                value: z
-                    .number()
-                    .min(0.01)
-                    .refine((val) => {
-                        // We cannot return Number.isInteger(val * 100)
-                        // It doesn't work with some values (ex.: 542.42) due to binary conversions
-                        const str = val.toString();
-                        const decimals = str.split('.')[1];
-                        return !decimals || decimals.length <= 2;
-                    })
-                    .max(999999999.99),
+                name: z.string(),
+                value: z.number(),
                 type: z.enum(['income', 'expense']),
                 category: z.enum(['need', 'want', 'investment']).optional(),
-                date: z.iso.date().transform((value) => new Date(value)),
+                date: z.string().transform((value) => new Date(value)),
             }),
             response: {
                 200: transactionSchema,
@@ -55,6 +46,7 @@ export const updateTransactionByIdRoute: FastifyPluginAsync<Options> = async (
                 403: forbiddenSchema,
                 404: transactionNotFoundSchema,
                 413: payloadTooLargeSchema,
+                422: unprocessableContentSchema,
                 429: tooManyRequestsSchema,
                 500: internalServerErrorSchema,
             },
@@ -80,11 +72,18 @@ export const updateTransactionByIdRoute: FastifyPluginAsync<Options> = async (
                     case 'TRANSACTION_NOT_FOUND':
                         request.log.warn({ code: result.code }, 'Not found');
                         return reply.status(404).send({ code: 'TRANSACTION_NOT_FOUND' });
+                    case 'TRANSACTION_NAME_INVALID':
+                    case 'TRANSACTION_VALUE_INVALID':
+                    case 'TRANSACTION_CATEGORY_INVALID':
+                    case 'TRANSACTION_DATE_INVALID':
+                        request.log.warn({ code: result.code }, 'Unprocessable content');
+                        return reply.status(422).send({ code: 'UNPROCESSABLE_CONTENT' });
                 }
             }
+            const transaction = result.data;
 
-            request.log.info({ transactionId: result.data.id }, 'Transaction updated');
-            return reply.status(200).send(TransactionMapper.toSchema(result.data));
+            request.log.info({ transactionId: transaction.id }, 'Transaction updated');
+            return reply.status(200).send(TransactionMapper.toSchema(transaction));
         },
     });
 };
