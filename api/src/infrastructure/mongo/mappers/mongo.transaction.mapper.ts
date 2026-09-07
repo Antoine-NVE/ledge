@@ -1,4 +1,4 @@
-import type { Transaction } from '../../../domain/entities/transaction.js';
+import { Transaction } from '../../../domain/entities/transaction.js';
 import type { MongoTransactionDocument } from '../documents/mongo.transaction.document.js';
 import { ObjectId } from 'mongodb';
 
@@ -15,15 +15,16 @@ export const MongoTransactionMapper = {
         updatedAt: transaction.updatedAt,
     }),
 
-    toEntity: (document: MongoTransactionDocument): Transaction => ({
-        id: document._id.toString(),
-        userId: document.userId.toString(),
-        name: document.name,
-        value: document.value,
-        type: document.type,
-        ...(document.category ? { category: document.category } : {}),
-        date: document.date,
-        createdAt: document.createdAt,
-        updatedAt: document.updatedAt,
-    }),
+    toEntity: (document: MongoTransactionDocument): Transaction =>
+        Transaction.reconstitute(
+            document._id.toString(),
+            document.userId.toString(),
+            document.name,
+            document.value,
+            document.type,
+            document.category,
+            document.date,
+            document.createdAt,
+            document.updatedAt,
+        ),
 };
