@@ -25,6 +25,8 @@ export const readTransactionsRoute: FastifyPluginAsync<Options> = async (
         url: '/transactions',
         schema: {
             tags: ['Transaction'],
+            // Unlike the transaction date in create/update, nothing downstream re-validates
+            // from/to (they never reach the entity), so the strict format check stays here.
             querystring: z.object({
                 from: z.iso
                     .date()
