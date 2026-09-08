@@ -3,7 +3,7 @@ import type { SessionRepository } from '../../domain/repositories/session.reposi
 import type { PasswordHasher } from '../../domain/ports/password-hasher.js';
 import type { IdGenerator } from '../../domain/ports/id-generator.js';
 import type { TokenGenerator } from '../../domain/ports/token-generator.js';
-import type { User } from '../../domain/entities/user.js';
+import { User } from '../../domain/entities/user.js';
 import type { Session } from '../../domain/entities/session.js';
 
 export class RegisterUseCase {
@@ -24,14 +24,10 @@ export class RegisterUseCase {
         const existing = await this.userRepository.findByEmail(email);
         if (existing) return { success: false, code: 'DUPLICATE_EMAIL' } as const;
 
-        const user: User = {
-            id: this.idGenerator.generate(),
-            email,
-            passwordHash: await this.passwordHasher.hash(password),
-            isEmailVerified: false,
-            createdAt: now,
-            updatedAt: now,
-        };
+        const result = await User.register(this.idGenerator.generate(), email, password, this.passwordHasher);
+        if (!result.success) return result;
+        const user = result.data;
+
         await this.userRepository.create(user);
 
         const session: Session = {

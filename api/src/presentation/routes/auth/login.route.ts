@@ -21,8 +21,8 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
         schema: {
             tags: ['Auth'],
             body: z.object({
-                email: z.email(),
-                password: z.string().min(1),
+                email: z.string(),
+                password: z.string(),
             }),
             response: {
                 200: userSchema,
@@ -40,12 +40,11 @@ export const loginRoute: FastifyPluginAsync<Options> = async (app, { loginUseCas
             if (!result.success) {
                 switch (result.code) {
                     case 'USER_NOT_FOUND':
-                    case 'INVALID_PASSWORD':
+                    case 'WRONG_PASSWORD':
                         request.log.warn({ code: result.code }, 'Unauthorized');
                         return reply.status(401).send({ code: 'INVALID_CREDENTIALS' });
                 }
             }
-
             const { user, ...session } = result.data;
 
             reply.setCookie('session_token', session.token, {

@@ -1,6 +1,5 @@
 import type { UserRepository } from '../../domain/repositories/user.repository.js';
 import type { EmailVerificationRepository } from '../../domain/repositories/email-verification.repository.js';
-import type { User } from '../../domain/entities/user.js';
 
 export class VerifyEmailUseCase {
     constructor(
@@ -19,15 +18,7 @@ export class VerifyEmailUseCase {
         if (!user) return { success: false, code: 'USER_NOT_FOUND' } as const;
         if (user.isEmailVerified) return { success: false, code: 'EMAIL_ALREADY_VERIFIED' } as const;
 
-        const updated: User = {
-            id: user.id,
-            email: user.email,
-            passwordHash: user.passwordHash,
-            isEmailVerified: true,
-            createdAt: user.createdAt,
-            updatedAt: now,
-        };
-        await this.userRepository.save(updated);
+        await this.userRepository.save(user.verifyEmail());
 
         await this.emailVerificationRepository.delete(emailVerification);
 
