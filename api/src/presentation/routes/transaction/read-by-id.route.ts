@@ -53,8 +53,9 @@ export const readTransactionByIdRoute: FastifyPluginAsync<Options> = async (
                         return reply.status(404).send({ code: 'TRANSACTION_NOT_FOUND' });
                 }
             }
+            const transaction = result.data;
 
-            return reply.status(200).send(TransactionMapper.toSchema(result.data));
+            return reply.status(200).send(TransactionMapper.toSchema(transaction));
         },
     });
 };

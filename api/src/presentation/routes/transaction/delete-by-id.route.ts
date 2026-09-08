@@ -53,8 +53,9 @@ export const deleteTransactionByIdRoute: FastifyPluginAsync<Options> = async (
                         return reply.status(404).send({ code: 'TRANSACTION_NOT_FOUND' });
                 }
             }
+            const transaction = result.data;
 
-            request.log.info({ transactionId: result.data.id }, 'Transaction deleted');
+            request.log.info({ transactionId: transaction.id }, 'Transaction deleted');
             return reply.status(204).send();
         },
     });

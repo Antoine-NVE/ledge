@@ -37,8 +37,9 @@ export const meRoute: FastifyPluginAsync<Options> = async (app, { getCurrentUser
                         return reply.status(401).send({ code: 'UNAUTHORIZED' });
                 }
             }
+            const user = result.data;
 
-            return reply.status(200).send(UserMapper.toSchema(result.data));
+            return reply.status(200).send(UserMapper.toSchema(user));
         },
     });
 };

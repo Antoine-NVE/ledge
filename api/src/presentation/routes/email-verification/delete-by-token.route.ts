@@ -53,8 +53,12 @@ export const deleteEmailVerificationByTokenRoute: FastifyPluginAsync<Options> = 
                         return reply.status(409).send({ code: 'EMAIL_ALREADY_VERIFIED' });
                 }
             }
+            const emailVerification = result.data;
 
-            request.log.info({ emailVerificationId: result.data.id, userId: result.data.userId }, 'Email verified');
+            request.log.info(
+                { emailVerificationId: emailVerification.id, userId: emailVerification.userId },
+                'Email verified',
+            );
             return reply.status(204).send();
         },
     });
